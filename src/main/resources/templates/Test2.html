@@ -3,14 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="/css/signup.css">
 </head>
 <body>
-    <form action="/Test2" method="post">
-        아이디 : <input type="text" name="userID"> <br>
-        비밀번호 : <input type="password" name="pwd"> <br>
-        이름 : <input type="text" name="userName"> <br>
-        이메일 : <input type="email" name="userEmail"><br>
-        <input type="submit" value="회원가입">
-    </form>
+<div class="container">
+    <header>
+        <div class="logo">BOB</div>
+    </header>
+
+    <div class="signup-container">
+        <div class="signup-box">
+            <form action="/Test2" method="post">
+                <div class="form-group">
+                    <label for="userName"><span class="required">*</span>이름</label>
+                    <input type="text" id="userName">
+                </div>
+
+                <div class="form-group">
+                    <label for="userID"><span class="required">*</span>아이디</label>
+                    <input type="text" id="userID">
+                    <button type="button" id="check-username" style="margin-left: 10px; background-color: #00b050; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">중복확인</button>
+                    <div id="username-message" style="margin-top: 5px; display: block; color: red; font-size: 0.9em;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pwd"><span class="required">*</span>비밀번호</label>
+                    <input type="password" id="pwd">
+                </div>
+
+                <div class="form-group">
+                    <label for="pwd-confirm"><span class="required">*</span>비밀번호 확인</label>
+                    <input type="password" id="pwd-confirm">
+                </div>
+
+                <div class="form-group">
+                    <label for="userEmail">이메일</label>
+                    <input type="text" id="userEmail">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone"><span class="required">*</span>전화번호</label>
+                    <div class="inline-group">
+                        <input type="text" maxlength="3" id="phone1">-
+                        <input type="text" maxlength="4" id="phone2">-
+                        <input type="text" maxlength="4" id="phone3">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="birthdate"><span class="required">*</span>생년월일</label>
+                    <div class="inline-group">
+                        <input type="text" id="birth-year" name="birth-year" required>년
+                        <input type="text" id="birth-month" name="birth-month" required>월
+                        <input type="text" id="birth-day" name="birth-day" required>일
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="gender"><span class="required">*</span>성별</label>
+                    <div>
+                        <label><input type="radio" name="gender" value="male"> 남성</label>
+                        <label style="margin-left: 20px;"><input type="radio" name="gender" value="female"> 여성</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="language"><span class="required">*</span>주언어</label>
+                    <select id="language" name="mainLanguage" multiple size="3">
+                        <option value="" disabled selected>주언어 선택</option>
+                        <option value="java">Java</option>
+                        <option value="clanguage">C언어</option>
+                        <option value="jsp">JSP</option>
+                        <option value="springboot">Springboot</option>
+                        <option value="react">React</option>
+                        <option value="javascript">JavaScript</option>
+                        <option value="html">HTML/CSS</option>
+                        <option value="others">기타</option>
+                    </select>
+                </div>
+                <div id="selected-languages" style="margin-top: 10px; color: #555; margin-left: 120px;"></div>
+
+                <div class="terms">
+                    <h2><span class="required">*</span> 회원 약관 동의</h2>
+                    <div class="terms-content">
+                        <p><b>제1조 (목적)</b></p>
+                        <p>이 약관은 회원이 웹사이트를 이용함에 있어 회사와 회원 간의 권리, 의무 및 책임 사항을 규정하는 것을 목적입니다.</p>
+                        <br>
+                        <p><b>제2조 (회원 가입 및 관리)</b></p>
+                        <p>1. 사용자는 정해진 절차에 따라 회원가입 신청을 완료해야 하며, 회사는 이를 승인한 후 회원 자격을 부여합니다.</p>
+                        <p>2. 회원은 계정 정보를 타인에게 양도하거나 공유할 수 없으며, 비밀번호 관리에 대한 책임은 본인에게 있습니다.</p>
+                        <br>
+                        <p><b>제3조 (서비스 이용)</b></p>
+                        <p>1. 회원은 회사가 제공하는 다양한 여행 정보 교환 서비스를 이용할 수 있습니다.</p>
+                        <p>2. 회사는 기술적 필요에 따라 서비스 이용을 일시 중단할 수 있으며, 이 경우 사전 공지를 합니다.</p>
+                    </div>
+                    <input type="checkbox" id="agree-terms" required>
+                    <label for="agree-terms">이용 약관을 읽었으며, 회원 약관에 동의합니다.</label>
+                </div>
+
+                <div class="terms">
+                    <h2><span class="required">*</span> 개인정보처리방침 동의</h2>
+                    <div class="terms-content">
+                        <p><b>제1조 (수집하는 개인정보 항목)</b></p>
+                        <p>회사는 회원가입, 서비스 제공을 위해 다음과 같은 개인정보를 수집합니다:</p>
+                        <p>·필수 항목: 이름, 이메일 주소, 비밀번호</p>
+                        <p>·선택 항목: 프로필 사진, 거주 지역, 선호 여행지</p>
+                        <br>
+                        <p><b>제2조 (개인정보의 수집 및 이용 목적)</b></p>
+                        <p>수집한 개인정보는 다음의 목적을 위해 사용됩니다:</p>
+                        <p>1. 회원 관리: 계정 생성, 비밀번호 찾기 등</p>
+                        <p>2. 맞춤형 서비스 제공: 개인화된 여행 정보 추천</p>
+                        <p>3. 서비스 운영 및 통계 분석: 서비스 품질 향상 및 사용자 분석</p>
+                        <br>
+                        <p><b>제3조 (개인정보의 보유 및 이용 기간)</b></p>
+                        <p>회원이 탈퇴하거나 개인정보 삭제를 요청하는 경우, 관련 법규에 따라 즉시 삭제됩니다.</p>
+                        <p>단, 관련 법령에 따라 일정 기간 보관해야 하는 정보는 해당 기간 동안 보관됩니다.</p>
+                        <br>
+                        <p><b>제4조 (개인정보의 제3자 제공)</b></p>
+                        <p>회사는 사용자의 동의 없이 제3자에게 개인정보를 제공하지 않습니다.</p>
+                        <p>다만, 법령에 따른 요구가 있을 경우 제공할 수 있습니다.</p>
+                    </div>
+                    <input type="checkbox" id="agree-privacy" required>
+                    <label for="agree-privacy">개인정보처리방침에 동의합니다.</label>
+                </div>
+
+                <button type="submit" class="btn-submit">회원가입</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('check-username').addEventListener('click', function() {
+            const userID = document.getElementById('userID').value;
+
+            if (userID === '') {
+                document.getElementById('username-message').textContent = '아이디를 입력해주세요.';
+                return;
+            }
+
+            // 서버에 아이디 중복 여부를 요청
+            fetch('/check-username?userID=' + encodeURIComponent(userID))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        document.getElementById('username-message').textContent = '이미 가입된 아이디입니다.';
+                        document.getElementById('username-message').style.color = 'red';
+                    } else {
+                        document.getElementById('username-message').textContent = '사용 가능한 아이디입니다.';
+                        document.getElementById('username-message').style.color = 'green';
+                    }
+                })
+                .catch(error => {
+                    console.error('아이디 중복 확인 중 오류 발생:', error);
+                });
+        });
+        //하하.
+        const languageSelect = document.getElementById('language');
+        const selectedLanguagesDisplay = document.getElementById('selected-languages');
+
+        // 다중 선택을 위한 클릭 이벤트
+        languageSelect.addEventListener('click', function() {
+            const selectedOptions = Array.from(languageSelect.options).filter(option => option.selected);
+            const selectedLanguages = selectedOptions.map(option => option.text);
+
+            // 선택된 언어를 표시
+            if (selectedLanguages.length > 0) {
+                selectedLanguagesDisplay.textContent = `선택된 주언어: ${selectedLanguages.join(', ')}`;
+            } else {
+                selectedLanguagesDisplay.textContent = '선택된 주언어가 없습니다.';
+            }
+        });
+
+        // 폼 제출 전에 전화번호 및 생년월일을 하나의 필드로 합쳐서 저장
+        document.querySelector('form').addEventListener('submit', function(event) {
+            event.preventDefault(); // 기본 제출 방지
+
+            // 전화번호 합치기
+            var phone = document.getElementById('phone1').value + '-' + document.getElementById('phone2').value + '-' + document.getElementById('phone3').value;
+
+            // 생년월일 합치기
+            var birthdate = document.getElementById('birth-year').value + '-' + document.getElementById('birth-month').value + '-' + document.getElementById('birth-day').value;
+
+            // hidden 필드나 다른 방식으로 값 전달
+            document.getElementById('userPhone').value = phone;
+            document.getElementById('userBirthday').value = birthdate;
+
+            // 실제 폼 제출
+            this.submit();
+        });
+    </script>
+
+    <!-- 숨겨진 필드 -->
+    <input type="hidden" id="userPhone" name="userPhone">
+    <input type="hidden" id="userBirthday" name="userBirthday">
+</div>
 </body>
 </html>
