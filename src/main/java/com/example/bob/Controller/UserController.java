@@ -24,10 +24,10 @@ public class UserController {
     private UserRepository userRepository; // 사용자 정보를 조회하는 Repository
 
     @GetMapping("/check-username")
-    public ResponseEntity<Map<String, Object>> checkUsername(@RequestParam String userIdLogin) {
-        System.out.println("Received userID: " + userIdLogin);  // 사용자 아이디 로그
+    public ResponseEntity<Map<String, Object>> checkUsername(@RequestParam String user_id_login) {
+        System.out.println("Received userID: " + user_id_login);  // 사용자 아이디 로그
         Map<String, Object> response = new HashMap<>();
-        boolean exists = userRepository.existsById(userIdLogin); // userID가 이미 존재하는지 확인
+        boolean exists = userRepository.existsById(user_id_login); // userID가 이미 존재하는지 확인
         System.out.println("User exists: " + exists);  // 결과 로그
         response.put("exists", exists);
         return ResponseEntity.ok(response);
@@ -46,5 +46,25 @@ public class UserController {
         userService.save(userDTO);
 
         return "redirect:/login";
+    }
+
+    @GetMapping("/login")
+    public String login() { return "login"; }
+    
+    @PostMapping("/login")
+    public String login(@RequestParam String username, @RequestParam String password) {
+        // 여기서 로그인 처리 로직을 작성합니다.
+        // 예: 사용자의 아이디와 비밀번호를 확인하고 세션을 생성하거나 리다이렉트를 처리합니다.
+
+        if (isValidUser(username, password)) {
+            return "redirect:/home"; // 로그인 성공 시 홈 화면으로 이동
+        } else {
+            return "redirect:/login"; // 로그인 실패 시 다시 로그인 페이지로 리다이렉트
+        }
+    }
+
+    private boolean isValidUser(String username, String password) {
+        // 실제 사용자 인증 로직을 구현
+        return "user".equals(username) && "password".equals(password);
     }
 }
