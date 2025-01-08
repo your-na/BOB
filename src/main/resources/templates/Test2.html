@@ -53,17 +53,20 @@
                 <div class="form-group">
                     <label for="birth-year"><span class="required">*</span>생년월일</label>
                     <div class="inline-group">
-                        <input type="text" id="birth-year" >년
-                        <input type="text" id="birth-month" >월
-                        <input type="text" id="birth-day" >일
+                        <input type="text" id="birth-year" maxlength="4">년
+                        <input type="text" id="birth-month" maxlength="2">월
+                        <input type="text" id="birth-day" maxlength="2">일
                     </div>
+                    <!-- hidden 필드로 값 전송 -->
+                    <input type="hidden" id="userPhone" name="user_phone">
+                    <input type="hidden" id="birthday" name="birthday">
                 </div>
 
                 <div class="form-group">
                     <label for="male"><span class="required">*</span>성별</label>
                     <div>
-                        <label><input type="radio" name="sex" value="male" id="male"> 남성</label>
-                        <label style="margin-left: 20px;"><input type="radio" name="sex" value="female" id="female"> 여성</label>
+                        <label><input type="radio" name="sex" value="M" id="male"> 남성</label>
+                        <label style="margin-left: 20px;"><input type="radio" name="sex" value="F" id="female"> 여성</label>
                     </div>
                 </div>
 
@@ -138,23 +141,35 @@
 
             if (userIdLogin === '') {
                 document.getElementById('username-message').textContent = '아이디를 입력해주세요.';
+                document.getElementById('username-message').style.color = 'red';  // 색상 추가
                 return;
             }
+
+            // 버튼 비활성화 (중복 클릭 방지)
+            const checkButton = document.getElementById('check-username');
+            checkButton.disabled = true;
 
             // 서버에 아이디 중복 여부를 요청
             fetch('/check-username?userIdLogin=' + encodeURIComponent(userIdLogin))
                 .then(response => response.json())
                 .then(data => {
+                    const messageElement = document.getElementById('username-message');
                     if (data.exists) {
-                        document.getElementById('username-message').textContent = '이미 가입된 아이디입니다.';
-                        document.getElementById('username-message').style.color = 'red';
+                        messageElement.textContent = '이미 가입된 아이디입니다.';
+                        messageElement.style.color = 'red';
                     } else {
-                        document.getElementById('username-message').textContent = '사용 가능한 아이디입니다.';
-                        document.getElementById('username-message').style.color = 'green';
+                        messageElement.textContent = '사용 가능한 아이디입니다.';
+                        messageElement.style.color = 'green';
                     }
                 })
                 .catch(error => {
                     console.error('아이디 중복 확인 중 오류 발생:', error);
+                    document.getElementById('username-message').textContent = '서버 오류. 다시 시도해 주세요.';
+                    document.getElementById('username-message').style.color = 'red';
+                })
+                .finally(() => {
+                    // 요청이 끝난 후 버튼 활성화
+                    checkButton.disabled = false;
                 });
         });
         //하하.
@@ -174,7 +189,6 @@
             }
         });
 
-        // 폼 제출 전에 전화번호 및 생년월일을 하나의 필드로 합쳐서 저장
         document.querySelector('form').addEventListener('submit', function(event) {
             event.preventDefault(); // 기본 제출 방지
 
@@ -184,18 +198,14 @@
             // 생년월일 합치기
             const birthdate = document.getElementById('birth-year').value + '-' + document.getElementById('birth-month').value + '-' + document.getElementById('birth-day').value;
 
-            // hidden 필드나 다른 방식으로 값 전달
+            // hidden 필드에 값 설정
             document.getElementById('userPhone').value = phone;
-            document.getElementById('userBirthday').value = birthdate;
+            document.getElementById('birthday').value = birthdate;
 
             // 실제 폼 제출
             this.submit();
         });
     </script>
-
-    <!-- 숨겨진 필드 -->
-    <input type="hidden" id="userPhone" name="userPhone">
-    <input type="hidden" id="userBirthday" name="birthday">
 </div>
 </body>
 </html>
