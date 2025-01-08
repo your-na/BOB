@@ -13,7 +13,7 @@ public class UserDTO {
 
     // 이름 아이디 비밀번호 이메일 전화번호 성별 주언어 생년월일
     private String userName;        // 이름
-    private String userID;          // 아이디
+    private String userIdLogin;          // 아이디
     private String pwd;             // 비밀번호
     private String userEmail;       // 이메일
     private String userPhone;       // 전화번호
@@ -26,7 +26,7 @@ public class UserDTO {
         UserDTO userDTO = new UserDTO();
 
         userDTO.setUserName(userEntity.getUserName());
-        userDTO.setUserID(userEntity.getUserID());
+        userDTO.setUserIdLogin(userEntity.getUserIdLogin());
         userDTO.setPwd(userEntity.getPwd());
         userDTO.setUserEmail(userEntity.getUserEmail());
         userDTO.setUserPhone(userEntity.getUserPhone());

@@ -24,10 +24,10 @@ public class UserController {
     private UserRepository userRepository; // 사용자 정보를 조회하는 Repository
 
     @GetMapping("/check-username")
-    public ResponseEntity<Map<String, Object>> checkUsername(@RequestParam String userID) {
-        System.out.println("Received userID: " + userID);  // 사용자 아이디 로그
+    public ResponseEntity<Map<String, Object>> checkUsername(@RequestParam String userIdLogin) {
+        System.out.println("Received userID: " + userIdLogin);  // 사용자 아이디 로그
         Map<String, Object> response = new HashMap<>();
-        boolean exists = userRepository.existsById(userID); // userID가 이미 존재하는지 확인
+        boolean exists = userRepository.existsById(userIdLogin); // userID가 이미 존재하는지 확인
         System.out.println("User exists: " + exists);  // 결과 로그
         response.put("exists", exists);
         return ResponseEntity.ok(response);

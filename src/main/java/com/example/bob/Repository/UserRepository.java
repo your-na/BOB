@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository //객체타입, PK타입
 public interface UserRepository extends JpaRepository<UserEntity, String> {
-    boolean existsById(String userID); // 아이디 중복 체크
+    boolean existsById(String userIdLogin); // 아이디 중복 체크
 
 }

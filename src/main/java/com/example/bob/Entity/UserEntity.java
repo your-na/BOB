@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Getter
@@ -14,14 +13,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @NoArgsConstructor
 @Table(name = "user")
 public class UserEntity {
-    //값 1씩 증가
-    //@GeneratedValue(strategy = GenerationType.IDENTITY);
+
+    @Id // PK
+    @GeneratedValue(strategy = GenerationType.IDENTITY) //자동 증가 id
+    private Long userId;
+
+    @Column(length = 100, unique = true) // 아이디는 유일한 값이므로 unique 제약 추가
+    private String userIdLogin;
 
     @Column(length = 100)
     private String userName;
-
-    @Id //PK
-    private String userID;
 
     @Column(length = 100)
     private String pwd;
@@ -29,28 +30,29 @@ public class UserEntity {
     @Column(length = 100)
     private String userEmail;
 
-    @Column(length = 14)
+    @Column(length = 100)
     private String userPhone;
 
-    @Column(length = 2)
-    private String Sex;
+    @Column(length = 100)
+    private String sex;
 
     @Column(length = 100)
     private String MainLanguage;
 
-    @Column(length = 8)
+    @Column(length = 100)
     private String Birthday;
 
     @Builder
     public static UserEntity toUserEntity(UserDTO userDTO) {
         UserEntity userEntity = new UserEntity();
 
-        userEntity.userID = userDTO.getUserID();
-        userEntity.pwd = userDTO.getPwd();
+        // userID는 자동으로 설정되므로 DTO에서 받아오지 않습니다.
         userEntity.userName = userDTO.getUserName();
+        userEntity.userIdLogin = userDTO.getUserIdLogin();
+        userEntity.pwd = userDTO.getPwd();
         userEntity.userEmail = userDTO.getUserEmail();
         userEntity.userPhone = userDTO.getUserPhone();
-        userEntity.Sex = userDTO.getSex();
+        userEntity.sex = userDTO.getSex();
         userEntity.MainLanguage = userDTO.getMainLanguage();
         userEntity.Birthday = userDTO.getBirthday();
 
