@@ -20,7 +20,7 @@ public class UserDTO {
     private String sex;             // 성별
     private String mainLanguage;    // 주 언어
     private String birthday;        // 생년월일
-
+    private String userNick;
 
     public static UserDTO toUserDTO(UserEntity userEntity) {
         UserDTO userDTO = new UserDTO();
@@ -33,6 +33,7 @@ public class UserDTO {
         userDTO.setSex(userEntity.getSex());
         userDTO.setMainLanguage(userEntity.getMainLanguage());
         userDTO.setBirthday(userEntity.getBirthday());
+        userDTO.setUserNick(userEntity.getUserNick());
 
         return userDTO;
     }
