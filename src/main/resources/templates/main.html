@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOB 메인 페이지</title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<!-- 메인 배너 -->
+<section class="main-banner">
+    <img src="/images/banner.png" alt="배너 이미지" class="banner-image">
+</section>
+
+<!-- 콘텐츠 섹션 -->
+<section class="content-container">
+    <!-- 미니 프로젝트 -->
+    <div class="content-section">
+        <div class="content-section-header">
+            <h2>미니 프로젝트</h2>
+            <p>더보기 ></p>
+        </div>
+        <div class="card latest-competitions">
+            <ul>
+                <li><img src="/images/banner.png" alt=""><a href="#">최신 공모전 1을 길게 쑤면 어뜨케 되려낭 ㅇ=에이비비씨기디이</a></li>
+                <li><img src="/images/banner.png" alt=""><a href="#">최신 공모전 2</a></li>
+                <li><img src="/images/banner.png" alt=""><a href="#">최신 공모전 3</a></li>
+                <li><img src="/images/banner.png" alt=""><a href="#">최신 공모전 4</a></li>
+                <li><img src="/images/banner.png" alt=""><a href="#">최신 공모전 5</a></li>
+            </ul>
+        </div>
+    </div>
+    <!-- 최신 공모전 -->
+    <div class="content-section">
+        <div class="content-section-header">
+            <h2>최신 공모전</h2>
+            <p>더보기 ></p>
+        </div>
+        <div class="card popular-competitions">
+            <div class="poster-grid">
+                <img src="/images/banner.png" alt="인기 공모전 포스터 넣">
+                <img src="/images/poster10.png" alt="인기 공모전 포스터 어">
+                <img src="/images/poster11.png" alt="인기 공모전 포스터 야">
+                <img src="/images/poster12.png" alt="인기 공모전 포스터 함">
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="extra-content">
+    <div class="board">
+        <div class="board-header">
+            <h3>팀원 모집글</h3>
+        </div>
+        <div class="hot-section">
+            <span class="hot-badge">HOT</span>
+            <p>핫게시물은 최상단에 순차적으로</p>
+        </div>
+        <ul>
+            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
+            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
+            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
+            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
+            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
+        </ul>
+    </div>
+    <div class="board">
+        <div class="board-header">
+            <h3>자유 게시판</h3>
+        </div>
+        <div class="hot-section">
+            <span class="hot-badge">HOT</span>
+            <p>핫게시물은 최상단에 순차적으로</p>
+        </div>
+        <ul>
+            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
+            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
+            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
+            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
+            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
+        </ul>
+    </div>
+    <div class="poster">
+        <img src="/images/banner.png" alt="포스터 이미지">
+    </div>
+</section>
+
+
+
+<!-- 플로팅 캘린더 버튼 -->
+<button class="floating-calendar" onclick="openCalendarPopup()"><img src="schedule.png" alt=""></button>
+
+<!-- 푸터 -->
+<footer class="footer">
+    <p>© 2024 BOB. All rights reserved.</p>
+</footer>
+
+<script>
+    // 팝업 열기 함수
+    function openCalendarPopup() {
+        const popup = document.getElementById("calendarPopup");
+        if (popup) {
+            popup.style.display = "block";
+        }
+    }
+
+    // 팝업 닫기 함수
+    function closeCalendarPopup() {
+        const popup = document.getElementById("calendarPopup");
+        if (popup) {
+            popup.style.display = "none";
+        }
+    }
+
+    // 팝업 동적 로드
+    document.addEventListener("DOMContentLoaded", () => {
+        fetch("calendarpopup.html")
+            .then(response => response.text())
+            .then(data => {
+                // 동적으로 HTML 삽입
+                document.getElementById("calendar-container").innerHTML = data;
+
+                // 닫기 버튼 이벤트 추가
+                const closeBtn = document.getElementById("closePopup");
+                if (closeBtn) {
+                    closeBtn.addEventListener("click", closeCalendarPopup);
+                }
+
+                // 팝업 외부 클릭 시 닫기
+                window.addEventListener("click", (event) => {
+                    const popup = document.getElementById("calendarPopup");
+                    if (event.target === popup) {
+                        closeCalendarPopup();
+                    }
+                });
+            })
+            .catch(error => console.error("Failed to load calendar popup:", error));
+    });
+</script>
+</body>
+</html>

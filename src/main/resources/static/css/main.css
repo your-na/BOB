@@ -1,0 +1,255 @@
+/* 메인 배너 */
+.main-banner {
+    position: relative;
+    text-align: center;
+    margin: 0 -12.5%;
+}
+
+.banner-image {
+    width: 100%;
+    height: 420px;
+}
+
+/* 콘텐츠 섹션 */
+.content-container {
+    display: flex;
+    flex-direction: row; /* 가로 배치 */
+    gap: 30px; /* 섹션 간 간격 */
+    padding: 20px;
+    justify-content: space-between; /* 섹션 간의 간격을 균등하게 */
+    margin: 0 10%;
+}
+
+/* 각 섹션 */
+.content-section {
+    width: 100%;
+    max-width: 43%; /* 두 섹션이 가로로 배치되므로 각 섹션의 너비를 조정 */
+}
+
+.content-section h2 {
+    margin-bottom: 15px;
+    color: #19CB13;
+    text-align: left;
+    font-size: 1.8rem;
+}
+
+.content-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* 헤더 요소 간의 간격을 균등하게 */
+    margin-bottom: 15px;
+}
+
+.content-section-header p {
+    font-size: 14px;
+    color: #666;
+    margin: 0; /* 기본 여백 제거 */
+    margin-left: auto; /* 오른쪽으로 밀기 */
+    cursor: pointer; /* 클릭 가능한 느낌을 주기 위해 포인터 적용 */
+}
+
+/* 카드 섹션 */
+.card {
+    padding: 20px;
+    border: 3px solid #19CB13;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 카드 제목 */
+.card h2 {
+    margin-top: 0;
+    color: #19CB13;
+    font-size: 1.5rem;
+}
+
+/* 최신 공모전 리스트 */
+.card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.card ul li {
+    display: flex; /* 이미지와 텍스트를 양옆으로 배치 */
+    align-items: flex-start; /* 텍스트를 이미지 상단에 정렬 */
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd; /* 리스트 항목 사이 구분선 */
+    padding: 10px 0;
+}
+
+.card li img {
+    width: 120px;
+    height: 70px;
+    border-radius: 15px;
+    object-fit: cover;
+    margin-right: 10px; /* 이미지와 텍스트 간 간격 */
+}
+
+.card ul li a {
+    text-decoration: none;
+    color: black;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+    line-height: 1.2; /* 텍스트의 줄 간격 */
+    margin-top: 3px; /* a 태그를 위로 5px 이동 */
+    display: inline-block;
+}
+
+.card ul li a:hover {
+    color: #19CB13; /* 호버 시 텍스트 색상 변경 */
+}
+
+
+.poster-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 50%); /* 2개의 열로 고정 */
+    height: 503px;
+    gap: 15px;
+    justify-items: center;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+}
+
+.poster-grid img {
+    width: 100%;
+    height: 260px; /* 고정된 높이 설정 */
+    object-fit: cover; /* 이미지를 비율에 맞게 잘라서 채움 */
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.poster-grid img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* 추가 콘텐츠 */
+.extra-content {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    background-color: #ffffff;
+    margin: 0 auto; /* 가운데 정렬 */
+    width: 80%; /* 전체 너비의 80% 사용 */
+}
+
+/* 게시판 스타일 */
+.board {
+    flex: 1;
+    border: none;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* 내용이 박스 바깥으로 나가는 것을 방지 */
+    position: relative; /* 내부 요소 배치를 위한 상대 위치 */
+}
+
+/* 게시판 제목과 초록색 상단 줄 */
+.board h3 {
+    font-size: 18px;
+    color: #19CB13;
+    margin: 0;
+    padding: 10px;
+    text-align: left;
+    border-radius: 10px 10px 0 0; /* 상단 테두리 둥글게 */
+}
+
+.board-header {
+    border-bottom: 5px solid #19CB13; /* 제목 아래 굵은 초록색 줄 */
+    margin-bottom: 10px;
+}
+
+/* HOT 배지와 설명 텍스트 */
+.hot-section {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.hot-badge {
+    background-color: #19CB13;
+    color: #fff;
+    border-radius: 12px;
+    font-size: 12px;
+    padding: 2px 10px;
+    margin-right: 8px; /* 텍스트와의 간격 */
+    display: inline-block;
+}
+
+.board p {
+    font-size: 14px;
+    color: #666;
+    margin: 0; /* 불필요한 여백 제거 */
+    display: inline-block; /* 같은 줄에 표시 */
+}
+
+/* 리스트 항목 스타일 */
+.board ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.board ul li {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd; /* 리스트 항목 사이 구분선 */
+}
+
+.board ul li:last-child {
+    border-bottom: none; /* 마지막 항목의 구분선 제거 */
+}
+
+.board ul li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    transition: color 0.2s ease-in-out; /* 부드러운 색상 전환 효과 */
+}
+
+.board ul li a:hover {
+    text-decoration: underline;
+    color: #19CB13; /* 마우스 오버 시 초록색 강조 */
+}
+
+.poster img {
+    width: 240px;
+    height: 350px; /* 고정된 높이 설정 */
+    object-fit: cover; /* 이미지를 비율에 맞게 잘라서 채움 */
+    border-radius: 5px;
+}
+
+/* 플로팅 버튼 */
+.floating-calendar {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #19CB13;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.floating-calendar img{
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    align-items: center;
+}
+/* 푸터 */
+.footer {
+    text-align: center;
+    padding: 10px 0;
+    margin: 0 -12.5%;
+    background-color: #f9f9f9;
+    border-top: 1px solid #ddd;
+}

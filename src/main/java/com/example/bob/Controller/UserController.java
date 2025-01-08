@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -67,4 +68,8 @@ public class UserController {
         // 실제 사용자 인증 로직을 구현
         return "user".equals(username) && "password".equals(password);
     }
+
+    //잠시 html 보기 위해 설정
+    @GetMapping("/main")
+    public String mainPage(Model model) { return "main";}
 }

@@ -1,15 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>header</title>
-    <link rel="stylesheet" href="/css/header.css">
+    <head>
+        <link rel="stylesheet" th:href="@{/css/header.css}">
+    </head>
+
 </head>
-<body>
+<header>
 <nav class="navigator">
     <div class="nav-left">
-        <h3 class="site-name"><a href="header.html">BOB</a></h3>
+        <h3 class="site-name"><a href="/main">BOB</a></h3>
         <ul class="nav-list">
             <li class="nav-item">
                 <a href="#" class="nav-menu">공모전</a>
@@ -98,5 +96,5 @@
         });
     });
 </script>
-</body>
-</html>
+</header>
+
