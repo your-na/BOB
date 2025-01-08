@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 정보 관리</title>
+    <link rel="stylesheet" href="profile.css">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+<header>
+    <a href="my-info.html" class="active">내 정보</a>
+    <a href="career.html">경력 관리</a>
+</header>
+
+<div class="container">
+    <div class="profile">
+        <div class="profile-pic" th:each="image : ${images}">
+            <img src="profile.png" alt="profile" id="profileimg">
+            <input type="file" name="files" id="files" multiple style="display: none;" accept="image/*">
+            <label for="files">
+                <div class="edit-icon">
+                    <img src="pencil.png" alt="edit">
+                </div>
+            </label>
+        </div>
+        <form>
+            <label for="nickname">닉네임</label>
+            <input type="text" id="nickname" name="nickname">
+
+            <label for="name">이름</label>
+            <input type="text" id="name" name="name">
+
+            <label for="username">아이디</label>
+            <input type="text" id="username" name="username">
+
+            <label for="email">이메일</label>
+            <input type="email" id="email" name="email">
+        </form>
+    </div>
+
+    <form>
+        <label>주언어</label>
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="language" value="JAVA"> JAVA</label>
+            <label><input type="checkbox" name="language" value="C언어"> C언어</label>
+            <label><input type="checkbox" name="language" value="JSP"> JSP</label>
+            <label><input type="checkbox" name="language" value="Springboot"> Springboot</label>
+            <label><input type="checkbox" name="language" value="React"> React</label>
+            <label><input type="checkbox" name="language" value="JavaScript"> JavaScript</label>
+            <label><input type="checkbox" name="language" value="HTML/CSS"> HTML/CSS</label>
+            <label><input type="checkbox" name="language" value="기타"> 기타</label>
+        </div>
+
+        <label for="bio" id="intro">소개글</label>
+        <textarea id="bio" name="bio"></textarea>
+
+        <label for="sex" id="sex">성별</label>
+        <div class="checkbox-group">
+            <label><input type="radio" name="sex" value="M"> 남성</label>
+            <label><input type="radio" name="sex" value="F"> 여성</label>
+        </div>
+    </form>
+</div>
+
+<div class="actions">
+    <button class="save">수정</button>
+    <button class="cancel">취소</button>
+</div>
+</body>
+</html>
