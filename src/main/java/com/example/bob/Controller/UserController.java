@@ -27,7 +27,7 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> checkUsername(@RequestParam String user_id_login) {
         System.out.println("Received userID: " + user_id_login);  // 사용자 아이디 로그
         Map<String, Object> response = new HashMap<>();
-        boolean exists = userRepository.existsById(user_id_login); // userID가 이미 존재하는지 확인
+        boolean exists = userRepository.existsByUserIdLogin(user_id_login); // userID가 이미 존재하는지 확인
         System.out.println("User exists: " + exists);  // 결과 로그
         response.put("exists", exists);
         return ResponseEntity.ok(response);
