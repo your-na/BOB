@@ -1,6 +1,7 @@
 package com.example.bob.Controller;
 
 import com.example.bob.DTO.UserDTO;
+import com.example.bob.Entity.UserEntity;
 import com.example.bob.Repository.UserRepository;
 import com.example.bob.Service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,11 @@ public class UserController {
     @Autowired
     private UserRepository userRepository; // 사용자 정보를 조회하는 Repository
 
+    @GetMapping("/")
+    public String redirectToMain(){
+        return "redirect:/main";
+    }
+
     @GetMapping("/check-username")
     public ResponseEntity<Map<String, Object>> checkUsername(@RequestParam String user_id_login) {
         System.out.println("Received userID: " + user_id_login);  // 사용자 아이디 로그
@@ -35,16 +41,27 @@ public class UserController {
     }
 
     //회원가입 페이지 출력 요청 (PostMapping에서 form에 대한 action 수행)
-    @GetMapping("/Test2")
+    @GetMapping("/signup")
     public String saveForm(){
-        return "Test2";
+        return "signup";
     }
 
-    @PostMapping("/Test2")
-    public String join(@ModelAttribute UserDTO userDTO){
-        System.out.println("UserController.save");
-        System.out.println("userDTO = " + userDTO);
-        userService.save(userDTO);
+    @PostMapping("/signup")
+    public String join( @RequestParam String phone1,
+                        @RequestParam String phone2,
+                        @RequestParam String phone3,
+                        @ModelAttribute UserDTO userDTO){
+
+        // phone1, phone2, phone3를 합쳐서 userPhone에 연결
+        String userPhone = phone1 + "-" + phone2 + "-" + phone3;
+        userDTO.setUserPhone(userPhone);
+
+        //디버깅 메세지
+        //System.out.println("UserController.save");
+        //System.out.println("userDTO = " + userDTO);
+
+        UserEntity userEntity = UserEntity.toUserEntity(userDTO);
+        userRepository.save(userEntity);
 
         return "redirect:/login";
     }
@@ -71,5 +88,7 @@ public class UserController {
 
     //잠시 html 보기 위해 설정
     @GetMapping("/main")
-    public String mainPage(Model model) { return "main";}
+    public String mainPage(Model model) {
+        return "main";
+    }
 }
