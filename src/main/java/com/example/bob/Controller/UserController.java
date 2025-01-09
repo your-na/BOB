@@ -42,21 +42,9 @@ public class UserController {
     }
 
     //회원가입 페이지 출력 요청 (PostMapping에서 form에 대한 action 수행)
-<<<<<<< HEAD
     @GetMapping("/Test2")
     public String saveForm() {
         return "Test2";
-    }
-
-    @PostMapping("/Test2")
-    public String join(@ModelAttribute UserDTO userDTO) {
-        System.out.println("UserController.save");
-        System.out.println("userDTO = " + userDTO);
-        userService.save(userDTO);
-=======
-    @GetMapping("/signup")
-    public String saveForm(){
-        return "signup";
     }
 
     @PostMapping("/signup")
@@ -75,7 +63,6 @@ public class UserController {
 
         UserEntity userEntity = UserEntity.toUserEntity(userDTO);
         userRepository.save(userEntity);
->>>>>>> origin/main
 
         return "redirect:/login";
     }
@@ -107,11 +94,8 @@ public class UserController {
     public String mainPage(Model model) {
         return "main";
     }
-<<<<<<< HEAD
 
     @GetMapping("/header")
     public String headerPage(Model model) {return "header";}
 }
-=======
-}
->>>>>>> origin/main
+
