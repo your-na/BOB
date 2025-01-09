@@ -41,6 +41,17 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/check-nickname")
+    public ResponseEntity<Map<String, Object>> checkUserNick(@RequestParam String user_nick) {
+        System.out.println("Received nickname: " + user_nick); // 닉네임 로그
+        Map<String, Object> response = new HashMap<>();
+        boolean exists = userRepository.existsByUserNick(user_nick); // 닉네임 중복 확인
+        System.out.println("Nickname exists: " + exists);  // 결과 로그
+        response.put("exists", exists);
+        return ResponseEntity.ok(response);
+    }
+
+
     //회원가입 페이지 출력 요청 (PostMapping에서 form에 대한 action 수행)
     @GetMapping("/signup")
     public String saveForm() {

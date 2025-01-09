@@ -12,4 +12,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     // 로그인
     Optional<UserEntity> findByUserIdLogin(String userIdLogin); // 로그인 아이디로 사용자 조회
+
+    boolean existsByUserNick(String userNick);
 }
