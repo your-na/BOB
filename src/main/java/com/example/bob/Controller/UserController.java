@@ -20,6 +20,7 @@ import java.util.Map;
 @Controller
 @RequiredArgsConstructor
 public class UserController {
+    @Autowired
     private final UserService userService;
 
     @Autowired

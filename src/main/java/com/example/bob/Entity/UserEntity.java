@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Entity
 @Getter
@@ -44,6 +45,12 @@ public class UserEntity {
 
     @Column(length = 100)
     private String Birthday;
+
+    // 비밀번호 암호화
+    @PrePersist
+    public void encryptPassword() {
+        this.pwd = new BCryptPasswordEncoder().encode(this.pwd);
+    }
 
     @Builder
     public static UserEntity toUserEntity(UserDTO userDTO) {
