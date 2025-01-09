@@ -13,7 +13,7 @@
 
     <div class="signup-container">
         <div class="signup-box">
-            <form action="/Test2" method="post">
+            <form action="/signup" method="post">
                 <div class="form-group">
                     <label for="userNick"><span class="required">*</span>닉네임</label>
                     <input type="text" id="userNick" name="userNick" Required>
@@ -212,20 +212,27 @@
         });
 
         document.querySelector('form').addEventListener('submit', function(event) {
-            event.preventDefault(); // 기본 제출 방지
 
-            // 전화번호 합치기
-            const phone = document.getElementById('phone1').value + '-' + document.getElementById('phone2').value + '-' + document.getElementById('phone3').value;
+            const userIdLogin = document.getElementById('userIdLogin').value;
+            const messageElemente = document.getElementById('username-message').value;
+            const signupButton = document.getElementById('signup-button');
 
-            // 생년월일 합치기
-            const birthdate = document.getElementById('birth-year').value + '-' + document.getElementById('birth-month').value + '-' + document.getElementById('birth-day').value;
+            // 중복 확인이 되지 않은 상태에서 회원가입 버튼을 눌렀을 때
+            if (userIdLogin !== '' && messageElement.textContent === ''){
+                // 중복 확인을 하지 않은 상태에서 회원가입을 시도한 경우
+                event.preventDefault(); //폼 제출 방지
+                alert('아이디 중복 확인을 해주세요.');
+                document.getElementById('userIdLogin').focus(); //아이디 입력 필드로 포커스 이동
+            }else {
+                // 아이디 중복이 없으면 폼을 정상적으로 제출
+                const birthdate = document.getElementById('birth-year').value + '-' + document.getElementById('birth-month').value + '-' + document.getElementById('birth-day').value;
 
-            // hidden 필드에 값 설정
-            document.getElementById('userPhone').value = phone;
-            document.getElementById('birthday').value = birthdate;
+                // hidden 필드에 값 설정
+                document.getElementById('birthday').value = birthdate;
 
-            // 실제 폼 제출
-            this.submit();
+                // 실제 폼 제출
+                this.submit();
+            }
         });
     </script>
 </div>
