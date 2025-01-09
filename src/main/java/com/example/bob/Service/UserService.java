@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -18,6 +21,10 @@ public class UserService {
 
     // 회원가입 처리
     public void save(UserDTO userDTO) {
+        if (userRepository.findByUserIdLogin(userDTO.getUserIdLogin()).isPresent()){
+            throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
+        }
+
         // 비밀번호 암호화
         userDTO.setPwd(passwordEncoder.encode(userDTO.getPwd()));
 
@@ -33,9 +40,14 @@ public class UserService {
         Optional<UserEntity> userOpt = userRepository.findByUserIdLogin(userIdLogin);
         if (userOpt.isPresent()) {
             UserEntity user = userOpt.get();
+            boolean matches = passwordEncoder.matches(password, user.getPwd());
+            if (!matches){
+                log.warn("비밀번호 불일치: {}", userIdLogin);
+            }
             // 비밀번호 확인
-            return passwordEncoder.matches(password, user.getPwd());
+            return matches;
         }
+        log.warn("존재하지 않는 사용자: {}", userIdLogin);
         return false;
     }
 }

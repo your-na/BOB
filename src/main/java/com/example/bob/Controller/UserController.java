@@ -42,9 +42,9 @@ public class UserController {
     }
 
     //회원가입 페이지 출력 요청 (PostMapping에서 form에 대한 action 수행)
-    @GetMapping("/Test2")
+    @GetMapping("/signup")
     public String saveForm() {
-        return "Test2";
+        return "signup";
     }
 
     @PostMapping("/signup")

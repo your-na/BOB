@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository //객체타입, PK타입
-public interface UserRepository extends JpaRepository<UserEntity, String> {
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
     // 회원가입
     boolean existsByUserIdLogin(String userIdLogin); // 아이디 중복 체크
 
