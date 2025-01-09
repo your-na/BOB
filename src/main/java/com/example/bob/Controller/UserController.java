@@ -36,12 +36,12 @@ public class UserController {
 
     //회원가입 페이지 출력 요청 (PostMapping에서 form에 대한 action 수행)
     @GetMapping("/Test2")
-    public String saveForm(){
+    public String saveForm() {
         return "Test2";
     }
 
     @PostMapping("/Test2")
-    public String join(@ModelAttribute UserDTO userDTO){
+    public String join(@ModelAttribute UserDTO userDTO) {
         System.out.println("UserController.save");
         System.out.println("userDTO = " + userDTO);
         userService.save(userDTO);
@@ -50,8 +50,10 @@ public class UserController {
     }
 
     @GetMapping("/login")
-    public String login() { return "login"; }
-    
+    public String login() {
+        return "login";
+    }
+
     @PostMapping("/login")
     public String login(@RequestParam String username, @RequestParam String password) {
         // 여기서 로그인 처리 로직을 작성합니다.
@@ -71,5 +73,10 @@ public class UserController {
 
     //잠시 html 보기 위해 설정
     @GetMapping("/main")
-    public String mainPage(Model model) { return "main";}
+    public String mainPage(Model model) {
+        return "main";
+    }
+
+    @GetMapping("/header")
+    public String headerPage(Model model) {return "header";}
 }
