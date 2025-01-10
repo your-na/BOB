@@ -68,12 +68,14 @@ body {
     display: flex;
     align-items: center; /* 수직 정렬 */
     gap: 20px; /* site-name과 nav-list 간의 간격 */
+    margin: 0 10%;
 }
 
 .nav-right {
     display: flex;
     align-items: center;
     gap: 50px;
+    margin: 0 10%;
 }
 
 .search-bar-container {

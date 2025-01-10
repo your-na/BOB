@@ -192,10 +192,16 @@ public class UserController {
 
         return "main";
     }
-
+    //회원가입 초기화면 입니둥
     @GetMapping("/sign")
     public String Form() {
         return "sign";
+    }
+
+    //이건 공모전 목록 test용이라서 나중에 삭제하고 해도 돼용
+    @GetMapping("/contest")
+    public String form() {
+        return "contest";
     }
 }
 

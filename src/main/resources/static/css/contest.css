@@ -1,0 +1,85 @@
+.main-banner {
+    position: relative;
+    text-align: center;
+    margin: 0 -12.5%;
+}
+
+.content {
+    display: flex;
+    margin: 20px auto;
+    max-width: 1200px;
+}
+
+.side-info {
+    width: 30%;
+    padding: 20px;
+    text-align: center;
+}
+
+.poster {
+    width: 200px;
+    height: 250px;
+    margin-bottom: 20px;
+}
+
+.apply-button {
+    display: inline-block;
+    background-color: #9c9c9c;
+    color: #fff;
+    padding: 10px 20px;
+    font-weight: bold;
+    border: none;
+    border-radius: 20px;
+    cursor: default;
+    font-size: 16px;
+}
+
+.apply-button:hover {
+    background-color: #9c9c9c;
+    font-weight: bold;
+}
+/*어차피 버튼 설정 안할거양 ㅋ크크킄*/
+
+.contest-list {
+    width: 70%;
+    padding: 20px;
+}
+
+.contest-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.contest-table th,
+.contest-table td {
+    text-align: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.contest-table th {
+    background-color: #F0FFEF;
+    border-top: 2px solid #00b800;
+    text-align: center;
+    color: #404040;
+    font-weight: bold;
+}
+
+.contest-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.contest-table td:last-child {
+    text-align: center;
+}
+
+.contest-table td {
+    color: #555;
+    background-color: #fff;
+}
+
+.contest-table td:last-child {
+    color: #00b100;
+    font-weight: bold;
+}

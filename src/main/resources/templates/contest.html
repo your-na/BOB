@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOB 메인 페이지</title>
+    <link rel="stylesheet" href="/css/contest.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<!-- 메인 배너 -->
+<section class="main-banner">
+    <img src="/images/banner.png" alt="배너 이미지" class="banner-image">
+</section>
+
+<div class="content">
+    <aside class="side-info">
+        <img src="https://via.placeholder.com/300x400" alt="공모전 이미지" class="poster">
+        <button class="apply-button">공모전 주최 신청</button>
+    </aside>
+    <section class="contest-list">
+        <table class="contest-table">
+            <thead>
+            <tr>
+                <th>공모명</th>
+                <th>주최</th>
+                <th>남은 기간</th>
+                <th>진행 일정</th>
+                <th>현황</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>길어라면 프로젝트 알아서 배우자지</td>
+                <td>한국IT산업협회</td>
+                <td>D-5456</td>
+                <td>2024.01.01 ~ 2024.06.30</td>
+                <td>진행 중</td>
+            </tr>
+            <!-- 샘플 데이터 반복 -->
+            <tr>
+                <td>길어라면 프로젝트 알아서 배우자지</td>
+                <td>한국IT산업협회</td>
+                <td>D-5456</td>
+                <td>2024.01.01 ~ 2024.06.30</td>
+                <td>진행 중</td>
+            </tr>
+            <tr>
+                <td>길어라면 프로젝트 알아서 배우자지</td>
+                <td>한국IT산업협회</td>
+                <td>D-5456</td>
+                <td>2024.01.01 ~ 2024.06.30</td>
+                <td>진행 종료</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+</body>
+</html>
