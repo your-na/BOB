@@ -153,9 +153,6 @@ public class UserController {
         return "redirect:/login"; // 로그아웃 후 로그인 페이지로 이동
     }
 
-    @GetMapping("/header")
-    public String headerPage(Model model) {return "header";}
-
     @GetMapping("/profile/{userId}")
     public String viewProfile(@PathVariable Long userId, Model model, HttpSession session) {
         // 세션에서 현재 로그인된 사용자 정보 가져오기
@@ -196,6 +193,9 @@ public class UserController {
         return "main";
     }
 
-
+    @GetMapping("/sign")
+    public String Form() {
+        return "sign";
+    }
 }
 
