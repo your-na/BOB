@@ -10,19 +10,19 @@
 <body>
 <!-- header -->
 <div th:insert="~{header :: header}"></div>
-<header>
-    <a href="my-info.html" class="active">내 정보</a>
-    <a href="career.html">경력 관리</a>
-</header>
+<div id="header">
+    <a href="/profile/" class="active">내 정보</a>
+    <a href="career.html">이력서 관리</a>
+</div>
 
 <div class="container">
     <div class="profile">
         <div class="profile-pic" th:each="image : ${images}">
-            <img src="profile.png" alt="profile" id="profileimg">
+            <img src="/images/profile.png" alt="profile" id="profileimg">
             <input type="file" name="files" id="files" multiple style="display: none;" accept="image/*">
             <label for="files">
                 <div class="edit-icon">
-                    <img src="pencil.png" alt="edit">
+                    <img src="/images/pencil.png" alt="edit">
                 </div>
             </label>
         </div>

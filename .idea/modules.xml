@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/bob.iml" filepath="$PROJECT_DIR$/.idea/modules/bob.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/bob.main.iml" filepath="$PROJECT_DIR$/.idea/modules/bob.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/bob.test.iml" filepath="$PROJECT_DIR$/.idea/modules/bob.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.example.bob.main.iml" filepath="$PROJECT_DIR$/.idea/modules/com.example.bob.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.example.bob.test.iml" filepath="$PROJECT_DIR$/.idea/modules/com.example.bob.test.iml" />
     </modules>
   </component>
