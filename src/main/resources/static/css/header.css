@@ -3,7 +3,14 @@ body {
     font-family: 'Arial', sans-serif;
 }
 
+
 .navigator {
+        position: fixed; /* 상단에 고정 */
+        top: 0; /* 화면의 맨 위에 위치 */
+        left: 0; /* 화면의 왼쪽에 위치 */
+        width: 100%; /* 화면 너비에 맞게 확장 */
+        z-index: 1000; /* 다른 요소들보다 위에 표시되도록 설정 */
+        background-color: #fff; /* 배경색 설정 */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -77,19 +84,19 @@ body {
 }
 
 .search-bar {
-    margin-top: 15px; /* 요소를 아래로 10px 이동 */
+    margin-top: 3px; /* 요소를 아래로 10px 이동 */
     width: 100%;
-    padding: 8px 40px;
+    padding: 8px 20px;
     border-radius: 10px;
     border: 1px solid #ccc;
     font-size: 12px;
 }
 
 .search-bar:focus {
-    margin-top: 15px;
+    margin-top: 3px;
     border-color: #19CB13;
     width: 100%;
-    padding: 8px 40px;
+    padding: 8px 20px;
     border-radius: 10px;
     border: 1px solid #19CB13;
     font-size: 12px;
