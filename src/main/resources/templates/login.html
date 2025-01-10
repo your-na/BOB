@@ -10,9 +10,9 @@
 <div class="login-container">
   <h1 class="logo">BOB</h1>
   <div class="login-box">
-    <form>
-      <input type="text" placeholder="아이디" class="input-field" required>
-      <input type="password" placeholder="비밀번호" class="input-field" required>
+    <form action="/login" method="POST">
+      <input type="text" name="username" placeholder="아이디" class="input-field" required>
+      <input type="password" name="password" placeholder="비밀번호" class="input-field" required>
       <button type="submit" class="login-btn">로그인</button>
     </form>
     <div class="options">

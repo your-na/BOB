@@ -19,6 +19,11 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder; //비밀번호 암호화
     private final UserRepository userRepository; //jpa, MySql, dependency 추가
 
+    // UserService 클래스에 passwordEncoder getter 추가
+    public BCryptPasswordEncoder getPasswordEncoder() {
+        return this.passwordEncoder;
+    }
+
     // 회원가입 처리
     public void save(UserDTO userDTO) {
         if (userRepository.findByUserIdLogin(userDTO.getUserIdLogin()).isPresent()){
@@ -45,7 +50,7 @@ public class UserService {
                 log.warn("비밀번호 불일치: {}", userIdLogin);
             }
             // 비밀번호 확인
-            return matches;
+            return true;
         }
         log.warn("존재하지 않는 사용자: {}", userIdLogin);
         return false;

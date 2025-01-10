@@ -46,6 +46,9 @@ public class UserEntity {
     @Column(length = 100)
     private String Birthday;
 
+    @Column(length = 255)
+    private String profileImageUrl = "/image/user.png"; //기본 이미지 경로
+
     // 비밀번호 암호화
     @PrePersist
     public void encryptPassword() {
@@ -68,5 +71,10 @@ public class UserEntity {
         userEntity.Birthday = userDTO.getBirthday();
 
         return userEntity;
+    }
+
+    //프로필 이미지 URL을 설정하는 메서드
+    public void setProfileImage(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 }
