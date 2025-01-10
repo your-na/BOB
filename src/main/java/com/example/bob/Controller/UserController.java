@@ -157,15 +157,26 @@ public class UserController {
     public String headerPage(Model model) {return "header";}
 
     @GetMapping("/profile/{userId}")
-    public String viewProfile(@PathVariable Long userId, Model model){
+    public String viewProfile(@PathVariable Long userId, Model model, HttpSession session) {
+        // 세션에서 현재 로그인된 사용자 정보 가져오기
+        UserEntity loggedInUser = (UserEntity) session.getAttribute("user");
+
+        // 로그인한 사용자만 자신의 프로필을 볼 수 있도록 검사
+        if (loggedInUser == null || !loggedInUser.getUserId().equals(userId)) {
+            // 로그인 안된 경우나, 다른 사용자의 프로필에 접근하려는 경우
+            return "redirect:/login";  // 로그인 페이지로 리다이렉트
+        }
+
         Optional<UserEntity> user = userRepository.findById(userId);
 
         if (user.isPresent()) {
             model.addAttribute("user", user.get());
-            return "profile";
+            return "profile";  // 자신의 프로필 페이지로 이동
+        } else {
+            return "redirect:/";  // 사용자가 존재하지 않으면 홈 페이지로 리다이렉트
         }
-        return "redirect:/";
     }
+
 
     //잠시 html 보기 위해 설정
     @GetMapping("/main")
