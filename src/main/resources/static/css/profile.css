@@ -73,7 +73,7 @@ body {
 
 .profile-pic {
     position: relative;
-    margin-top: 150px;
+    margin-bottom: 20px;
     text-align: center; /* 이미지 가운데 정렬 */
 }
 

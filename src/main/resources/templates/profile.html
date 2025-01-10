@@ -17,7 +17,7 @@
 
 <div class="container">
     <div class="profile">
-        <div class="profile-pic" th:each="image : ${images}">
+        <div class="profile-pic"><!--th:each="image : ${images}"-->
             <img src="/images/profile.png" alt="profile" id="profileimg">
             <input type="file" name="files" id="files" multiple style="display: none;" accept="image/*">
             <label for="files">
@@ -69,5 +69,22 @@
     <button class="save">수정</button>
     <button class="cancel">취소</button>
 </div>
+
+<script>
+    // 파일 선택 시 프로필 이미지를 변경하는 기능
+    document.getElementById('files').addEventListener('change', function(event) {
+        const file = event.target.files[0]; // 선택된 첫 번째 파일
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                document.getElementById('profileimg').src = e.target.result; // 프로필 이미지 변경
+            };
+
+            reader.readAsDataURL(file); // 파일을 데이터 URL로 읽어오기
+        }
+    });
+
+</script>
 </body>
 </html>
