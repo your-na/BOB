@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+<div class="container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <img src="profile-placeholder.png" alt="Profile Picture">
+        <div class="info">
+            <h2>닉네임 <span style="color: #dc3545; font-size: 1rem;">여</span></h2>
+            <p>안녕하세요~ 이분 소개글</p>
+        </div>
+        <button class="message-button">메시지 보내기</button>
+    </div>
+    <hr>
+    <div id="header">
+        <a href="/profile/" class="active">내 정보</a>
+        <a href="#">이력서 관리</a>
+        </div>
+    </div>
+    <!-- Skills Section -->
+    <div class="skills">
+        <h3>회원의 주언어</h3>
+        <div class="skill-list">
+            <span>JAVA</span>
+            <span>C언어</span>
+            <span>JSP</span>
+            <span>Springboot</span>
+            <span>React</span>
+            <span>JavaScript</span>
+            <span>HTML/CSS</span>
+        </div>
+    </div>
+
+    <!-- Posts Section -->
+    <div class="posts">
+        <h3>회원이 쓴 게시글</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>제목</th>
+                <th>작성일</th>
+                <th>좋아요</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>공모전 같이 하실 분 모집합니다!</td>
+                <td>2024-12-26</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>공모전 같이 하실 분 모집합니다!</td>
+                <td>2024-12-26</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>공모전 같이 하실 분 모집합니다!</td>
+                <td>2024-12-26</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>공모전 같이 하실 분 모집합니다!</td>
+                <td>2024-12-26</td>
+                <td>0</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
