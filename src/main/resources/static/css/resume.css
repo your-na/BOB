@@ -1,0 +1,252 @@
+body {
+    margin: 0 10%;
+    font-family: 'Arial', sans-serif;
+}
+
+#header {
+    margin-top: 100px;
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+#header a {
+    text-decoration: none;
+    color: black;
+    margin-right: 20px;
+    font-size: 18px;
+}
+
+#header a.active {
+    font-weight: bold;
+    color: green;
+    border-bottom: 3px solid green;
+}
+
+.container {
+    margin: 0 10%;
+    display: flex;
+    justify-content: space-between; /* 좌우 정렬 */
+    gap: 20px; /* 섹션 간 간격 */
+    padding: 20px;
+}
+
+.profile-pic {
+    position: relative;
+    margin-bottom: 20px;
+    text-align: center; /* 이미지 가운데 정렬 */
+}
+
+.profile-pic img {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%; /* 원형 */
+    border: 3px solid #ddd; /* 좀 더 부드러운 테두리 색상 */
+    object-fit: cover; /* 이미지 비율 유지 */
+    transition: border-color 0.3s ease; /* 테두리 색상 변경에 애니메이션 추가 */
+}
+
+.profile-info {
+    text-align: center;
+}
+
+.profile-info .nickname {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.profile-info .user-id {
+    color: gray;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+
+.profile-info .introduction {
+    width: 100%;
+    height: 80px;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: none;
+}
+
+
+.career-management {
+    width: 65%;
+}
+
+.career-management label, .career-management p {
+    font-weight: bold;
+}
+.career-add, .portfolio-add {
+    margin-bottom: 20px;
+}
+
+.career-add input, .portfolio-add input,
+.career-add textarea {
+    width: calc(100% - 10px);
+    margin: 5px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: none;
+    margin-top: 10px;
+}
+
+.add-button {
+    display: block;
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: green;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.career-list ul, .portfolio-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.career-list ul li, .portfolio-list ul li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.career-list li, .portfolio-list li {
+    color: #333333;
+    border-bottom: 1px solid grey;
+    padding: 5px 0;
+}
+
+.portfolio-list a {
+    font-size: 13px;
+    color: grey;
+    text-decoration: none;
+}
+#career {
+    display: flex;
+}
+
+#kbw{
+    margin-top: -15px;
+    margin-left: auto; /* 오른쪽으로 정렬 */
+    display: flex;
+    align-items: center; /* 세로 중앙 정렬 */
+    gap: 5px;
+}
+
+#jyn {
+    display: flex;
+    margin-top: 10%;
+}
+
+#jyn button {
+    margin-top: -5px;
+    margin-left: auto;
+}
+
+#career-start, #career-end{
+    margin-right: 10px;
+    width: 80px;
+    height: 8px;
+    font-size: 10px;
+}
+
+#career-description{
+    height: 140px;
+}
+.add-button {
+    border-radius: 10px;
+    margin-top: 6px;
+    width: 67px;
+    height: 28px;
+    line-height: 8px;
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    background-color: white;
+    border: 2px solid #0bba0b;
+    color: #0bba0b;
+}
+.delete-button {
+    border-radius: 20px;
+    background-color: white;
+    color: red;
+    border: 2px solid red;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.save-button, .default-button {
+    padding: 10px 20px;
+    margin-top: 20px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.save-button {
+    border-radius: 10px;
+    background-color: white;
+    border: 2px solid #0e8a0e;
+    color: #0e8a0e;
+}
+
+.default-button {
+    border-radius: 10px;
+    background-color: white;
+    border: 2px solid grey;
+    color: grey;
+}
+
+
+.pagination {
+    margin-left: auto;
+    display: flex; /* 버튼들을 가로로 배치 */
+    align-items: center; /* 세로 정렬 */
+    gap: 5px; /* 버튼 간 간격 */
+}
+
+.page {
+    width: 30px; /* 버튼의 너비 */
+    height: 30px; /* 버튼의 높이 */
+    border: 1px solid #ccc; /* 기본 테두리 */
+    border-bottom: none;
+    border-radius: 3px; /* 모서리 둥글게 */
+    background-color: white; /* 버튼 배경색 */
+    color: gray; /* 기본 글자 색상 */
+    text-align: center; /* 텍스트 가운데 정렬 */
+    line-height: 30px; /* 텍스트를 수직 중앙에 위치 */
+    font-size: 14px; /* 글자 크기 */
+    cursor: pointer; /* 마우스를 올리면 포인터 표시 */
+    transition: all 0.2s ease; /* 클릭 시 부드러운 효과 */
+}
+
+.page:hover {
+    border-color: green; /* 마우스 올릴 때 테두리 색 변경 */
+    color: green; /* 텍스트 색 변경 */
+}
+
+.page.active {
+    border: 2px solid green; /* 활성화된 버튼 강조 */
+    border-bottom: none;
+    color: green; /* 활성화된 버튼의 텍스트 색상 */
+    font-weight: bold; /* 텍스트를 굵게 */
+}
+
+.vertical-line {
+    width: 0.5px; /* 선의 두께 */
+    height: 720px; /* 선의 길이 */
+    background-color: #e3e3e3; /* 선의 색상 */
+    margin: 0 10px; /* 주변 여백 */
+}

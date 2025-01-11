@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/css/resume.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+<div id="header">
+    <a href="/profile/">내 정보</a>
+    <a href="#" class="active">이력서 관리</a>
+
+    <div class="pagination">
+        <button class="page active">1</button>
+        <button class="page">2</button>
+        <button class="page">3</button>
+    </div>
+</div>
+<div class="container">
+    <div class="profile">
+        <div class="profile-pic"><!--th:each="image : ${images}"-->
+            <img src="/images/profile.png" alt="profile" id="profileimg">
+        </div>
+        <div class="profile-info">
+            <p class="nickname">닉네임</p>
+            <p class="user-id">아이디</p>
+            <textarea class="introduction" placeholder="본인의 매력이나 다짐을 작성해주세요."></textarea>
+        </div>
+    </div>
+
+    <div class="vertical-line"></div>
+
+    <div class="career-management">
+        <div class="career-add">
+            <div id="career">
+                <label for="career-start">경력 추가</label>
+                <div id="kbw">
+                    <input type="date" id="career-start">
+                    <span>~</span>
+                    <input type="date" id="career-end">
+                    <button class="add-button">추가</button>
+                </div>
+            </div>
+            <textarea id="career-description" placeholder="경력 내용을 입력하세요"></textarea>
+        </div>
+
+        <div class="career-list">
+            <p>경력</p>
+            <ul>
+                <li>
+                    <span>A 공모전 우수상</span>
+                    <span>2024.12.19</span>
+                    <button class="delete-button">삭제</button>
+                </li>
+                <li>
+                    <span>BOB 회사 인턴직 근무</span>
+                    <span>2021.03 ~ 2024.12</span>
+                    <button class="delete-button">삭제</button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="portfolio-add">
+            <div id="jyn">
+                <label for="portfolio">포트폴리오 추가</label>
+                <button class="add-button">추가</button>
+            </div>
+            <input type="text" id="portfolio" placeholder="포트폴리오를 입력해주세요.">
+            <input type="text" id="portfolio-link" placeholder="포트폴리오 URL 입력">
+        </div>
+
+        <div class="portfolio-list">
+            <p>포트폴리오</p>
+            <ul>
+                <li>
+                    <span>A 공모전 우수상</span>
+                    <a href="https://example.com" target="_blank">https://example.com</a>
+                    <button class="delete-button">삭제</button>
+                </li>
+                <li>
+                    <span>BOB 회사 인턴직 근무</span>
+                    <a href="https://example.com" target="_blank">https://example.com</a>
+                    <button class="delete-button">삭제</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<button class="save-button">수정</button>
+<button class="default-button">대표 이력서 지정</button>
+
+</body>
+</html>
