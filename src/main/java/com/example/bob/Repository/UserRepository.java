@@ -3,6 +3,7 @@ package com.example.bob.Repository;
 import com.example.bob.Entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
 import java.util.Optional;
 
 @Repository //객체타입, PK타입

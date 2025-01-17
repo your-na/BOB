@@ -6,7 +6,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -47,13 +50,16 @@ public class UserEntity {
     private String Birthday;
 
     @Column(length = 255)
-    private String profileImageUrl = "/image/user.png"; //기본 이미지 경로
+    private String profileImageUrl = "/images/user.png"; //기본 이미지 경로
 
-    // 비밀번호 암호화
-    @PrePersist
-    public void encryptPassword() {
-        this.pwd = new BCryptPasswordEncoder().encode(this.pwd);
-    }
+    @Column(name = "account_created_at")
+    private LocalDateTime accountCreatedAt; // 계정 생성 날짜
+
+    @Column(length = 500)
+    private String userBio = "소개를 작성해보세요.";
+
+    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserHistoryEntity> userHistories = new ArrayList<>();
 
     @Builder
     public static UserEntity toUserEntity(UserDTO userDTO) {
@@ -76,5 +82,10 @@ public class UserEntity {
     //프로필 이미지 URL을 설정하는 메서드
     public void setProfileImage(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
+    }
+
+    // UserHistory 추가
+    public void addHistory(UserHistoryEntity history) {
+        this.userHistories.add(history);
     }
 }

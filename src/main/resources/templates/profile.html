@@ -17,62 +17,61 @@
 
 <div class="container">
     <div class="profile">
-        <div class="profile-pic"><!--th:each="image : ${images}"-->
-            <img src="/images/profile.png" alt="profile" id="profileimg">
-            <input type="file" name="files" id="files" multiple style="display: none;" accept="image/*">
-            <label for="files">
+        <div class="profile-pic">
+            <img th:src="${user.profileImageUrl}" alt="profile" id="profileimg">
+            <input type="file" name="profileImage" id="profileImage" multiple style="display: none;" accept="image/*">
+            <label for="profileImage">
                 <div class="edit-icon">
                     <img src="/images/pencil.png" alt="edit">
                 </div>
             </label>
         </div>
-        <form>
+        <form action="/profile/update" method="post" enctype="multipart/form-data">
             <label for="nickname">닉네임</label>
-            <input type="text" id="nickname" name="nickname">
+            <input type="text" id="nickname" name="nickname" th:value="${user.userNick}">
 
             <label for="name">이름</label>
-            <input type="text" id="name" name="name">
+            <input type="text" id="name" name="name" th:value="${user.userName}">
 
             <label for="username">아이디</label>
-            <input type="text" id="username" name="username">
+            <input type="text" id="username" name="username" th:value="${user.userIdLogin}">
 
             <label for="email">이메일</label>
-            <input type="email" id="email" name="email">
+            <input type="email" id="email" name="email" th:value="${user.userEmail}">
         </form>
     </div>
 
     <form>
         <label>주언어</label>
         <div class="checkbox-group">
-            <label><input type="checkbox" name="language" value="JAVA"> JAVA</label>
-            <label><input type="checkbox" name="language" value="C언어"> C언어</label>
-            <label><input type="checkbox" name="language" value="JSP"> JSP</label>
-            <label><input type="checkbox" name="language" value="Springboot"> Springboot</label>
-            <label><input type="checkbox" name="language" value="React"> React</label>
-            <label><input type="checkbox" name="language" value="JavaScript"> JavaScript</label>
-            <label><input type="checkbox" name="language" value="HTML/CSS"> HTML/CSS</label>
-            <label><input type="checkbox" name="language" value="기타"> 기타</label>
+            <label><input type="checkbox" name="language" value="JAVA" th:checked="${user.mainLanguage.contains('java')}"> JAVA</label>
+            <label><input type="checkbox" name="language" value="C언어" th:checked="${user.mainLanguage.contains('clanguage')}"> C언어</label>
+            <label><input type="checkbox" name="language" value="JSP" th:checked="${user.mainLanguage.contains('jsp')}"> JSP</label>
+            <label><input type="checkbox" name="language" value="Springboot" th:checked="${user.mainLanguage.contains('springboot')}"> Springboot</label>
+            <label><input type="checkbox" name="language" value="React" th:checked="${user.mainLanguage.contains('react')}"> React</label>
+            <label><input type="checkbox" name="language" value="JavaScript" th:checked="${user.mainLanguage.contains('javascript')}"> JavaScript</label>
+            <label><input type="checkbox" name="language" value="HTML/CSS" th:checked="${user.mainLanguage.contains('html')}"> HTML/CSS</label>
+            <label><input type="checkbox" name="language" value="기타" th:checked="${user.mainLanguage.contains('others')}"> 기타</label>
         </div>
 
         <label for="bio" id="intro">소개글</label>
-        <textarea id="bio" name="bio"></textarea>
+        <textarea id="bio" name="bio" th:text="${user.userBio}"></textarea>
 
         <label for="sex" id="sex">성별</label>
         <div class="checkbox-group">
-            <label><input type="radio" name="sex" value="M"> 남성</label>
-            <label><input type="radio" name="sex" value="F"> 여성</label>
+            <label><input type="radio" name="sex" value="M" th:checked="${user.sex == 'M'}"> 남성</label>
+            <label><input type="radio" name="sex" value="F" th:checked="${user.sex == 'F'}"> 여성</label>
+        </div>
+        <div class="actions">
+            <button class="save">수정</button>
+            <button class="cancel" type="button" onclick="window.location.href='/profile'">취소</button>
         </div>
     </form>
 </div>
 
-<div class="actions">
-    <button class="save">수정</button>
-    <button class="cancel">취소</button>
-</div>
-
 <script>
     // 파일 선택 시 프로필 이미지를 변경하는 기능
-    document.getElementById('files').addEventListener('change', function(event) {
+    document.getElementById('profileImage').addEventListener('change', function(event) {
         const file = event.target.files[0]; // 선택된 첫 번째 파일
         if (file) {
             const reader = new FileReader();
@@ -84,7 +83,6 @@
             reader.readAsDataURL(file); // 파일을 데이터 URL로 읽어오기
         }
     });
-
 </script>
 </body>
 </html>

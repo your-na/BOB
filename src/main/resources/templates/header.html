@@ -61,9 +61,10 @@
                     <span class="search-icon"><img src="/images/search.png" alt=""></span>
                 </form>
             </div>
-            <a th:href="@{${profileLink}}" class="user-icon">
+            <a th:href="${user != null ? '/profile' : '/login'}" class="user-icon">
                 <img th:src="${user != null && user.profileImageUrl != null ? user.profileImageUrl : '/images/user.png'}" alt="Profile Image">
             </a>
+
         </div>
     </nav>
     <script>

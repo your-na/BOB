@@ -3,6 +3,8 @@ package com.example.bob.DTO;
 import  com.example.bob.Entity.UserEntity;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,7 +22,10 @@ public class UserDTO {
     private String sex;             // 성별
     private String mainLanguage;    // 주 언어
     private String birthday;        // 생년월일
-    private String userNick;
+    private String userNick;        // 유저 닉네임
+    private LocalDateTime accountCreatedAt; // 계정 생성 날짜
+    private String profileImageUrl;
+    private String bio;
 
     public static UserDTO toUserDTO(UserEntity userEntity) {
         UserDTO userDTO = new UserDTO();
@@ -34,6 +39,9 @@ public class UserDTO {
         userDTO.setMainLanguage(userEntity.getMainLanguage());
         userDTO.setBirthday(userEntity.getBirthday());
         userDTO.setUserNick(userEntity.getUserNick());
+        userDTO.setAccountCreatedAt(userEntity.getAccountCreatedAt());
+        userDTO.setProfileImageUrl(userEntity.getProfileImageUrl()); // 프로필 이미지 URL 설정
+        userDTO.setBio(userEntity.getUserBio());
 
         return userDTO;
     }
