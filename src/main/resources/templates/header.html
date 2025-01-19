@@ -13,30 +13,12 @@
                     <div class="all-dropdown-menu">
                         <div class="dropdown-section">
                             <ul>
-                                <li><a href="#">공모전 정보</a></li>
-                                <li><a href="#">지난 공모전</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-menu">게시판</a>
-                    <div class="all-dropdown-menu">
-                        <div class="dropdown-section">
-                            <ul>
-                                <li><a href="#">자유게시판</a></li>
-                                <li><a href="#">공지사항</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-menu">문의</a>
-                    <div class="all-dropdown-menu">
-                        <div class="dropdown-section">
-                            <ul>
-                                <li><a href="#">문의사항</a></li>
-                                <li><a href="#">FAQ</a></li>
+                                <li><a href="#">전체 공모전</a></li>
+                                <li><a href="#">기업 공모전</a></li>
+                                <li><a href="#">외부 공모전</a></li>
+                                <li><a href="#">공모전 팀 모집</a></li>
+                                <li><a href="#">참가중인 공모전</a></li>
+                                <li><a href="#">저장한 공모전</a></li>
                             </ul>
                         </div>
                     </div>
@@ -46,11 +28,32 @@
                     <div class="all-dropdown-menu">
                         <div class="dropdown-section">
                             <ul>
-                                <li><a href="#">문의사항</a></li>
-                                <li><a href="#">FAQ</a></li>
+                                <li><a href="#">프로젝트</a></li>
+                                <li><a href="#">프로젝트 생성</a></li>
+                                <li><a href="#">참가 중인 프로젝트</a></li>
+                                <li><a href="#">저장한 프로젝트</a></li>
                             </ul>
                         </div>
                     </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-menu">구직</a>
+                    <div class="all-dropdown-menu">
+                        <div class="dropdown-section">
+                            <ul>
+                                <li><a href="#">구인 공고</a></li>
+                                <li><a href="#">포트폴리오 모음방</a></li>
+                                <li><a href="#">신청한 구직</a></li>
+                                <li><a href="#">저장한 공고</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-menu">이력서</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-menu">게시판</a>
                 </li>
             </ul>
         </div>
@@ -61,9 +64,34 @@
                     <span class="search-icon"><img src="/images/search.png" alt=""></span>
                 </form>
             </div>
-            <a th:href="${user != null ? '/profile' : '/login'}" class="user-icon">
-                <img th:src="${user != null && user.profileImageUrl != null ? user.profileImageUrl : '/images/user.png'}" alt="Profile Image">
+            <a class="chatting-icon">
+                <img src="/images/chatting.png" alt="">
             </a>
+            <div class="nav-item1">
+                <a th:href="${user != null ? '/profile' : '/login'}" class="user-icon">
+                    <img src="/images/user.png" alt="Profile Image">
+                </a>
+                <div class="all-dropdown-menu">
+                    <div class="dropdown-section">
+                        <ul>
+                            <!-- 로그인 상태일 때 -->
+                            <li th:if="${user != null}"><a href="#">내 정보</a></li>
+                            <li th:if="${user != null}"><a href="#">알림</a></li>
+                            <li th:if="${user != null}"><a href="#">구직/프로젝트/공모전 내역</a></li>
+                            <li th:if="${user != null}">
+                                    <a th:href="@{/logout}" method="post" >로그아웃</a>
+                            </li>
+
+
+
+                            <!-- 비로그인 상태일 때 -->
+                            <li th:unless="${user != null}"><a href="/login" id="plz"><img src="/images/login.png">로그인 해주세요</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+
 
         </div>
     </nav>

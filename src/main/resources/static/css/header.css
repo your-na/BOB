@@ -121,7 +121,7 @@ body {
     object-fit: cover;
 }
 
-.user-icon {
+.user-icon, .chatting-icon {
     font-size: 10px;
     text-decoration: none;
     color: black;
@@ -129,7 +129,7 @@ body {
     height: 23px;
 }
 
-.user-icon img{
+.user-icon img, .chatting-icon img{
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -140,22 +140,47 @@ body {
     display: none;
     position: absolute;
     top: 100%; /* 네비게이션 아래로 배치 */
+    left: 0; /* 드롭다운을 부모 요소의 왼쪽에 맞춤 */
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 150px; /* 드롭다운 크기 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 5px 0; /* 위, 아래 간격만 추가 */
+    z-index: 1000;
+    text-align: left; /* 텍스트를 왼쪽 정렬 */
+}
+
+/* 드롭다운 메뉴 숨김 기본값 */
+.nav-item1 .all-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%; /* 네비게이션 아래로 배치 */
     left: 0;
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 5px;
-    width: 100px; /* 드롭다운 크기 */
+    width: 120px; /* 드롭다운 크기 */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 15px;
     z-index: 1000;
 }
-
 .nav-item {
     position: relative;
 }
 
+.nav-item1 {
+    position: relative;
+    width: 23px;
+    height: 23px;
+}
+
 /* 개별 메뉴에 마우스를 올릴 때 드롭다운 표시 */
 .nav-item:hover .all-dropdown-menu {
+    display: block;
+}
+
+.nav-item1:hover .all-dropdown-menu {
     display: block;
 }
 
@@ -190,3 +215,23 @@ body {
     color: #19CB13;
 }
 /*여기까지 헤더*/
+
+#plz {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* 이미지와 텍스트 사이 간격 */
+    text-decoration: none; /* 링크 밑줄 제거 */
+    color: #757575;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+#plz img{
+    width: 20px;
+    height: 20px;
+}
+
+#plz:hover {
+    color : #757575;
+    font-weight: bold;
+}
