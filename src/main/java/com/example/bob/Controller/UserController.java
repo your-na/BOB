@@ -148,6 +148,11 @@ public class UserController {
 
     @GetMapping("/contest")
     public String form() {
-        return "userprofile";
+        return "project";
+    }
+
+    @GetMapping("/cw")
+    public String Form() {
+        return "newproject";
     }
 }

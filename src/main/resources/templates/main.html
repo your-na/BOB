@@ -12,8 +12,21 @@
 <div th:insert="~{header :: header}"></div>
 
 <!-- 메인 배너 -->
-<section class="main-banner">
-    <img src="/images/banner.png" alt="배너 이미지" class="banner-image">
+<section class="carousel">
+    <div class="carousel-content">
+        <div class="carousel-item active"><img src="/images/banner.png" alt=""></div>
+        <div class="carousel-item active"><img src="/images/banner.png" alt=""></div>
+        <div class="carousel-item active"><img src="/images/banner.png" alt=""></div>
+    </div>
+    <div class="carousel-controls">
+        <button class="prev-btn">◀</button>
+        <button class="next-btn">▶</button>
+    </div>
+    <div class="carousel-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+    </div>
 </section>
 
 <!-- 콘텐츠 섹션 -->
@@ -56,6 +69,7 @@
     <div class="board">
         <div class="board-header">
             <h3>공모전 팀원 모집글</h3>
+            <p>더보기 ></p>
         </div>
         <div class="hot-section">
             <span class="hot-badge">HOT</span>
@@ -72,6 +86,7 @@
     <div class="board">
         <div class="board-header">
             <h3>프로젝트 팀원 모집글</h3>
+            <p>더보기 ></p>
         </div>
         <div class="hot-section">
             <span class="hot-badge">HOT</span>
@@ -88,6 +103,7 @@
     <div class="board">
         <div class="board-header">
             <h3>자유 게시판</h3>
+            <p>더보기 ></p>
         </div>
         <div class="hot-section">
             <span class="hot-badge">HOT</span>
@@ -153,6 +169,48 @@
                 });
             })
             .catch(error => console.error("Failed to load calendar popup:", error));
+    });
+    //배너 수정할거양 흥.
+    document.addEventListener('DOMContentLoaded', () => {
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+        const dots = document.querySelectorAll('.dot');
+        const carouselItems = document.querySelectorAll('.carousel-item');
+        const carouselContent = document.querySelector('.carousel-content');
+        let currentIndex = 0;
+
+        function showSlide(index) {
+            if (index >= carouselItems.length) index = 0;
+            if (index < 0) index = carouselItems.length - 1;
+
+            carouselContent.style.transform = `translateX(-${index * 100}%)`;
+
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+
+            currentIndex = index;
+        }
+
+        function nextSlide() {
+            showSlide(currentIndex + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentIndex - 1);
+        }
+
+        prevBtn.addEventListener('click', prevSlide);
+        nextBtn.addEventListener('click', nextSlide);
+
+        dots.forEach((dot, i) => {
+            dot.addEventListener('click', () => {
+                showSlide(i);
+            });
+        });
+
+        // Auto-slide feature (optional)
+        setInterval(nextSlide, 3000); // Change slide every 3 seconds
     });
 </script>
 </body>

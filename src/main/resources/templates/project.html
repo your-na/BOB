@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/css/project.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<!-- 메인 배너 -->
+<section class="main-banner">
+    <img src="/images/banner.png" alt="배너 이미지" class="banner-image">
+</section>
+
+<section class="project-list">
+    <button class="create-post-button">
+        <a href="/cw">프로젝트 생성</a>
+    </button>
+    <table class="contest-table">
+        <thead>
+        <tr>
+            <th>프로젝트명</th>
+            <th>생성자</th>
+            <th>모집 기간</th>
+            <th>진행 일정</th>
+            <th>조회수</th>
+            <th>좋아요</th>
+            <th>현황</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>곰신곰신앱 만들기</td>
+            <td>유나나콘</td>
+            <td>D-3</td>
+            <td>2025.01.26 ~ 2024.06.26</td>
+            <td>24</td>
+            <td>3</td>
+            <td>모집중</td>
+        </tr>
+        <!-- 샘플 데이터 반복 -->
+        <tr>
+            <td>곰신곰신앱 만들기</td>
+            <td>유나나콘</td>
+            <td>D-3</td>
+            <td>2025.01.26 ~ 2024.06.26</td>
+            <td>24</td>
+            <td>3</td>
+            <td>모집중</td>
+        </tr>
+        </tbody>
+    </table>
+</section>
+</body>
+</html>

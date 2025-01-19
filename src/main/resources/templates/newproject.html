@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>프로젝트 생성</title>
+  <link rel="stylesheet" href="/css/newproject.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<main class="main-content">
+  <section class="project-create">
+    <h1>프로젝트 생성</h1>
+    <hr>
+    <form action="#" method="post" class="project-form">
+      <div class="bw">
+      <div class="form-group">
+        <label for="project-dates">진행 일정</label>
+        <div class="date-inputs">
+          <input type="date" id="start-date" name="start-date">
+          <span>~</span>
+          <input type="date" id="end-date" name="end-date">
+        </div>
+      </div>
+      <p class="info-text">* 모집일은 선택하신 진행 일정의 시작일 전 날짜로 자동 선택됩니다.</p>
+      </div>
+      <div class="form-group">
+        <input type="text" id="project-name" name="project-name" placeholder="프로젝트명을 입력하세요.">
+      </div>
+      <div class="form-group">
+        <textarea id="project-description" name="project-description" placeholder="프로젝트 내용을 입력해주세요."></textarea>
+      </div>
+      <div class="bwbw">
+      <div class="form-group">
+        <label for="recruitment">모집 인원</label>
+        <select id="recruitment" name="recruitment">
+          <option value="0">0명</option>
+          <option value="1">1명</option>
+          <option value="2">2명</option>
+          <option value="3">3명</option>
+        </select>
+      </div>
+      <button type="submit" class="submit-btn">등록</button>
+      </div>
+      <p class="info-text">* 개인 프로젝트를 원하시면 모집 인원 0명을 선택해주세요.</p>
+    </form>
+  </section>
+</main>
+</body>
+</html>

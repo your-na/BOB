@@ -1,48 +1,14 @@
 .main-banner {
+    margin-top: 70px;
     position: relative;
     text-align: center;
     margin: 0 -12.5%;
 }
 
-.content {
-    display: flex;
-    margin: 20px auto;
-    max-width: 1200px;
-}
-
-.side-info {
-    width: 30%;
-    padding: 20px;
-    text-align: center;
-}
-
-.poster {
-    width: 200px;
-    height: 250px;
-    margin-bottom: 20px;
-}
-
-.apply-button {
-    display: inline-block;
-    background-color: #9c9c9c;
-    color: #fff;
-    padding: 10px 20px;
-    font-weight: bold;
-    border: none;
-    border-radius: 20px;
-    cursor: default;
-    font-size: 16px;
-}
-
-.apply-button:hover {
-    background-color: #9c9c9c;
-    font-weight: bold;
-}
-/*어차피 버튼 설정 안할거양 ㅋ크크킄*/
-
-.contest-list {
+.project-list {
     width: 70%;
     padding: 20px;
+    margin: 0 10%;
 }
 
 .contest-table {
@@ -84,8 +50,19 @@
     font-weight: bold;
 }
 
-#bob {
-    margin-left: 92%;
-    width: 60px;
-    height: 30px;
+.create-post-button {
+    margin-left: 90%;
+    border: none;
+    background-color: #16ca16;
+    border-radius: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.create-post-button a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
 }
