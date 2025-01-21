@@ -10,11 +10,9 @@
 <div class="login-container">
   <h1 class="logo">BOB</h1>
   <div class="login-box">
-    <form id="loginForm" action="/login" method="post">
+    <form action="/login" method="post">
       <input type="text" name="username" placeholder="아이디" class="input-field" required>
-      <div class="errorMessage" id="username-error"></div> <!-- 아이디 오류 메시지 추가 -->
       <input type="password" name="password" placeholder="비밀번호" class="input-field" required>
-      <div class="errorMessage" id="password-error"></div> <!-- 비밀번호 오류 메시지 추가 -->
       <button type="submit" class="login-btn">로그인</button>
     </form>
     <div class="options">
@@ -24,50 +22,5 @@
     </div>
   </div>
 </div>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // form ID가 'loginForm'인 요소를 찾고, 그에 이벤트 리스너를 추가
-    document.getElementById('loginForm').addEventListener('submit', function(event) {
-      event.preventDefault(); // 폼 제출 기본 동작 방지
-
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-
-      // 오류 메시지 초기화
-      document.getElementById('username-error').innerText = '';
-      document.getElementById('password-error').innerText = '';
-
-      // 로그인 요청
-      fetch('http://localhost:8090/api/user/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username: username, password: password })
-      })
-              .then(response => {
-                if (!response.ok) {
-                  return response.text().then(errorMessage => {
-                    if (errorMessage.includes("아이디")) {
-                      document.getElementById("username-error").innerText = "아이디가 틀립니다."; // 아이디 오류 메시지
-                    } else if (errorMessage.includes("비밀번호")) {
-                      document.getElementById("password-error").innerText = "비밀번호가 틀립니다."; // 비밀번호 오류 메시지
-                    }
-                    throw new Error(errorMessage); // 오류 메시지를 던져서 catch로 이동
-                  });
-                }
-                return response.text(); // 성공 시 응답 텍스트 반환
-              })
-              .then(data => {
-                // 로그인 성공 시 처리 (예: 대시보드로 리다이렉트)
-                alert(data); // "로그인 성공" 메시지 표시
-                window.location.href = '/main'; // 로그인 후 이동할 페이지
-              })
-              .catch(error => {
-                console.error("로그인 실패:", error); // 오류 로그 출력
-              });
-    });
-  });
-</script>
 </body>
 </html>
