@@ -24,11 +24,15 @@ body {
 }
 
 .container {
-    margin: 0 10%;
+    margin-left: 15%;
+    width: 60%; /* 적절한 너비 설정 */
+    background-color: white; /* 배경색 */
+    border: none;
+    padding: 30px; /* 내부 여백 */
     display: flex;
-    justify-content: space-between; /* 좌우 정렬 */
-    gap: 20px; /* 섹션 간 간격 */
-    padding: 20px;
+    flex-direction: column; /* 세로 정렬 */
+    gap: 20px; /* 내부 요소 간 간격 */
+    align-items: center; /* 내부 콘텐츠 가운데 정렬 */
 }
 
 .container .profile,

@@ -63,6 +63,20 @@ public class UserService implements org.springframework.security.core.userdetail
         userRepository.save(userEntity);
     }
 
+    // 로그인 검증 메서드 추가
+    public boolean validateUser(String username, String password) {
+        // 사용자 조회
+        Optional<UserEntity> userOpt = userRepository.findByUserIdLogin(username);
+
+        if (userOpt.isPresent()) {
+            UserEntity userEntity = userOpt.get();
+            // 비밀번호 검증
+            return passwordEncoder.matches(password, userEntity.getPwd());
+        }
+
+        return false; // 사용자 이름이 없거나 비밀번호가 틀린 경우
+    }
+
     // UserDetailsService 구현 (Spring Security 인증용)
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
