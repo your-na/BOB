@@ -8,6 +8,8 @@ import com.example.bob.Repository.UserHistoryRepository;
 import com.example.bob.Repository.UserRepository;
 import com.example.bob.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -74,34 +76,61 @@ public class UserService implements org.springframework.security.core.userdetail
     }
 
     @Transactional
-    public void updateUserInfo(UserUpdateDTO userUpdateDTO, MultipartFile profileImage, Long userId) {
+    public String updateUserInfo(UserUpdateDTO userUpdateDTO, MultipartFile profileImage, Long userId) {
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 로그 추가: userEntity가 제대로 조회되는지 확인
-        log.info("Updating user with ID: " + userId);
-        log.info("New Nickname: " + userUpdateDTO.getUserNick());
-        log.info("New Email: " + userUpdateDTO.getUserEmail());
-        log.info("New Bio: " + userUpdateDTO.getUserBio());
-        log.info("New Language: " + userUpdateDTO.getMainLanguage());
+        // 이미지 처리
+        if (profileImage != null && !profileImage.isEmpty()) {
+            // 기존 이미지 삭제
+            deleteExistingProfileImage(userEntity.getProfileImageUrl());
+            String profileImageUrl = saveProfileImage(profileImage); // 저장 후 URL 반환
+            userEntity.setProfileImageUrl(profileImageUrl);
+        }
 
+        // 사용자 정보 업데이트
         userEntity.setUserNick(userUpdateDTO.getUserNick());
         userEntity.setUserEmail(userUpdateDTO.getUserEmail());
         userEntity.setUserBio(userUpdateDTO.getUserBio());
         userEntity.setMainLanguage(userUpdateDTO.getMainLanguage());
 
-        // 이미지 처리
-        if (profileImage != null && !profileImage.isEmpty()) {
-            String profileImageUrl = saveProfileImage(profileImage); // 저장 후 URL 반환
-            userEntity.setProfileImageUrl(profileImageUrl);
-        }
-
-        // 저장 전에 값 확인 로그
-        log.info("Updated User Entity: " + userEntity);
-
         userRepository.save(userEntity);
+
+        // 사용자 정보 갱신 후 이미지 URL 반환
+        return userEntity.getProfileImageUrl();
     }
 
+
+
+    // UserHistoryEntity 저장 메서드
+    private void saveUserHistory(UserEntity userEntity, String oldNick, String newNick, String oldEmail, String newEmail,
+                                 String oldBio, String newBio, String oldLanguage, String newLanguage,
+                                 String oldProfileImage, String newProfileImage) {
+
+        // 변경된 값이 있을 때만 기록
+        if (!oldNick.equals(newNick) || !oldEmail.equals(newEmail) || !oldBio.equals(newBio) ||
+                !oldLanguage.equals(newLanguage) || !oldProfileImage.equals(newProfileImage)) {
+
+            UserHistoryEntity history = UserHistoryEntity.builder()
+                    .userEntity(userEntity)
+                    .userNick(newNick)
+                    .userIdLogin(userEntity.getUserIdLogin())
+                    .userName(userEntity.getUserName())
+                    .pwd(userEntity.getPwd())  // 비밀번호는 업데이트 안 되므로 그대로 유지
+                    .userEmail(newEmail)
+                    .userPhone(userEntity.getUserPhone())
+                    .sex(userEntity.getSex())
+                    .mainLanguage(newLanguage)
+                    .birthday(userEntity.getBirthday())
+                    .profileImageUrl(newProfileImage)
+                    .accountCreatedAt(userEntity.getAccountCreatedAt())
+                    .userBio(newBio)
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+
+            userHistoryRepository.save(history);  // 변경 내역 저장
+        }
+    }
 
     public String saveProfileImage(MultipartFile file) {
         try {
@@ -124,13 +153,32 @@ public class UserService implements org.springframework.security.core.userdetail
         }
     }
 
+    @Transactional
+    public String updateProfileImage(MultipartFile profileImage, Long userId) {
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 기존 이미지 삭제
+        deleteExistingProfileImage(userEntity.getProfileImageUrl());
+
+        // 새 이미지 저장
+        String newProfileImageUrl = saveProfileImage(profileImage);
+
+        // 사용자 엔티티에 새 이미지 URL 설정
+        userEntity.setProfileImageUrl(newProfileImageUrl);
+        userRepository.save(userEntity);
+
+        return newProfileImageUrl; // 새 이미지 URL 반환
+    }
 
 
     private void deleteExistingProfileImage(String profileImageUrl) {
         if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
             Path existingFilePath = Paths.get(uploadDir, profileImageUrl.replace("/images/profileImages/", ""));
             try {
+                // 기존 이미지가 존재하면 삭제
                 Files.deleteIfExists(existingFilePath);
+                log.info("Deleted existing profile image: " + existingFilePath.toString());
             } catch (IOException e) {
                 log.warn("Failed to delete existing profile image: " + profileImageUrl, e);
             }

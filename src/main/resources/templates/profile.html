@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf_header" content="${_csrf.headerName}">
+    <meta name="_csrf" content="${_csrf.token}">
     <title>내 정보 관리</title>
     <link rel="stylesheet" href="/css/profile.css">
     <link rel="stylesheet" th:href="@{/css/header.css}">
@@ -15,17 +17,18 @@
 </div>
 
 <div class="container">
-    <div class="profile">
-        <div class="profile-pic">
-            <img th:src="${user.profileImageUrl}" alt="profile" id="profileimg">
-            <input type="file" name="profileImage" id="profileImage" multiple style="display: none;" accept="image/*">
-            <label for="profileImage">
-                <div class="edit-icon">
-                    <img src="/images/pencil.png" alt="edit">
-                </div>
-            </label>
-        </div>
-        <form action="/profile/update" method="post" enctype="multipart/form-data">
+    <form action="/profile/update" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="_csrf" value="${_csrf.token}">
+        <div class="profile">
+            <div class="profile-pic">
+                <img th:src="${profileImageUrl != null ? profileImageUrl : '/images/profile.png'}" alt="profile" id="profileimg">
+                <input type="file" name="profileImage" id="profileImage" style="display: none;" accept="image/*">
+                <label for="profileImage">
+                    <div class="edit-icon">
+                        <img src="/images/pencil.png" alt="edit">
+                    </div>
+                </label>
+            </div>
             <label for="nickname">닉네임</label>
             <input type="text" id="nickname" name="nickname" th:value="${user.userNick}">
 
@@ -37,20 +40,18 @@
 
             <label for="email">이메일</label>
             <input type="email" id="email" name="email" th:value="${user.userEmail}">
-        </form>
-    </div>
+        </div>
 
-    <form>
         <label>주언어</label>
         <div class="checkbox-group">
-            <label><input type="checkbox" name="language" value="JAVA" th:checked="${user.mainLanguage.contains('java')}"> JAVA</label>
-            <label><input type="checkbox" name="language" value="C언어" th:checked="${user.mainLanguage.contains('clanguage')}"> C언어</label>
-            <label><input type="checkbox" name="language" value="JSP" th:checked="${user.mainLanguage.contains('jsp')}"> JSP</label>
-            <label><input type="checkbox" name="language" value="Springboot" th:checked="${user.mainLanguage.contains('springboot')}"> Springboot</label>
-            <label><input type="checkbox" name="language" value="React" th:checked="${user.mainLanguage.contains('react')}"> React</label>
-            <label><input type="checkbox" name="language" value="JavaScript" th:checked="${user.mainLanguage.contains('javascript')}"> JavaScript</label>
-            <label><input type="checkbox" name="language" value="HTML/CSS" th:checked="${user.mainLanguage.contains('html')}"> HTML/CSS</label>
-            <label><input type="checkbox" name="language" value="기타" th:checked="${user.mainLanguage.contains('others')}"> 기타</label>
+            <label><input type="checkbox" name="language" value="java" th:checked="${user.mainLanguage.contains('java')}"> JAVA</label>
+            <label><input type="checkbox" name="language" value="clanguage" th:checked="${user.mainLanguage.contains('clanguage')}"> C언어</label>
+            <label><input type="checkbox" name="language" value="jsp" th:checked="${user.mainLanguage.contains('jsp')}"> JSP</label>
+            <label><input type="checkbox" name="language" value="springboot" th:checked="${user.mainLanguage.contains('springboot')}"> Springboot</label>
+            <label><input type="checkbox" name="language" value="react" th:checked="${user.mainLanguage.contains('react')}"> React</label>
+            <label><input type="checkbox" name="language" value="javascript" th:checked="${user.mainLanguage.contains('javascript')}"> JavaScript</label>
+            <label><input type="checkbox" name="language" value="html" th:checked="${user.mainLanguage.contains('html')}"> HTML/CSS</label>
+            <label><input type="checkbox" name="language" value="others" th:checked="${user.mainLanguage.contains('others')}"> 기타</label>
         </div>
 
         <label for="bio" id="intro">소개글</label>
@@ -61,6 +62,7 @@
             <label><input type="radio" name="sex" value="M" th:checked="${user.sex == 'M'}"> 남성</label>
             <label><input type="radio" name="sex" value="F" th:checked="${user.sex == 'F'}"> 여성</label>
         </div>
+
         <div class="actions">
             <button class="save">수정</button>
             <button class="cancel" type="button" onclick="window.location.href='/profile'">취소</button>
@@ -76,12 +78,14 @@
             const reader = new FileReader();
 
             reader.onload = function(e) {
-                document.getElementById('profileimg').src = e.target.result; // 프로필 이미지 변경
+                // 파일을 읽은 후 프로필 이미지 미리보기 변경
+                document.getElementById('profileimg').src = e.target.result;
             };
 
             reader.readAsDataURL(file); // 파일을 데이터 URL로 읽어오기
         }
     });
 </script>
+
 </body>
 </html>

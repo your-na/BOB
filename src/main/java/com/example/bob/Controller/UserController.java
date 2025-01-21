@@ -6,7 +6,6 @@ import com.example.bob.Repository.UserRepository;
 import com.example.bob.Service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -97,7 +96,7 @@ public class UserController {
             if (optionalUser.isPresent()) {
                 UserEntity userEntity = optionalUser.get();
                 String fileName = profileImage.getOriginalFilename();
-                Path path = Paths.get("static/profileImages/" + fileName);
+                Path path = Paths.get("static/images/profileImages/" + fileName);
                 try {
                     Files.copy(profileImage.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
                     userEntity.setProfileImageUrl("/profileImages/" + fileName);

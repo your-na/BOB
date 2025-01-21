@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -47,6 +48,10 @@ public class ProfileController {
         UserEntity userEntity = ((UserDetailsImpl) userDetails).getUserEntity();
         model.addAttribute("user", userEntity);
 
+        // profileImageUrl을 제대로 설정하여 전달
+        String profileImageUrl = userEntity.getProfileImageUrl(); // UserEntity에서 프로필 이미지 URL 가져오기
+        model.addAttribute("profileImageUrl", profileImageUrl);
+
         return "profile";  // 로그인 상태면 프로필 페이지로 이동
     }
 
@@ -56,13 +61,21 @@ public class ProfileController {
                                 @RequestParam String bio,
                                 @RequestParam("language") List<String> languages,
                                 @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
-                                @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                RedirectAttributes redirectAttributes) {
         Long userId = userDetails.getUserEntity().getUserId();
 
         // 프로필 이미지 URL 처리
         String profileImageUrl = null;
         if (profileImage != null && !profileImage.isEmpty()) {
-            profileImageUrl = userService.saveProfileImage(profileImage); // 이미지 저장 및 URL 반환
+            try {
+                profileImageUrl = userService.saveProfileImage(profileImage); // 이미지 저장 및 URL 반환
+            } catch (Exception e) {
+                // 예외 처리 (이미지 저장 실패 시)
+                e.printStackTrace();
+                // 기본 이미지를 사용하도록 할 수 있음
+                profileImageUrl = "/images/default_profile.png";
+            }
         }
 
         // DTO 생성
@@ -74,8 +87,18 @@ public class ProfileController {
         userUpdateDTO.setProfileImageUrl(profileImageUrl);
 
         // 사용자 정보 업데이트
-        userService.updateUserInfo(userUpdateDTO, profileImage, userId);
+        String updatedImage = userService.updateUserInfo(userUpdateDTO, profileImage, userId);
 
-        return "redirect:/profile";
+        // 타임스탬프를 추가하여 이미지 URL 갱신
+        // 이미지 URL에 타임스탬프를 추가하여 캐시를 방지
+        String finalImageUrl = profileImageUrl + "?timestamp=" + System.currentTimeMillis();
+        redirectAttributes.addFlashAttribute("profileImageUrl", finalImageUrl);
+
+
+        // 리다이렉트 시, 모델에 데이터 추가
+        redirectAttributes.addFlashAttribute("profileImageUrl", finalImageUrl);
+
+        return "redirect:/profile"; // 리다이렉트 후 새로운 프로필 페이지 표시
     }
+
 }
