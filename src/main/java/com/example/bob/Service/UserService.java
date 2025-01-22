@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,6 +45,12 @@ public class UserService implements org.springframework.security.core.userdetail
 
     @Value("${file.upload-dir}")
     private String uploadDir;
+
+    public UserEntity getUserEntity(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+    }
+
 
     // 회원가입 처리
     public void save(UserDTO userDTO) {
@@ -94,27 +102,38 @@ public class UserService implements org.springframework.security.core.userdetail
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 이미지 처리
+        // 이전 값 저장
+        String oldNick = userEntity.getUserNick();
+        String oldEmail = userEntity.getUserEmail();
+        String oldBio = userEntity.getUserBio();
+        String oldLanguage = userEntity.getMainLanguage();
+        String oldProfileImage = userEntity.getProfileImageUrl();
+
+        // 프로필 이미지 처리
         if (profileImage != null && !profileImage.isEmpty()) {
-            // 기존 이미지 삭제
-            deleteExistingProfileImage(userEntity.getProfileImageUrl());
-            String profileImageUrl = saveProfileImage(profileImage); // 저장 후 URL 반환
-            userEntity.setProfileImageUrl(profileImageUrl);
+            updateProfileImage(profileImage, userEntity);  // 이미지 업데이트
         }
 
-        // 사용자 정보 업데이트
+        // 유저 정보 업데이트
         userEntity.setUserNick(userUpdateDTO.getUserNick());
         userEntity.setUserEmail(userUpdateDTO.getUserEmail());
         userEntity.setUserBio(userUpdateDTO.getUserBio());
         userEntity.setMainLanguage(userUpdateDTO.getMainLanguage());
 
-        userRepository.save(userEntity);
+        // 프로필 이미지 URL 업데이트
+        if (userUpdateDTO.getProfileImageUrl() != null) {
+            userEntity.setProfileImageUrl(userUpdateDTO.getProfileImageUrl());
+        }
 
-        // 사용자 정보 갱신 후 이미지 URL 반환
+        userRepository.save(userEntity);  // 사용자 정보 저장
+
+        // 변경 내역 기록
+        saveUserHistory(userEntity, oldNick, userUpdateDTO.getUserNick(), oldEmail, userUpdateDTO.getUserEmail(),
+                oldBio, userUpdateDTO.getUserBio(), oldLanguage, userUpdateDTO.getMainLanguage(),
+                oldProfileImage, userEntity.getProfileImageUrl());
+
         return userEntity.getProfileImageUrl();
     }
-
-
 
     // UserHistoryEntity 저장 메서드
     private void saveUserHistory(UserEntity userEntity, String oldNick, String newNick, String oldEmail, String newEmail,
@@ -150,7 +169,11 @@ public class UserService implements org.springframework.security.core.userdetail
         try {
             // 파일 저장 경로 생성
             String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get(uploadDir, fileName);
+
+            // 한글을 URL 인코딩 처리
+            String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString());
+
+            Path filePath = Paths.get(uploadDir, encodedFileName);
 
             // 디렉토리 확인 및 생성
             if (!Files.exists(filePath.getParent())) {
@@ -161,38 +184,25 @@ public class UserService implements org.springframework.security.core.userdetail
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
             // 반환할 URL (static 디렉토리 기준)
-            return "/images/profileImages/" + fileName;
+            return "uploads/profileImages/" + encodedFileName;
         } catch (IOException e) {
             throw new RuntimeException("Failed to store file", e);
         }
     }
 
     @Transactional
-    public String updateProfileImage(MultipartFile profileImage, Long userId) {
-        UserEntity userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // 기존 이미지 삭제
+    public void updateProfileImage(MultipartFile profileImage, UserEntity userEntity) {
         deleteExistingProfileImage(userEntity.getProfileImageUrl());
-
-        // 새 이미지 저장
         String newProfileImageUrl = saveProfileImage(profileImage);
-
-        // 사용자 엔티티에 새 이미지 URL 설정
         userEntity.setProfileImageUrl(newProfileImageUrl);
-        userRepository.save(userEntity);
-
-        return newProfileImageUrl; // 새 이미지 URL 반환
     }
-
 
     private void deleteExistingProfileImage(String profileImageUrl) {
         if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
-            Path existingFilePath = Paths.get(uploadDir, profileImageUrl.replace("/images/profileImages/", ""));
+            Path existingFilePath = Paths.get(uploadDir, profileImageUrl.replace("uploads/profileImages/", ""));
             try {
-                // 기존 이미지가 존재하면 삭제
                 Files.deleteIfExists(existingFilePath);
-                log.info("Deleted existing profile image: " + existingFilePath.toString());
+                log.info("Deleted existing profile image: " + existingFilePath);
             } catch (IOException e) {
                 log.warn("Failed to delete existing profile image: " + profileImageUrl, e);
             }

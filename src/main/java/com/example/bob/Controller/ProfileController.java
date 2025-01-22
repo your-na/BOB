@@ -5,16 +5,28 @@ import com.example.bob.DTO.UserUpdateDTO;
 import com.example.bob.Entity.UserEntity;
 import com.example.bob.Service.UserService;
 import com.example.bob.security.UserDetailsImpl;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Controller
@@ -42,17 +54,17 @@ public class ProfileController {
     @GetMapping("/profile")
     public String profilePage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         if (userDetails == null) {
-            return "redirect:/login";  // 로그인하지 않은 경우 로그인 페이지로 리디렉션
+            return "redirect:/login";  // 로그인하지 않으면 로그인 페이지로 리디렉션
         }
 
-        UserEntity userEntity = ((UserDetailsImpl) userDetails).getUserEntity();
+        UserEntity userEntity = ((UserDetailsImpl) userDetails).getUserEntity(); // 현재 로그인한 사용자
         model.addAttribute("user", userEntity);
 
-        // profileImageUrl을 제대로 설정하여 전달
+        // 프로필 이미지 URL을 설정
         String profileImageUrl = userEntity.getProfileImageUrl(); // UserEntity에서 프로필 이미지 URL 가져오기
         model.addAttribute("profileImageUrl", profileImageUrl);
 
-        return "profile";  // 로그인 상태면 프로필 페이지로 이동
+        return "profile";  // 프로필 페이지로 이동
     }
 
     @PostMapping("/profile/update")
@@ -69,16 +81,14 @@ public class ProfileController {
         String profileImageUrl = null;
         if (profileImage != null && !profileImage.isEmpty()) {
             try {
-                profileImageUrl = userService.saveProfileImage(profileImage); // 이미지 저장 및 URL 반환
+                profileImageUrl = userService.saveProfileImage(profileImage);
             } catch (Exception e) {
-                // 예외 처리 (이미지 저장 실패 시)
                 e.printStackTrace();
-                // 기본 이미지를 사용하도록 할 수 있음
-                profileImageUrl = "/images/default_profile.png";
+                profileImageUrl = "/images/profile.png";  // 기본 이미지 경로
             }
         }
 
-        // DTO 생성
+        // UserUpdateDTO 생성
         UserUpdateDTO userUpdateDTO = new UserUpdateDTO();
         userUpdateDTO.setUserNick(nickname);
         userUpdateDTO.setUserEmail(email);
@@ -87,18 +97,39 @@ public class ProfileController {
         userUpdateDTO.setProfileImageUrl(profileImageUrl);
 
         // 사용자 정보 업데이트
-        String updatedImage = userService.updateUserInfo(userUpdateDTO, profileImage, userId);
+        userService.updateUserInfo(userUpdateDTO, profileImage, userId);
 
         // 타임스탬프를 추가하여 이미지 URL 갱신
-        // 이미지 URL에 타임스탬프를 추가하여 캐시를 방지
         String finalImageUrl = profileImageUrl + "?timestamp=" + System.currentTimeMillis();
+
+        // 리다이렉트 시 프로필 이미지 URL을 전달
         redirectAttributes.addFlashAttribute("profileImageUrl", finalImageUrl);
+        redirectAttributes.addFlashAttribute("user", userUpdateDTO); // 수정된 사용자 정보를 추가로 전달
 
-
-        // 리다이렉트 시, 모델에 데이터 추가
-        redirectAttributes.addFlashAttribute("profileImageUrl", finalImageUrl);
-
-        return "redirect:/profile"; // 리다이렉트 후 새로운 프로필 페이지 표시
+        return "redirect:/profile";  // 리다이렉트 후 새로운 프로필 페이지 표시
     }
 
+
+    private final String uploadDir = "uploads/profileImages/";  // 파일이 저장된 경로
+
+    @GetMapping("/uploads/profileImages/{fileName}")
+    public ResponseEntity<Resource> serveFile(@PathVariable String fileName) {
+        try {
+            // URL 디코딩 처리
+            String decodedFileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8.toString());
+
+            // 파일 경로 생성
+            Path filePath = Paths.get(uploadDir, decodedFileName);
+
+            // 파일이 존재하는지 확인
+            if (Files.exists(filePath)) {
+                Resource file = new UrlResource(filePath.toUri());
+                return ResponseEntity.ok().body(file);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

@@ -31,7 +31,7 @@ public class SecurityConfig {
                         .ignoringRequestMatchers("/login", "/signup", "/profile/update") // 로그인과 회원가입 경로에 대해 CSRF 예외 설정
                 )
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/", "/main", "/css/**", "/js/**", "/images/**", "/static/**").permitAll() // 인증 없이 접근 가능 경로 설정
+                        .requestMatchers("/", "/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**").permitAll() // 인증 없이 접근 가능 경로 설정
                         .requestMatchers("/login", "/sign").anonymous() // 로그인하지 않은 사용자만 접근 가능
                         .requestMatchers("/profile/**").authenticated() // 프로필 페이지는 인증된 사용자만 접근 가능
                         .requestMatchers( "/signup", "/check-nickname", "/check-username").permitAll()  // 닉네임 중복 확인 요청도 인증 없이 접근 가능
