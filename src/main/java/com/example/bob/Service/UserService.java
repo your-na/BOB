@@ -10,6 +10,7 @@ import com.example.bob.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,71 +35,35 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserService implements org.springframework.security.core.userdetails.UserDetailsService{
+public class UserService implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder; // 비밀번호 암호화
     private final UserRepository userRepository; //jpa, MySql, dependency 추가
     private final UserHistoryRepository userHistoryRepository;
 
-    private static final String IMAGE_URL_PREFIX = "/images/profileImages/";
-
-
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    public UserEntity getUserEntity(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserEntity userEntity = userRepository.findByUserIdLogin(username)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
+        return new UserDetailsImpl(userEntity);
     }
 
-
     // 회원가입 처리
+    @Transactional
     public void save(UserDTO userDTO) {
         if (userRepository.existsByUserIdLogin(userDTO.getUserIdLogin())) {
             throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
         }
-
-        // 비밀번호 암호화
         userDTO.setPwd(passwordEncoder.encode(userDTO.getPwd()));
-
-        // request -> DTO -> Entity -> Repository에서 save
         UserEntity userEntity = UserEntity.toUserEntity(userDTO);
-
-        // 계정 생성 날짜 설정
-        userEntity.setAccountCreatedAt(LocalDateTime.now());  // 현재 시간을 계정 생성 날짜로 설정
-
-        // 사용자 저장
         userRepository.save(userEntity);
     }
 
-    // 로그인 검증 메서드 추가
-    public boolean validateUser(String username, String password) {
-        // 사용자 조회
-        Optional<UserEntity> userOpt = userRepository.findByUserIdLogin(username);
-
-        if (userOpt.isPresent()) {
-            UserEntity userEntity = userOpt.get();
-            // 비밀번호 검증
-            return passwordEncoder.matches(password, userEntity.getPwd());
-        }
-
-        return false; // 사용자 이름이 없거나 비밀번호가 틀린 경우
-    }
-
-    // UserDetailsService 구현 (Spring Security 인증용)
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<UserEntity> userOpt = userRepository.findByUserIdLogin(username);
-        if (userOpt.isPresent()) {
-            UserEntity userEntity = userOpt.get();
-            return new UserDetailsImpl(userEntity);  // UserDetailsImpl로 사용자 반환
-        } else {
-            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username);
-        }
-    }
-
     @Transactional
-    public String updateUserInfo(UserUpdateDTO userUpdateDTO, MultipartFile profileImage, Long userId) {
+    public UserDTO updateUserInfo(UserUpdateDTO userUpdateDTO, MultipartFile profileImage, Long userId) {
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -111,7 +76,7 @@ public class UserService implements org.springframework.security.core.userdetail
 
         // 프로필 이미지 처리
         if (profileImage != null && !profileImage.isEmpty()) {
-            updateProfileImage(profileImage, userEntity);  // 이미지 업데이트
+            updateProfileImage(profileImage, userEntity);
         }
 
         // 유저 정보 업데이트
@@ -132,10 +97,10 @@ public class UserService implements org.springframework.security.core.userdetail
                 oldBio, userUpdateDTO.getUserBio(), oldLanguage, userUpdateDTO.getMainLanguage(),
                 oldProfileImage, userEntity.getProfileImageUrl());
 
-        return userEntity.getProfileImageUrl();
+        // 최신 유저 정보를 반환
+        return UserDTO.toUserDTO(userEntity);
     }
 
-    // UserHistoryEntity 저장 메서드
     private void saveUserHistory(UserEntity userEntity, String oldNick, String newNick, String oldEmail, String newEmail,
                                  String oldBio, String newBio, String oldLanguage, String newLanguage,
                                  String oldProfileImage, String newProfileImage) {
@@ -158,35 +123,24 @@ public class UserService implements org.springframework.security.core.userdetail
                     .profileImageUrl(newProfileImage)
                     .accountCreatedAt(userEntity.getAccountCreatedAt())
                     .userBio(newBio)
-                    .updatedAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now()) // 현재 날짜를 명시적으로 설정
                     .build();
 
             userHistoryRepository.save(history);  // 변경 내역 저장
         }
     }
 
-    public String saveProfileImage(MultipartFile file) {
+    private String saveProfileImage(MultipartFile file) {
         try {
-            // 파일 저장 경로 생성
             String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+            Path filePath = Paths.get(uploadDir, fileName);
 
-            // 한글을 URL 인코딩 처리
-            String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString());
-
-            Path filePath = Paths.get(uploadDir, encodedFileName);
-
-            // 디렉토리 확인 및 생성
-            if (!Files.exists(filePath.getParent())) {
-                Files.createDirectories(filePath.getParent());
-            }
-
-            // 파일 저장
+            Files.createDirectories(filePath.getParent());
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            // 반환할 URL (static 디렉토리 기준)
-            return "uploads/profileImages/" + encodedFileName;
+            return "uploads/profileImages/" + fileName;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to store file", e);
+            throw new RuntimeException("프로필 이미지를 저장할 수 없습니다.", e);
         }
     }
 

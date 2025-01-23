@@ -47,4 +47,15 @@ public class UserUpdateDTO {
     public void setProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
     }
+
+    @Override
+    public String toString() {
+        return "UserUpdateDTO{" +
+                "userNick='" + userNick + '\'' +
+                ", userEmail='" + userEmail + '\'' +
+                ", userBio='" + userBio + '\'' +
+                ", mainLanguage='" + mainLanguage + '\'' +
+                ", profileImageUrl='" + profileImageUrl + '\'' +
+                '}';
+    }
 }

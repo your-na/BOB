@@ -75,6 +75,9 @@ public class UserEntity {
         userEntity.sex = userDTO.getSex();
         userEntity.MainLanguage = userDTO.getMainLanguage();
         userEntity.Birthday = userDTO.getBirthday();
+        userEntity.profileImageUrl = userDTO.getProfileImageUrl();
+        userEntity.userBio = userDTO.getBio();
+        userEntity.accountCreatedAt = userDTO.getAccountCreatedAt();
 
         return userEntity;
     }

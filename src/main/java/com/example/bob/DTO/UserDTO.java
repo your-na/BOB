@@ -45,4 +45,8 @@ public class UserDTO {
 
         return userDTO;
     }
+
+    public UserEntity toUserEntity() {
+        return UserEntity.toUserEntity(this);
+    }
 }

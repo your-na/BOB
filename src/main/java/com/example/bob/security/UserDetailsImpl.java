@@ -1,8 +1,10 @@
 package com.example.bob.security;
 
 import com.example.bob.Entity.UserEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -10,7 +12,7 @@ import java.util.Collections;
 
 public class UserDetailsImpl implements UserDetails {
 
-    private final UserEntity userEntity;
+    private UserEntity userEntity;
 
     public UserDetailsImpl(UserEntity userEntity) {
         this.userEntity = userEntity;
@@ -29,6 +31,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
+        System.out.println("UserIdLogin: " + userEntity.getUserIdLogin());
         return userEntity.getUserIdLogin();
     }
 
@@ -55,5 +58,17 @@ public class UserDetailsImpl implements UserDetails {
     // UserEntity 정보 반환
     public UserEntity getUserEntity() {
         return userEntity;
+    }
+
+    // UserEntity 정보 갱신 후 SecurityContext에 반영
+    public void updateUserEntity(UserEntity newUserEntity) {
+        this.userEntity = newUserEntity;
+        // 업데이트된 UserEntity를 SecurityContext에 반영
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(this, null, getAuthorities());
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        System.out.println("SecurityContext updated with: " + authentication.getPrincipal());
     }
 }

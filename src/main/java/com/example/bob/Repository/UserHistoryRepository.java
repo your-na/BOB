@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface UserHistoryRepository extends JpaRepository<UserHistoryEntity, Long> {
-    List<UserHistoryEntity> findByUserEntity_UserId(Long userId); // 특정 사용자의 이력 조회
+    List<UserHistoryEntity> findByUserEntityUserId(Long userId); // userId를 기준으로 특정 사용자의 이력 조회
 }
 
