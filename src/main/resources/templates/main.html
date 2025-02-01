@@ -31,10 +31,25 @@
 
 <!-- 콘텐츠 섹션 -->
 <section class="content-container">
+    <!-- 최신 공모전 -->
+    <div class="content-section">
+        <div class="content-section-header">
+            <h2>관심 분야 공모전</h2>
+            <p>더보기 ></p>
+        </div>
+        <div class="card popular-competitions">
+            <div class="poster-grid">
+                <img src="/images/banner.png" alt="인기 공모전 포스터 넣">
+                <img src="/images/poster10.png" alt="인기 공모전 포스터 어">
+                <img src="/images/poster11.png" alt="인기 공모전 포스터 야">
+                <img src="/images/poster12.png" alt="인기 공모전 포스터 함">
+            </div>
+        </div>
+    </div>
     <!-- 미니 프로젝트 -->
     <div class="content-section">
         <div class="content-section-header">
-            <h2>미니 프로젝트</h2>
+            <h2>관심 가졌던 채용 공고</h2>
             <p>더보기 ></p>
         </div>
         <div class="card latest-competitions">
@@ -47,67 +62,20 @@
             </ul>
         </div>
     </div>
-    <!-- 최신 공모전 -->
-    <div class="content-section">
-        <div class="content-section-header">
-            <h2>최신 공모전</h2>
-            <p>더보기 ></p>
-        </div>
-        <div class="card popular-competitions">
-            <div class="poster-grid">
-                <img src="/images/banner.png" alt="인기 공모전 포스터 넣">
-                <img src="/images/poster10.png" alt="인기 공모전 포스터 어">
-                <img src="/images/poster11.png" alt="인기 공모전 포스터 야">
-                <img src="/images/poster12.png" alt="인기 공모전 포스터 함">
-            </div>
-        </div>
-    </div>
 </section>
 
 
 <section class="extra-content">
     <div class="board">
         <div class="board-header">
-            <h3>공모전 팀원 모집글</h3>
-            <p>더보기 ></p>
+            <h3>전체 게시판</h3>
         </div>
-        <div class="hot-section">
-            <span class="hot-badge">HOT</span>
-            <p>핫게시물은 최상단에 순차적으로</p>
-        </div>
-        <ul>
-            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
-            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
-            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
-            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
-            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
-        </ul>
-    </div>
-    <div class="board">
-        <div class="board-header">
-            <h3>프로젝트 팀원 모집글</h3>
-            <p>더보기 ></p>
-        </div>
-        <div class="hot-section">
-            <span class="hot-badge">HOT</span>
-            <p>핫게시물은 최상단에 순차적으로</p>
-        </div>
-        <ul>
-            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
-            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
-            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
-            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
-            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
-        </ul>
-    </div>
-    <div class="board">
-        <div class="board-header">
-            <h3>자유 게시판</h3>
-            <p>더보기 ></p>
-        </div>
-        <div class="hot-section">
-            <span class="hot-badge">HOT</span>
-            <p>핫게시물은 최상단에 순차적으로</p>
+        <a id="qh">게시판은 모두 최신순으로 보여집니다.</a>
+        <!-- 필터 버튼 -->
+        <div class="filter-container">
+            <button class="filter-btn active">공모전</button>
+            <button class="filter-btn">프로젝트</button>
+            <button class="filter-btn">자유</button>
         </div>
         <ul>
             <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
@@ -211,6 +179,18 @@
 
         // Auto-slide feature (optional)
         setInterval(nextSlide, 3000); // Change slide every 3 seconds
+    });
+
+    //active 버튼 스크립트~
+    const buttons = document.querySelectorAll('.filter-btn');
+
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            // 모든 버튼에서 active 클래스 제거
+            buttons.forEach(btn => btn.classList.remove('active'));
+            // 클릭한 버튼에 active 클래스 추가
+            button.classList.add('active');
+        });
     });
 </script>
 </body>

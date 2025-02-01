@@ -209,8 +209,7 @@
 
 .board-header {
     display: flex;
-    border-bottom: 5px solid #19CB13; /* 제목 아래 굵은 초록색 줄 */
-    margin-bottom: 10px;
+    margin-bottom: 3px;
 }
 
 .board-header p {
@@ -224,7 +223,11 @@
     transform: translateY(-50%); /* 정확하게 세로 중앙에 맞추기 */
 }
 
-
+#qh {
+    font-size: 10px;
+    color: grey;
+    margin-left: 10px;
+}
 /* HOT 배지와 설명 텍스트 */
 .hot-section {
     display: flex;
@@ -313,4 +316,31 @@
     margin: 0 -12.5%;
     background-color: #f9f9f9;
     border-top: 1px solid #ddd;
+}
+
+.filter-container {
+    text-align: left;
+    margin: 20px 0;
+    border-bottom: 5px solid #19CB13; /* 제목 아래 굵은 초록색 줄 */
+}
+
+.filter-btn.active {
+    background-color: #78d678;
+    border-radius: 20px;
+    font-weight: bold;
+    color: forestgreen;
+}
+
+.filter-btn {
+    padding: 5px 10px;
+    margin: 5px;
+    border: 1px solid grey;
+    border-radius: 20px;
+    background-color: white;
+    color: grey;
+    cursor: pointer;
+}
+
+.filter-btn:hover {
+    background-color: #aae4aa;
 }
