@@ -68,18 +68,20 @@
                 <img src="/images/chatting.png" alt="">
             </a>
             <div class="nav-item1">
-                <a th:href="${user != null ? '/profile' : '/login'}" class="user-icon">
+                <a class="user-icon">
                     <img src="/images/user.png" alt="Profile Image">
                 </a>
                 <div class="all-dropdown-menu">
                     <div class="dropdown-section">
                         <ul>
                             <!-- 로그인 상태일 때 -->
-                            <li th:if="${user != null}"><a href="#">내 정보</a></li>
+                            <li th:if="${user != null}"><a href="/profile">내 정보</a></li>
                             <li th:if="${user != null}"><a href="#">알림</a></li>
                             <li th:if="${user != null}"><a href="#">구직/프로젝트/공모전 내역</a></li>
                             <li th:if="${user != null}">
-                                    <a th:href="@{/logout}" method="post" >로그아웃</a>
+                                <form id="logoutForm" th:action="@{/logout}" method="post">
+                                    <button type="submit">로그아웃</button>
+                                </form>
                             </li>
 
 

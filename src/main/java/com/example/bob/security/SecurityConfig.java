@@ -28,7 +28,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // CSRF 활성화 및 쿠키에 토큰 저장
-                        .ignoringRequestMatchers("/login", "/signup", "/profile/update") // 로그인과 회원가입 경로에 대해 CSRF 예외 설정
+                        .ignoringRequestMatchers("/login", "/signup", "/profile/update", "/logout") // 로그인과 회원가입 경로에 대해 CSRF 예외 설정
                 )
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/", "/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**").permitAll() // 인증 없이 접근 가능 경로 설정
@@ -45,8 +45,10 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout") // 로그아웃 URL
-                        .logoutSuccessUrl("/main")); // 로그아웃 후 이동할 경로
-
+                        .logoutSuccessUrl("/main") // 로그아웃 후 이동할 경로
+                        .invalidateHttpSession(true) // ✅ 세션 무효화
+                        .deleteCookies("JSESSIONID", "XSRF-TOKEN") // ✅ CSRF 토큰 삭제 (보안 강화)
+                );
         return http.build();
     }
 

@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import java.net.URLDecoder;
@@ -50,32 +52,29 @@ public class ProfileController {
     }
 
     @GetMapping("/profile")
-    public String profilePage(@AuthenticationPrincipal UserDetails userDetails, Model model,
-                              @ModelAttribute("user") UserUpdateDTO userUpdateDTO) {
+    public String profilePage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         if (userDetails == null) {
-            return "redirect:/login";  // 로그인하지 않으면 로그인 페이지로 리디렉션
+            return "redirect:/login";
         }
 
-        UserEntity userEntity = ((UserDetailsImpl) userDetails).getUserEntity(); // 현재 로그인한 사용자
+        if (!(userDetails instanceof UserDetailsImpl)) {
+            return "redirect:/error";
+        }
+
+        UserDetailsImpl userDetailsImpl = (UserDetailsImpl) userDetails;
+        Long userId = userDetailsImpl.getUserEntity().getUserId();
+
+        if (userId == null) {
+            return "redirect:/error";
+        }
+
+        UserEntity userEntity = userService.findUserById(userId);
         model.addAttribute("user", userEntity);
+        model.addAttribute("profileImageUrl", userEntity.getProfileImageUrl());
 
-        // 프로필 이미지 URL을 설정
-        String profileImageUrl = userEntity.getProfileImageUrl(); // UserEntity에서 프로필 이미지 URL 가져오기
-        model.addAttribute("profileImageUrl", profileImageUrl);
-
-        // 수정된 사용자 정보가 있으면 이를 화면에 반영
-        if (userUpdateDTO != null) {
-            model.addAttribute("userNick", userUpdateDTO.getUserNick());
-            model.addAttribute("userEmail", userUpdateDTO.getUserEmail());
-            model.addAttribute("userBio", userUpdateDTO.getUserBio());
-            model.addAttribute("mainLanguage", userUpdateDTO.getMainLanguage());
-        }
-
-        // 디버깅: userUpdateDTO가 제대로 전달되었는지 확인
-        System.out.println("Updated User: " + userUpdateDTO);
-
-        return "profile";  // 프로필 페이지로 이동
+        return "profile";
     }
+
 
     @PostMapping("/profile/update")
     public String updateProfile(@RequestParam String nickname,
@@ -85,52 +84,48 @@ public class ProfileController {
                                 @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
                                 @AuthenticationPrincipal UserDetailsImpl userDetails,
                                 RedirectAttributes redirectAttributes) {
-        Long userId = userDetails.getUserEntity().getUserId();
 
-        // UserUpdateDTO 생성
+        if (userDetails == null || userDetails.getUserEntity().getUserId() == null) {
+            System.out.println("⚠ updateProfile: userId가 null 또는 인증 정보 없음.");
+            return "redirect:/login"; // 인증이 없으면 로그인 페이지로 이동
+        }
+
+        Long userId = userDetails.getUserEntity().getUserId();
         UserUpdateDTO userUpdateDTO = new UserUpdateDTO();
         userUpdateDTO.setUserNick(nickname);
         userUpdateDTO.setUserEmail(email);
         userUpdateDTO.setUserBio(bio);
         userUpdateDTO.setMainLanguage(String.join(",", languages));
 
-        // 프로필 이미지 처리
         if (profileImage != null && !profileImage.isEmpty()) {
             try {
-                // 프로필 이미지 업데이트
                 userService.updateProfileImage(profileImage, userDetails.getUserEntity());
-                // 업데이트된 프로필 이미지 URL 가져오기
                 userUpdateDTO.setProfileImageUrl(userDetails.getUserEntity().getProfileImageUrl());
             } catch (Exception e) {
                 e.printStackTrace();
-                // 기본 이미지 URL 설정
                 userUpdateDTO.setProfileImageUrl("/images/profile.png");
             }
         } else {
-            // 이미지가 없으면 기존 이미지를 그대로 유지
             userUpdateDTO.setProfileImageUrl(userDetails.getUserEntity().getProfileImageUrl());
         }
-
-        // 디버깅: userUpdateDTO가 제대로 설정되었는지 확인
-        System.out.println("Updated User: " + userUpdateDTO);  // userUpdateDTO의 상태 출력
 
         // 사용자 정보 업데이트
         UserDTO updatedUserDTO = userService.updateUserInfo(userUpdateDTO, profileImage, userId);
 
-        // 업데이트된 사용자 정보를 UserDetailsImpl에 반영
-        userDetails.updateUserEntity(updatedUserDTO.toUserEntity());
+        // SecurityContext 업데이트
+        UserDetailsImpl updatedUserDetails = new UserDetailsImpl(updatedUserDTO.toUserEntity());
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(updatedUserDetails, updatedUserDetails.getPassword(), updatedUserDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 타임스탬프를 추가하여 이미지 URL 갱신
         String finalImageUrl = userUpdateDTO.getProfileImageUrl() + "?timestamp=" + System.currentTimeMillis();
-
-        // 리다이렉트 시 프로필 이미지 URL을 전달
         redirectAttributes.addFlashAttribute("profileImageUrl", finalImageUrl);
         redirectAttributes.addFlashAttribute("userNick", userUpdateDTO.getUserNick());
         redirectAttributes.addFlashAttribute("userEmail", userUpdateDTO.getUserEmail());
         redirectAttributes.addFlashAttribute("userBio", userUpdateDTO.getUserBio());
         redirectAttributes.addFlashAttribute("mainLanguage", userUpdateDTO.getMainLanguage());
 
-        return "redirect:/profile";  // 리다이렉트 후 새로운 프로필 페이지 표시
+        return "redirect:/profile";
     }
 
     private final String uploadDir = "uploads/profileImages/";  // 파일이 저장된 경로

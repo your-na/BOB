@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class UserDTO {
 
     // 이름 아이디 비밀번호 이메일 전화번호 성별 주언어 생년월일
+    private Long userId;
     private String userName;        // 이름
     private String userIdLogin;          // 아이디
     private String pwd;             // 비밀번호
@@ -30,6 +31,7 @@ public class UserDTO {
     public static UserDTO toUserDTO(UserEntity userEntity) {
         UserDTO userDTO = new UserDTO();
 
+        userDTO.setUserId(userEntity.getUserId());
         userDTO.setUserName(userEntity.getUserName());
         userDTO.setUserIdLogin(userEntity.getUserIdLogin());
         userDTO.setPwd(userEntity.getPwd());

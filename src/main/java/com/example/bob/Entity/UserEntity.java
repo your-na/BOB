@@ -65,6 +65,7 @@ public class UserEntity {
     public static UserEntity toUserEntity(UserDTO userDTO) {
         UserEntity userEntity = new UserEntity();
 
+        userEntity.userId = userDTO.getUserId();
         // userID는 자동으로 설정되므로 DTO에서 받아오지 않습니다.
         userEntity.userNick = userDTO.getUserNick();
         userEntity.userName = userDTO.getUserName();

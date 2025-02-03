@@ -44,6 +44,10 @@ public class UserService implements UserDetailsService {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
+    public UserEntity findUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity userEntity = userRepository.findByUserIdLogin(username)
