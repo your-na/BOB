@@ -62,6 +62,17 @@ public class UserService implements UserDetailsService {
             throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
         }
         userDTO.setPwd(passwordEncoder.encode(userDTO.getPwd()));
+
+        if (userDTO.getProfileImageUrl() == null) {
+            userDTO.setProfileImageUrl("/images/user.png");
+        }
+        if (userDTO.getBio() == null) {
+            userDTO.setBio("소개를 작성해보세요.");
+        }
+        if (userDTO.getAccountCreatedAt() == null) {
+            userDTO.setAccountCreatedAt(LocalDateTime.now());
+        }
+
         UserEntity userEntity = UserEntity.toUserEntity(userDTO);
         userRepository.save(userEntity);
     }
@@ -78,21 +89,11 @@ public class UserService implements UserDetailsService {
         String oldLanguage = userEntity.getMainLanguage();
         String oldProfileImage = userEntity.getProfileImageUrl();
 
-        // 프로필 이미지 처리
-        if (profileImage != null && !profileImage.isEmpty()) {
-            updateProfileImage(profileImage, userEntity);
-        }
-
         // 유저 정보 업데이트
         userEntity.setUserNick(userUpdateDTO.getUserNick());
         userEntity.setUserEmail(userUpdateDTO.getUserEmail());
         userEntity.setUserBio(userUpdateDTO.getUserBio());
         userEntity.setMainLanguage(userUpdateDTO.getMainLanguage());
-
-        // 프로필 이미지 URL 업데이트
-        if (userUpdateDTO.getProfileImageUrl() != null) {
-            userEntity.setProfileImageUrl(userUpdateDTO.getProfileImageUrl());
-        }
 
         userRepository.save(userEntity);  // 사용자 정보 저장
 
@@ -150,19 +151,27 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void updateProfileImage(MultipartFile profileImage, UserEntity userEntity) {
-        deleteExistingProfileImage(userEntity.getProfileImageUrl());
+        String oldProfileImageUrl = userEntity.getProfileImageUrl();
+
+        // 기존 이미지 삭제
+        if (oldProfileImageUrl != null && !oldProfileImageUrl.equals("/images/user.png")) {
+            deleteExistingProfileImage(oldProfileImageUrl);
+        }
+
         String newProfileImageUrl = saveProfileImage(profileImage);
         userEntity.setProfileImageUrl(newProfileImageUrl);
+
+        userRepository.save(userEntity);
     }
 
     private void deleteExistingProfileImage(String profileImageUrl) {
-        if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+        if (profileImageUrl != null && !profileImageUrl.equals("/images/user.png")) {
             Path existingFilePath = Paths.get(uploadDir, profileImageUrl.replace("uploads/profileImages/", ""));
             try {
                 Files.deleteIfExists(existingFilePath);
-                log.info("Deleted existing profile image: " + existingFilePath);
+                log.info("✅ 기존 프로필 이미지 삭제 완료: " + existingFilePath);
             } catch (IOException e) {
-                log.warn("Failed to delete existing profile image: " + profileImageUrl, e);
+                log.warn("⚠ 기존 프로필 이미지 삭제 실패: " + profileImageUrl, e);
             }
         }
     }

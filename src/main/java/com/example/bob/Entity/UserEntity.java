@@ -76,9 +76,9 @@ public class UserEntity {
         userEntity.sex = userDTO.getSex();
         userEntity.MainLanguage = userDTO.getMainLanguage();
         userEntity.Birthday = userDTO.getBirthday();
-        userEntity.profileImageUrl = userDTO.getProfileImageUrl();
-        userEntity.userBio = userDTO.getBio();
-        userEntity.accountCreatedAt = userDTO.getAccountCreatedAt();
+        userEntity.profileImageUrl = (userDTO.getProfileImageUrl() != null) ? userDTO.getProfileImageUrl() : "/images/user.png";
+        userEntity.userBio = (userDTO.getBio() != null) ? userDTO.getBio() : "소개를 작성해보세요.";
+        userEntity.accountCreatedAt = (userDTO.getAccountCreatedAt() != null) ? userDTO.getAccountCreatedAt() : LocalDateTime.now();
 
         return userEntity;
     }

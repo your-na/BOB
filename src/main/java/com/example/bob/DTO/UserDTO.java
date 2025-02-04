@@ -41,9 +41,9 @@ public class UserDTO {
         userDTO.setMainLanguage(userEntity.getMainLanguage());
         userDTO.setBirthday(userEntity.getBirthday());
         userDTO.setUserNick(userEntity.getUserNick());
-        userDTO.setAccountCreatedAt(userEntity.getAccountCreatedAt());
-        userDTO.setProfileImageUrl(userEntity.getProfileImageUrl()); // 프로필 이미지 URL 설정
-        userDTO.setBio(userEntity.getUserBio());
+        userDTO.setProfileImageUrl(userEntity.getProfileImageUrl() != null ? userEntity.getProfileImageUrl() : "/images/user.png");
+        userDTO.setBio(userEntity.getUserBio() != null ? userEntity.getUserBio() : "소개를 작성해보세요.");
+        userDTO.setAccountCreatedAt(userEntity.getAccountCreatedAt() != null ? userEntity.getAccountCreatedAt() : LocalDateTime.now());
 
         return userDTO;
     }
