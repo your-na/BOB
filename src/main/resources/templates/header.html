@@ -80,7 +80,7 @@
                             <li th:if="${user != null}"><a href="#">구직/프로젝트/공모전 내역</a></li>
                             <li th:if="${user != null}">
                                 <form id="logoutForm" th:action="@{/logout}" method="post">
-                                    <button type="submit">로그아웃</button>
+                                    <button type="submit" class="logout">로그아웃</button>
                                 </form>
                             </li>
 

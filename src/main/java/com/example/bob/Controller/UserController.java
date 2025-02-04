@@ -150,8 +150,11 @@ public class UserController {
         return "project";
     }
 
-    @GetMapping("/cw")
+    @GetMapping("/bw")
     public String Form() {
         return "newproject";
     }
+
+    @GetMapping("/bowon")
+    public String postform() {return "postproject";}
 }
