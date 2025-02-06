@@ -145,7 +145,7 @@ public class UserController {
         return "redirect:/";
     }
 
-    @GetMapping("/contest")
+    @GetMapping("/project")
     public String form() {
         return "project";
     }
