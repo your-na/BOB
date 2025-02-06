@@ -145,15 +145,6 @@ public class UserController {
         return "redirect:/";
     }
 
-    @GetMapping("/project")
-    public String form() {
-        return "project";
-    }
-
-    @GetMapping("/bw")
-    public String Form() {
-        return "newproject";
-    }
 
     @GetMapping("/bowon")
     public String postform() {return "postproject";}

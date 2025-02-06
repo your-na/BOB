@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>프로젝트 목록</title>
     <link rel="stylesheet" href="/css/project.css">
     <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
@@ -16,12 +16,14 @@
 </section>
 
 <section class="project-list">
-
+    <!-- 프로젝트 생성 버튼 -->
     <form>
         <button class="create-post-button">
             <a href="/bw">프로젝트 생성</a>
         </button>
     </form>
+
+    <!-- 프로젝트 목록 테이블 -->
     <table class="contest-table">
         <thead>
         <tr>
@@ -35,24 +37,15 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td>곰신곰신앱 만들기</td>
-            <td>유나나콘</td>
-            <td>D-3</td>
-            <td>2025.01.26 ~ 2024.06.26</td>
-            <td>24</td>
-            <td>3</td>
-            <td>모집중</td>
-        </tr>
-        <!-- 샘플 데이터 반복 -->
-        <tr>
-            <td>곰신곰신앱 만들기</td>
-            <td>유나나콘</td>
-            <td>D-3</td>
-            <td>2025.01.26 ~ 2024.06.26</td>
-            <td>24</td>
-            <td>3</td>
-            <td>모집중</td>
+        <!-- Thymeleaf 반복문으로 프로젝트 데이터 출력 -->
+        <tr th:each="project : ${projects}">
+            <td th:text="${project.title}">프로젝트명</td>
+            <td th:text="${project.createdBy}">생성자</td>
+            <td th:text="'D-' + ${project.recruitmentPeriod}">D-3</td>
+            <td th:text="${project.startDate} + ' ~ ' + ${project.endDate}">2025-01-01 ~ 2025-12-31</td>
+            <td th:text="${project.views}">0</td>
+            <td th:text="${project.likes}">0</td>
+            <td th:text="${project.status}">모집중</td>
         </tr>
         </tbody>
     </table>
