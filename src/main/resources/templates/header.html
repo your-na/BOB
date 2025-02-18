@@ -1,134 +1,127 @@
 <head>
     <link rel="stylesheet" th:href="@{/css/header.css}">
-
 </head>
 <div th:fragment="header">
-<header>
-    <nav class="navigator">
-        <div class="nav-left">
-            <h3 class="site-name"><a href="/main">BOB</a></h3>
-            <ul class="nav-list">
-                <li class="nav-item">
-                    <a href="#" class="nav-menu">공모전</a>
-                    <div class="all-dropdown-menu">
-                        <div class="dropdown-section">
-                            <ul>
-                                <li><a href="contest">전체 공모전</a></li>
-                                <li><a href="#">기업 공모전</a></li>
-                                <li><a href="#">외부 공모전</a></li>
-                                <li><a href="#">공모전 팀 모집</a></li>
-                                <li><a href="#">공모전 활동</a></li>
-                                <li><a href="#">찜한 공모전</a></li>
-                            </ul>
+    <header>
+        <nav class="navigator">
+            <div class="nav-left">
+                <h3 class="site-name"><a href="/main">BOB</a></h3>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#" class="nav-menu">공모전</a>
+                        <div class="all-dropdown-menu">
+                            <div class="dropdown-section">
+                                <ul>
+                                    <li><a href="contest">전체 공모전</a></li>
+                                    <li><a href="#">기업 공모전</a></li>
+                                    <li><a href="#">외부 공모전</a></li>
+                                    <li><a href="#">공모전 팀 모집</a></li>
+                                    <li><a href="#">공모전 활동</a></li>
+                                    <li><a href="#">찜한 공모전</a></li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-menu">프로젝트</a>
-                    <div class="all-dropdown-menu">
-                        <div class="dropdown-section">
-                            <ul>
-                                <li><a href="project">프로젝트</a></li>
-                                <li><a href="bw">프로젝트 생성</a></li>
-                                <li><a href="#">내가 쓴 프로젝트</a></li>
-                                <li><a href="#">찜한 프로젝트</a></li>
-                            </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-menu">프로젝트</a>
+                        <div class="all-dropdown-menu">
+                            <div class="dropdown-section">
+                                <ul>
+                                    <li><a th:href="@{/project}">프로젝트</a></li> <!-- ✅ 기존 "project" 제거하고 올바른 경로로 변경 -->
+                                    <li><a href="bw">프로젝트 생성</a></li>
+                                    <li><a href="#">내가 쓴 프로젝트</a></li>
+                                    <li><a href="#">찜한 프로젝트</a></li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-menu">구직</a>
-                    <div class="all-dropdown-menu">
-                        <div class="dropdown-section">
-                            <ul>
-                                <li><a href="#">구인 공고</a></li>
-                                <li><a href="#">포트폴리오 모음방</a></li>
-                                <li><a href="#">신청한 구직 내역</a></li>
-                                <li><a href="#">찜한 공고</a></li>
-                            </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-menu">구직</a>
+                        <div class="all-dropdown-menu">
+                            <div class="dropdown-section">
+                                <ul>
+                                    <li><a href="#">구인 공고</a></li>
+                                    <li><a href="#">포트폴리오 모음방</a></li>
+                                    <li><a href="#">신청한 구직 내역</a></li>
+                                    <li><a href="#">찜한 공고</a></li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-menu">이력서</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-menu">게시판</a>
-                </li>
-            </ul>
-        </div>
-        <div class="nav-right">
-            <div class="search-bar-container">
-                <form id="searchForm">
-                    <input type="text" name="kw" id="search_kw" class="search-bar" placeholder="검색어 입력" th:value="${kw}">
-                    <span class="search-icon"><img src="/images/search.png" alt=""></span>
-                </form>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-menu">이력서</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-menu">게시판</a>
+                    </li>
+                </ul>
             </div>
-            <a class="chatting-icon">
-                <img src="/images/chatting.png" alt="">
-            </a>
-            <div class="nav-item1">
-                <a class="user-icon">
-                    <img src="/images/user.png" alt="Profile Image">
+            <div class="nav-right">
+                <div class="search-bar-container">
+                    <form id="searchForm">
+                        <input type="text" name="kw" id="search_kw" class="search-bar" placeholder="검색어 입력" th:value="${kw}">
+                        <span class="search-icon"><img src="/images/search.png" alt=""></span>
+                    </form>
+                </div>
+                <a class="chatting-icon">
+                    <img src="/images/chatting.png" alt="">
                 </a>
-                <div class="all-dropdown-menu">
-                    <div class="dropdown-section">
-                        <ul>
-                            <!-- 로그인 상태일 때 -->
-                            <li th:if="${user != null}"><a href="/profile">내 정보 / 평점</a></li>
-                            <li th:if="${user != null}"><a href="#">알림</a></li>
-                            <li th:if="${user != null}"><a href="#">경력 내역</a></li>
-                            <li th:if="${user != null}"><a href="#">지원 현황</a></li>
-                            <li th:if="${user != null}">
-                                <form id="logoutForm" th:action="@{/logout}" method="post">
-                                    <button type="submit" class="logout">로그아웃</button>
-                                </form>
-                            </li>
+                <div class="nav-item1">
+                    <a class="user-icon">
+                        <img src="/images/user.png" alt="Profile Image">
+                    </a>
+                    <div class="all-dropdown-menu">
+                        <div class="dropdown-section">
+                            <ul>
+                                <!-- 로그인 상태일 때 -->
+                                <li th:if="${user != null}"><a href="/profile">내 정보 / 평점</a></li>
+                                <li th:if="${user != null}"><a href="#">알림</a></li>
+                                <li th:if="${user != null}"><a href="#">경력 내역</a></li>
+                                <li th:if="${user != null}"><a href="#">지원 현황</a></li>
+                                <li th:if="${user != null}">
+                                    <form id="logoutForm" th:action="@{/logout}" method="post">
+                                        <button type="submit" class="logout">로그아웃</button>
+                                    </form>
+                                </li>
 
-
-
-                            <!-- 비로그인 상태일 때 -->
-                            <li th:unless="${user != null}"><a href="/login" id="plz"><img src="/images/login.png">로그인 해주세요</a></li>
-                        </ul>
+                                <!-- 비로그인 상태일 때 -->
+                                <li th:unless="${user != null}"><a href="/login" id="plz"><img src="/images/login.png">로그인 해주세요</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
+        </nav>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const dropdownToggles = document.querySelectorAll(".dropdown-toggle");
 
+                dropdownToggles.forEach(toggle => {
+                    toggle.addEventListener("click", (e) => {
+                        e.preventDefault(); // 기본 동작 막기
+                        const parent = toggle.parentElement;
 
+                        // 다른 드롭다운 닫기
+                        document.querySelectorAll(".dropdown").forEach(dropdown => {
+                            if (dropdown !== parent) {
+                                dropdown.classList.remove("show");
+                            }
+                        });
 
-        </div>
-    </nav>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const dropdownToggles = document.querySelectorAll(".dropdown-toggle");
-
-            dropdownToggles.forEach(toggle => {
-                toggle.addEventListener("click", (e) => {
-                    e.preventDefault(); // 기본 동작 막기
-                    const parent = toggle.parentElement;
-
-                    // 다른 드롭다운 닫기
-                    document.querySelectorAll(".dropdown").forEach(dropdown => {
-                        if (dropdown !== parent) {
-                            dropdown.classList.remove("show");
-                        }
+                        // 현재 드롭다운 열기/닫기
+                        parent.classList.toggle("show");
                     });
+                });
 
-                    // 현재 드롭다운 열기/닫기
-                    parent.classList.toggle("show");
+                // 페이지 클릭 시 드롭다운 닫기
+                document.addEventListener("click", (e) => {
+                    if (!e.target.closest(".dropdown")) {
+                        document.querySelectorAll(".dropdown").forEach(dropdown => {
+                            dropdown.classList.remove("show");
+                        });
+                    }
                 });
             });
-
-            // 페이지 클릭 시 드롭다운 닫기
-            document.addEventListener("click", (e) => {
-                if (!e.target.closest(".dropdown")) {
-                    document.querySelectorAll(".dropdown").forEach(dropdown => {
-                        dropdown.classList.remove("show");
-                    });
-                }
-            });
-        });
-    </script>
-</header>
+        </script>
+    </header>
 </div>
-

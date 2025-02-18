@@ -39,7 +39,10 @@
         <tbody>
         <!-- Thymeleaf 반복문으로 프로젝트 데이터 출력 -->
         <tr th:each="project : ${projects}">
-            <td th:text="${project.title}">프로젝트명</td>
+            <!-- ✅ 프로젝트 제목 클릭 시 해당 프로젝트의 상세 페이지(`/postproject/{id}`)로 이동 -->
+            <td>
+                <a th:href="@{/postproject/{id}(id=${project.id})}" th:text="${project.title}">프로젝트명</a>
+            </td>
             <td th:text="${project.createdBy}">생성자</td>
             <td th:text="'D-' + ${project.recruitmentPeriod}">D-3</td>
             <td th:text="${project.startDate} + ' ~ ' + ${project.endDate}">2025-01-01 ~ 2025-12-31</td>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>프로젝트 상세보기</title>
     <link rel="stylesheet" href="/css/postproject.css">
     <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
@@ -12,28 +12,34 @@
 
 <!-- 제목과 모집현황을 같은 줄에 배치 -->
 <div class="title-row">
-    <div class="title">공모전A 함께 할 팀원 모집합니다!</div> <span class="deadline">D-14</span>
-    <div class="status">모집현황 <div class="team"><div id="yes"> <img src="/images/team.png"></div><div id="no"><img src="/images/user.png"><img src="/images/user.png"><img src="/images/user.png"></div></div></div>
-</div>
-<hr>
-<!-- 작성일을 제목 아래로 배치 -->
-<div class="meta">
-    <span class="meta1">나유정</span>
-    <span class="meta2">작성일 : 2025.01.03 오후 11:05</span>
+    <div class="title" th:text="${project.title}">공모전A 함께 할 팀원 모집합니다!</div>
+    <span class="deadline" th:text="'D-' + ${project.recruitmentPeriod}">D-14</span>
 </div>
 
-<div class="content">
-    저는 프론트 쪽이고, 제 경력은 프로필 보기로 확인해 주세요. 저는 경력보단 참여 잘 할 자신 있으신 분을 위주로 뽑을 예정입니다 ^_^
+<!-- 작성자 및 작성일 -->
+<div class="meta">
+    <span class="meta1" th:text="${project.createdBy}">작성자</span>
+    <span class="meta2">작성일 : <span th:text="${project.startDate}">2025-01-03</span></span>
 </div>
+
+<!-- 본문 내용 -->
+<div class="content" th:text="${project.description}">
+    저는 프론트 쪽이고, 제 경력은 프로필 보기로 확인해 주세요.
+</div>
+
 <form>
     <button class="apply-btn">팀 신청하기</button>
 </form>
 
 <hr>
+
+<!-- 좋아요 및 스크랩 -->
 <div class="interaction">
-    <div id="heart"><img src="/images/heart.png"> 10</div><div id="scrap"><img src="/images/scrap.png"> 2</div>
+    <div id="heart"><img src="/images/heart.png"> <span th:text="${project.likes}">10</span></div>
+    <div id="scrap"><img src="/images/scrap.png"> <span>2</span></div>
 </div>
 
+<!-- 댓글 입력 -->
 <form>
     <input type="text" class="comment-box" placeholder="댓글을 작성해주세요.">
 </form>
