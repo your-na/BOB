@@ -291,7 +291,7 @@
 .floating-calendar {
     position: fixed;
     bottom: 20px;
-    right: 20px;
+    right: 60px;
     background-color: #19CB13;
     color: white;
     border: none;

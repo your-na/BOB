@@ -17,8 +17,8 @@
                                 <li><a href="#">기업 공모전</a></li>
                                 <li><a href="#">외부 공모전</a></li>
                                 <li><a href="#">공모전 팀 모집</a></li>
-                                <li><a href="#">참가중인 공모전</a></li>
-                                <li><a href="#">저장한 공모전</a></li>
+                                <li><a href="#">공모전 활동</a></li>
+                                <li><a href="#">찜한 공모전</a></li>
                             </ul>
                         </div>
                     </div>
@@ -30,8 +30,8 @@
                             <ul>
                                 <li><a href="project">프로젝트</a></li>
                                 <li><a href="bw">프로젝트 생성</a></li>
-                                <li><a href="#">참가 중인 프로젝트</a></li>
-                                <li><a href="#">저장한 프로젝트</a></li>
+                                <li><a href="#">내가 쓴 프로젝트</a></li>
+                                <li><a href="#">찜한 프로젝트</a></li>
                             </ul>
                         </div>
                     </div>
@@ -43,8 +43,8 @@
                             <ul>
                                 <li><a href="#">구인 공고</a></li>
                                 <li><a href="#">포트폴리오 모음방</a></li>
-                                <li><a href="#">신청한 구직</a></li>
-                                <li><a href="#">저장한 공고</a></li>
+                                <li><a href="#">신청한 구직 내역</a></li>
+                                <li><a href="#">찜한 공고</a></li>
                             </ul>
                         </div>
                     </div>
@@ -75,9 +75,10 @@
                     <div class="dropdown-section">
                         <ul>
                             <!-- 로그인 상태일 때 -->
-                            <li th:if="${user != null}"><a href="/profile">내 정보</a></li>
+                            <li th:if="${user != null}"><a href="/profile">내 정보 / 평점</a></li>
                             <li th:if="${user != null}"><a href="#">알림</a></li>
-                            <li th:if="${user != null}"><a href="#">구직/프로젝트/공모전 내역</a></li>
+                            <li th:if="${user != null}"><a href="#">경력 내역</a></li>
+                            <li th:if="${user != null}"><a href="#">지원 현황</a></li>
                             <li th:if="${user != null}">
                                 <form id="logoutForm" th:action="@{/logout}" method="post">
                                     <button type="submit" class="logout">로그아웃</button>
