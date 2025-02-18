@@ -44,16 +44,14 @@ public class ProjectService {
 
         // 이미 좋아요를 눌렀다면 취소
         if (project.getLikedUsers().contains(userId)) {
-            project.getLikedUsers().remove(userId);  // 좋아요 취소
-            project.setLikes(project.getLikes() - 1);  // 좋아요 수 감소
-        }
-        // 좋아요 추가
-        else {
-            project.getLikedUsers().add(userId);  // 좋아요 추가
-            project.setLikes(project.getLikes() + 1);  // 좋아요 수 증가
+            project.getLikedUsers().remove(userId);
+            project.setLikes(project.getLikes() - 1);
+        } else {
+            project.getLikedUsers().add(userId);
+            project.setLikes(project.getLikes() + 1);
         }
 
-        return projectRepository.save(project);  // DB에 좋아요 상태 저장
+        return projectRepository.save(project);
     }
 
     /**
@@ -62,11 +60,8 @@ public class ProjectService {
     @Transactional
     public ProjectEntity incrementViews(Long projectId) {
         ProjectEntity project = getProjectById(projectId);
-
-        // 조회수 1 증가
         project.setViews(project.getViews() + 1);
-
-        return projectRepository.save(project);  // DB에 조회수 저장
+        return projectRepository.save(project);
     }
 
     /**
@@ -76,15 +71,19 @@ public class ProjectService {
     public ProjectEntity toggleScrap(Long projectId, Long userId) {
         ProjectEntity project = getProjectById(projectId);
 
-        // 이미 스크랩을 눌렀다면 취소
         if (project.getScrapUsers().contains(userId)) {
-            project.getScrapUsers().remove(userId);  // 스크랩 취소
-        }
-        // 스크랩 추가
-        else {
-            project.getScrapUsers().add(userId);  // 스크랩 추가
+            project.getScrapUsers().remove(userId);
+        } else {
+            project.getScrapUsers().add(userId);
         }
 
-        return projectRepository.save(project);  // DB에 스크랩 상태 저장
+        return projectRepository.save(project);
+    }
+
+    /**
+     * ✅ 프로젝트 목록 갱신 (새 프로젝트 저장 후 목록 자동 업데이트)
+     */
+    public List<ProjectEntity> refreshProjectList() {
+        return projectRepository.findAll();
     }
 }

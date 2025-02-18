@@ -23,8 +23,11 @@ public class ProjectEntity {
     @Column(length = 100, nullable = false)
     private String title; // 프로젝트명
 
-    @Column(length = 100)
-    private String createdBy; // 생성자
+    @Column(length = 255, nullable = false)
+    private String createdBy; // ✅ 닉네임 저장 (created_by 컬럼과 매핑)
+
+    @Column(length = 255, nullable = false)
+    private String creatorNick; // ✅ creator_nick 컬럼 추가
 
     @Column(nullable = false)
     private int recruitmentPeriod; // 모집 기간
@@ -50,21 +53,19 @@ public class ProjectEntity {
     @Column(length = 500)
     private String description; // 설명
 
-    @Column(length = 255, nullable = false)
-    private String creatorNick; // 생성자 닉네임
-
-    // ✅ 좋아요한 사용자 리스트 저장
     @ElementCollection
     private List<Long> likedUsers = new ArrayList<>();
 
-    // ✅ 스크랩한 사용자 리스트 저장
     @ElementCollection
     private List<Long> scrapUsers = new ArrayList<>();  // 스크랩 기능 추가
 
     @PrePersist
     public void prePersist() {
+        if (this.createdBy == null || this.createdBy.isEmpty()) {
+            this.createdBy = "default_nick"; // 기본값 설정
+        }
         if (this.creatorNick == null || this.creatorNick.isEmpty()) {
-            this.creatorNick = "default_nick"; // 기본값 설정
+            this.creatorNick = this.createdBy; // creatorNick이 없으면 createdBy 값으로 설정
         }
     }
 }

@@ -2,98 +2,55 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>프로젝트 상세보기</title>
+    <title th:text="${project.title}">프로젝트 상세보기</title>
     <link rel="stylesheet" href="/css/postproject.css">
     <link rel="stylesheet" th:href="@{/css/header.css}">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery 추가 -->
 </head>
 <body>
 <!-- header -->
 <div th:insert="~{header :: header}"></div>
 
-<!-- 제목과 모집현황을 같은 줄에 배치 -->
+<!-- 제목과 모집현황 -->
 <div class="title-row">
-    <div class="title" th:text="${project.title}">공모전A 함께 할 팀원 모집합니다!</div>
+    <div class="title" th:text="${project.title}">프로젝트 제목</div>
     <span class="deadline" th:text="'D-' + ${project.recruitmentPeriod}">D-14</span>
+    <div class="status">
+        모집현황
+        <div class="team">
+            <div id="yes"><img src="/images/team.png"></div>
+            <div id="no"><img src="/images/user.png"><img src="/images/user.png"><img src="/images/user.png"></div>
+        </div>
+    </div>
 </div>
+<hr>
 
 <!-- 작성자 및 작성일 -->
 <div class="meta">
     <span class="meta1" th:text="${project.createdBy}">작성자</span>
-    <span class="meta2">작성일 : <span th:text="${project.startDate}">2025-01-03</span></span>
+    <span class="meta2" th:text="'작성일 : ' + ${#temporals.format(project.startDate, 'yyyy.MM.dd')}">작성일</span>
 </div>
 
-<!-- 본문 내용 -->
+<!-- 프로젝트 설명 -->
 <div class="content" th:text="${project.description}">
-    저는 프론트 쪽이고, 제 경력은 프로필 보기로 확인해 주세요.
+    프로젝트 설명 내용
 </div>
 
+<!-- 팀 신청 버튼 -->
 <form>
     <button class="apply-btn">팀 신청하기</button>
 </form>
 
 <hr>
-
-<!-- 좋아요 및 스크랩 -->
+<!-- 좋아요 & 스크랩 -->
 <div class="interaction">
-    <!-- ✅ 좋아요 버튼 (AJAX 요청) -->
-    <div id="heart" onclick="toggleLike()">
-        <img id="heart-icon" src="/images/heart.png">
-        <span id="like-count" th:text="${project.likes}">10</span>
-    </div>
-
-    <!-- ✅ 스크랩 버튼 (AJAX 요청) -->
-    <div id="scrap" onclick="toggleScrap()">
-        <img id="scrap-icon" src="/images/scrap.png">
-    </div>
+    <div id="heart"><img src="/images/heart.png"> <span th:text="${project.likes}">10</span></div>
+    <div id="scrap"><img src="/images/scrap.png"> <span>2</span></div>
 </div>
 
 <!-- 댓글 입력 -->
 <form>
     <input type="text" class="comment-box" placeholder="댓글을 작성해주세요.">
 </form>
-
-<!-- ✅ 좋아요 & 스크랩 AJAX 요청 스크립트 -->
-<script>
-    // 페이지 로드 시 조회수 증가
-    $(document).ready(function() {
-        let projectId = window.location.pathname.split("/").pop(); // 현재 프로젝트 ID 가져오기
-
-        // AJAX 요청으로 조회수 증가
-        $.post(`/postproject/${projectId}/incrementViews`)
-            .done(function(response) {
-                console.log("조회수 증가 완료");
-            })
-            .fail(function() {
-                console.log("조회수 증가 실패");
-            });
-    });
-
-    function toggleLike() {
-        let projectId = window.location.pathname.split("/").pop(); // 현재 URL에서 프로젝트 ID 가져오기
-
-        $.post(`/postproject/${projectId}/like`, { userId: 1 }) // 사용자 ID는 나중에 변경 가능
-            .done(function (updatedLikes) {
-                $("#like-count").text(updatedLikes); // 좋아요 수 업데이트
-                $("#heart-icon").attr("src", "/images/heart_red.png"); // 빨간색 하트로 변경
-            })
-            .fail(function () {
-                alert("좋아요 요청 실패!");
-            });
-    }
-
-    function toggleScrap() {
-        let projectId = window.location.pathname.split("/").pop();
-
-        $.post(`/postproject/${projectId}/scrap`, { userId: 1 })
-            .done(function () {
-                $("#scrap-icon").attr("src", "/images/scrap_yellow.png"); // 노란색으로 변경
-            })
-            .fail(function () {
-                alert("스크랩 요청 실패!");
-            });
-    }
-</script>
 
 </body>
 </html>

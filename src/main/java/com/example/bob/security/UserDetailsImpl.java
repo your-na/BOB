@@ -23,6 +23,11 @@ public class UserDetailsImpl implements UserDetails {
         return userEntity;
     }
 
+    // ✅ 닉네임 반환 메서드 추가
+    public String getUserNick() {
+        return userEntity != null ? userEntity.getUserNick() : "알 수 없음";
+    }
+
     @Override
     public String getUsername() {
         return userEntity.getUserIdLogin();
