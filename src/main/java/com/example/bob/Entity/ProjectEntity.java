@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -40,7 +42,7 @@ public class ProjectEntity {
     private int views; // 조회수
 
     @Column(nullable = false)
-    private int likes; // 좋아요
+    private int likes; // 좋아요 개수
 
     @Column(length = 50, nullable = false)
     private String status; // 모집 상태 (예: 모집중)
@@ -50,6 +52,14 @@ public class ProjectEntity {
 
     @Column(length = 255, nullable = false)
     private String creatorNick; // 생성자 닉네임
+
+    // ✅ 좋아요한 사용자 리스트 저장
+    @ElementCollection
+    private List<Long> likedUsers = new ArrayList<>();
+
+    // ✅ 스크랩한 사용자 리스트 저장
+    @ElementCollection
+    private List<Long> scrapUsers = new ArrayList<>();  // 스크랩 기능 추가
 
     @PrePersist
     public void prePersist() {

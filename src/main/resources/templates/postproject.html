@@ -5,6 +5,7 @@
     <title>프로젝트 상세보기</title>
     <link rel="stylesheet" href="/css/postproject.css">
     <link rel="stylesheet" th:href="@{/css/header.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery 추가 -->
 </head>
 <body>
 <!-- header -->
@@ -35,13 +36,64 @@
 
 <!-- 좋아요 및 스크랩 -->
 <div class="interaction">
-    <div id="heart"><img src="/images/heart.png"> <span th:text="${project.likes}">10</span></div>
-    <div id="scrap"><img src="/images/scrap.png"> <span>2</span></div>
+    <!-- ✅ 좋아요 버튼 (AJAX 요청) -->
+    <div id="heart" onclick="toggleLike()">
+        <img id="heart-icon" src="/images/heart.png">
+        <span id="like-count" th:text="${project.likes}">10</span>
+    </div>
+
+    <!-- ✅ 스크랩 버튼 (AJAX 요청) -->
+    <div id="scrap" onclick="toggleScrap()">
+        <img id="scrap-icon" src="/images/scrap.png">
+    </div>
 </div>
 
 <!-- 댓글 입력 -->
 <form>
     <input type="text" class="comment-box" placeholder="댓글을 작성해주세요.">
 </form>
+
+<!-- ✅ 좋아요 & 스크랩 AJAX 요청 스크립트 -->
+<script>
+    // 페이지 로드 시 조회수 증가
+    $(document).ready(function() {
+        let projectId = window.location.pathname.split("/").pop(); // 현재 프로젝트 ID 가져오기
+
+        // AJAX 요청으로 조회수 증가
+        $.post(`/postproject/${projectId}/incrementViews`)
+            .done(function(response) {
+                console.log("조회수 증가 완료");
+            })
+            .fail(function() {
+                console.log("조회수 증가 실패");
+            });
+    });
+
+    function toggleLike() {
+        let projectId = window.location.pathname.split("/").pop(); // 현재 URL에서 프로젝트 ID 가져오기
+
+        $.post(`/postproject/${projectId}/like`, { userId: 1 }) // 사용자 ID는 나중에 변경 가능
+            .done(function (updatedLikes) {
+                $("#like-count").text(updatedLikes); // 좋아요 수 업데이트
+                $("#heart-icon").attr("src", "/images/heart_red.png"); // 빨간색 하트로 변경
+            })
+            .fail(function () {
+                alert("좋아요 요청 실패!");
+            });
+    }
+
+    function toggleScrap() {
+        let projectId = window.location.pathname.split("/").pop();
+
+        $.post(`/postproject/${projectId}/scrap`, { userId: 1 })
+            .done(function () {
+                $("#scrap-icon").attr("src", "/images/scrap_yellow.png"); // 노란색으로 변경
+            })
+            .fail(function () {
+                alert("스크랩 요청 실패!");
+            });
+    }
+</script>
+
 </body>
 </html>
