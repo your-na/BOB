@@ -30,6 +30,7 @@
     text-align: center;
     color: #404040;
     font-weight: bold;
+    white-space: nowrap; /* ✅ 헤더 줄바꿈 방지 */
 }
 
 .contest-table tr:nth-child(even) {

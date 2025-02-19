@@ -6,7 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -14,10 +17,28 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
 
     /**
-     * ✅ 모든 프로젝트 가져오기
+     * ✅ D-Day 계산 (진행 시작일 하루 전 기준)
+     */
+    public String calculateDDay(LocalDate startDate) {
+        LocalDate today = LocalDate.now();
+        long dDay = ChronoUnit.DAYS.between(today, startDate.minusDays(1));
+
+        if (dDay == 0) {
+            return "D-0"; // 모집 마감일
+        } else if (dDay > 0) {
+            return "D-" + dDay;
+        } else {
+            return "마감됨"; // 모집이 이미 끝난 경우
+        }
+    }
+
+    /**
+     * ✅ 모든 프로젝트 가져오기 (D-Day 적용)
      */
     public List<ProjectEntity> getAllProjects() {
-        return projectRepository.findAll();
+        return projectRepository.findAll().stream()
+                .peek(project -> project.setDDay(calculateDDay(project.getStartDate()))) // D-Day 설정
+                .collect(Collectors.toList());
     }
 
     /**
@@ -84,6 +105,8 @@ public class ProjectService {
      * ✅ 프로젝트 목록 갱신 (새 프로젝트 저장 후 목록 자동 업데이트)
      */
     public List<ProjectEntity> refreshProjectList() {
-        return projectRepository.findAll();
+        return projectRepository.findAll().stream()
+                .peek(project -> project.setDDay(calculateDDay(project.getStartDate()))) // D-Day 적용
+                .collect(Collectors.toList());
     }
 }

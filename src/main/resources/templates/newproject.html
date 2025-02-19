@@ -50,12 +50,50 @@
   </section>
 </main>
 
-<!-- 프로젝트 생성 버튼 -->
-<a href="/bw" class="btn btn-primary">프로젝트 생성</a>
-
 <script>
   document.getElementById("project-create-btn")?.addEventListener("click", function() {
     window.location.href = "/newproject"; // ✅ URL을 /newproject로 수정
+  });
+
+  // ✅ 날짜 선택 제한 기능 추가
+  document.addEventListener("DOMContentLoaded", function() {
+    let today = new Date().toISOString().split("T")[0]; // 오늘 날짜 (YYYY-MM-DD 형식)
+
+    let startDateInput = document.getElementById("start-date");
+    let endDateInput = document.getElementById("end-date");
+
+    // ✅ 시작 날짜는 무조건 오늘 이후만 가능하도록 설정
+    startDateInput.setAttribute("min", today);
+
+    // ✅ 시작 날짜 변경 시, 오늘 이전 날짜가 선택되면 자동 수정
+    startDateInput.addEventListener("change", function() {
+      let startDate = startDateInput.value;
+
+      // 🔹 시작 날짜가 오늘 이전이면 자동으로 오늘 날짜로 변경
+      if (startDate < today) {
+        alert("시작 날짜는 오늘 이후로 선택해야 합니다!");
+        startDateInput.value = today;
+        startDate = today;
+      }
+
+      endDateInput.setAttribute("min", startDate); // 종료 날짜는 시작 날짜 이상만 가능
+    });
+
+    // ✅ 종료 날짜 선택 시, 시작 날짜보다 빠르면 자동 수정 (같은 날짜는 허용)
+    endDateInput.addEventListener("change", function() {
+      let startDate = startDateInput.value;
+      let endDate = endDateInput.value;
+
+      if (endDate < startDate) {
+        alert("끝나는 날짜는 시작 날짜보다 빠를 수 없습니다!");
+        endDateInput.value = startDate; // 자동으로 시작 날짜와 동일하게 설정
+      }
+    });
+
+    // ✅ 페이지 로드 시에도 시작 날짜를 오늘로 강제 설정 (잘못된 값 방지)
+    if (startDateInput.value < today) {
+      startDateInput.value = today;
+    }
   });
 </script>
 

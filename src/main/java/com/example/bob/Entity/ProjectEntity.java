@@ -59,6 +59,13 @@ public class ProjectEntity {
     @ElementCollection
     private List<Long> scrapUsers = new ArrayList<>();  // 스크랩 기능 추가
 
+    @Transient // 데이터베이스에 저장되지 않음 (조회용)
+    private String dDay;
+
+    public void setDDay(String dDay) {
+        this.dDay = dDay;
+    }
+
     @PrePersist
     public void prePersist() {
         if (this.createdBy == null || this.createdBy.isEmpty()) {
