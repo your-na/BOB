@@ -53,14 +53,11 @@ public class ProjectEntity {
     @Column(length = 500)
     private String description; // 설명
 
-    @ElementCollection
-    private List<Long> likedUsers = new ArrayList<>();
-
-    @ElementCollection
-    private List<Long> scrapUsers = new ArrayList<>();  // 스크랩 기능 추가
-
     @Transient // 데이터베이스에 저장되지 않음 (조회용)
     private String dDay;
+
+    @ElementCollection
+    private List<Long> likedUsers = new ArrayList<>(); // 좋아요 누른 유저들
 
     public void setDDay(String dDay) {
         this.dDay = dDay;
@@ -74,5 +71,30 @@ public class ProjectEntity {
         if (this.creatorNick == null || this.creatorNick.isEmpty()) {
             this.creatorNick = this.createdBy; // creatorNick이 없으면 createdBy 값으로 설정
         }
+    }
+
+    // 좋아요 수 증가 처리
+    public void toggleLike() {
+        this.likes += 1; // 좋아요 수 증가
+    }
+
+    // 좋아요 수 감소 처리
+    public void decrementLike() {
+        this.likes -= 1; // 좋아요 수 감소
+    }
+
+    // 특정 사용자가 좋아요를 눌렀는지 확인
+    public boolean isUserLiked(Long userId) {
+        return likedUsers.contains(userId); // 사용자가 좋아요를 눌렀는지 확인
+    }
+
+    // 사용자가 좋아요를 눌렀을 때 추가
+    public void addUserToLikes(Long userId) {
+        likedUsers.add(userId); // 사용자 추가
+    }
+
+    // 사용자가 좋아요를 취소할 때 제거
+    public void removeUserFromLikes(Long userId) {
+        likedUsers.remove(userId); // 사용자 제거
     }
 }

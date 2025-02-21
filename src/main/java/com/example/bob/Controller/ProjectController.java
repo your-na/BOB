@@ -44,29 +44,20 @@ public class ProjectController {
         return "postproject";  // 프로젝트 상세 페이지
     }
 
+    /**
+     * ✅ 좋아요 토글 API
+     */
     @PostMapping("/postproject/{id}/like")
     @ResponseBody
     public ResponseEntity<?> likeProject(@PathVariable Long id, @RequestParam Long userId) {
         try {
             // 좋아요 토글 메서드 호출 (좋아요 수 및 리스트 갱신)
             ProjectEntity updatedProject = projectService.toggleLike(id, userId);
-            return ResponseEntity.ok(updatedProject.getLikes()); // 변경된 좋아요 개수 반환
+
+            // 변경된 좋아요 개수 반환
+            return ResponseEntity.ok(updatedProject.getLikes());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("좋아요 요청 실패");
-        }
-    }
-
-    /**
-     * ✅ 스크랩 API (AJAX 요청)
-     */
-    @PostMapping("/postproject/{id}/scrap")
-    @ResponseBody
-    public ResponseEntity<?> scrapProject(@PathVariable Long id, @RequestParam Long userId) {
-        try {
-            ProjectEntity updatedProject = projectService.toggleScrap(id, userId);
-            return ResponseEntity.ok("스크랩 처리 성공");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("스크랩 요청 실패");
         }
     }
 
@@ -83,7 +74,7 @@ public class ProjectController {
     }
 
     /**
-     * ✅ 프로젝트 생성 페이지 (newproject.html) - 기존 매핑 유지
+     * ✅ 프로젝트 생성 페이지 (newproject.html)
      */
     @GetMapping("/newproject")
     public String showNewProjectForm() {
@@ -107,13 +98,13 @@ public class ProjectController {
                                 @RequestParam("start-date") String startDateStr,
                                 @RequestParam("end-date") String endDateStr,
                                 @RequestParam("recruitment") int recruitment,
-                                @AuthenticationPrincipal UserDetailsImpl userDetails,  // ✅ 로그인한 사용자 정보 가져오기
+                                @AuthenticationPrincipal UserDetailsImpl userDetails,  // 로그인한 사용자 정보 가져오기
                                 Model model) {
 
-        // ✅ 현재 로그인한 사용자의 닉네임 가져오기
+        // 현재 로그인한 사용자의 닉네임 가져오기
         String creatorNick = userDetails.getUserNick();
 
-        // ✅ String → LocalDate 변환
+        // String → LocalDate 변환
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate startDate = LocalDate.parse(startDateStr, formatter);
         LocalDate endDate = LocalDate.parse(endDateStr, formatter);
@@ -122,8 +113,8 @@ public class ProjectController {
         ProjectEntity newProject = ProjectEntity.builder()
                 .title(projectName)
                 .description(projectDescription)
-                .createdBy(creatorNick) // ✅ created_by 컬럼에 저장
-                .creatorNick(creatorNick) // ✅ creator_nick 컬럼에도 동일한 값 저장
+                .createdBy(creatorNick) // created_by 컬럼에 저장
+                .creatorNick(creatorNick) // creator_nick 컬럼에도 동일한 값 저장
                 .startDate(startDate)
                 .endDate(endDate)
                 .recruitmentPeriod(recruitment)
@@ -136,9 +127,7 @@ public class ProjectController {
         // DB에 저장
         ProjectEntity savedProject = projectService.saveProject(newProject);
 
-        // ✅ 목록에도 반영되면서, 생성한 프로젝트 상세 페이지로 이동
+        // 목록에도 반영되면서, 생성한 프로젝트 상세 페이지로 이동
         return "redirect:/postproject/" + savedProject.getId();
     }
 }
-
-

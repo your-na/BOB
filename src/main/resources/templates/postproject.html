@@ -24,9 +24,6 @@
     <div class="post-detail">
         <img class="postdetail" src="/images/postdetail.png" alt="점 세 개" onclick="toggleDropdown()">
         <div class="dropdown-menu" id="dropdownMenu">
-<!--            이 부분 th:href는 백에서 수정해주세용... ㅎㅁㅎ-->
-<!--            <a class="action-button" th:href="@{}">수정하기</a>-->
-<!--            <a class="action-button" th:href="@{}">삭제하기</a>-->
         </div>
     </div>
 </div>
@@ -51,15 +48,63 @@
 <hr>
 <!-- 좋아요 & 스크랩 -->
 <div class="interaction">
-    <div id="heart"><img src="/images/heart.png"> <span th:text="${project.likes}">10</span></div>
+    <div id="heart" onclick="toggleHeart()">
+        <img id="heartImage" src="/images/heart.png"> <!-- 빈 하트 이미지로 시작 -->
+        <span id="likesCount">10</span> <!-- 좋아요 수 표시 -->
+    </div>
     <div id="scrap"><img src="/images/scrap.png"> <span>2</span></div>
 </div>
+
+
 
 <!-- 댓글 입력 -->
 <form>
     <input type="text" class="comment-box" placeholder="댓글을 작성해주세요.">
     <button class="postbutton">등록</button>
 </form>
+
+<!-- JavaScript -->
+<script>
+    // 이 예시에서는 'isLiked'라는 변수를 사용하여 사용자가 하트를 눌렀는지 여부를 확인합니다.
+    let isLiked = false; // 하트를 눌렀는지 여부, 기본은 false (하트를 누르지 않은 상태)
+    let likesCount = 10; // 현재 좋아요 수, 실제로는 서버에서 가져와야 함
+
+    function toggleHeart() {
+        const heartImage = document.getElementById('heartImage');
+        const likesSpan = document.getElementById('likesCount');
+
+        // 이미 하트를 눌렀으면 취소하고, 누르지 않았다면 좋아요를 추가
+        if (isLiked) {
+            heartImage.src = '/images/heart.png'; // 빈 하트로 변경
+            likesCount--; // 좋아요 수 감소
+        } else {
+            heartImage.src = '/images/fillheart.png'; // 채워진 하트로 변경
+            likesCount++; // 좋아요 수 증가
+        }
+
+        // 좋아요 상태 변경 후, isLiked 상태 업데이트
+        isLiked = !isLiked;
+
+        // 좋아요 수 업데이트
+        likesSpan.textContent = likesCount;
+
+
+        // 서버에 좋아요 수 갱신 요청
+        fetch(`/postproject/${projectId}/like`, {
+            method: 'POST',
+        })
+            .then(response => response.json())
+            .then(updatedLikes => {
+                // 서버에서 받은 새로운 좋아요 수로 목록 업데이트
+                likesSpan.textContent = updatedLikes;  // 목록에 반영
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+
+</script>
 
 </body>
 </html>
