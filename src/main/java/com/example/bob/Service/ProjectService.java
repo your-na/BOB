@@ -21,7 +21,7 @@ public class ProjectService {
      */
     public String calculateDDay(LocalDate startDate) {
         LocalDate today = LocalDate.now();
-        long dDay = ChronoUnit.DAYS.between(today, startDate.minusDays(1));
+        long dDay = ChronoUnit.DAYS.between(today, startDate.minusDays(0));
 
         if (dDay == 0) {
             return "D-0"; // 모집 마감일

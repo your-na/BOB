@@ -103,9 +103,22 @@
 .comment-box {
     margin-top: 30px;
     padding: 8px;
-    width: 100%;
-    height: 40px;
+    width: 90%;
+    height: 30px;
     border: 1px solid #ccc;
     border-radius: 5px;
     background: #f9f9f9;
+}
+
+.comment-box:focus {
+    border-color: #00c800;
+}
+.postbutton {
+    margin-left: 30px;
+    width: 60px;
+    height: 30px;
+    border: none;
+    background: #2fd12f;
+    color: white;
+    border-radius: 10px;
 }

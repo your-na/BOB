@@ -44,8 +44,12 @@
 .contest-table td {
     color: #555;
     background-color: #fff;
+    text-decoration: none; /* 링크 밑줄 제거 */
 }
 
+.contest-table td:first-child {
+    text-decoration: none;
+}
 .contest-table td:last-child {
     color: #00b100;
     font-weight: bold;
