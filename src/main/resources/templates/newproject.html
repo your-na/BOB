@@ -16,7 +16,6 @@
     <h1>프로젝트 생성</h1>
     <hr>
     <form action="#" method="post" class="project-form">
-      <div class="bw">
         <div class="form-group">
           <label for="project-dates">진행 일정</label>
           <div class="date-inputs">
@@ -25,13 +24,13 @@
             <input type="date" id="end-date" name="end-date">
           </div>
         </div>
-        <p class="info-text">* 모집일은 선택하신 진행 일정의 시작일 전 날짜로 자동 선택됩니다.</p>
-      </div>
       <div class="form-group">
-        <input type="text" id="project-name" name="project-name" placeholder="프로젝트명을 입력하세요.">
-      </div>
-      <div class="form-group">
-        <textarea id="project-description" name="project-description" placeholder="프로젝트 내용을 입력해주세요."></textarea>
+        <label for="party-dates">모집 일정</label>
+        <div class="date-inputs">
+          <input type="date" id="startdate" name="start-date">
+          <span>~</span>
+          <input type="date" id="enddate" name="end-date">
+        </div>
       </div>
       <div class="bwbw">
         <div class="form-group">
@@ -41,11 +40,33 @@
             <option value="1">1명</option>
             <option value="2">2명</option>
             <option value="3">3명</option>
+            <option value="plus">기타</option>
           </select>
+          <div id="custom-input-group" style="display: none; display: flex; align-items: center;">
+            <input type="text" id="custom-recruitment" name="custom-recruitment" placeholder="직접 입력">
+            <p style="margin-left: 5px;">명</p>
+          </div>
         </div>
-        <button type="submit" class="submit-btn">등록</button>
       </div>
-      <p class="info-text">* 개인 프로젝트를 원하시면 모집 인원 0명을 선택해주세요.</p>
+        <br>
+      <div class="form-group">
+        <label for="project-name">프로젝트 주제</label>
+        <input type="text" id="project-name" name="project-name" placeholder="프로젝트명을 입력하세요.">
+      </div>
+        <br>
+      <div class="form-group">
+        <label for="project-goal">프로젝트 목표</label>
+        <textarea id="project-goal" name="project-goal" placeholder="프로젝트 목표를 간단히 입력해주세요."></textarea>
+      </div>
+      <div class="form-group">
+        <label for="project-description">프로젝트 내용</label>
+        <textarea id="project-description" name="project-description" placeholder="프로젝트 내용을 입력해주세요."></textarea>
+      </div>
+        <br>
+      <div class="btn">
+        <button type="submit" class="submit-btn">등록</button>
+        <button type="button" class="cancel-button"><a href="/project" class="ynbw">취소</a></button>
+      </div>
     </form>
   </section>
 </main>
@@ -95,6 +116,26 @@
       startDateInput.value = today;
     }
   });
+
+  document.addEventListener("DOMContentLoaded", function() {
+    var recruitmentSelect = document.getElementById("recruitment");
+    var customInputGroup = document.getElementById("custom-input-group");
+
+    // 페이지 로드 시 '기타'가 아닐 경우 숨김 (예외처리)
+    if (recruitmentSelect.value !== "plus") {
+      customInputGroup.style.display = "none";
+    }
+
+    recruitmentSelect.addEventListener("change", function() {
+      if (this.value === "plus") {
+        customInputGroup.style.display = "flex"; // 보이기
+        customInputGroup.style.alignItems = "center"; // 정렬 맞추기
+      } else {
+        customInputGroup.style.display = "none"; // 숨기기
+      }
+    });
+  });
+
 </script>
 
 </body>
