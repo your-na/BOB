@@ -148,4 +148,7 @@ public class UserController {
 
     @GetMapping("/bowon")
     public String postform() {return "postproject";}
+
+    @GetMapping("/job")
+    public String jobform() {return "job";}
 }

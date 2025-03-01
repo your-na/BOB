@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/css/rating.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+<div id="header">
+    <a href="/profile/">내 정보</a>
+    <a href="#" class="active">내 평점</a>
+</div>
+<div class="container">
+
+    <!-- 점수 원형 그래프 -->
+    <div class="score-section">
+        <div class="circle">
+            <span class="score">100</span>
+        </div>
+        <div class="feedback">
+            <div class="feedback-item">
+                <span class="feedback-text">리더십이 좋았어요</span>
+                <span class="feedback-score">100%</span>
+            </div>
+            <div class="feedback-item">
+                <span class="feedback-text">적극적이에요</span>
+                <span class="feedback-score">100%</span>
+            </div>
+            <div class="feedback-item">
+                <span class="feedback-text">친절했어요</span>
+                <span class="feedback-score">100%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 공모전 평가 -->
+    <div class="contest-review">
+        <div class="contest-title">
+            <strong>공모전 A</strong>
+            <span>원보강, 나유정, 진유서</span>
+            <span>2025.01.31</span>
+            <span class="rating">★★★★★</span>
+            <a href="#" class="details">상세보기 ></a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

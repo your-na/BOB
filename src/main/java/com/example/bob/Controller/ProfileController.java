@@ -150,4 +150,9 @@ public class ProfileController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @GetMapping("/rating")
+    public String ratingForm() {
+        return "rating"; // rating.html 반환
+    }
+
 }

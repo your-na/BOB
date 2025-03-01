@@ -56,6 +56,7 @@
             <th>진행 일정</th>
             <th>조회수</th>
             <th>좋아요</th>
+            <th>모집 인원</th>
             <th>현황</th>
         </tr>
         </thead>
@@ -70,6 +71,7 @@
             <td th:text="${project.startDate} + ' ~ ' + ${project.endDate}">2025-01-01 ~ 2025-12-31</td>
             <td th:text="${project.views}">0</td>
             <td th:text="${project.likes}">0</td>
+            <td>1/4</td>
             <td th:text="${project.status}">모집중</td>
         </tr>
         </tbody>
