@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/css/success.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<div class="container">
+    <form>
+    <div class="success">
+    <div class="success-icon">
+        <img src="/images/check.png">
+    </div>
+    <h2>신청이 완료되었습니다!</h2>
+    <p class="subtitle">귀하의 지원서가 성공적으로 제출되었습니다.</p>
+    </div>
+    <table class="info-table">
+        <tr>
+            <th>프로젝트명</th>
+            <td>공모전 함께 할 팀원 모집합니다</td>
+        </tr>
+        <tr>
+            <th>프로젝트 담당자</th>
+            <td>나유정</td>
+        </tr>
+        <tr>
+            <th>제출 날짜</th>
+            <td>February 15, 2024 at 14:30 GMT</td>
+        </tr>
+        <tr>
+            <th>신청 마감일</th>
+            <td>March 1, 2024 at 23:59 GMT</td>
+        </tr>
+    </table>
+
+    <div class="next-steps">
+        <h3>이후</h3>
+        <ul>
+            <li>• 제출하신 신청서는 프로젝트 담당자에게 자동으로 제출됩니다.</li>
+            <li>• 담당자가 수락 시 자동으로 프로젝트 팀 스페이스가 생성됩니다.</li>
+            <li>• 생성된 팀 스페이스는 일정 플로어를 통해 확인 가능합니다.</li>
+        </ul>
+    </div>
+
+    <div class="buttons">
+            <button class="btn green">제출한 신청서 보기</button>
+            <button class="btn gray">해당 글로 돌아가기</button>
+    </div>
+    </form>
+</div>
+</body>
+</html>

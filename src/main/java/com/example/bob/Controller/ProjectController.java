@@ -130,4 +130,10 @@ public class ProjectController {
         // 목록에도 반영되면서, 생성한 프로젝트 상세 페이지로 이동
         return "redirect:/postproject/" + savedProject.getId();
     }
+
+    @GetMapping("/success")
+    public String showsuccessForm() {
+        return "success"; // success.html 반환
+    }
+
 }
