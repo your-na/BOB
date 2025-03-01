@@ -98,23 +98,28 @@ public class ProjectController {
                                 @RequestParam("start-date") String startDateStr,
                                 @RequestParam("end-date") String endDateStr,
                                 @RequestParam("recruitment") int recruitment,
-                                @AuthenticationPrincipal UserDetailsImpl userDetails,  // 로그인한 사용자 정보 가져오기
+                                @AuthenticationPrincipal UserDetailsImpl userDetails,
                                 Model model) {
 
-        // 현재 로그인한 사용자의 닉네임 가져오기
         String creatorNick = userDetails.getUserNick();
 
-        // String → LocalDate 변환
+        // ✅ 쉼표(`,`)가 포함된 경우 분리하여 첫 번째 값만 사용
+        if (startDateStr.contains(",")) {
+            startDateStr = startDateStr.split(",")[0].trim();
+        }
+        if (endDateStr.contains(",")) {
+            endDateStr = endDateStr.split(",")[0].trim();
+        }
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate startDate = LocalDate.parse(startDateStr, formatter);
         LocalDate endDate = LocalDate.parse(endDateStr, formatter);
 
-        // 새로운 프로젝트 생성
         ProjectEntity newProject = ProjectEntity.builder()
                 .title(projectName)
                 .description(projectDescription)
-                .createdBy(creatorNick) // created_by 컬럼에 저장
-                .creatorNick(creatorNick) // creator_nick 컬럼에도 동일한 값 저장
+                .createdBy(creatorNick)
+                .creatorNick(creatorNick)
                 .startDate(startDate)
                 .endDate(endDate)
                 .recruitmentPeriod(recruitment)
@@ -124,12 +129,11 @@ public class ProjectController {
                 .status("모집중")
                 .build();
 
-        // DB에 저장
         ProjectEntity savedProject = projectService.saveProject(newProject);
 
-        // 목록에도 반영되면서, 생성한 프로젝트 상세 페이지로 이동
         return "redirect:/postproject/" + savedProject.getId();
     }
+
 
     @GetMapping("/success")
     public String showsuccessForm() {
