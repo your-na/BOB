@@ -61,6 +61,14 @@
     margin-left: 20px; /* 간격 조정 */
 }
 
+.goal {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: white;
+    height: 30px;
+}
 .content {
     margin-top: 10px;
     padding: 10px;
@@ -125,4 +133,46 @@
 
 .postdetail {
     height: 23px;
+}
+
+/* 드롭다운 메뉴 */
+.dropdownmenu {
+    display: none; /* 기본적으로 숨김 */
+    position: absolute;
+    top: 200px; /* 점 세 개 아래에 약간의 간격 추가 */
+    right: 20px; /* 우측 정렬 */
+    background-color: white;
+    border: 1px solid #eaeaea;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10; /* 더 높은 z-index 값으로 설정 */
+    padding: 10px;
+    display: flex;
+    flex-direction: column; /* 버튼을 세로로 정렬 */
+    gap: 10px; /* 버튼 사이의 간격 */
+}
+
+.dropdownmenu a {
+    display: block;
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    text-align: left;
+    cursor: pointer;
+    white-space: normal; /* 글씨가 가로로 이어지게 설정 */
+}
+
+.dropdownmenu a:hover {
+    color: #0e8a0e;
+    font-weight: bold;
+}
+.dropdownmenu button:hover {
+    background-color: #f1f1f1;
+}
+
+.form-group {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
 }

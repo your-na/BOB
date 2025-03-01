@@ -23,7 +23,9 @@
     </div>
     <div class="post-detail">
         <img class="postdetail" src="/images/postdetail.png" alt="점 세 개" onclick="toggleDropdown()">
-        <div class="dropdown-menu" id="dropdownMenu">
+        <div class="dropdownmenu" id="dropdownMenu">
+            <a class="action-button">수정하기</a>
+            <a class="action-button">삭제하기</a>
         </div>
     </div>
 </div>
@@ -35,9 +37,36 @@
     <span class="meta2" th:text="'작성일 : ' + ${#temporals.format(project.startDate, 'yyyy.MM.dd')}">작성일</span>
 </div>
 
+<div class="form-group">
+    <label for="project-dates">진행 일정</label>
+    <div class="date-inputs">
+        <input type="date" id="start-date" name="start-date">
+        <span>~</span>
+        <input type="date" id="end-date" name="end-date">
+    </div>
+</div>
+<div class="form-group">
+    <label for="party-dates">모집 일정</label>
+    <div class="date-inputs">
+        <input type="date" id="startdate" name="start-date">
+        <span>~</span>
+        <input type="date" id="enddate" name="end-date">
+    </div>
+</div>
+<!--프로젝트 목표-->
+<div class="good">
+    <p>프로젝트 목표</p>
+    <div class="goal">
+        프로젝트 목표
+    </div>
+</div>
+
 <!-- 프로젝트 설명 -->
-<div class="content" th:text="${project.description}">
-    프로젝트 설명 내용
+<div class="good">
+    <p>프로젝트 내용</p>
+    <div class="content" th:text="${project.description}">
+        프로젝트 설명 내용
+    </div>
 </div>
 
 <!-- 팀 신청 버튼 -->
@@ -103,7 +132,21 @@
             });
     }
 
+        // 드롭다운 토글 기능
+        function toggleDropdown() {
+        var dropdown = document.getElementById("dropdownMenu");
+        if (dropdown.style.display === "none" || dropdown.style.display === "") {
+        dropdown.style.display = "block";
+    } else {
+        dropdown.style.display = "none";
+    }
+    }
 
+        // 페이지 로드 시 기본적으로 드롭다운을 숨기기
+        document.addEventListener("DOMContentLoaded", function() {
+        var dropdown = document.getElementById("dropdownMenu");
+        dropdown.style.display = "none"; // 기본적으로 숨기기
+    });
 </script>
 
 </body>
