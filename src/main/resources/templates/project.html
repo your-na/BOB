@@ -71,11 +71,16 @@
             <td th:text="${project.startDate} + ' ~ ' + ${project.endDate}">2025-01-01 ~ 2025-12-31</td>
             <td th:text="${project.views}">0</td>
             <td th:text="${project.likes}">0</td>
-            <td>1/4</td>
+            <!-- 동적으로 모집 인원 표시 -->
+            <td>
+                <span th:text="${project.currentParticipants}">0</span>/
+                <span th:text="${project.recruitmentCount}">0</span>
+            </td>
             <td th:text="${project.status}">모집중</td>
         </tr>
         </tbody>
     </table>
+
 </section>
 
 <script>

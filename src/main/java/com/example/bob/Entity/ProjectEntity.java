@@ -59,8 +59,16 @@ public class ProjectEntity {
     @ElementCollection
     private List<Long> likedUsers = new ArrayList<>(); // 좋아요 누른 유저들
 
+    @Column(nullable = false)
+    private int currentParticipants; // 실제 참여 인원 필드 추가
+
     public void setDDay(String dDay) {
         this.dDay = dDay;
+    }
+
+    // 필요한 getter 메서드 추가
+    public int getCurrentParticipants() {
+        return currentParticipants;
     }
 
     @PrePersist
@@ -73,28 +81,6 @@ public class ProjectEntity {
         }
     }
 
-    // 좋아요 수 증가 처리
-    public void toggleLike() {
-        this.likes += 1; // 좋아요 수 증가
-    }
-
-    // 좋아요 수 감소 처리
-    public void decrementLike() {
-        this.likes -= 1; // 좋아요 수 감소
-    }
-
-    // 특정 사용자가 좋아요를 눌렀는지 확인
-    public boolean isUserLiked(Long userId) {
-        return likedUsers.contains(userId); // 사용자가 좋아요를 눌렀는지 확인
-    }
-
-    // 사용자가 좋아요를 눌렀을 때 추가
-    public void addUserToLikes(Long userId) {
-        likedUsers.add(userId); // 사용자 추가
-    }
-
-    // 사용자가 좋아요를 취소할 때 제거
-    public void removeUserFromLikes(Long userId) {
-        likedUsers.remove(userId); // 사용자 제거
-    }
+    // 기타 메서드들 (좋아요 처리, 조회수 처리 등)
 }
+

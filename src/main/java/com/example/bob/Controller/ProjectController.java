@@ -9,10 +9,16 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import com.example.bob.DTO.ProjectDTO; // ProjectDTO 클래스 import
+import java.util.stream.Collectors;  // Collectors 클래스를 import
+
+
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+
 
 @Controller
 @RequiredArgsConstructor
@@ -21,14 +27,19 @@ public class ProjectController {
     private final ProjectService projectService;
 
     /**
-     * ✅ 프로젝트 목록 페이지로 이동
+     * 프로젝트 목록 페이지로 이동
      */
     @GetMapping("/project")
     public String showProjects(Model model) {
-        List<ProjectEntity> projects = projectService.getAllProjects(); // DB에서 모든 프로젝트 가져오기
-        model.addAttribute("projects", projects);
+        List<ProjectEntity> projects = projectService.getAllProjects(); // 엔티티 리스트 가져오기
+        List<ProjectDTO> projectDTOs = projects.stream()
+                .map(project -> projectService.convertToDTO(project)) // 엔티티 -> DTO 변환
+                .collect(Collectors.toList()); // Collectors import 필요
+        model.addAttribute("projects", projectDTOs); // DTO 리스트를 모델에 추가
         return "project"; // 프로젝트 목록 페이지
     }
+
+
 
     /**
      * ✅ 프로젝트 상세 보기 (postproject.html)
@@ -92,18 +103,19 @@ public class ProjectController {
     /**
      * ✅ 프로젝트 생성 처리 (등록 버튼을 눌렀을 때 실행)
      */
-    @PostMapping("/bw")
+@PostMapping("/bw")
     public String createProject(@RequestParam("project-name") String projectName,
                                 @RequestParam("project-description") String projectDescription,
                                 @RequestParam("start-date") String startDateStr,
                                 @RequestParam("end-date") String endDateStr,
-                                @RequestParam("recruitment") int recruitment,
+                                @RequestParam("recruitment") String recruitmentStr,  // String으로 받기
+                                @RequestParam(value = "recruitmentCount", required = false) String recruitmentCountStr, // 기타일 경우만 사용
                                 @AuthenticationPrincipal UserDetailsImpl userDetails,
                                 Model model) {
 
         String creatorNick = userDetails.getUserNick();
 
-        // ✅ 쉼표(`,`)가 포함된 경우 분리하여 첫 번째 값만 사용
+        // 날짜 처리
         if (startDateStr.contains(",")) {
             startDateStr = startDateStr.split(",")[0].trim();
         }
@@ -115,6 +127,32 @@ public class ProjectController {
         LocalDate startDate = LocalDate.parse(startDateStr, formatter);
         LocalDate endDate = LocalDate.parse(endDateStr, formatter);
 
+        // 모집 인원 처리 (기타일 경우 직접 입력한 숫자 처리)
+        int recruitment = 0;
+
+        // "기타"가 선택되었을 때 처리
+        if ("기타".equals(recruitmentStr)) {
+            try {
+                if (recruitmentCountStr != null && !recruitmentCountStr.isEmpty()) {
+                    recruitment = Integer.parseInt(recruitmentCountStr); // 기타에서 받은 숫자
+                } else {
+                    recruitment = 0; // 값이 없으면 기본값 0 처리
+                }
+            } catch (NumberFormatException e) {
+                model.addAttribute("error", "잘못된 모집 인원 값입니다.");
+                return "newproject"; // 에러 페이지로 이동
+            }
+        } else {
+            // 기본적으로 받은 숫자 처리
+            try {
+                recruitment = Integer.parseInt(recruitmentStr);
+            } catch (NumberFormatException e) {
+                model.addAttribute("error", "잘못된 모집 인원 값입니다.");
+                return "newproject"; // 에러 페이지로 이동
+            }
+        }
+
+        // 프로젝트 생성
         ProjectEntity newProject = ProjectEntity.builder()
                 .title(projectName)
                 .description(projectDescription)
@@ -123,16 +161,18 @@ public class ProjectController {
                 .startDate(startDate)
                 .endDate(endDate)
                 .recruitmentPeriod(recruitment)
-                .recruitmentCount(recruitment)
+                .recruitmentCount(recruitment)  // 모집 인원 값
                 .views(0)
                 .likes(0)
                 .status("모집중")
                 .build();
 
-        ProjectEntity savedProject = projectService.saveProject(newProject);
+        // 프로젝트 저장
+        ProjectEntity savedProject = projectService.saveProject(newProject);  // 프로젝트 저장
 
-        return "redirect:/postproject/" + savedProject.getId();
+        return "redirect:/postproject/" + savedProject.getId(); // 상세 페이지로 리디렉션
     }
+
 
 
     @GetMapping("/success")

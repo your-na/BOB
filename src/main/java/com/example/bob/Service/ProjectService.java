@@ -5,6 +5,8 @@ import com.example.bob.Repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.bob.DTO.ProjectDTO; // ProjectDTO 클래스 import
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,6 +14,34 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
+
+    public ProjectDTO convertToDTO(ProjectEntity projectEntity) {
+        return new ProjectDTO(
+                projectEntity.getId(),
+                projectEntity.getTitle(),
+                projectEntity.getCreatedBy(),
+                projectEntity.getStartDate(),
+                projectEntity.getEndDate(),
+                projectEntity.getRecruitmentCount(),
+                projectEntity.getCurrentParticipants(),
+                projectEntity.getViews(),
+                projectEntity.getLikes(),
+                projectEntity.getStatus(),
+                projectEntity.getRecruitmentPeriod() // recruitmentPeriod 값 추가
+        );
+    }
+
+
+
+
+    // 모든 프로젝트를 DTO로 변환하여 반환
+    public List<ProjectDTO> getAllProjectsDTO() {
+        List<ProjectEntity> projectEntities = projectRepository.findAll();
+        return projectEntities.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
 
     private final ProjectRepository projectRepository;
 
@@ -60,3 +90,5 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 }
+
+

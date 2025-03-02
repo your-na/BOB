@@ -132,9 +132,31 @@
         customInputGroup.style.alignItems = "center"; // 정렬 맞추기
       } else {
         customInputGroup.style.display = "none"; // 숨기기
+
+
+        document.addEventListener("DOMContentLoaded", function() {
+          var recruitmentSelect = document.getElementById("recruitment");
+          var customInputGroup = document.getElementById("custom-input-group");
+
+          // 페이지 로드 시 '기타'가 아닐 경우 숨김
+          if (recruitmentSelect.value !== "plus") {
+            customInputGroup.style.display = "none";
+          }
+
+          // '기타'를 선택했을 때 사용자 입력 필드 보이기
+          recruitmentSelect.addEventListener("change", function() {
+            if (this.value === "plus") {
+              customInputGroup.style.display = "flex"; // 보이기
+              customInputGroup.style.alignItems = "center"; // 정렬 맞추기
+            } else {
+              customInputGroup.style.display = "none"; // 숨기기
+            }
+          });
+        });
       }
     });
   });
+
 
 </script>
 
