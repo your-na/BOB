@@ -11,12 +11,18 @@
     margin: 0 10%;
 }
 
+/* 📌 필터와 검색 아이콘을 같은 줄에 정렬 */
+.upupup {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 필터, 검색 아이콘, 생성 버튼 간격 조정 */
+}
+
 .searchicon {
     margin-left: 10px;
-        font-size: 10px;
-        text-decoration: none;
-        width: 35px;
-        height: 35px;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
 }
 
 .searchicon img {
@@ -35,40 +41,96 @@
 /* 🔍 검색창 스타일 (기본적으로 숨김) */
 .search-box {
     position: absolute;
-    left: 50px; /* 아이콘 바로 옆에 위치하도록 설정 */
+    left: 50px;
     top: 50%;
     transform: translateY(-50%);
     background: white;
     border: 1px solid #ccc;
-    border-radius: 15px;
-    padding: 5px;
-    width: 200px;
+    border-radius: 10px;
+    padding: 15px;
+    width: 320px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: none; /* 기본적으로 숨김 */
+    flex-direction: column;
+    gap: 10px;
 }
 
-/* 🔍 검색창 내부 스타일 */
-.search-box input {
-    width: 100%;
-    padding: 5px;
-    border: none;
-    outline: none;
+/* 🔍 검색창 상단 */
+.search-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
 }
 
-/* ❌ 닫기 버튼 */
+.search-title {
+    font-size: 16px;
+    font-weight: bold;
+}
+
 #search-close {
+    margin-left: 300px;
     background: none;
     border: none;
     font-size: 18px;
     cursor: pointer;
-    margin-left: 5px;
     color: #888;
 }
 
-/* 📌 필터와 검색 아이콘을 같은 줄에 정렬 */
-.upupup {
+/* 📅 입력 필드 스타일 */
+.search-field {
+    display: flex;
+    align-items: center; /* 한 줄 정렬 */
+    justify-content: space-between; /* 내부 요소 정렬 */
+    gap: 10px;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.search-field label {
+    font-size: 12px;
+    font-weight: bold;
+    width: 80px; /* 라벨 고정 너비 */
+}
+
+#search-input {
+    width: 300px;
+    height: 30px;
+    border-radius: 10px;
+    border: 1px solid forestgreen;
+    padding-left: 10px;
+}
+/* 📅 기간 입력 필드 한 줄 정렬 */
+.date-group {
     display: flex;
     align-items: center;
-    gap: 10px; /* 필터, 검색 아이콘, 생성 버튼 간격 조정 */
+    gap: 5px;
+    flex: 1;
+}
+
+.date-group input {
+    flex: 1;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+    width: 50px;
+}
+
+/* ✅ 완료 버튼 */
+.submit-btn {
+    width: 100%;
+    background-color: #00b800;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.submit-btn:hover {
+    background-color: #008f00;
 }
 
 /* 검색창 활성화될 때 */
@@ -90,6 +152,7 @@
 #filter:focus {
     border: 1px solid green;
 }
+
 .contest-table {
     width: 100%;
     border-collapse: collapse;
@@ -129,6 +192,7 @@
 .contest-table td:first-child {
     text-decoration: none;
 }
+
 .contest-table td:last-child {
     color: #00b100;
     font-weight: bold;
