@@ -23,6 +23,10 @@ public class ProjectEntity {
     @Column(length = 100, nullable = false)
     private String title; // 프로젝트명
 
+    @Column(length = 500, nullable = true)  // ✅ 목표 필드 추가
+    private String goal;  // 프로젝트 목표
+
+
     @Column(length = 255, nullable = false)
     private String createdBy; // ✅ 닉네임 저장 (created_by 컬럼과 매핑)
 
@@ -80,7 +84,4 @@ public class ProjectEntity {
             this.creatorNick = this.createdBy; // creatorNick이 없으면 createdBy 값으로 설정
         }
     }
-
-    // 기타 메서드들 (좋아요 처리, 조회수 처리 등)
 }
-

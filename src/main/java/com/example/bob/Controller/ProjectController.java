@@ -51,9 +51,22 @@ public class ProjectController {
         // 조회수 증가 처리
         project = projectService.incrementViews(id); // 조회수 증가
 
+        // 현재 날짜 추가
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+        model.addAttribute("today", today);
+
+        // 프로젝트 목표 추가
+        model.addAttribute("goal", project.getGoal());
+
         model.addAttribute("project", project);
         return "postproject";  // 프로젝트 상세 페이지
+
     }
+
+
+
+
+
 
     /**
      * ✅ 좋아요 토글 API
@@ -106,6 +119,7 @@ public class ProjectController {
 @PostMapping("/bw")
     public String createProject(@RequestParam("project-name") String projectName,
                                 @RequestParam("project-description") String projectDescription,
+                                @RequestParam("project-goal") String projectGoal,  // 프로젝트 목표 추가
                                 @RequestParam("start-date") String startDateStr,
                                 @RequestParam("end-date") String endDateStr,
                                 @RequestParam("recruitment") String recruitmentStr,  // String으로 받기
@@ -156,6 +170,7 @@ public class ProjectController {
         ProjectEntity newProject = ProjectEntity.builder()
                 .title(projectName)
                 .description(projectDescription)
+                .goal(projectGoal) // ✅ 프로젝트 목표 저장
                 .createdBy(creatorNick)
                 .creatorNick(creatorNick)
                 .startDate(startDate)

@@ -34,7 +34,8 @@
 <!-- 작성자 및 작성일 -->
 <div class="meta">
     <span class="meta1" th:text="${project.createdBy}">작성자</span>
-    <span class="meta2" th:text="'작성일 : ' + ${#temporals.format(project.startDate, 'yyyy.MM.dd')}">작성일</span>
+    <span class="meta2" th:text="'작성일 : ' + ${today}">작성일</span>
+
 </div>
 
 <div class="form-group">
@@ -57,7 +58,7 @@
 <div class="good">
     <p>프로젝트 목표</p>
     <div class="goal">
-        프로젝트 목표
+        <span th:text="${goal}">여기에 프로젝트 목표가 들어갑니다.</span>
     </div>
 </div>
 
