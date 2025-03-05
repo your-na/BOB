@@ -29,6 +29,8 @@ public class ProjectService {
                 projectEntity.getId(),
                 projectEntity.getTitle(),
                 projectEntity.getCreatedBy(),
+                projectEntity.getDescription(), // ✅ 추가됨 (프로젝트 내용)
+                projectEntity.getGoal(), // ✅ 추가됨 (프로젝트 목표)
                 projectEntity.getStartDate(),
                 projectEntity.getEndDate(),
                 projectEntity.getRecruitmentCount(),
@@ -36,9 +38,10 @@ public class ProjectService {
                 projectEntity.getViews(),
                 projectEntity.getLikes(),
                 projectEntity.getStatus(),
-                projectEntity.getRecruitmentPeriod() // 모집 기간 추가
+                projectEntity.getRecruitmentPeriod()
         );
     }
+
 
     /**
      * ✅ 모든 프로젝트를 DTO로 변환하여 반환

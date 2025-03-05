@@ -23,15 +23,14 @@ public class ProjectEntity {
     @Column(length = 100, nullable = false)
     private String title; // 프로젝트명
 
-    @Column(length = 500, nullable = true)  // ✅ 목표 필드 추가
+    @Column(length = 500, nullable = true)
     private String goal;  // 프로젝트 목표
 
+    @Column(length = 255, nullable = false)
+    private String createdBy; // 작성자
 
     @Column(length = 255, nullable = false)
-    private String createdBy; // ✅ 닉네임 저장 (created_by 컬럼과 매핑)
-
-    @Column(length = 255, nullable = false)
-    private String creatorNick; // ✅ creator_nick 컬럼 추가
+    private String creatorNick; // 생성자 닉네임
 
     @Column(nullable = false)
     private int recruitmentPeriod; // 모집 기간
@@ -41,6 +40,12 @@ public class ProjectEntity {
 
     @Column(nullable = false)
     private LocalDate endDate; // 종료 날짜
+
+    @Column(name = "recruitment_start_date", nullable = false)
+    private LocalDate recruitmentStartDate;
+
+    @Column(name = "recruitment_end_date", nullable = false)
+    private LocalDate recruitmentEndDate;
 
     @Column(nullable = false)
     private int recruitmentCount; // 모집 인원
@@ -52,36 +57,32 @@ public class ProjectEntity {
     private int likes; // 좋아요 개수
 
     @Column(length = 50, nullable = false)
-    private String status; // 모집 상태 (예: 모집중)
+    private String status; // 모집 상태
 
     @Column(length = 500)
-    private String description; // 설명
+    private String description; // 프로젝트 설명
 
-    @Transient // 데이터베이스에 저장되지 않음 (조회용)
+    @Transient
     private String dDay;
 
     @ElementCollection
     private List<Long> likedUsers = new ArrayList<>(); // 좋아요 누른 유저들
 
     @Column(nullable = false)
-    private int currentParticipants; // 실제 참여 인원 필드 추가
+    private int currentParticipants; // 실제 참여 인원
 
     public void setDDay(String dDay) {
         this.dDay = dDay;
     }
 
-    // 필요한 getter 메서드 추가
-    public int getCurrentParticipants() {
-        return currentParticipants;
-    }
-
+    // ✅ @PrePersist 추가 (데이터 저장 전에 기본값 설정)
     @PrePersist
     public void prePersist() {
-        if (this.createdBy == null || this.createdBy.isEmpty()) {
-            this.createdBy = "default_nick"; // 기본값 설정
+        if (this.recruitmentStartDate == null) {
+            this.recruitmentStartDate = LocalDate.now();  // 기본값: 오늘 날짜
         }
-        if (this.creatorNick == null || this.creatorNick.isEmpty()) {
-            this.creatorNick = this.createdBy; // creatorNick이 없으면 createdBy 값으로 설정
+        if (this.recruitmentEndDate == null) {
+            this.recruitmentEndDate = LocalDate.now().plusDays(7);  // 기본값: 7일 후
         }
     }
 }

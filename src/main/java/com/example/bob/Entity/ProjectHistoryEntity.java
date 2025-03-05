@@ -41,8 +41,21 @@ public class ProjectHistoryEntity {
     @Column(nullable = false)
     private LocalDate endDate;  // ✅ 진행 종료일
 
+
     @Column(nullable = false)
     private int recruitmentPeriod;  // ✅ 모집 기간
+
+    @Column(nullable = false)
+    private int recruitmentCount;  // ✅ 모집 인원 추가
+
+    @Column(nullable = false)
+    private int views;  // ✅ 조회수 추가
+
+    @Column(nullable = false)
+    private int likes;  // ✅ 좋아요 개수 추가
+
+    @Column(nullable = false)
+    private int currentParticipants;  // ✅ 실제 참여 인원 추가
 
     @Column(nullable = false)
     private LocalDateTime modifiedAt;  // ✅ 수정/삭제된 날짜

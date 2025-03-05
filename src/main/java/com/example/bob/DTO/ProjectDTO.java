@@ -7,6 +7,8 @@ public class ProjectDTO {
     private Long id; // 프로젝트 ID
     private String title; // 프로젝트명
     private String createdBy; // 생성자
+    private String description; // 프로젝트 내용 ✅ 추가됨
+    private String goal; // 프로젝트 목표 ✅ 추가됨
     private LocalDate startDate; // 시작 날짜
     private LocalDate endDate; // 종료 날짜
     private int recruitmentCount; // 모집 인원
@@ -17,11 +19,14 @@ public class ProjectDTO {
     private int recruitmentPeriod; // 모집 기간 필드 추가
 
     // 생성자
-    public ProjectDTO(Long id, String title, String createdBy, LocalDate startDate, LocalDate endDate,
-                      int recruitmentCount, int currentParticipants, int views, int likes, String status, int recruitmentPeriod) {
+    public ProjectDTO(Long id, String title, String createdBy, String description, String goal,
+                      LocalDate startDate, LocalDate endDate, int recruitmentCount,
+                      int currentParticipants, int views, int likes, String status, int recruitmentPeriod) {
         this.id = id;
         this.title = title;
         this.createdBy = createdBy;
+        this.description = description; // ✅ 추가됨
+        this.goal = goal; // ✅ 추가됨
         this.startDate = startDate;
         this.endDate = endDate;
         this.recruitmentCount = recruitmentCount;
@@ -55,6 +60,22 @@ public class ProjectDTO {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public String getDescription() {  // ✅ 추가됨
+        return description;
+    }
+
+    public void setDescription(String description) {  // ✅ 추가됨
+        this.description = description;
+    }
+
+    public String getGoal() {  // ✅ 추가됨
+        return goal;
+    }
+
+    public void setGoal(String goal) {  // ✅ 추가됨
+        this.goal = goal;
     }
 
     public LocalDate getStartDate() {
