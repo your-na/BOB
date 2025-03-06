@@ -198,6 +198,7 @@
     font-weight: bold;
 }
 
+/* ✅ 버튼 스타일 유지 */
 .create-post-button {
     margin-left: 50px;
     border: none;
@@ -206,11 +207,19 @@
     padding: 10px 20px;
     cursor: pointer;
     white-space: nowrap;
+    font-size: 16px; /* 글자 크기 유지 */
+    color: white !important; /* 흰색 유지 */
 }
 
+/* ✅ 버튼 내부 링크 스타일 */
 .create-post-button a {
     color: white;
     text-decoration: none;
     font-weight: bold;
     font-size: 16px;
 }
+
+/* ✅ 버튼 구조 변경 */
+<form action="/newproject" method="get">
+<button type="submit" class="create-post-button">프로젝트 생성</button>
+</form>

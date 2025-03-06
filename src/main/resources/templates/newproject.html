@@ -15,23 +15,29 @@
   <section class="project-create">
     <h1>프로젝트 생성</h1>
     <hr>
-    <form action="#" method="post" class="project-form">
-        <div class="form-group">
-          <label for="project-dates">진행 일정</label>
-          <div class="date-inputs">
-            <input type="date" id="start-date" name="start-date">
-            <span>~</span>
-            <input type="date" id="end-date" name="end-date">
-          </div>
+
+    <!-- ✅ action을 /bw로 수정 + CSRF 토큰 추가 -->
+    <form action="/bw" method="post" class="project-form">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+      <div class="form-group">
+        <label for="project-dates">진행 일정</label>
+        <div class="date-inputs">
+          <input type="date" id="start-date" name="start-date">
+          <span>~</span>
+          <input type="date" id="end-date" name="end-date">
         </div>
+      </div>
+
       <div class="form-group">
         <label for="party-dates">모집 일정</label>
         <div class="date-inputs">
-          <input type="date" id="startdate" name="start-date">
+          <input type="date" id="startdate" name="recruitment-start-date">
           <span>~</span>
-          <input type="date" id="enddate" name="end-date">
+          <input type="date" id="enddate" name="recruitment-end-date">
         </div>
       </div>
+
       <div class="bwbw">
         <div class="form-group">
           <label for="recruitment">모집 인원</label>
@@ -48,116 +54,84 @@
           </div>
         </div>
       </div>
-        <br>
+
+      <br>
       <div class="form-group">
         <label for="project-name">프로젝트 주제</label>
         <input type="text" id="project-name" name="project-name" placeholder="프로젝트명을 입력하세요.">
       </div>
-        <br>
+
+      <br>
       <div class="form-group">
         <label for="project-goal">프로젝트 목표</label>
         <textarea id="project-goal" name="project-goal" placeholder="프로젝트 목표를 간단히 입력해주세요."></textarea>
       </div>
+
       <div class="form-group">
         <label for="project-description">프로젝트 내용</label>
         <textarea id="project-description" name="project-description" placeholder="프로젝트 내용을 입력해주세요."></textarea>
       </div>
-        <br>
+
+      <br>
       <div class="btn">
         <button type="submit" class="submit-btn">등록</button>
-        <button type="button" class="cancel-button"><a href="/project" class="ynbw">취소</a></button>
+        <button type="button" class="cancel-button">
+          <a href="/project" class="ynbw">취소</a>
+        </button>
       </div>
     </form>
   </section>
 </main>
 
 <script>
-  document.getElementById("project-create-btn")?.addEventListener("click", function() {
-    window.location.href = "/newproject"; // ✅ URL을 /newproject로 수정
-  });
-
-  // ✅ 날짜 선택 제한 기능 추가
+  // ✅ 페이지 로드 후 실행
   document.addEventListener("DOMContentLoaded", function() {
-    let today = new Date().toISOString().split("T")[0]; // 오늘 날짜 (YYYY-MM-DD 형식)
+    let today = new Date().toISOString().split("T")[0];
 
     let startDateInput = document.getElementById("start-date");
     let endDateInput = document.getElementById("end-date");
 
-    // ✅ 시작 날짜는 무조건 오늘 이후만 가능하도록 설정
     startDateInput.setAttribute("min", today);
 
-    // ✅ 시작 날짜 변경 시, 오늘 이전 날짜가 선택되면 자동 수정
     startDateInput.addEventListener("change", function() {
       let startDate = startDateInput.value;
-
-      // 🔹 시작 날짜가 오늘 이전이면 자동으로 오늘 날짜로 변경
       if (startDate < today) {
         alert("시작 날짜는 오늘 이후로 선택해야 합니다!");
         startDateInput.value = today;
         startDate = today;
       }
-
-      endDateInput.setAttribute("min", startDate); // 종료 날짜는 시작 날짜 이상만 가능
+      endDateInput.setAttribute("min", startDate);
     });
 
-    // ✅ 종료 날짜 선택 시, 시작 날짜보다 빠르면 자동 수정 (같은 날짜는 허용)
     endDateInput.addEventListener("change", function() {
       let startDate = startDateInput.value;
       let endDate = endDateInput.value;
-
       if (endDate < startDate) {
         alert("끝나는 날짜는 시작 날짜보다 빠를 수 없습니다!");
-        endDateInput.value = startDate; // 자동으로 시작 날짜와 동일하게 설정
+        endDateInput.value = startDate;
       }
     });
 
-    // ✅ 페이지 로드 시에도 시작 날짜를 오늘로 강제 설정 (잘못된 값 방지)
     if (startDateInput.value < today) {
       startDateInput.value = today;
     }
-  });
 
-  document.addEventListener("DOMContentLoaded", function() {
     var recruitmentSelect = document.getElementById("recruitment");
     var customInputGroup = document.getElementById("custom-input-group");
 
-    // 페이지 로드 시 '기타'가 아닐 경우 숨김 (예외처리)
     if (recruitmentSelect.value !== "plus") {
       customInputGroup.style.display = "none";
     }
 
     recruitmentSelect.addEventListener("change", function() {
       if (this.value === "plus") {
-        customInputGroup.style.display = "flex"; // 보이기
-        customInputGroup.style.alignItems = "center"; // 정렬 맞추기
+        customInputGroup.style.display = "flex";
+        customInputGroup.style.alignItems = "center";
       } else {
-        customInputGroup.style.display = "none"; // 숨기기
-
-
-        document.addEventListener("DOMContentLoaded", function() {
-          var recruitmentSelect = document.getElementById("recruitment");
-          var customInputGroup = document.getElementById("custom-input-group");
-
-          // 페이지 로드 시 '기타'가 아닐 경우 숨김
-          if (recruitmentSelect.value !== "plus") {
-            customInputGroup.style.display = "none";
-          }
-
-          // '기타'를 선택했을 때 사용자 입력 필드 보이기
-          recruitmentSelect.addEventListener("change", function() {
-            if (this.value === "plus") {
-              customInputGroup.style.display = "flex"; // 보이기
-              customInputGroup.style.alignItems = "center"; // 정렬 맞추기
-            } else {
-              customInputGroup.style.display = "none"; // 숨기기
-            }
-          });
-        });
+        customInputGroup.style.display = "none";
       }
     });
   });
-
-
 </script>
 
 </body>

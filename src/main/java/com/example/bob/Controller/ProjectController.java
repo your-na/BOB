@@ -171,7 +171,7 @@ public class ProjectController {
     /**
      * ✅ 프로젝트 수정 처리 (수정 후 JSON 응답 반환)
      */
-    @PostMapping("/postproject/{id}/edit")
+    @PostMapping("/postprojecsst/{id}/edit")
     @ResponseBody
     public ResponseEntity<String> updateProject(@PathVariable Long id, @RequestBody ProjectDTO projectDTO) {
         try {
