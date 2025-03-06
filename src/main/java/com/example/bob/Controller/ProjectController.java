@@ -202,4 +202,9 @@ public class ProjectController {
     public String projectapplicationForm() {
         return "projectapplication";
     }
+
+    @GetMapping("/teamrequest")
+    public String teamrequestForm() {
+        return "teamrequest";
+    }
 }
