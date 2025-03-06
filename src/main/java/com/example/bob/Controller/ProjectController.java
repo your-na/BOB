@@ -197,4 +197,9 @@ public class ProjectController {
     public String showsuccessForm() {
         return "success";
     }
+
+    @GetMapping("/projectapplication")
+    public String projectapplicationForm() {
+        return "projectapplication";
+    }
 }
