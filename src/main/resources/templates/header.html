@@ -75,7 +75,7 @@
                             <ul>
                                 <!-- 로그인 상태일 때 -->
                                 <li th:if="${user != null}"><a href="/profile">내 정보 / 평점</a></li>
-                                <li th:if="${user != null}"><a href="#">알림</a></li>
+                                <li th:if="${user != null}"><a href="#" class="notification-icon" id="notification-icon">알림</a><span class="notification-badge" id="notification-badge"></span></li>
                                 <li th:if="${user != null}"><a href="#">경력 내역</a></li>
                                 <li th:if="${user != null}"><a href="#">지원 현황</a></li>
                                 <li th:if="${user != null}">
@@ -92,6 +92,21 @@
                 </div>
             </div>
         </nav>
+        <!-- 📩 알림창 -->
+        <form>
+        <div class="notification-box" id="notification-box">
+            <div class="notification-header">
+                <h3>알림</h3>
+                <button id="close-notification">&times;</button>
+            </div>
+            <ul id="notification-list">
+                <!-- 알림 데이터가 여기에 동적으로 추가됨 -->
+            </ul>
+            <div class="notification-footer">
+                <button id="clear-all">모두 삭제</button>
+            </div>
+        </div>
+        </form>
         <script>
             document.addEventListener("DOMContentLoaded", () => {
                 const dropdownToggles = document.querySelectorAll(".dropdown-toggle");
@@ -121,6 +136,65 @@
                         });
                     }
                 });
+            });
+
+            //알림부분
+            document.addEventListener("DOMContentLoaded", function () {
+                const notificationIcon = document.getElementById("notification-icon");
+                const notificationBox = document.getElementById("notification-box");
+                const closeNotification = document.getElementById("close-notification");
+                const notificationList = document.getElementById("notification-list");
+                const notificationBadge = document.getElementById("notification-badge");
+                const clearAllButton = document.getElementById("clear-all");
+
+                // 가짜 알림 데이터 (백엔드에서 가져올 수 있음)
+                let notifications = [
+                    { id: 1, message: "새로운 댓글이 달렸습니다!", link: "/comments/1" },
+                    { id: 2, message: "새로운 프로젝트가 생성되었습니다!", link: "/projects/2" },
+                    { id: 3, message: "모집 마감이 임박했습니다!", link: "/projects/3" }
+                ];
+
+                // 🔔 알림 목록 렌더링
+                function renderNotifications() {
+                    notificationList.innerHTML = ""; // 기존 목록 초기화
+                    if (notifications.length === 0) {
+                        notificationList.innerHTML = "<li class='notification-item'>알림이 없습니다.</li>";
+                        notificationBadge.style.display = "none"; // 알림 배지 숨기기
+                        return;
+                    }
+
+                    notifications.forEach(notification => {
+                        let item = document.createElement("li");
+                        item.classList.add("notification-item");
+                        item.textContent = notification.message;
+                        item.onclick = function () {
+                            window.location.href = notification.link; // 해당 페이지로 이동
+                        };
+                        notificationList.appendChild(item);
+                    });
+
+                    notificationBadge.style.display = "flex"; // 알림 배지 보이기
+                    notificationBadge.textContent = notifications.length; // 알림 개수 표시
+                }
+
+                // 🔥 알림 아이콘 클릭 시 알림창 표시/숨김
+                notificationIcon.addEventListener("click", function () {
+                    notificationBox.style.display = (notificationBox.style.display === "none" || notificationBox.style.display === "") ? "flex" : "none";
+                });
+
+                // ❌ 알림창 닫기 버튼
+                closeNotification.addEventListener("click", function () {
+                    notificationBox.style.display = "none";
+                });
+
+                // 🗑 "모두 삭제" 버튼
+                clearAllButton.addEventListener("click", function () {
+                    notifications = [];
+                    renderNotifications();
+                });
+
+                // 페이지 로드 시 알림 렌더링
+                renderNotifications();
             });
         </script>
     </header>
