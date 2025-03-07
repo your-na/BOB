@@ -167,28 +167,30 @@ public class ProjectController {
         return "editproject"; // ✅ editproject.html 파일 렌더링
     }
 
-
     /**
-     * ✅ 프로젝트 수정 처리 (수정 후 JSON 응답 반환)
+     * ✅ 프로젝트 수정 처리 (수정 후 상세보기 페이지로 이동)
      */
-    @PostMapping("/postprojecsst/{id}/edit")
-    @ResponseBody
-    public ResponseEntity<String> updateProject(@PathVariable Long id, @RequestBody ProjectDTO projectDTO) {
-        try {
-            projectService.updateProject(
-                    id,
-                    projectDTO.getTitle(),
-                    projectDTO.getDescription(),
-                    projectDTO.getGoal(),
-                    projectDTO.getStartDate(),
-                    projectDTO.getEndDate(),
-                    projectDTO.getRecruitmentPeriod()
-            );
-            return ResponseEntity.ok("프로젝트가 성공적으로 수정되었습니다!");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("프로젝트 수정에 실패했습니다.");
-        }
-    }
+    @PostMapping("/postproject/{id}/edit")
+    public ResponseEntity<String> updateProject(
+            @PathVariable Long id,
+            @RequestBody ProjectDTO projectDTO) { // ✅ JSON 데이터를 받도록 @RequestBody 추가
+        projectService.updateProject(
+                id,
+                projectDTO.getTitle(),
+                projectDTO.getDescription(),
+                projectDTO.getGoal(),
+                projectDTO.getStartDate(),
+                projectDTO.getEndDate(),
+                projectDTO.getRecruitmentPeriod(),  // ✅ 모집 기간 추가됨
+                projectDTO.getRecruitmentCount(),  // ✅ 모집 인원 추가
+                projectDTO.getRecruitmentStartDate(), // ✅ 모집 시작일 추가
+                projectDTO.getRecruitmentEndDate() // ✅ 모집 종료일 추가
+        );
+        return ResponseEntity.ok("/postproject/" + id); // ✅ 성공 시 해당 프로젝트 상세보기 페이지로 이동
+
+}
+
+
 
     /**
      * ✅ 성공 페이지 이동

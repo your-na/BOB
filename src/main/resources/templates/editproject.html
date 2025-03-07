@@ -6,6 +6,10 @@
   <title>프로젝트 수정</title>
   <link rel="stylesheet" href="/css/newproject.css">
   <link rel="stylesheet" th:href="@{/css/header.css}">
+
+  <!-- ✅ CSRF 토큰 추가 -->
+  <meta name="_csrf" th:content="${_csrf.token}">
+  <meta name="_csrf_header" th:content="${_csrf.headerName}">
 </head>
 <body>
 <!-- header -->
@@ -16,57 +20,56 @@
     <h1>프로젝트 수정</h1>
     <hr>
     <form th:action="@{'/postproject/' + ${project.id} + '/edit'}" method="post" class="project-form">
-    <label for="project-dates">진행 일정</label>
-        <div class="date-inputs">
-          <input type="date" id="start-date" name="start-date" th:value="${project.startDate}">
-          <span>~</span>
-          <input type="date" id="end-date" name="end-date" th:value="${project.endDate}">
-        </div>
+      <label for="project-dates">진행 일정</label>
+      <div class="date-inputs">
+        <input type="date" id="start-date" name="startDate" th:value="${project.startDate}">
+        <span>~</span>
+        <input type="date" id="end-date" name="endDate" th:value="${project.endDate}">
       </div>
 
       <div class="form-group">
         <label for="party-dates">모집 일정</label>
         <div class="date-inputs">
-          <input type="date" id="recruit-start-date" name="recruit-start-date" th:value="${project.recruitmentStartDate}">
+          <input type="date" id="recruit-start-date" name="recruitmentStartDate" th:value="${project.recruitmentStartDate}">
           <span>~</span>
-          <input type="date" id="recruit-end-date" name="recruit-end-date" th:value="${project.recruitmentEndDate}">
+          <input type="date" id="recruit-end-date" name="recruitmentEndDate" th:value="${project.recruitmentEndDate}">
         </div>
       </div>
 
       <div class="form-group">
         <label for="recruitment">모집 인원</label>
-        <select id="recruitment" name="recruitment">
+        <select id="recruitment" name="recruitmentCount">
           <option value="0" th:selected="${project.recruitmentCount == 0}">0명</option>
           <option value="1" th:selected="${project.recruitmentCount == 1}">1명</option>
           <option value="2" th:selected="${project.recruitmentCount == 2}">2명</option>
           <option value="3" th:selected="${project.recruitmentCount == 3}">3명</option>
           <option value="plus">기타</option>
         </select>
-        <div id="custom-input-group" style="display: none; display: flex; align-items: center;">
+        <div id="custom-input-group" style="display: none;">
           <input type="text" id="custom-recruitment" name="custom-recruitment" placeholder="직접 입력">
-          <p style="margin-left: 5px;">명</p>
+          <p>명</p>
         </div>
       </div>
 
       <div class="form-group">
         <label for="project-name">프로젝트 주제</label>
-        <input type="text" id="project-name" name="project-name" th:value="${project.title}" placeholder="프로젝트명을 입력하세요.">
+        <input type="text" id="project-name" name="title" th:value="${project.title}" required>
       </div>
 
       <div class="form-group">
         <label for="project-goal">프로젝트 목표</label>
-        <textarea id="project-goal" name="project-goal" th:text="${project.goal}" placeholder="프로젝트 목표를 입력하세요."></textarea>
+        <textarea id="project-goal" name="goal" th:text="${project.goal}" required></textarea>
       </div>
 
       <div class="form-group">
         <label for="project-description">프로젝트 내용</label>
-        <textarea id="project-description" name="project-description" th:text="${project.description}" placeholder="프로젝트 내용을 입력하세요."></textarea>
+        <textarea id="project-description" name="description" th:text="${project.description}" required></textarea>
       </div>
 
       <div class="btn">
         <button type="submit" class="submit-btn">수정</button>
         <button type="button" class="cancel-button">
-          <a href="/project" class="ynbw">취소</a>
+          <a href="/project">취소</a>
         </button>
       </div>
     </form>
@@ -74,58 +77,22 @@
 </main>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    let today = new Date().toISOString().split("T")[0];
-
-    let startDateInput = document.getElementById("start-date");
-    let endDateInput = document.getElementById("end-date");
-
-    startDateInput.setAttribute("min", today);
-
-    startDateInput.addEventListener("change", function() {
-      let startDate = startDateInput.value;
-      if (startDate < today) {
-        alert("시작 날짜는 오늘 이후로 선택해야 합니다!");
-        startDateInput.value = today;
-      }
-      endDateInput.setAttribute("min", startDate);
-    });
-
-    endDateInput.addEventListener("change", function() {
-      let startDate = startDateInput.value;
-      let endDate = endDateInput.value;
-      if (endDate < startDate) {
-        alert("끝나는 날짜는 시작 날짜보다 빠를 수 없습니다!");
-        endDateInput.value = startDate;
-      }
-    });
-
-    let recruitmentSelect = document.getElementById("recruitment");
-    let customInputGroup = document.getElementById("custom-input-group");
-
-    if (recruitmentSelect.value !== "plus") {
-      customInputGroup.style.display = "none";
-    }
-
-    recruitmentSelect.addEventListener("change", function() {
-      if (this.value === "plus") {
-        customInputGroup.style.display = "flex";
-        customInputGroup.style.alignItems = "center";
-      } else {
-        customInputGroup.style.display = "none";
-      }
-    });
-  });
-
   document.querySelector(".submit-btn").addEventListener("click", function(event) {
     event.preventDefault();
 
-    let projectId = window.location.pathname.split("/").pop();
-    let recruitmentValue = document.getElementById("recruitment").value;
+    // ✅ CSRF 토큰 가져오기
+    let csrfTokenElement = document.querySelector("meta[name='_csrf']");
+    let csrfHeaderElement = document.querySelector("meta[name='_csrf_header']");
 
-    if (recruitmentValue === "plus") {
-      recruitmentValue = document.getElementById("custom-recruitment").value;
+    if (!csrfTokenElement || !csrfHeaderElement) {
+      console.error("CSRF 토큰을 찾을 수 없습니다!");
+      alert("CSRF 인증 오류! 페이지를 새로고침하고 다시 시도하세요.");
+      return;
     }
+
+    let csrfToken = csrfTokenElement.getAttribute("content");
+    let csrfHeader = csrfHeaderElement.getAttribute("content");
+    let projectId = window.location.pathname.split("/")[2]; // ✅ URL에서 프로젝트 ID 추출
 
     let data = {
       title: document.getElementById("project-name").value,
@@ -135,23 +102,26 @@
       endDate: document.getElementById("end-date").value,
       recruitmentStartDate: document.getElementById("recruit-start-date").value,
       recruitmentEndDate: document.getElementById("recruit-end-date").value,
-      recruitmentPeriod: recruitmentValue
+      recruitmentCount: document.getElementById("recruitment").value
     };
 
     fetch(`/postproject/${projectId}/edit`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        [csrfHeader]: csrfToken  // ✅ CSRF 토큰 추가
       },
       body: JSON.stringify(data)
     })
             .then(response => {
-              if (response.ok) {
-                alert("프로젝트가 성공적으로 수정되었습니다!");
-                window.location.href = "/postproject/" + projectId;
-              } else {
-                alert("프로젝트 수정에 실패했습니다.");
+              if (!response.ok) {
+                throw new Error("HTTP 오류: " + response.status);
               }
+              return response.text();  // ✅ 백엔드에서 URL을 반환받음
+            })
+            .then(url => {
+              alert("프로젝트가 성공적으로 수정되었습니다!");
+              window.location.href = url;  // ✅ 수정된 프로젝트 상세보기 페이지로 이동
             })
             .catch(error => {
               console.error("수정 요청 실패:", error);

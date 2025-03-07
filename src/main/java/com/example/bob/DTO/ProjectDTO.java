@@ -17,16 +17,19 @@ public class ProjectDTO {
     private int likes; // 좋아요 개수
     private String status; // 모집 상태
     private int recruitmentPeriod; // 모집 기간 필드 추가
+    private LocalDate recruitmentStartDate;  // ✅ 모집 시작일 추가
+    private LocalDate recruitmentEndDate;  // ✅ 모집 종료일 추가
 
-    // 생성자
+    // ✅ 생성자에서 모든 필드를 포함하도록 수정
     public ProjectDTO(Long id, String title, String createdBy, String description, String goal,
                       LocalDate startDate, LocalDate endDate, int recruitmentCount,
-                      int currentParticipants, int views, int likes, String status, int recruitmentPeriod) {
+                      int currentParticipants, int views, int likes, String status,
+                      int recruitmentPeriod, LocalDate recruitmentStartDate, LocalDate recruitmentEndDate) {
         this.id = id;
         this.title = title;
         this.createdBy = createdBy;
-        this.description = description; // ✅ 추가됨
-        this.goal = goal; // ✅ 추가됨
+        this.description = description;
+        this.goal = goal;
         this.startDate = startDate;
         this.endDate = endDate;
         this.recruitmentCount = recruitmentCount;
@@ -35,9 +38,12 @@ public class ProjectDTO {
         this.likes = likes;
         this.status = status;
         this.recruitmentPeriod = recruitmentPeriod;
+        this.recruitmentStartDate = recruitmentStartDate;  // ✅ 추가됨
+        this.recruitmentEndDate = recruitmentEndDate;  // ✅ 추가됨
     }
 
-    // Getter and Setter methods
+    // ✅ Getter 및 Setter 메서드 추가 (모든 필드 포함)
+
     public Long getId() {
         return id;
     }
@@ -62,19 +68,19 @@ public class ProjectDTO {
         this.createdBy = createdBy;
     }
 
-    public String getDescription() {  // ✅ 추가됨
+    public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {  // ✅ 추가됨
+    public void setDescription(String description) {
         this.description = description;
     }
 
-    public String getGoal() {  // ✅ 추가됨
+    public String getGoal() {
         return goal;
     }
 
-    public void setGoal(String goal) {  // ✅ 추가됨
+    public void setGoal(String goal) {
         this.goal = goal;
     }
 
@@ -142,7 +148,23 @@ public class ProjectDTO {
         this.recruitmentPeriod = recruitmentPeriod;
     }
 
-    // 생성된 프로젝트 상태 표시 메서드
+    public LocalDate getRecruitmentStartDate() {
+        return recruitmentStartDate;
+    }
+
+    public void setRecruitmentStartDate(LocalDate recruitmentStartDate) {
+        this.recruitmentStartDate = recruitmentStartDate;
+    }
+
+    public LocalDate getRecruitmentEndDate() {
+        return recruitmentEndDate;
+    }
+
+    public void setRecruitmentEndDate(LocalDate recruitmentEndDate) {
+        this.recruitmentEndDate = recruitmentEndDate;
+    }
+
+    // ✅ 참가 현황 반환 메서드 추가
     public String getParticipantsStatus() {
         return currentParticipants + "/" + recruitmentCount;
     }
