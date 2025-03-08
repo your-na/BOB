@@ -101,19 +101,28 @@ public class ProjectService {
     @Transactional
     public ProjectEntity updateProject(Long id, String title, String description, String goal,
                                        LocalDate startDate, LocalDate endDate, int recruitmentPeriod) {
+        // 기존 프로젝트 찾기
         ProjectEntity project = projectRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트가 없습니다."));
 
-        saveProjectHistory(project, "수정됨");  // ✅ 수정 전 데이터를 히스토리에 저장
+        // 수정 전 히스토리 저장 (기존 상태)
+        saveProjectHistory(project, "수정됨");  // 수정 전에 상태 저장
 
+        // 프로젝트 수정
         project.setTitle(title);
         project.setDescription(description);
         project.setGoal(goal);
-        project.setStartDate(startDate);  // ✅ 진행 시작일 변경
-        project.setEndDate(endDate);  // ✅ 진행 종료일 변경
-        project.setRecruitmentPeriod(recruitmentPeriod);  // ✅ 모집 일정 변경
+        project.setStartDate(startDate);  // 진행 시작일 변경
+        project.setEndDate(endDate);  // 진행 종료일 변경
+        project.setRecruitmentPeriod(recruitmentPeriod);  // 모집 일정 변경
 
-        return projectRepository.save(project);  // ✅ 변경된 데이터 저장
+        // 수정된 프로젝트 상태 저장
+        projectRepository.save(project);  // 프로젝트 데이터 저장
+
+        // 수정된 프로젝트도 히스토리로 저장
+        saveProjectHistory(project, "수정된 상태로 저장됨");  // 수정 후 상태 저장
+
+        return project;  // 수정된 프로젝트 반환
     }
 
     /**

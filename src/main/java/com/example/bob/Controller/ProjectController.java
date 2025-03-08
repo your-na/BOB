@@ -157,39 +157,40 @@ public class ProjectController {
         return "redirect:/postproject/" + savedProject.getId();
     }
 
-    /**
-     * ✅ 프로젝트 수정 페이지로 이동
-     */
+    // 프로젝트 수정 페이지로 이동
     @GetMapping("/postproject/{id}/edit")
     public String showEditProjectPage(@PathVariable Long id, Model model) {
-        ProjectEntity project = projectService.getProjectById(id); // 해당 ID의 프로젝트 가져오기
-        model.addAttribute("project", project); // 모델에 프로젝트 정보 추가
-        return "editproject"; // ✅ editproject.html 파일 렌더링
+        ProjectEntity project = projectService.getProjectById(id);
+        model.addAttribute("project", project);
+        return "editproject";
     }
 
+    // 프로젝트 수정 처리 (폼 데이터를 사용하여 처리)
+    @PostMapping("/postproject/{id}/edit")
+    public String updateProject(@PathVariable Long id,
+                                @RequestParam("project-name") String projectName,
+                                @RequestParam("project-description") String projectDescription,
+                                @RequestParam("project-goal") String projectGoal,
+                                @RequestParam("start-date") String startDateStr,
+                                @RequestParam("end-date") String endDateStr,
+                                @RequestParam("recruitment") String recruitmentStr,
+                                @RequestParam(value = "recruitmentCount", required = false) String recruitmentCountStr,
+                                Model model) {
 
-    /**
-     * ✅ 프로젝트 수정 처리 (수정 후 JSON 응답 반환)
-     */
-    @PostMapping("/postprojecsst/{id}/edit")
-    @ResponseBody
-    public ResponseEntity<String> updateProject(@PathVariable Long id, @RequestBody ProjectDTO projectDTO) {
+        // 날짜 파싱
         try {
-            projectService.updateProject(
-                    id,
-                    projectDTO.getTitle(),
-                    projectDTO.getDescription(),
-                    projectDTO.getGoal(),
-                    projectDTO.getStartDate(),
-                    projectDTO.getEndDate(),
-                    projectDTO.getRecruitmentPeriod()
-            );
-            return ResponseEntity.ok("프로젝트가 성공적으로 수정되었습니다!");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate startDate = LocalDate.parse(startDateStr, formatter);
+            LocalDate endDate = LocalDate.parse(endDateStr, formatter);
+            int recruitment = Integer.parseInt(recruitmentStr);
+
+            // 상세 페이지로 리디렉션
+            return "redirect:/postproject/" + id;
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("프로젝트 수정에 실패했습니다.");
+            model.addAttribute("error", "프로젝트 수정에 실패했습니다.");
+            return "editproject";
         }
     }
-
     /**
      * ✅ 성공 페이지 이동
      */
