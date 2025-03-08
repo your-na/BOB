@@ -209,7 +209,9 @@ public class ProjectController {
     }
 
     @GetMapping("/projapplication")
-    public String projapplicationForm() {
-        return "projapplication";
-    }
+    public String projapplicationForm() { return "projapplication"; }
+
+    @GetMapping("/myproject")
+    public String myprojectForm() { return "myproject"; }
+
 }

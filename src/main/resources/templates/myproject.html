@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>프로젝트 목록</title>
+  <link rel="stylesheet" href="/css/myproject.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<section class="project-list">
+  <div class="upupup">
+    <form>
+      <!-- 검색 아이콘 -->
+      <div class="search-container">
+        <div class="searchicon" id="searchicon">
+          <img src="/images/search-icon.png" alt="검색">
+        </div>
+
+        <!-- 검색창 (기본적으로 숨김) -->
+        <div class="search-box" id="search-box">
+          <!-- 검색창 상단 -->
+          <div class="search-header">
+            <button type="button" id="search-close">&times;</button>
+          </div>
+
+          <!-- 프로젝트 제목 검색 -->
+          <div class="search-field">
+            <input type="text" id="search-input" placeholder="검색어 입력">
+          </div>
+
+          <!-- 모집 기간 -->
+          <div class="search-field">
+            <label for="recruit-start">모집기간</label>
+            <div class="date-group">
+              <input type="date" id="recruit-start">
+              <span>~</span>
+              <input type="date" id="recruit-end">
+            </div>
+          </div>
+
+          <!-- 진행 기간 -->
+          <div class="search-field">
+          <label for="progress-start">진행기간</label>
+          <div class="date-group">
+            <input type="date" id="progress-start">
+            <span>~</span>
+            <input type="date" id="progress-end">
+          </div>
+        </div>
+
+          <!-- 역할 -->
+          <div class="search-field">
+            <label for="progress-start">역할</label>
+            <div class="role">
+              <input type="checkbox" id="주최">
+              <span>주최</span>
+              <input type="checkbox" id="참여">
+              <span>참여</span>
+            </div>
+          </div>
+
+          <!-- 상태 -->
+          <div class="search-field">
+            <label for="progress-start">상태</label>
+            <div class="state">
+              <input type="checkbox" id="모집중">
+              <span>모집중</span>
+              <input type="checkbox" id="진행중">
+              <span>진행중</span>
+              <input type="checkbox" id="완료">
+              <span>완료</span>
+            </div>
+          </div>
+
+          <!-- 완료 버튼 -->
+          <button class="submit-btn">완료</button>
+        </div>
+      </div>
+    </form>
+
+    <select id="filter" name="filter">
+      <option value="all">최신순</option>
+      <option value="ing">인기순</option>
+      <option value="ed">오래된순</option>
+    </select>
+
+    <!-- 프로젝트 생성 버튼 -->
+    <form action="/newproject" method="get">
+      <button type="submit" class="create-post-button">프로젝트 생성</button>
+    </form>
+
+
+  </div>
+
+  <!-- 프로젝트 목록 테이블 -->
+  <table class="contest-table">
+    <thead>
+    <tr>
+      <th>프로젝트명</th>
+      <th>생성자</th>
+      <th>모집 기간</th>
+      <th>진행 일정</th>
+      <th>조회수</th>
+      <th>좋아요</th>
+      <th>모집 인원</th>
+      <th>현황</th>
+      <th>역할</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Thymeleaf 반복문으로 프로젝트 데이터 출력 -->
+    <tr th:each="project : ${projects}">
+      <td>
+        <a th:href="@{/postproject/{id}(id=${project.id})}" th:text="${project.title}">프로젝트명</a>
+      </td>
+      <td th:text="${project.createdBy}">생성자</td>
+      <td th:text="'D-' + ${project.recruitmentPeriod}">D-3</td>
+      <td th:text="${project.startDate} + ' ~ ' + ${project.endDate}">2025-01-01 ~ 2025-12-31</td>
+      <td th:text="${project.views}">0</td>
+      <td th:text="${project.likes}">0</td>
+      <!-- 동적으로 모집 인원 표시 -->
+      <td>
+        <span th:text="${project.currentParticipants}">0</span>/
+        <span th:text="${project.recruitmentCount}">0</span>
+      </td>
+      <td th:text="${project.status}">모집중</td>
+    </tr>
+    </tbody>
+  </table>
+
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var searchIcon = document.getElementById("searchicon");
+    var searchBox = document.getElementById("search-box");
+    var searchClose = document.getElementById("search-close");
+
+    // 검색 아이콘 클릭 시 검색창 표시
+    searchIcon.addEventListener("click", function () {
+      searchBox.style.display = "block";
+    });
+
+    // 닫기 버튼 클릭 시 검색창 숨기기
+    searchClose.addEventListener("click", function () {
+      searchBox.style.display = "none";
+    });
+  });
+</script>
+</body>
+</html>
