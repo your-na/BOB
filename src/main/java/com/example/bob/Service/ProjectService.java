@@ -6,7 +6,10 @@ import com.example.bob.Entity.ProjectHistoryEntity;
 import com.example.bob.Repository.ProjectHistoryRepository;
 import com.example.bob.Repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -20,6 +23,7 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final ProjectHistoryRepository projectHistoryRepository;
+    private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
 
     /**
      * ✅ 프로젝트를 DTO로 변환하는 메서드
@@ -29,8 +33,8 @@ public class ProjectService {
                 projectEntity.getId(),
                 projectEntity.getTitle(),
                 projectEntity.getCreatedBy(),
-                projectEntity.getDescription(), // ✅ 추가됨 (프로젝트 내용)
-                projectEntity.getGoal(), // ✅ 추가됨 (프로젝트 목표)
+                projectEntity.getDescription(),
+                projectEntity.getGoal(),
                 projectEntity.getStartDate(),
                 projectEntity.getEndDate(),
                 projectEntity.getRecruitmentCount(),
@@ -42,22 +46,13 @@ public class ProjectService {
         );
     }
 
-
     /**
      * ✅ 모든 프로젝트를 DTO로 변환하여 반환
      */
     public List<ProjectDTO> getAllProjectsDTO() {
-        List<ProjectEntity> projectEntities = projectRepository.findAll();
-        return projectEntities.stream()
+        return projectRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
-    }
-
-    /**
-     * ✅ 모든 프로젝트 가져오기
-     */
-    public List<ProjectEntity> getAllProjects() {
-        return projectRepository.findAll();
     }
 
     /**
@@ -76,53 +71,49 @@ public class ProjectService {
     }
 
     /**
-     * ✅ 프로젝트 수정/삭제 이력 저장
+     * ✅ 프로젝트 수정/삭제 이력 저장 (별도 트랜잭션 적용)
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void saveProjectHistory(ProjectEntity project, String actionType) {
-        ProjectHistoryEntity history = ProjectHistoryEntity.builder()
-                .project(project)  // ✅ 연관된 프로젝트 저장
-                .title(project.getTitle())
-                .description(project.getDescription())
-                .goal(project.getGoal())
-                .createdBy(project.getCreatedBy())
-                .startDate(project.getStartDate())  // ✅ 진행 시작일 저장
-                .endDate(project.getEndDate())  // ✅ 진행 종료일 저장
-                .recruitmentPeriod(project.getRecruitmentPeriod())  // ✅ 모집 기간 저장
-                .modifiedAt(LocalDateTime.now())  // ✅ 수정 날짜 기록
-                .actionType(actionType)  // "수정됨" 또는 "삭제됨"
-                .build();
-
-        projectHistoryRepository.save(history);  // ✅ 히스토리 저장
+        try {
+            ProjectHistoryEntity history = ProjectHistoryEntity.builder()
+                    .project(project)
+                    .title(project.getTitle())
+                    .description(project.getDescription())
+                    .goal(project.getGoal())
+                    .createdBy(project.getCreatedBy())
+                    .startDate(project.getStartDate())
+                    .endDate(project.getEndDate())
+                    .recruitmentPeriod(project.getRecruitmentPeriod())
+                    .modifiedAt(LocalDateTime.now())
+                    .actionType(actionType)
+                    .build();
+            projectHistoryRepository.save(history);
+        } catch (Exception e) {
+            logger.error("🚨 프로젝트 히스토리 저장 실패: " + e.getMessage());
+            throw new RuntimeException("히스토리 저장 실패", e); // 예외를 던져서 롤백 유도
+        }
     }
 
     /**
-     * ✅ 프로젝트 수정
+     * ✅ 프로젝트 수정 (트랜잭션 적용)
      */
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ProjectEntity updateProject(Long id, String title, String description, String goal,
                                        LocalDate startDate, LocalDate endDate, int recruitmentPeriod) {
-        // 기존 프로젝트 찾기
         ProjectEntity project = projectRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트가 없습니다."));
 
-        // 수정 전 히스토리 저장 (기존 상태)
-        saveProjectHistory(project, "수정됨");  // 수정 전에 상태 저장
+        saveProjectHistory(project, "수정됨");
 
-        // 프로젝트 수정
         project.setTitle(title);
         project.setDescription(description);
         project.setGoal(goal);
-        project.setStartDate(startDate);  // 진행 시작일 변경
-        project.setEndDate(endDate);  // 진행 종료일 변경
-        project.setRecruitmentPeriod(recruitmentPeriod);  // 모집 일정 변경
+        project.setStartDate(startDate);
+        project.setEndDate(endDate);
+        project.setRecruitmentPeriod(recruitmentPeriod);
 
-        // 수정된 프로젝트 상태 저장
-        projectRepository.save(project);  // 프로젝트 데이터 저장
-
-        // 수정된 프로젝트도 히스토리로 저장
-        saveProjectHistory(project, "수정된 상태로 저장됨");  // 수정 후 상태 저장
-
-        return project;  // 수정된 프로젝트 반환
+        return projectRepository.save(project);
     }
 
     /**
@@ -130,11 +121,14 @@ public class ProjectService {
      */
     @Transactional
     public void deleteProject(Long id) {
-        ProjectEntity project = projectRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트가 없습니다."));
-
-        saveProjectHistory(project, "삭제됨");  // ✅ 삭제 이력 저장
-        projectRepository.deleteById(id);  // ✅ 실제 테이블에서 삭제
+        try {
+            ProjectEntity project = getProjectById(id);
+            saveProjectHistory(project, "삭제됨");
+            projectRepository.deleteById(id);
+        } catch (Exception e) {
+            logger.error("프로젝트 삭제 중 오류 발생: ", e);
+            throw e;  // 예외를 던져서 롤백을 유발
+        }
     }
 
     /**
@@ -142,18 +136,14 @@ public class ProjectService {
      */
     @Transactional
     public ProjectEntity toggleLike(Long projectId, Long userId) {
-        // 프로젝트를 가져옴
         ProjectEntity project = getProjectById(projectId);
-
-        // 이미 좋아요를 눌렀으면 취소, 아니면 좋아요 추가
         if (project.getLikedUsers().contains(userId)) {
-            project.getLikedUsers().remove(userId); // 좋아요 취소
-            project.setLikes(project.getLikes() - 1); // 좋아요 수 감소
+            project.getLikedUsers().remove(userId);
+            project.setLikes(project.getLikes() - 1);
         } else {
-            project.getLikedUsers().add(userId); // 좋아요 추가
-            project.setLikes(project.getLikes() + 1); // 좋아요 수 증가
+            project.getLikedUsers().add(userId);
+            project.setLikes(project.getLikes() + 1);
         }
-
         return projectRepository.save(project);
     }
 

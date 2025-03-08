@@ -28,7 +28,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // CSRF 활성화 및 쿠키에 토큰 저장
-                        .ignoringRequestMatchers("/login", "/signup", "/profile/update", "/logout", "/bw") // 로그인과 회원가입 경로에 대해 CSRF 예외 설정
+                        .ignoringRequestMatchers("/login", "/signup", "/profile/update", "/logout", "/bw", "/postproject/*/edit") // 로그인과 회원가입 경로에 대해 CSRF 예외 설정
                 )
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers( "/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**", "/project").permitAll() // 인증 없이 접근 가능 경로 설정

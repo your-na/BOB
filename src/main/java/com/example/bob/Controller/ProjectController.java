@@ -4,6 +4,7 @@ import com.example.bob.DTO.ProjectDTO;
 import com.example.bob.Entity.ProjectEntity;
 import com.example.bob.Service.ProjectService;
 import com.example.bob.security.UserDetailsImpl;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,9 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
+@Transactional
 @RequiredArgsConstructor
 public class ProjectController {
 
@@ -27,10 +28,7 @@ public class ProjectController {
      */
     @GetMapping("/project")
     public String showProjects(Model model) {
-        List<ProjectEntity> projects = projectService.getAllProjects();
-        List<ProjectDTO> projectDTOs = projects.stream()
-                .map(project -> projectService.convertToDTO(project))
-                .collect(Collectors.toList());
+        List<ProjectDTO> projectDTOs = projectService.getAllProjectsDTO();
         model.addAttribute("projects", projectDTOs);
         return "project";
     }
@@ -41,17 +39,10 @@ public class ProjectController {
     @GetMapping("/postproject/{id}")
     public String showProjectDetail(@PathVariable Long id, Model model) {
         ProjectEntity project = projectService.getProjectById(id);
-
-        // 조회수 증가 처리
         project = projectService.incrementViews(id);
-
-        // 현재 날짜 추가
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
         model.addAttribute("today", today);
-
-        // 프로젝트 목표 추가
         model.addAttribute("goal", project.getGoal());
-
         model.addAttribute("project", project);
         return "postproject";
     }
@@ -107,14 +98,6 @@ public class ProjectController {
                                 Model model) {
 
         String creatorNick = userDetails.getUserNick();
-
-        if (startDateStr.contains(",")) {
-            startDateStr = startDateStr.split(",")[0].trim();
-        }
-        if (endDateStr.contains(",")) {
-            endDateStr = endDateStr.split(",")[0].trim();
-        }
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate startDate = LocalDate.parse(startDateStr, formatter);
         LocalDate endDate = LocalDate.parse(endDateStr, formatter);
@@ -157,7 +140,9 @@ public class ProjectController {
         return "redirect:/postproject/" + savedProject.getId();
     }
 
-    // 프로젝트 수정 페이지로 이동
+    /**
+     * ✅ 프로젝트 수정 페이지로 이동
+     */
     @GetMapping("/postproject/{id}/edit")
     public String showEditProjectPage(@PathVariable Long id, Model model) {
         ProjectEntity project = projectService.getProjectById(id);
@@ -165,7 +150,9 @@ public class ProjectController {
         return "editproject";
     }
 
-    // 프로젝트 수정 처리 (폼 데이터를 사용하여 처리)
+    /**
+     * ✅ 프로젝트 수정 처리
+     */
     @PostMapping("/postproject/{id}/edit")
     public String updateProject(@PathVariable Long id,
                                 @RequestParam("project-name") String projectName,
@@ -177,20 +164,47 @@ public class ProjectController {
                                 @RequestParam(value = "recruitmentCount", required = false) String recruitmentCountStr,
                                 Model model) {
 
-        // 날짜 파싱
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate startDate = LocalDate.parse(startDateStr, formatter);
-            LocalDate endDate = LocalDate.parse(endDateStr, formatter);
-            int recruitment = Integer.parseInt(recruitmentStr);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate startDate = LocalDate.parse(startDateStr, formatter);
+        LocalDate endDate = LocalDate.parse(endDateStr, formatter);
 
-            // 상세 페이지로 리디렉션
+        int recruitment = 0;
+        if ("기타".equals(recruitmentStr)) {
+            try {
+                if (recruitmentCountStr != null && !recruitmentCountStr.isEmpty()) {
+                    recruitment = Integer.parseInt(recruitmentCountStr);
+                }
+            } catch (NumberFormatException e) {
+                model.addAttribute("error", "잘못된 모집 인원 값입니다.");
+                return "editproject";
+            }
+        } else {
+            try {
+                recruitment = Integer.parseInt(recruitmentStr);
+            } catch (NumberFormatException e) {
+                model.addAttribute("error", "잘못된 모집 인원 값입니다.");
+                return "editproject";
+            }
+        }
+
+        try {
+            ProjectEntity updatedProject = projectService.updateProject(
+                    id,
+                    projectName,
+                    projectDescription,
+                    projectGoal,
+                    startDate,
+                    endDate,
+                    recruitment
+            );
+            model.addAttribute("project", updatedProject);
             return "redirect:/postproject/" + id;
         } catch (Exception e) {
             model.addAttribute("error", "프로젝트 수정에 실패했습니다.");
             return "editproject";
         }
     }
+
     /**
      * ✅ 성공 페이지 이동
      */
