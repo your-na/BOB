@@ -23,6 +23,8 @@
     </aside>
 
     <section class="contest-list">
+        <h2>공모전</h2>
+        <hr>
         <div class="filter-wrapper">
             <div class="filter-container">
                 <select id="sort-filter">
@@ -60,15 +62,21 @@
         <!-- 필터링 창 -->
         <div class="filter-box" id="filter-box">
             <div class="filter-tabs">
-                <button class="filter-tab active" data-target="filter-type">공모전 유형</button>
-                <button class="filter-tab" data-target="filter-lang">프로그래밍 언어</button>
+                <button class="filter-tab active" data-target="filter-who">주최</button>
+                <button class="filter-tab" data-target="filter-type">공모전 유형</button>
+                <button class="filter-tab" data-target="filter-lang">코딩 언어</button>
                 <button class="filter-tab" data-target="filter-level">난이도</button>
                 <button class="filter-tab" data-target="filter-prize">상금</button>
                 <button class="filter-tab" data-target="filter-location">지역</button>
             </div>
 
             <div class="filter-content">
-                <div class="filter-category active" id="filter-type">
+                <div class="filter-category active" id="filter-who">
+                    <button class="filter-option">기업</button>
+                    <button class="filter-option">외부</button>
+                </div>
+
+                <div class="filter-category" id="filter-type">
                     <button class="filter-option">해커톤</button>
                     <button class="filter-option">알고리즘</button>
                     <button class="filter-option">오픈소스</button>
