@@ -96,10 +96,17 @@
     padding: 20px;
 }
 
+.contest-list h2{
+    color: #44d644;
+    font-weight: bold;
+    font-size: 29px;
+}
+
 .contest-table {
+
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
+    margin-top: 20px;
 }
 
 .contest-table th,
@@ -225,6 +232,7 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: none;
     z-index: 1000; /* 다른 요소 위에 표시 */
+    margin-top: 110px;
 }
 
 /* 필터 창 활성화 */
