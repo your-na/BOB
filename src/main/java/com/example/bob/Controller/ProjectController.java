@@ -48,6 +48,16 @@ public class ProjectController {
     }
 
     /**
+     * ✅ 프론트엔드(Vue, React)에서 사용 가능한 REST API 추가 (JSON 반환)
+     */
+    @GetMapping("/api/projects/{id}")
+    @ResponseBody
+    public ResponseEntity<ProjectEntity> getProjectById(@PathVariable Long id) {
+        ProjectEntity project = projectService.getProjectById(id);
+        return ResponseEntity.ok(project); // JSON 데이터 반환
+    }
+
+    /**
      * ✅ 좋아요 토글 API
      */
     @PostMapping("/postproject/{id}/like")
@@ -163,12 +173,10 @@ public class ProjectController {
                                 @RequestParam("recruitment") String recruitmentStr,
                                 @RequestParam(value = "recruitmentCount", required = false) String recruitmentCountStr,
                                 Model model) {
-        // 날짜 파싱 및 유효성 검증
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate startDate = LocalDate.parse(startDateStr, formatter);
         LocalDate endDate = LocalDate.parse(endDateStr, formatter);
 
-        // 모집 인원 처리
         int recruitment = 0;
         if ("기타".equals(recruitmentStr)) {
             try {
@@ -188,29 +196,17 @@ public class ProjectController {
             }
         }
 
-        // 업데이트 처리
         try {
             ProjectEntity updatedProject = projectService.updateProject(
-                    id,
-                    projectName,
-                    projectDescription,
-                    projectGoal,
-                    startDate,
-                    endDate,
-                    recruitment
-            );
-            model.addAttribute("project", updatedProject);  // 업데이트된 프로젝트를 모델에 추가
-            return "redirect:/postproject/" + id;  // 수정 후 상세 페이지로 리디렉션
+                    id, projectName, projectDescription, projectGoal, startDate, endDate, recruitment);
+            model.addAttribute("project", updatedProject);
+            return "redirect:/postproject/" + id;
         } catch (Exception e) {
             model.addAttribute("error", "프로젝트 수정에 실패했습니다.");
-            return "editproject";  // 수정 실패 시, 에러 메시지 표시
+            return "editproject";
         }
     }
 
-
-    /**
-     * ✅ 성공 페이지 이동
-     */
     @GetMapping("/success")
     public String showsuccessForm() {
         return "success";
