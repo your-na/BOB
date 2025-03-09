@@ -9,9 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +22,8 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@PersistenceContext
+
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
@@ -66,16 +71,21 @@ public class ProjectService {
     /**
      * ✅ 프로젝트 저장 후 반환
      */
+    @Transactional
     public ProjectEntity saveProject(ProjectEntity project) {
         return projectRepository.save(project);
     }
 
+    @PersistenceContext
+    private EntityManager entityManager;  // EntityManager 주입
+
     /**
-     * ✅ 프로젝트 수정/삭제 이력 저장 (별도 트랜잭션 적용)
+     * 프로젝트 수정/삭제 이력 저장
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void saveProjectHistory(ProjectEntity project, String actionType) {
         try {
+            // 이력 객체 생성
             ProjectHistoryEntity history = ProjectHistoryEntity.builder()
                     .project(project)
                     .title(project.getTitle())
@@ -88,24 +98,38 @@ public class ProjectService {
                     .modifiedAt(LocalDateTime.now())
                     .actionType(actionType)
                     .build();
-            projectHistoryRepository.save(history);
+
+            // 디버깅: 저장될 히스토리 값 출력
+            logger.info("Saving project history: " + history);
+
+            // EntityManager를 사용하여 저장
+            entityManager.persist(history);  // 엔티티 저장
+            entityManager.flush();  // 즉시 커밋
         } catch (Exception e) {
-            logger.error("🚨 프로젝트 히스토리 저장 실패: " + e.getMessage());
-            throw new RuntimeException("히스토리 저장 실패", e); // 예외를 던져서 롤백 유도
+            logger.error("프로젝트 히스토리 저장 실패: " + e.getMessage());
+            throw new RuntimeException("히스토리 저장 실패", e);  // 예외 발생 시 롤백 유도
         }
     }
 
     /**
-     * ✅ 프로젝트 수정 (트랜잭션 적용)
+     * 프로젝트 수정 (트랜잭션 적용)
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ProjectEntity updateProject(Long id, String title, String description, String goal,
                                        LocalDate startDate, LocalDate endDate, int recruitmentPeriod) {
+        System.out.println("✅ updateProject 시작");
+
+        // 프로젝트 조회
         ProjectEntity project = projectRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트가 없습니다."));
+        System.out.println("✅ 프로젝트 조회 완료: " + project.getId());
 
+        // 프로젝트 정보 업데이트 전에 히스토리 저장
+        System.out.println("✅ 히스토리 저장 함수 호출 전");
         saveProjectHistory(project, "수정됨");
+        System.out.println("✅ 히스토리 저장 함수 호출 후");
 
+        // 프로젝트 정보 업데이트
         project.setTitle(title);
         project.setDescription(description);
         project.setGoal(goal);
@@ -113,23 +137,34 @@ public class ProjectService {
         project.setEndDate(endDate);
         project.setRecruitmentPeriod(recruitmentPeriod);
 
-        return projectRepository.save(project);
+        System.out.println("✅ 프로젝트 정보 업데이트 완료");
+
+        // 업데이트된 프로젝트를 프로젝트 테이블에 저장
+        project = projectRepository.save(project);
+        System.out.println("✅ 프로젝트 저장 완료");
+
+        // 수정 후 저장된 프로젝트 리턴
+        return project;
     }
 
     /**
-     * ✅ 프로젝트 삭제 (논리 삭제 X, 실제 DB에서 제거)
+     * 프로젝트 삭제 (논리 삭제 X, 실제 DB에서 제거)
      */
     @Transactional
     public void deleteProject(Long id) {
         try {
-            ProjectEntity project = getProjectById(id);
+            ProjectEntity project = projectRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트가 없습니다."));
+            // 삭제 전에 히스토리 저장
             saveProjectHistory(project, "삭제됨");
+            // 프로젝트 삭제
             projectRepository.deleteById(id);
         } catch (Exception e) {
             logger.error("프로젝트 삭제 중 오류 발생: ", e);
             throw e;  // 예외를 던져서 롤백을 유발
         }
     }
+
 
     /**
      * ✅ 좋아요 토글 (좋아요 추가/삭제)

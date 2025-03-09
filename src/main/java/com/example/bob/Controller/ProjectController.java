@@ -163,11 +163,12 @@ public class ProjectController {
                                 @RequestParam("recruitment") String recruitmentStr,
                                 @RequestParam(value = "recruitmentCount", required = false) String recruitmentCountStr,
                                 Model model) {
-
+        // 날짜 파싱 및 유효성 검증
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate startDate = LocalDate.parse(startDateStr, formatter);
         LocalDate endDate = LocalDate.parse(endDateStr, formatter);
 
+        // 모집 인원 처리
         int recruitment = 0;
         if ("기타".equals(recruitmentStr)) {
             try {
@@ -187,6 +188,7 @@ public class ProjectController {
             }
         }
 
+        // 업데이트 처리
         try {
             ProjectEntity updatedProject = projectService.updateProject(
                     id,
@@ -197,13 +199,14 @@ public class ProjectController {
                     endDate,
                     recruitment
             );
-            model.addAttribute("project", updatedProject);
-            return "redirect:/postproject/" + id;
+            model.addAttribute("project", updatedProject);  // 업데이트된 프로젝트를 모델에 추가
+            return "redirect:/postproject/" + id;  // 수정 후 상세 페이지로 리디렉션
         } catch (Exception e) {
             model.addAttribute("error", "프로젝트 수정에 실패했습니다.");
-            return "editproject";
+            return "editproject";  // 수정 실패 시, 에러 메시지 표시
         }
     }
+
 
     /**
      * ✅ 성공 페이지 이동
