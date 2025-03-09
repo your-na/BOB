@@ -207,6 +207,13 @@ public class ProjectController {
         }
     }
 
+    @DeleteMapping("/postproject/{id}/delete")
+    public ResponseEntity<String> deleteProject(@PathVariable Long id) {
+        projectService.deleteProject(id);
+        return ResponseEntity.ok("✅ 프로젝트가 삭제되었습니다.");
+    }
+
+
     @GetMapping("/success")
     public String showsuccessForm() {
         return "success";

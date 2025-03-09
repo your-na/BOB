@@ -153,17 +153,23 @@ public class ProjectService {
     @Transactional
     public void deleteProject(Long id) {
         try {
+            // 1️⃣ 삭제할 프로젝트 찾기
             ProjectEntity project = projectRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트가 없습니다."));
-            // 삭제 전에 히스토리 저장
+
+            // 2️⃣ 삭제 이력 저장 (프로젝트 히스토리에 남기기)
             saveProjectHistory(project, "삭제됨");
-            // 프로젝트 삭제
+
+            // 3️⃣ 실제 프로젝트 삭제 (DB에서 제거)
             projectRepository.deleteById(id);
+
+            System.out.println("🔥 프로젝트 삭제 완료: " + id);
         } catch (Exception e) {
-            logger.error("프로젝트 삭제 중 오류 발생: ", e);
-            throw e;  // 예외를 던져서 롤백을 유발
+            logger.error("❌ 프로젝트 삭제 중 오류 발생: ", e);
+            throw e;  // 예외 발생 시 롤백
         }
     }
+
 
 
     /**

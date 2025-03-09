@@ -1,11 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <title th:text="${project.title}">프로젝트 상세보기</title>
+
+    <!-- ✅ CSRF 토큰 추가 (보안 인증) -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
     <link rel="stylesheet" href="/css/postproject.css">
     <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
+
 <body>
 <!-- header -->
 <div th:insert="~{header :: header}"></div>
@@ -23,7 +29,7 @@
     </div>
     <div class="post-detail">
         <img class="postdetail" src="/images/postdetail.png" alt="점 세 개" onclick="toggleDropdown()">
-        <div class="dropdownmenu" id="dropdownMenu">
+        <div class="dropdownmenu" id="dropdownMenu" style="display: none;">
             <a class="action-button" th:href="@{'/postproject/' + ${project.id} + '/edit'}">수정하기</a>
             <a class="action-button" href="javascript:void(0);" onclick="deleteProject()">삭제하기</a>
         </div>
@@ -35,7 +41,6 @@
 <div class="meta">
     <span class="meta1" th:text="${project.createdBy}">작성자</span>
     <span class="meta2" th:text="'작성일 : ' + ${today}">작성일</span>
-
 </div>
 
 <div class="form-group">
@@ -87,68 +92,65 @@
     <div id="scrap"><img src="/images/scrap.png"> <span>0</span></div>
 </div>
 
-
-
 <!-- 댓글 입력 -->
 <form>
     <input type="text" class="comment-box" placeholder="댓글을 작성해주세요.">
     <button class="postbutton">등록</button>
 </form>
 
-<!-- JavaScript -->
 <script>
-    // 이 예시에서는 'isLiked'라는 변수를 사용하여 사용자가 하트를 눌렀는지 여부를 확인합니다.
-    let isLiked = false; // 하트를 눌렀는지 여부, 기본은 false (하트를 누르지 않은 상태)
-    let likesCount = 10; // 현재 좋아요 수, 실제로는 서버에서 가져와야 함
+    // ✅ 드롭다운 토글 기능 (초기 숨김 처리)
+    function toggleDropdown() {
+        var dropdown = document.getElementById("dropdownMenu");
+        dropdown.style.display = (dropdown.style.display === "none" || dropdown.style.display === "") ? "block" : "none";
+    }
 
-    function toggleHeart() {
-        const heartImage = document.getElementById('heartImage');
-        const likesSpan = document.getElementById('likesCount');
+    // ✅ 프로젝트 삭제 함수 (삭제 기능만 수정)
+    function deleteProject() {
+        let projectId = window.location.pathname.split("/")[2];
 
-        // 이미 하트를 눌렀으면 취소하고, 누르지 않았다면 좋아요를 추가
-        if (isLiked) {
-            heartImage.src = '/images/heart.png'; // 빈 하트로 변경
-            likesCount--; // 좋아요 수 감소
-        } else {
-            heartImage.src = '/images/fillheart.png'; // 채워진 하트로 변경
-            likesCount++; // 좋아요 수 증가
+        if (!confirm("⚠️ 정말 삭제하시겠습니까? 삭제 후 복구할 수 없습니다!")) {
+            return;
         }
 
-        // 좋아요 상태 변경 후, isLiked 상태 업데이트
-        isLiked = !isLiked;
+        // ✅ CSRF 토큰 가져오기
+        let csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+        let csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
 
-        // 좋아요 수 업데이트
-        likesSpan.textContent = likesCount;
+        if (!csrfToken || !csrfHeader) {
+            alert("❌ CSRF 토큰을 찾을 수 없습니다. 다시 시도해주세요.");
+            return;
+        }
 
-
-        // 서버에 좋아요 수 갱신 요청
-        fetch(`/postproject/${projectId}/like`, {
-            method: 'POST',
+        fetch(`/postproject/${projectId}/delete`, {
+            method: "DELETE",  // ✅ DELETE 메서드로 변경
+            headers: {
+                [csrfHeader]: csrfToken  // ✅ CSRF 헤더 추가
+            }
         })
-            .then(response => response.json())
-            .then(updatedLikes => {
-                // 서버에서 받은 새로운 좋아요 수로 목록 업데이트
-                likesSpan.textContent = updatedLikes;  // 목록에 반영
+            .then(response => {
+                if (response.ok) {
+                    alert("✅ 프로젝트가 삭제되었습니다.");
+                    window.location.href = "/project";
+                } else {
+                    return response.text().then(text => {
+                        console.error("❌ 서버 응답:", text);
+                        alert("❌ 프로젝트 삭제에 실패했습니다.");
+                    });
+                }
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error("❌ 삭제 요청 실패:", error);
+                alert("❌ 프로젝트 삭제 중 오류 발생");
             });
     }
 
-        // 드롭다운 토글 기능
-        function toggleDropdown() {
+    // ✅ 페이지 로드 시 드롭다운 메뉴 숨기기
+    document.addEventListener("DOMContentLoaded", function() {
         var dropdown = document.getElementById("dropdownMenu");
-        if (dropdown.style.display === "none" || dropdown.style.display === "") {
-        dropdown.style.display = "block";
-    } else {
-        dropdown.style.display = "none";
-    }
-    }
-
-        // 페이지 로드 시 기본적으로 드롭다운을 숨기기
-        document.addEventListener("DOMContentLoaded", function() {
-        var dropdown = document.getElementById("dropdownMenu");
-        dropdown.style.display = "none"; // 기본적으로 숨기기
+        if (dropdown) {
+            dropdown.style.display = "none"; // 기본적으로 숨기기
+        }
     });
 </script>
 
