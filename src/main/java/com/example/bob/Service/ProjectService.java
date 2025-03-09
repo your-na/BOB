@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
@@ -47,7 +47,10 @@ public class ProjectService {
                 projectEntity.getViews(),
                 projectEntity.getLikes(),
                 projectEntity.getStatus(),
-                projectEntity.getRecruitmentPeriod()
+                projectEntity.getRecruitmentPeriod(),
+                projectEntity.getRecruitmentStartDate(),
+                projectEntity.getRecruitmentEndDate()
+
         );
     }
 
@@ -82,7 +85,7 @@ public class ProjectService {
     /**
      * 프로젝트 수정/삭제 이력 저장
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void saveProjectHistory(ProjectEntity project, String actionType) {
         try {
             // 이력 객체 생성
@@ -95,6 +98,9 @@ public class ProjectService {
                     .startDate(project.getStartDate())
                     .endDate(project.getEndDate())
                     .recruitmentPeriod(project.getRecruitmentPeriod())
+                    .recruitmentCount(project.getRecruitmentCount()) // ✅ 모집 인원 추가
+                    .recruitmentEndDate(project.getRecruitmentEndDate())
+                    .recruitmentStartDate(project.getRecruitmentStartDate())
                     .modifiedAt(LocalDateTime.now())
                     .actionType(actionType)
                     .build();
@@ -110,13 +116,11 @@ public class ProjectService {
             throw new RuntimeException("히스토리 저장 실패", e);  // 예외 발생 시 롤백 유도
         }
     }
-
-    /**
-     * 프로젝트 수정 (트랜잭션 적용)
-     */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public ProjectEntity updateProject(Long id, String title, String description, String goal,
-                                       LocalDate startDate, LocalDate endDate, int recruitmentPeriod) {
+                                       LocalDate startDate, LocalDate endDate,
+                                       LocalDate recruitmentStartDate, LocalDate recruitmentEndDate,
+                                       int recruitmentPeriod, Integer recruitmentCount) { // ✅ Integer로 변경
         System.out.println("✅ updateProject 시작");
 
         // 프로젝트 조회
@@ -124,10 +128,9 @@ public class ProjectService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트가 없습니다."));
         System.out.println("✅ 프로젝트 조회 완료: " + project.getId());
 
-        // 프로젝트 정보 업데이트 전에 히스토리 저장
-        System.out.println("✅ 히스토리 저장 함수 호출 전");
-        saveProjectHistory(project, "수정됨");
-        System.out.println("✅ 히스토리 저장 함수 호출 후");
+        // 기존 값 확인
+        System.out.println("🔥 기존 모집 일정: 시작일=" + project.getRecruitmentStartDate() + ", 종료일=" + project.getRecruitmentEndDate());
+        System.out.println("🔥 기존 모집 인원: " + project.getRecruitmentCount());
 
         // 프로젝트 정보 업데이트
         project.setTitle(title);
@@ -137,13 +140,36 @@ public class ProjectService {
         project.setEndDate(endDate);
         project.setRecruitmentPeriod(recruitmentPeriod);
 
+        // ✅ 모집 일정 변경 로그 추가
+        if (recruitmentStartDate != null && !recruitmentStartDate.equals(project.getRecruitmentStartDate())) {
+            System.out.println("✅ 모집 시작일 변경: " + project.getRecruitmentStartDate() + " → " + recruitmentStartDate);
+            project.setRecruitmentStartDate(recruitmentStartDate);
+        }
+
+        if (recruitmentEndDate != null && !recruitmentEndDate.equals(project.getRecruitmentEndDate())) {
+            System.out.println("✅ 모집 종료일 변경: " + project.getRecruitmentEndDate() + " → " + recruitmentEndDate);
+            project.setRecruitmentEndDate(recruitmentEndDate);
+        }
+
+        // ✅ 모집 인원 변경 확인 및 업데이트 (기본형 int 비교)
+        if (recruitmentCount != null && project.getRecruitmentCount() != recruitmentCount) {
+            System.out.println("✅ 모집 인원 변경: " + project.getRecruitmentCount() + " → " + recruitmentCount);
+            project.setRecruitmentCount(recruitmentCount);
+        } else {
+            System.out.println("⚠ 모집 인원 변경 없음: " + project.getRecruitmentCount());
+        }
+
         System.out.println("✅ 프로젝트 정보 업데이트 완료");
 
-        // 업데이트된 프로젝트를 프로젝트 테이블에 저장
+        // 🚀 강제 저장 (DB 반영 확인)
         project = projectRepository.save(project);
-        System.out.println("✅ 프로젝트 저장 완료");
+        projectRepository.flush(); // ✅ DB 즉시 반영
 
-        // 수정 후 저장된 프로젝트 리턴
+        System.out.println("🔥 최종 저장된 모집 인원: " + project.getRecruitmentCount());
+
+        // ✅ 프로젝트 정보 업데이트 후 히스토리 저장
+        saveProjectHistory(project, "수정됨");
+
         return project;
     }
 
@@ -151,22 +177,27 @@ public class ProjectService {
      * 프로젝트 삭제 (논리 삭제 X, 실제 DB에서 제거)
      */
     @Transactional
-    public void deleteProject(Long id) {
+    public void deleteProject(Long id, String userNick) {  // ✅ userNick 추가
         try {
-            // 1️⃣ 삭제할 프로젝트 찾기
             ProjectEntity project = projectRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트가 없습니다."));
+                    .orElseThrow(() -> new IllegalArgumentException("❌ 해당 프로젝트가 없습니다."));
 
-            // 2️⃣ 삭제 이력 저장 (프로젝트 히스토리에 남기기)
+            // ✅ 프로젝트 작성자와 요청 사용자가 같은지 확인
+            if (!project.getCreatedBy().equals(userNick)) {
+                throw new SecurityException("❌ 삭제 권한이 없습니다."); // 🔴 예외 추가
+            }
+
+            // ✅ 삭제 전에 히스토리 저장
             saveProjectHistory(project, "삭제됨");
 
-            // 3️⃣ 실제 프로젝트 삭제 (DB에서 제거)
+            // ✅ 프로젝트 삭제
             projectRepository.deleteById(id);
-
-            System.out.println("🔥 프로젝트 삭제 완료: " + id);
+        } catch (SecurityException e) {
+            logger.error("🚨 삭제 권한 없음: " + e.getMessage());
+            throw e;  // ❗ 사용자 권한 문제는 그대로 던짐
         } catch (Exception e) {
             logger.error("❌ 프로젝트 삭제 중 오류 발생: ", e);
-            throw e;  // 예외 발생 시 롤백
+            throw new RuntimeException("프로젝트 삭제 실패", e);  // ❗ 명확한 예외 메시지 던짐
         }
     }
 

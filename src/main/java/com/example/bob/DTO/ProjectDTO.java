@@ -17,11 +17,13 @@ public class ProjectDTO {
     private int likes; // 좋아요 개수
     private String status; // 모집 상태
     private int recruitmentPeriod; // 모집 기간 필드 추가
+    private LocalDate recruitmentEndDate;
+    private LocalDate recruitmentStartDate;
 
     // 생성자
     public ProjectDTO(Long id, String title, String createdBy, String description, String goal,
                       LocalDate startDate, LocalDate endDate, int recruitmentCount,
-                      int currentParticipants, int views, int likes, String status, int recruitmentPeriod) {
+                      int currentParticipants, int views, int likes, String status, int recruitmentPeriod, LocalDate recruitmentEndDate, LocalDate recruitmentStartDate ) {
         this.id = id;
         this.title = title;
         this.createdBy = createdBy;
@@ -35,6 +37,8 @@ public class ProjectDTO {
         this.likes = likes;
         this.status = status;
         this.recruitmentPeriod = recruitmentPeriod;
+        this.recruitmentEndDate = recruitmentEndDate;
+        this.recruitmentStartDate = recruitmentStartDate;
     }
 
     // Getter and Setter methods
@@ -97,6 +101,10 @@ public class ProjectDTO {
     public int getRecruitmentCount() {
         return recruitmentCount;
     }
+
+    public LocalDate getRecruitmentEndDate() {return recruitmentEndDate; }
+
+    public LocalDate getRecruitmentStartDate() {return recruitmentStartDate; }
 
     public void setRecruitmentCount(int recruitmentCount) {
         this.recruitmentCount = recruitmentCount;
