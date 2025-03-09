@@ -11,6 +11,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -55,6 +57,24 @@ public class ProjectController {
     public ResponseEntity<ProjectEntity> getProjectById(@PathVariable Long id) {
         ProjectEntity project = projectService.getProjectById(id);
         return ResponseEntity.ok(project); // JSON 데이터 반환
+    }
+
+    /**
+     * ✅ 프로젝트 삭제 API (CSRF 토큰 포함)
+     */
+    @DeleteMapping("/postproject/{id}")  // ✅ `/delete` 제거
+    @ResponseBody
+    public ResponseEntity<String> deleteProject(@PathVariable Long id,
+                                                @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            System.out.println("🚀 DELETE 요청 도착! 프로젝트 ID: " + id); // ✅ 요청 로그 추가
+            projectService.deleteProject(id, userDetails.getUserNick());
+            return ResponseEntity.ok("✅ 프로젝트가 삭제되었습니다.");
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("❌ 삭제 권한이 없습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("❌ 프로젝트 삭제 실패");
+        }
     }
 
     /**

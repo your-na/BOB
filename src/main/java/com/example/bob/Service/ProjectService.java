@@ -173,24 +173,34 @@ public class ProjectService {
         return project;
     }
 
-
     /**
      * 프로젝트 삭제 (논리 삭제 X, 실제 DB에서 제거)
      */
     @Transactional
-    public void deleteProject(Long id) {
+    public void deleteProject(Long id, String userNick) {  // ✅ userNick 추가
         try {
             ProjectEntity project = projectRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트가 없습니다."));
-            // 삭제 전에 히스토리 저장
+                    .orElseThrow(() -> new IllegalArgumentException("❌ 해당 프로젝트가 없습니다."));
+
+            // ✅ 프로젝트 작성자와 요청 사용자가 같은지 확인
+            if (!project.getCreatedBy().equals(userNick)) {
+                throw new SecurityException("❌ 삭제 권한이 없습니다."); // 🔴 예외 추가
+            }
+
+            // ✅ 삭제 전에 히스토리 저장
             saveProjectHistory(project, "삭제됨");
-            // 프로젝트 삭제
+
+            // ✅ 프로젝트 삭제
             projectRepository.deleteById(id);
+        } catch (SecurityException e) {
+            logger.error("🚨 삭제 권한 없음: " + e.getMessage());
+            throw e;  // ❗ 사용자 권한 문제는 그대로 던짐
         } catch (Exception e) {
-            logger.error("프로젝트 삭제 중 오류 발생: ", e);
-            throw e;  // 예외를 던져서 롤백을 유발
+            logger.error("❌ 프로젝트 삭제 중 오류 발생: ", e);
+            throw new RuntimeException("프로젝트 삭제 실패", e);  // ❗ 명확한 예외 메시지 던짐
         }
     }
+
 
 
     /**
