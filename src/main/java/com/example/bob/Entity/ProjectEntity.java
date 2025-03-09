@@ -71,9 +71,8 @@ public class ProjectEntity {
     @Column(nullable = false)
     private int currentParticipants; // 실제 참여 인원
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProjectHistoryEntity> projectHistoryEntities = new ArrayList<>();
-
+    @OneToMany(mappedBy = "project", cascade = CascadeType.PERSIST, orphanRemoval = false)
+    private List<ProjectHistoryEntity> history;
 
     public void setDDay(String dDay) {
         this.dDay = dDay;
