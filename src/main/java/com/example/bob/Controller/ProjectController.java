@@ -164,7 +164,7 @@ public class ProjectController {
      * ✅ 프로젝트 수정 처리
      */
     @PostMapping("/postproject/{id}/edit")
-    @Transactional  // 🚀 Controller에서 트랜잭션 관리
+    @Transactional
     public String updateProject(@PathVariable Long id,
                                 @RequestParam("project-name") String projectName,
                                 @RequestParam("project-description") String projectDescription,
@@ -173,15 +173,15 @@ public class ProjectController {
                                 @RequestParam("end-date") String endDateStr,
                                 @RequestParam(value = "recruitment-start-date", required = false) String recruitmentStartStr,
                                 @RequestParam(value = "recruitment-end-date", required = false) String recruitmentEndStr,
-                                @RequestParam("recruitment") String recruitmentStr,
-                                @RequestParam(value = "recruitmentCount", required = false) String recruitmentCountStr,
+                                @RequestParam(value = "recruitment", required = false) String recruitmentStr,
+                                @RequestParam(value = "recruitmentCount", required = false, defaultValue = "0") Integer recruitmentCount, // ✅ 기본값 설정
                                 Model model) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         LocalDate startDate = LocalDate.parse(startDateStr, formatter);
         LocalDate endDate = LocalDate.parse(endDateStr, formatter);
 
-        // ✅ 기존 모집 일정 가져오기 (기존 값 유지)
+        // ✅ 기존 프로젝트 데이터 가져오기
         ProjectEntity existingProject = projectService.getProjectById(id);
         LocalDate recruitmentStartDate = (recruitmentStartStr != null && !recruitmentStartStr.isEmpty()) ?
                 LocalDate.parse(recruitmentStartStr, formatter) : existingProject.getRecruitmentStartDate();
@@ -190,20 +190,27 @@ public class ProjectController {
 
         System.out.println("🚀 모집 시작일 요청 값: " + recruitmentStartStr);
         System.out.println("🚀 모집 종료일 요청 값: " + recruitmentEndStr);
+        System.out.println("🚀 모집 인원 요청 값: " + recruitmentCount);
 
+        // ✅ `recruitmentStr`을 정수 값으로 변환
         int recruitment = 0;
         try {
-            recruitment = Integer.parseInt(recruitmentStr);
+            if ("plus".equals(recruitmentStr)) {
+                recruitment = recruitmentCount; // 직접 입력 값 사용
+            } else {
+                recruitment = Integer.parseInt(recruitmentStr); // 기존 select 값 사용
+            }
         } catch (NumberFormatException e) {
             model.addAttribute("error", "잘못된 모집 인원 값입니다.");
             return "editproject";
         }
 
         try {
-            // ✅ 모집 일정까지 전달!
             ProjectEntity updatedProject = projectService.updateProject(
                     id, projectName, projectDescription, projectGoal,
-                    startDate, endDate, recruitmentStartDate, recruitmentEndDate, recruitment);
+                    startDate, endDate, recruitmentStartDate, recruitmentEndDate,
+                    recruitment, recruitmentCount // ✅ 이제 `recruitmentCount`가 올바르게 전달됨
+            );
 
             model.addAttribute("project", updatedProject);
             return "redirect:/postproject/" + id;

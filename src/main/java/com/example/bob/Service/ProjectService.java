@@ -98,6 +98,7 @@ public class ProjectService {
                     .startDate(project.getStartDate())
                     .endDate(project.getEndDate())
                     .recruitmentPeriod(project.getRecruitmentPeriod())
+                    .recruitmentCount(project.getRecruitmentCount()) // ✅ 모집 인원 추가
                     .recruitmentEndDate(project.getRecruitmentEndDate())
                     .recruitmentStartDate(project.getRecruitmentStartDate())
                     .modifiedAt(LocalDateTime.now())
@@ -115,15 +116,11 @@ public class ProjectService {
             throw new RuntimeException("히스토리 저장 실패", e);  // 예외 발생 시 롤백 유도
         }
     }
-
-    /**
-     * 프로젝트 수정 (트랜잭션 적용)
-     */
     @Transactional
     public ProjectEntity updateProject(Long id, String title, String description, String goal,
                                        LocalDate startDate, LocalDate endDate,
                                        LocalDate recruitmentStartDate, LocalDate recruitmentEndDate,
-                                       int recruitmentPeriod) {
+                                       int recruitmentPeriod, Integer recruitmentCount) { // ✅ Integer로 변경
         System.out.println("✅ updateProject 시작");
 
         // 프로젝트 조회
@@ -133,9 +130,7 @@ public class ProjectService {
 
         // 기존 값 확인
         System.out.println("🔥 기존 모집 일정: 시작일=" + project.getRecruitmentStartDate() + ", 종료일=" + project.getRecruitmentEndDate());
-
-        // 프로젝트 정보 업데이트 전에 히스토리 저장
-        saveProjectHistory(project, "수정됨");
+        System.out.println("🔥 기존 모집 인원: " + project.getRecruitmentCount());
 
         // 프로젝트 정보 업데이트
         project.setTitle(title);
@@ -143,32 +138,41 @@ public class ProjectService {
         project.setGoal(goal);
         project.setStartDate(startDate);
         project.setEndDate(endDate);
+        project.setRecruitmentPeriod(recruitmentPeriod);
 
         // ✅ 모집 일정 변경 로그 추가
         if (recruitmentStartDate != null && !recruitmentStartDate.equals(project.getRecruitmentStartDate())) {
             System.out.println("✅ 모집 시작일 변경: " + project.getRecruitmentStartDate() + " → " + recruitmentStartDate);
             project.setRecruitmentStartDate(recruitmentStartDate);
-        } else {
-            System.out.println("⚠ 모집 시작일 변경 없음: " + project.getRecruitmentStartDate());
         }
 
         if (recruitmentEndDate != null && !recruitmentEndDate.equals(project.getRecruitmentEndDate())) {
             System.out.println("✅ 모집 종료일 변경: " + project.getRecruitmentEndDate() + " → " + recruitmentEndDate);
             project.setRecruitmentEndDate(recruitmentEndDate);
-        } else {
-            System.out.println("⚠ 모집 종료일 변경 없음: " + project.getRecruitmentEndDate());
         }
 
-        project.setRecruitmentPeriod(recruitmentPeriod);
+        // ✅ 모집 인원 변경 확인 및 업데이트 (기본형 int 비교)
+        if (recruitmentCount != null && project.getRecruitmentCount() != recruitmentCount) {
+            System.out.println("✅ 모집 인원 변경: " + project.getRecruitmentCount() + " → " + recruitmentCount);
+            project.setRecruitmentCount(recruitmentCount);
+        } else {
+            System.out.println("⚠ 모집 인원 변경 없음: " + project.getRecruitmentCount());
+        }
+
         System.out.println("✅ 프로젝트 정보 업데이트 완료");
 
-        // 🚀 강제 저장
-        projectRepository.save(project);
-        projectRepository.flush();
+        // 🚀 강제 저장 (DB 반영 확인)
+        project = projectRepository.save(project);
+        projectRepository.flush(); // ✅ DB 즉시 반영
 
-        System.out.println("🔥 최종 저장된 모집 일정: 시작일=" + project.getRecruitmentStartDate() + ", 종료일=" + project.getRecruitmentEndDate());
+        System.out.println("🔥 최종 저장된 모집 인원: " + project.getRecruitmentCount());
+
+        // ✅ 프로젝트 정보 업데이트 후 히스토리 저장
+        saveProjectHistory(project, "수정됨");
+
         return project;
     }
+
 
     /**
      * 프로젝트 삭제 (논리 삭제 X, 실제 DB에서 제거)

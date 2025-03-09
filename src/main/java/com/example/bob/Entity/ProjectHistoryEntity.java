@@ -43,7 +43,7 @@ public class ProjectHistoryEntity {
 
 
     @Column(nullable = false)
-    private int recruitmentPeriod;  // ✅ 모집 인원
+    private int recruitmentPeriod;  // ✅ 모집 날짜 인가?
 
     @Column(name = "recruitment_start_date", nullable = false)
     private LocalDate recruitmentStartDate;
@@ -53,7 +53,7 @@ public class ProjectHistoryEntity {
 
 
     @Column(nullable = false)
-    private int recruitmentCount;  // ✅ 모집 인원 추가
+    private int recruitmentCount;  // ✅ 모집 인원 수
 
     @Column(nullable = false)
     private int views;  // ✅ 조회수 추가

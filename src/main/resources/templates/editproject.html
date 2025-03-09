@@ -40,15 +40,15 @@
       <!-- 모집 인원 -->
       <div class="form-group">
         <label for="recruitment">모집 인원</label>
-        <select id="recruitment" name="recruitment">
+        <select id="recruitment" name="recruitment">  <!-- ✅ name을 그대로 유지 -->
           <option value="0" th:selected="${project.recruitmentCount == 0}">0명</option>
           <option value="1" th:selected="${project.recruitmentCount == 1}">1명</option>
           <option value="2" th:selected="${project.recruitmentCount == 2}">2명</option>
           <option value="3" th:selected="${project.recruitmentCount == 3}">3명</option>
-          <option value="plus">기타</option>
+          <option value="plus">기타</option> <!-- 기타 선택 시 직접 입력 가능 -->
         </select>
         <div id="custom-input-group" style="display: none; align-items: center;">
-          <input type="text" id="custom-recruitment" name="custom-recruitment" placeholder="직접 입력">
+          <input type="number" id="custom-recruitment" name="custom-recruitment" placeholder="직접 입력">
           <p style="margin-left: 5px;">명</p>
         </div>
       </div>
@@ -86,6 +86,19 @@
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("editForm");
+    const recruitmentSelect = document.getElementById("recruitment");
+    const customRecruitmentInput = document.getElementById("custom-recruitment");
+    const customInputGroup = document.getElementById("custom-input-group");
+
+    // "기타" 선택 시 입력 필드 표시
+    recruitmentSelect.addEventListener("change", function () {
+      if (recruitmentSelect.value === "plus") {
+        customInputGroup.style.display = "flex";
+      } else {
+        customInputGroup.style.display = "none";
+        customRecruitmentInput.value = ""; // 기존 입력값 초기화
+      }
+    });
 
     form.addEventListener("submit", function (event) {
       event.preventDefault(); // 기본 제출 방지
@@ -96,14 +109,23 @@
         return;
       }
 
-      let recruitmentValue = document.getElementById("recruitment").value;
+      // 모집 인원 값 처리
+      let recruitmentValue = recruitmentSelect.value;
+      let recruitmentCountValue = "";
       if (recruitmentValue === "plus") {
-        recruitmentValue = document.getElementById("custom-recruitment").value;
+        recruitmentCountValue = customRecruitmentInput.value.trim();
+        if (!recruitmentCountValue || isNaN(recruitmentCountValue) || parseInt(recruitmentCountValue) < 0) {
+          alert("올바른 모집 인원을 입력하세요.");
+          return;
+        }
+      } else {
+        recruitmentCountValue = recruitmentValue;
       }
 
       // FormData 사용
       const formData = new FormData(form);
       formData.append("project-id", projectId);
+      formData.append("recruitmentCount", recruitmentCountValue); // ✅ 모집 인원 추가
 
       // 🚀 전송할 데이터 콘솔 확인
       console.log("🚀 서버로 보내는 데이터:");
@@ -130,6 +152,7 @@
               });
     });
   });
+
 </script>
 
 </body>
