@@ -43,7 +43,14 @@ public class ProjectHistoryEntity {
 
 
     @Column(nullable = false)
-    private int recruitmentPeriod;  // ✅ 모집 기간
+    private int recruitmentPeriod;  // ✅ 모집 인원
+
+    @Column(name = "recruitment_start_date", nullable = false)
+    private LocalDate recruitmentStartDate;
+
+    @Column(name = "recruitment_end_date", nullable = false)
+    private LocalDate recruitmentEndDate;
+
 
     @Column(nullable = false)
     private int recruitmentCount;  // ✅ 모집 인원 추가

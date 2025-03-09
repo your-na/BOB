@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
@@ -47,7 +47,10 @@ public class ProjectService {
                 projectEntity.getViews(),
                 projectEntity.getLikes(),
                 projectEntity.getStatus(),
-                projectEntity.getRecruitmentPeriod()
+                projectEntity.getRecruitmentPeriod(),
+                projectEntity.getRecruitmentStartDate(),
+                projectEntity.getRecruitmentEndDate()
+
         );
     }
 
@@ -82,7 +85,7 @@ public class ProjectService {
     /**
      * 프로젝트 수정/삭제 이력 저장
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void saveProjectHistory(ProjectEntity project, String actionType) {
         try {
             // 이력 객체 생성
@@ -95,6 +98,8 @@ public class ProjectService {
                     .startDate(project.getStartDate())
                     .endDate(project.getEndDate())
                     .recruitmentPeriod(project.getRecruitmentPeriod())
+                    .recruitmentEndDate(project.getRecruitmentEndDate())
+                    .recruitmentStartDate(project.getRecruitmentStartDate())
                     .modifiedAt(LocalDateTime.now())
                     .actionType(actionType)
                     .build();
@@ -114,9 +119,11 @@ public class ProjectService {
     /**
      * 프로젝트 수정 (트랜잭션 적용)
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public ProjectEntity updateProject(Long id, String title, String description, String goal,
-                                       LocalDate startDate, LocalDate endDate, int recruitmentPeriod) {
+                                       LocalDate startDate, LocalDate endDate,
+                                       LocalDate recruitmentStartDate, LocalDate recruitmentEndDate,
+                                       int recruitmentPeriod) {
         System.out.println("✅ updateProject 시작");
 
         // 프로젝트 조회
@@ -124,10 +131,11 @@ public class ProjectService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트가 없습니다."));
         System.out.println("✅ 프로젝트 조회 완료: " + project.getId());
 
+        // 기존 값 확인
+        System.out.println("🔥 기존 모집 일정: 시작일=" + project.getRecruitmentStartDate() + ", 종료일=" + project.getRecruitmentEndDate());
+
         // 프로젝트 정보 업데이트 전에 히스토리 저장
-        System.out.println("✅ 히스토리 저장 함수 호출 전");
         saveProjectHistory(project, "수정됨");
-        System.out.println("✅ 히스토리 저장 함수 호출 후");
 
         // 프로젝트 정보 업데이트
         project.setTitle(title);
@@ -135,15 +143,30 @@ public class ProjectService {
         project.setGoal(goal);
         project.setStartDate(startDate);
         project.setEndDate(endDate);
-        project.setRecruitmentPeriod(recruitmentPeriod);
 
+        // ✅ 모집 일정 변경 로그 추가
+        if (recruitmentStartDate != null && !recruitmentStartDate.equals(project.getRecruitmentStartDate())) {
+            System.out.println("✅ 모집 시작일 변경: " + project.getRecruitmentStartDate() + " → " + recruitmentStartDate);
+            project.setRecruitmentStartDate(recruitmentStartDate);
+        } else {
+            System.out.println("⚠ 모집 시작일 변경 없음: " + project.getRecruitmentStartDate());
+        }
+
+        if (recruitmentEndDate != null && !recruitmentEndDate.equals(project.getRecruitmentEndDate())) {
+            System.out.println("✅ 모집 종료일 변경: " + project.getRecruitmentEndDate() + " → " + recruitmentEndDate);
+            project.setRecruitmentEndDate(recruitmentEndDate);
+        } else {
+            System.out.println("⚠ 모집 종료일 변경 없음: " + project.getRecruitmentEndDate());
+        }
+
+        project.setRecruitmentPeriod(recruitmentPeriod);
         System.out.println("✅ 프로젝트 정보 업데이트 완료");
 
-        // 업데이트된 프로젝트를 프로젝트 테이블에 저장
-        project = projectRepository.save(project);
-        System.out.println("✅ 프로젝트 저장 완료");
+        // 🚀 강제 저장
+        projectRepository.save(project);
+        projectRepository.flush();
 
-        // 수정 후 저장된 프로젝트 리턴
+        System.out.println("🔥 최종 저장된 모집 일정: 시작일=" + project.getRecruitmentStartDate() + ", 종료일=" + project.getRecruitmentEndDate());
         return project;
     }
 
