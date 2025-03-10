@@ -10,52 +10,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import jakarta.persistence.PersistenceContext;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.PersistenceContext;
 
 @Service
 @RequiredArgsConstructor
-@PersistenceContext
-
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final ProjectHistoryRepository projectHistoryRepository;
     private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
 
-    /**
-     * ✅ 프로젝트를 DTO로 변환하는 메서드
-     */
-    public ProjectDTO convertToDTO(ProjectEntity projectEntity) {
-        return new ProjectDTO(
-                projectEntity.getId(),
-                projectEntity.getTitle(),
-                projectEntity.getCreatedBy(),
-                projectEntity.getDescription(),
-                projectEntity.getGoal(),
-                projectEntity.getStartDate(),
-                projectEntity.getEndDate(),
-                projectEntity.getRecruitmentCount(),
-                projectEntity.getCurrentParticipants(),
-                projectEntity.getViews(),
-                projectEntity.getLikes(),
-                projectEntity.getStatus(),
-                projectEntity.getRecruitmentPeriod()
-        );
-    }
+    @PersistenceContext
+    private EntityManager entityManager;  // ✅ EntityManager 주입
 
     /**
      * ✅ 모든 프로젝트를 DTO로 변환하여 반환
      */
     public List<ProjectDTO> getAllProjectsDTO() {
-        return projectRepository.findAll().stream()
+        return projectRepository.findAllActiveProjects().stream()  // ✅ INACTIVE 상태 제외
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -63,9 +41,10 @@ public class ProjectService {
     /**
      * ✅ 특정 프로젝트 가져오기
      */
+    @Transactional(readOnly = true)
     public ProjectEntity getProjectById(Long id) {
         return projectRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트가 존재하지 않습니다: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("❌ 해당 프로젝트가 없습니다. ID=" + id));
     }
 
     /**
@@ -73,19 +52,41 @@ public class ProjectService {
      */
     @Transactional
     public ProjectEntity saveProject(ProjectEntity project) {
-        return projectRepository.save(project);
+        ProjectEntity savedProject = projectRepository.save(project);
+        saveProjectHistory(savedProject, "생성됨");
+        return savedProject;
     }
 
-    @PersistenceContext
-    private EntityManager entityManager;  // EntityManager 주입
+    /**
+     * ✅ 프로젝트 삭제 (히스토리 유지)
+     */
+    @Transactional
+    public void deleteProject(Long id, String userNick) {
+        // ✅ 프로젝트 찾기
+        ProjectEntity project = projectRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("❌ 해당 프로젝트가 없습니다."));
+
+        String owner = project.getCreatedBy();
+        if (!owner.equals(userNick)) {
+            throw new SecurityException("❌ 삭제 권한이 없습니다.");
+        }
+
+        // ✅ 프로젝트 삭제 이력 저장
+        saveProjectHistory(project, "삭제됨");
+
+        // ✅ 실제 삭제하는 대신 상태를 "INACTIVE"로 변경
+        project.setStatus("INACTIVE");
+        projectRepository.save(project);
+
+        logger.info("✅ 프로젝트 비활성화 완료 (ID={})", id);
+    }
 
     /**
-     * 프로젝트 수정/삭제 이력 저장
+     * ✅ 프로젝트 수정/삭제 이력 저장 (히스토리 남기기)
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void saveProjectHistory(ProjectEntity project, String actionType) {
         try {
-            // 이력 객체 생성
             ProjectHistoryEntity history = ProjectHistoryEntity.builder()
                     .project(project)
                     .title(project.getTitle())
@@ -95,41 +96,39 @@ public class ProjectService {
                     .startDate(project.getStartDate())
                     .endDate(project.getEndDate())
                     .recruitmentPeriod(project.getRecruitmentPeriod())
+                    .recruitmentCount(project.getRecruitmentCount())
+                    .recruitmentEndDate(project.getRecruitmentEndDate())
+                    .recruitmentStartDate(project.getRecruitmentStartDate())
+                    .views(project.getViews())
+                    .likes(project.getLikes())
+                    .currentParticipants(project.getCurrentParticipants())
                     .modifiedAt(LocalDateTime.now())
                     .actionType(actionType)
                     .build();
 
-            // 디버깅: 저장될 히스토리 값 출력
-            logger.info("Saving project history: " + history);
+            projectHistoryRepository.save(history);
+            entityManager.flush(); // 🚀 즉시 DB 반영
+            entityManager.clear(); // 🚀 Hibernate가 DELETE 시 히스토리를 날리는 것 방지
 
-            // EntityManager를 사용하여 저장
-            entityManager.persist(history);  // 엔티티 저장
-            entityManager.flush();  // 즉시 커밋
+            logger.info("✅ 프로젝트 히스토리 저장됨: " + history);
+
         } catch (Exception e) {
-            logger.error("프로젝트 히스토리 저장 실패: " + e.getMessage());
-            throw new RuntimeException("히스토리 저장 실패", e);  // 예외 발생 시 롤백 유도
+            logger.error("❌ 프로젝트 히스토리 저장 실패: " + e.getMessage());
+            throw new RuntimeException("히스토리 저장 실패", e);
         }
     }
 
     /**
-     * 프로젝트 수정 (트랜잭션 적용)
+     * ✅ 프로젝트 업데이트 (수정 후 히스토리 저장)
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public ProjectEntity updateProject(Long id, String title, String description, String goal,
-                                       LocalDate startDate, LocalDate endDate, int recruitmentPeriod) {
-        System.out.println("✅ updateProject 시작");
-
-        // 프로젝트 조회
+                                       LocalDate startDate, LocalDate endDate,
+                                       LocalDate recruitmentStartDate, LocalDate recruitmentEndDate,
+                                       int recruitmentPeriod, Integer recruitmentCount) {
         ProjectEntity project = projectRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트가 없습니다."));
-        System.out.println("✅ 프로젝트 조회 완료: " + project.getId());
 
-        // 프로젝트 정보 업데이트 전에 히스토리 저장
-        System.out.println("✅ 히스토리 저장 함수 호출 전");
-        saveProjectHistory(project, "수정됨");
-        System.out.println("✅ 히스토리 저장 함수 호출 후");
-
-        // 프로젝트 정보 업데이트
         project.setTitle(title);
         project.setDescription(description);
         project.setGoal(goal);
@@ -137,34 +136,20 @@ public class ProjectService {
         project.setEndDate(endDate);
         project.setRecruitmentPeriod(recruitmentPeriod);
 
-        System.out.println("✅ 프로젝트 정보 업데이트 완료");
-
-        // 업데이트된 프로젝트를 프로젝트 테이블에 저장
-        project = projectRepository.save(project);
-        System.out.println("✅ 프로젝트 저장 완료");
-
-        // 수정 후 저장된 프로젝트 리턴
-        return project;
-    }
-
-    /**
-     * 프로젝트 삭제 (논리 삭제 X, 실제 DB에서 제거)
-     */
-    @Transactional
-    public void deleteProject(Long id) {
-        try {
-            ProjectEntity project = projectRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트가 없습니다."));
-            // 삭제 전에 히스토리 저장
-            saveProjectHistory(project, "삭제됨");
-            // 프로젝트 삭제
-            projectRepository.deleteById(id);
-        } catch (Exception e) {
-            logger.error("프로젝트 삭제 중 오류 발생: ", e);
-            throw e;  // 예외를 던져서 롤백을 유발
+        if (recruitmentStartDate != null) {
+            project.setRecruitmentStartDate(recruitmentStartDate);
         }
-    }
+        if (recruitmentEndDate != null) {
+            project.setRecruitmentEndDate(recruitmentEndDate);
+        }
+        if (recruitmentCount != null) {
+            project.setRecruitmentCount(recruitmentCount);
+        }
 
+        ProjectEntity updatedProject = projectRepository.save(project);
+        saveProjectHistory(updatedProject, "수정됨");
+        return updatedProject;
+    }
 
     /**
      * ✅ 좋아요 토글 (좋아요 추가/삭제)
@@ -190,5 +175,28 @@ public class ProjectService {
         ProjectEntity project = getProjectById(projectId);
         project.setViews(project.getViews() + 1);
         return projectRepository.save(project);
+    }
+
+    /**
+     * ✅ 프로젝트를 DTO로 변환하는 메서드
+     */
+    public ProjectDTO convertToDTO(ProjectEntity projectEntity) {
+        return new ProjectDTO(
+                projectEntity.getId(),
+                projectEntity.getTitle(),
+                projectEntity.getCreatedBy(),
+                projectEntity.getDescription(),
+                projectEntity.getGoal(),
+                projectEntity.getStartDate(),
+                projectEntity.getEndDate(),
+                projectEntity.getRecruitmentCount(),
+                projectEntity.getCurrentParticipants(),
+                projectEntity.getViews(),
+                projectEntity.getLikes(),
+                projectEntity.getStatus(),
+                projectEntity.getRecruitmentPeriod(),
+                projectEntity.getRecruitmentStartDate(),
+                projectEntity.getRecruitmentEndDate()
+        );
     }
 }
