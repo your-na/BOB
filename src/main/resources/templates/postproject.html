@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title th:text="${project.title}">프로젝트 상세보기</title>
 
     <!-- ✅ CSRF 토큰 추가 -->
@@ -75,10 +76,12 @@
     <div class="content" th:text="${project.description}">프로젝트 설명 내용</div>
 </div>
 
-<!-- 팀 신청 버튼 -->
-<form>
-    <button class="apply-btn">팀 신청하기</button>
+<!-- 프로젝트 신청 페이지로 이동하는 버튼 -->
+<form action="/projectapplication" method="get">
+    <input type="hidden" name="projectId" th:value="${project.id}">
+    <button type="submit" class="apply-btn">팀 신청하기</button>
 </form>
+
 
 <hr>
 
@@ -99,6 +102,7 @@
 
 <!-- JavaScript -->
 <script defer>
+
     document.addEventListener("DOMContentLoaded", function () {
         console.log("🚀 JavaScript 로드 완료!");
 
