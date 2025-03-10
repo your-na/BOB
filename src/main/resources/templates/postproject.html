@@ -28,8 +28,8 @@
         </div>
     </div>
     <div class="post-detail">
-        <img class="postdetail" src="/images/postdetail.png" alt="점 세 개" onclick="toggleDropdown()">
-        <div class="dropdownmenu" id="dropdownMenu" style="display: none;"> <!-- 기본적으로 숨김 -->
+        <img class="postdetail" src="/images/postdetail.png" alt="점 세 개" onclick="toggleDropdown()" th:if="${isOwner}">
+        <div class="dropdownmenu" id="dropdownMenu" style="display: none;" th:if="${isOwner}">
             <a class="action-button" th:href="@{'/postproject/' + ${project.id} + '/edit'}">수정하기</a>
             <a class="action-button" href="javascript:void(0);" onclick="deleteProject()">삭제하기</a>
         </div>
