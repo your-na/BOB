@@ -34,16 +34,12 @@ public class ProjectService {
     private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
 
     @PersistenceContext
-
-    private EntityManager entityManager;  // ✅ EntityManager 주입
-
-    
+    private EntityManager entityManager;  // EntityManager 주입
 
     /**
      * ✅ 모든 프로젝트를 DTO로 변환하여 반환
      */
     public List<ProjectDTO> getAllProjectsDTO() {
-
         return projectRepository.findAllActiveProjects().stream()  // INACTIVE 상태 제외
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -63,10 +59,6 @@ public class ProjectService {
      */
     @Transactional
     public ProjectEntity saveProject(ProjectEntity project) {
-        logger.info("🚀 프로젝트 저장 전 모집 종료일: {}", project.getRecruitmentEndDate()); // 🚀 로그 추가
-
-        project.updateStatus(); // ✅ 상태 업데이트
-
         logger.info("🚀 프로젝트 저장 전 모집 종료일: {}", project.getRecruitmentEndDate()); // 로그 추가
 
         project.updateStatus(); // 상태 업데이트
@@ -79,7 +71,7 @@ public class ProjectService {
     }
 
     /**
-     * ✅ 프로젝트 삭제 (히스토리 유지)
+     * ✅ 프로젝트 삭제 (히스토리 저장 후 실제로 삭제)
      */
     @Transactional
     public void deleteProject(Long id, String userNick) {
@@ -92,14 +84,13 @@ public class ProjectService {
             throw new SecurityException("❌ 삭제 권한이 없습니다.");
         }
 
-        // 프로젝트 삭제 이력 저장
+        // 프로젝트 삭제 전 히스토리 저장
         saveProjectHistory(project, "삭제됨");
 
-        // 실제 삭제하는 대신 상태를 "INACTIVE"로 변경
-        project.setStatus("INACTIVE");
-        projectRepository.save(project);
+        // 프로젝트 실제 삭제 (INACTIVE 상태로 변경하지 않고 삭제)
+        projectRepository.delete(project);
 
-        logger.info("✅ 프로젝트 비활성화 완료 (ID={})", id);
+        logger.info("✅ 프로젝트 삭제 완료 (ID={})");
     }
 
     /**
@@ -128,16 +119,7 @@ public class ProjectService {
                     .status(project.getStatus())  // 모집 상태도 저장
                     .build();
 
-            projectHistoryRepository.save(history);
-
-            entityManager.flush(); // 🚀 즉시 DB 반영
-            entityManager.clear(); // 🚀 Hibernate가 DELETE 시 히스토리를 날리는 것 방지
-
-            entityManager.flush(); // 즉시 DB 반영
-            entityManager.clear(); // Hibernate가 DELETE 시 히스토리를 날리는 것 방지
-
-            logger.info("✅ 프로젝트 히스토리 저장됨: " + history);
-
+            projectHistoryRepository.save(history);  // 히스토리 저장
         } catch (Exception e) {
             logger.error("❌ 프로젝트 히스토리 저장 실패: " + e.getMessage());
             throw new RuntimeException("히스토리 저장 실패", e);
@@ -172,29 +154,13 @@ public class ProjectService {
             project.setRecruitmentCount(recruitmentCount);
         }
 
-        project.updateStatus(); // ✅ 업데이트 후 상태도 변경
-
         project.updateStatus(); // 업데이트 후 상태도 변경
-
         ProjectEntity updatedProject = projectRepository.save(project);
         saveProjectHistory(updatedProject, "수정됨");
         return updatedProject;
     }
 
     /**
-<<<<<<< HEAD
-     * ✅ 기존 ACTIVE 데이터를 "모집중" 또는 "진행중"으로 변경
-     */
-    @Transactional
-    public void updateOldStatuses() {
-        LocalDate today = LocalDate.now();
-        projectRepository.updateOldActiveToRecruiting(today);
-        projectRepository.updateOldActiveToOngoing(today);
-    }
-
-    /**
-=======
->>>>>>> origin/develop
      * ✅ 좋아요 토글 (좋아요 추가/삭제)
      */
     @Transactional
@@ -264,4 +230,36 @@ public class ProjectService {
                 .map(userProject -> convertToDTO(userProject.getProject()))
                 .collect(Collectors.toList());
     }
+
+    public void applyForProject(Long projectId, UserEntity user) {
+        ProjectEntity project = getProjectById(projectId);
+
+        // 이미 신청한 사용자가 아닌지 확인 (필요 시)
+        if (userProjectRepository.findByUser(user).stream().anyMatch(up -> up.getProject().equals(project))) {
+            throw new IllegalArgumentException("이미 신청한 프로젝트입니다.");
+        }
+
+        // 신청자 정보 저장
+        UserProjectEntity userProjectEntity = UserProjectEntity.builder()
+                .user(user)
+                .project(project)
+                .joinDate(LocalDate.now())
+                .status("참여중")
+                .build();
+        userProjectRepository.save(userProjectEntity);
+
+        // 프로젝트의 모집 인원 업데이트
+        project.setCurrentParticipants(project.getCurrentParticipants() + 1);
+        projectRepository.save(project);
+    }
+
+    // 프로젝트 신청 처리 메서드 추가
+    public void submitApplication(UserEntity userEntity, ProjectEntity project, String message) {
+        // 신청 정보 저장
+        applyForProject(project.getId(), userEntity);
+
+        // 신청 메세지 로직 추가 (필요한 경우)
+        // 예: 신청 메시지를 저장하거나 추가적인 처리 수행
+    }
+
 }
