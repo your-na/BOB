@@ -156,4 +156,8 @@ public class UserController {
     public String contestform() {return "contest";}
     @GetMapping("/postcontest")
     public String postcform() {return "postcontest";}
+
+    //관리자 공모전 임의 주소
+    @GetMapping("/adcontest")
+    public String adcontestform() {return "ad_contest";}
 }

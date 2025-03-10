@@ -25,7 +25,7 @@
 
 .apply-button {
     display: inline-block;
-    background-color: #9c9c9c;
+    background-color: #66dc66;
     color: #fff;
     padding: 10px 20px;
     font-weight: bold;
@@ -33,10 +33,11 @@
     border-radius: 20px;
     cursor: default;
     font-size: 16px;
+    cursor: pointer;
 }
 
 .apply-button:hover {
-    background-color: #9c9c9c;
+    background-color: #70d370;
     font-weight: bold;
 }
 
@@ -366,3 +367,21 @@
     cursor: pointer;
 }
 
+.deletebtn {
+    background: none;
+    color: red;
+    border: 1.5px solid red;
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    height: 30px;
+    margin-left: 620px;
+    margin-top: 30px;
+}
+
+.ohoh {
+    display: flex;
+}
