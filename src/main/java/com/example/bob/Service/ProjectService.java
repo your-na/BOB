@@ -3,8 +3,11 @@ package com.example.bob.Service;
 import com.example.bob.DTO.ProjectDTO;
 import com.example.bob.Entity.ProjectEntity;
 import com.example.bob.Entity.ProjectHistoryEntity;
+import com.example.bob.Entity.UserEntity;
+import com.example.bob.Entity.UserProjectEntity;
 import com.example.bob.Repository.ProjectHistoryRepository;
 import com.example.bob.Repository.ProjectRepository;
+import com.example.bob.Repository.UserProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,16 +29,26 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final ProjectHistoryRepository projectHistoryRepository;
+    private final UserProjectRepository userProjectRepository; // UserProjectRepository 추가
+
     private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
 
     @PersistenceContext
+<<<<<<< HEAD
     private EntityManager entityManager;  // ✅ EntityManager 주입
+=======
+    private EntityManager entityManager;  // EntityManager 주입
+>>>>>>> origin/develop
 
     /**
      * ✅ 모든 프로젝트를 DTO로 변환하여 반환
      */
     public List<ProjectDTO> getAllProjectsDTO() {
+<<<<<<< HEAD
         return projectRepository.findAllActiveProjects().stream()  // ✅ INACTIVE 상태 제외
+=======
+        return projectRepository.findAllActiveProjects().stream()  // INACTIVE 상태 제외
+>>>>>>> origin/develop
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -54,24 +67,29 @@ public class ProjectService {
      */
     @Transactional
     public ProjectEntity saveProject(ProjectEntity project) {
+<<<<<<< HEAD
         logger.info("🚀 프로젝트 저장 전 모집 종료일: {}", project.getRecruitmentEndDate()); // 🚀 로그 추가
 
         project.updateStatus(); // ✅ 상태 업데이트
+=======
+        logger.info("🚀 프로젝트 저장 전 모집 종료일: {}", project.getRecruitmentEndDate()); // 로그 추가
+
+        project.updateStatus(); // 상태 업데이트
+>>>>>>> origin/develop
         ProjectEntity savedProject = projectRepository.save(project);
 
-        logger.info("✅ 저장된 프로젝트의 모집 종료일: {}", savedProject.getRecruitmentEndDate()); // 🚀 로그 추가
+        logger.info("✅ 저장된 프로젝트의 모집 종료일: {}", savedProject.getRecruitmentEndDate()); // 로그 추가
 
         saveProjectHistory(savedProject, "생성됨");
         return savedProject;
     }
-
 
     /**
      * ✅ 프로젝트 삭제 (히스토리 유지)
      */
     @Transactional
     public void deleteProject(Long id, String userNick) {
-        // ✅ 프로젝트 찾기
+        // 프로젝트 찾기
         ProjectEntity project = projectRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("❌ 해당 프로젝트가 없습니다."));
 
@@ -80,10 +98,10 @@ public class ProjectService {
             throw new SecurityException("❌ 삭제 권한이 없습니다.");
         }
 
-        // ✅ 프로젝트 삭제 이력 저장
+        // 프로젝트 삭제 이력 저장
         saveProjectHistory(project, "삭제됨");
 
-        // ✅ 실제 삭제하는 대신 상태를 "INACTIVE"로 변경
+        // 실제 삭제하는 대신 상태를 "INACTIVE"로 변경
         project.setStatus("INACTIVE");
         projectRepository.save(project);
 
@@ -113,12 +131,17 @@ public class ProjectService {
                     .currentParticipants(project.getCurrentParticipants())
                     .modifiedAt(LocalDateTime.now())
                     .actionType(actionType)
-                    .status(project.getStatus())  // ✅ 모집 상태도 저장
+                    .status(project.getStatus())  // 모집 상태도 저장
                     .build();
 
             projectHistoryRepository.save(history);
+<<<<<<< HEAD
             entityManager.flush(); // 🚀 즉시 DB 반영
             entityManager.clear(); // 🚀 Hibernate가 DELETE 시 히스토리를 날리는 것 방지
+=======
+            entityManager.flush(); // 즉시 DB 반영
+            entityManager.clear(); // Hibernate가 DELETE 시 히스토리를 날리는 것 방지
+>>>>>>> origin/develop
 
             logger.info("✅ 프로젝트 히스토리 저장됨: " + history);
 
@@ -156,13 +179,18 @@ public class ProjectService {
             project.setRecruitmentCount(recruitmentCount);
         }
 
+<<<<<<< HEAD
         project.updateStatus(); // ✅ 업데이트 후 상태도 변경
+=======
+        project.updateStatus(); // 업데이트 후 상태도 변경
+>>>>>>> origin/develop
         ProjectEntity updatedProject = projectRepository.save(project);
         saveProjectHistory(updatedProject, "수정됨");
         return updatedProject;
     }
 
     /**
+<<<<<<< HEAD
      * ✅ 기존 ACTIVE 데이터를 "모집중" 또는 "진행중"으로 변경
      */
     @Transactional
@@ -173,6 +201,8 @@ public class ProjectService {
     }
 
     /**
+=======
+>>>>>>> origin/develop
      * ✅ 좋아요 토글 (좋아요 추가/삭제)
      */
     @Transactional
@@ -214,10 +244,35 @@ public class ProjectService {
                 projectEntity.getCurrentParticipants(),
                 projectEntity.getViews(),
                 projectEntity.getLikes(),
-                projectEntity.getStatus(),  // ✅ 한글 상태 반영
+                projectEntity.getStatus(),  // 한글 상태 반영
                 projectEntity.getRecruitmentPeriod(),
                 projectEntity.getRecruitmentStartDate(),
                 projectEntity.getRecruitmentEndDate()
         );
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * ✅ 사용자가 만든 프로젝트 목록을 반환
+     */
+    public List<ProjectDTO> getCreatedProjects(UserEntity user) {
+        // UserEntity를 사용하여 사용자가 만든 프로젝트 목록을 조회
+        List<ProjectEntity> createdProjects = projectRepository.findByCreatedBy(user.getUserNick());
+        return createdProjects.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * ✅ 사용자가 참가한 프로젝트 목록을 반환
+     */
+    public List<ProjectDTO> getJoinedProjects(UserEntity user) {
+        // UserEntity를 사용하여 사용자가 참가한 프로젝트 목록을 조회
+        List<UserProjectEntity> userProjects = userProjectRepository.findByUser(user);
+        return userProjects.stream()
+                .map(userProject -> convertToDTO(userProject.getProject()))
+                .collect(Collectors.toList());
+    }
+>>>>>>> origin/develop
 }
