@@ -10,15 +10,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+<<<<<<< Updated upstream
 import jakarta.persistence.PersistenceContext;
 import org.springframework.transaction.annotation.Propagation;
 
 
 import jakarta.persistence.EntityManager;
+=======
+
+>>>>>>> Stashed changes
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+<<<<<<< Updated upstream
+=======
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.PersistenceContext;
+>>>>>>> Stashed changes
 
 @Service
 @RequiredArgsConstructor
@@ -76,11 +87,49 @@ public class ProjectService {
      */
     @Transactional
     public ProjectEntity saveProject(ProjectEntity project) {
+<<<<<<< Updated upstream
         return projectRepository.save(project);
     }
 
     @PersistenceContext
     private EntityManager entityManager;  // EntityManager 주입
+=======
+        logger.info("🚀 프로젝트 저장 전 모집 종료일: {}", project.getRecruitmentEndDate()); // 🚀 로그 추가
+
+        project.updateStatus(); // ✅ 상태 업데이트
+        ProjectEntity savedProject = projectRepository.save(project);
+
+        logger.info("✅ 저장된 프로젝트의 모집 종료일: {}", savedProject.getRecruitmentEndDate()); // 🚀 로그 추가
+
+        saveProjectHistory(savedProject, "생성됨");
+        return savedProject;
+    }
+
+
+    /**
+     * ✅ 프로젝트 삭제 (히스토리 유지)
+     */
+    @Transactional
+    public void deleteProject(Long id, String userNick) {
+        // ✅ 프로젝트 찾기
+        ProjectEntity project = projectRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("❌ 해당 프로젝트가 없습니다."));
+
+        String owner = project.getCreatedBy();
+        if (!owner.equals(userNick)) {
+            throw new SecurityException("❌ 삭제 권한이 없습니다.");
+        }
+
+        // ✅ 프로젝트 삭제 이력 저장
+        saveProjectHistory(project, "삭제됨");
+
+        // ✅ 실제 삭제하는 대신 상태를 "INACTIVE"로 변경
+        project.setStatus("INACTIVE");
+        projectRepository.save(project);
+
+        logger.info("✅ 프로젝트 비활성화 완료 (ID={})", id);
+    }
+>>>>>>> Stashed changes
 
     /**
      * 프로젝트 수정/삭제 이력 저장
@@ -103,6 +152,7 @@ public class ProjectService {
                     .recruitmentStartDate(project.getRecruitmentStartDate())
                     .modifiedAt(LocalDateTime.now())
                     .actionType(actionType)
+                    .status(project.getStatus())  // ✅ 모집 상태도 저장
                     .build();
 
             // 디버깅: 저장될 히스토리 값 출력
@@ -159,6 +209,7 @@ public class ProjectService {
             System.out.println("⚠ 모집 인원 변경 없음: " + project.getRecruitmentCount());
         }
 
+<<<<<<< Updated upstream
         System.out.println("✅ 프로젝트 정보 업데이트 완료");
 
         // 🚀 강제 저장 (DB 반영 확인)
@@ -203,6 +254,24 @@ public class ProjectService {
 
 
 
+=======
+        project.updateStatus(); // ✅ 업데이트 후 상태도 변경
+        ProjectEntity updatedProject = projectRepository.save(project);
+        saveProjectHistory(updatedProject, "수정됨");
+        return updatedProject;
+    }
+
+    /**
+     * ✅ 기존 ACTIVE 데이터를 "모집중" 또는 "진행중"으로 변경
+     */
+    @Transactional
+    public void updateOldStatuses() {
+        LocalDate today = LocalDate.now();
+        projectRepository.updateOldActiveToRecruiting(today);
+        projectRepository.updateOldActiveToOngoing(today);
+    }
+
+>>>>>>> Stashed changes
     /**
      * ✅ 좋아요 토글 (좋아요 추가/삭제)
      */
@@ -228,4 +297,30 @@ public class ProjectService {
         project.setViews(project.getViews() + 1);
         return projectRepository.save(project);
     }
+<<<<<<< Updated upstream
+=======
+
+    /**
+     * ✅ 프로젝트를 DTO로 변환하는 메서드
+     */
+    public ProjectDTO convertToDTO(ProjectEntity projectEntity) {
+        return new ProjectDTO(
+                projectEntity.getId(),
+                projectEntity.getTitle(),
+                projectEntity.getCreatedBy(),
+                projectEntity.getDescription(),
+                projectEntity.getGoal(),
+                projectEntity.getStartDate(),
+                projectEntity.getEndDate(),
+                projectEntity.getRecruitmentCount(),
+                projectEntity.getCurrentParticipants(),
+                projectEntity.getViews(),
+                projectEntity.getLikes(),
+                projectEntity.getStatus(),  // ✅ 한글 상태 반영
+                projectEntity.getRecruitmentPeriod(),
+                projectEntity.getRecruitmentStartDate(),
+                projectEntity.getRecruitmentEndDate()
+        );
+    }
+>>>>>>> Stashed changes
 }

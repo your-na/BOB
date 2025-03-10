@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true) // ✅ 기존 엔티티 수정 가능하게 설정
 @Table(name = "project")
 public class ProjectEntity {
 
@@ -57,7 +57,8 @@ public class ProjectEntity {
     private int likes; // 좋아요 개수
 
     @Column(length = 50, nullable = false)
-    private String status; // 모집 상태
+    @Builder.Default
+    private String status = "모집중"; // ✅ 기본값을 한글로 설정 ("모집중", "진행중")
 
     @Column(length = 500)
     private String description; // 프로젝트 설명
@@ -79,14 +80,20 @@ public class ProjectEntity {
         this.dDay = dDay;
     }
 
-    // ✅ @PrePersist 추가 (데이터 저장 전에 기본값 설정)
+    // ✅ 상태를 한글로 자동 설정 (모집중 / 진행중)
+    public void updateStatus() {
+        if (this.startDate.isBefore(LocalDate.now())) {
+            this.status = "진행중"; // ✅ 시작일이 지나면 진행중
+        } else {
+            this.status = "모집중"; // ✅ 기본값
+        }
+    }
+
     @PrePersist
     public void prePersist() {
         if (this.recruitmentStartDate == null) {
-            this.recruitmentStartDate = LocalDate.now();  // 기본값: 오늘 날짜
-        }
-        if (this.recruitmentEndDate == null) {
-            this.recruitmentEndDate = LocalDate.now().plusDays(7);  // 기본값: 7일 후
+            this.recruitmentStartDate = LocalDate.now();
         }
     }
+
 }
