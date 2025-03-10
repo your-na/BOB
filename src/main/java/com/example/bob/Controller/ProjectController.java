@@ -39,15 +39,28 @@ public class ProjectController {
      * ✅ 프로젝트 상세 보기 (postproject.html)
      */
     @GetMapping("/postproject/{id}")
-    public String showProjectDetail(@PathVariable Long id, Model model) {
+    public String showProjectDetail(@PathVariable Long id,
+                                    Model model,
+                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        // 프로젝트 객체를 한번만 가져오도록 수정
         ProjectEntity project = projectService.getProjectById(id);
-        project = projectService.incrementViews(id);
+        projectService.incrementViews(id); // 조회수 증가, project 객체는 이미 있음
+
+        // 현재 날짜 가져오기
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+
+        // 모델에 데이터 추가
         model.addAttribute("today", today);
         model.addAttribute("goal", project.getGoal());
         model.addAttribute("project", project);
+        model.addAttribute("isOwner", project.getCreatedBy().equals(userDetails.getUserNick())); // 로그인한 사용자가 작성자인지 체크
+
+        // 로그인한 사용자가 해당 프로젝트의 작성자인지 체크
+        model.addAttribute("isOwner", project.getCreatedBy().equals(userDetails.getUserNick()));
+
         return "postproject";
     }
+
 
     /**
      * ✅ 프론트엔드(Vue, React)에서 사용 가능한 REST API 추가 (JSON 반환)
