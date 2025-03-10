@@ -58,14 +58,11 @@ public class ProjectService {
      * ✅ 프로젝트 저장 후 반환
      */
     @Transactional
-    public ProjectEntity saveProject(ProjectEntity project) {
-        logger.info("🚀 프로젝트 저장 전 모집 종료일: {}", project.getRecruitmentEndDate()); // 로그 추가
-
+    public ProjectEntity saveProject(ProjectEntity project) {;
         project.updateStatus(); // 상태 업데이트
+        project.calculateDDay(); // 디데이 계산
+
         ProjectEntity savedProject = projectRepository.save(project);
-
-        logger.info("✅ 저장된 프로젝트의 모집 종료일: {}", savedProject.getRecruitmentEndDate()); // 로그 추가
-
         saveProjectHistory(savedProject, "생성됨");
         return savedProject;
     }

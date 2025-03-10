@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +65,7 @@ public class ProjectEntity {
     private String description; // 프로젝트 설명
 
     @Transient
-    private String dDay;
+    private long dDay;  // 디데이 필드 (long으로 변경)
 
     @ElementCollection
     private List<Long> likedUsers = new ArrayList<>(); // 좋아요 누른 유저들
@@ -76,17 +77,24 @@ public class ProjectEntity {
     private List<ProjectHistoryEntity> projectHistoryEntities = new ArrayList<>();
 
 
-    public void setDDay(String dDay) {
-        this.dDay = dDay;
-    }
-
     // ✅ 상태를 한글로 자동 설정 (모집중 / 진행중)
     public void updateStatus() {
-        if (this.startDate.isBefore(LocalDate.now())) {
-            this.status = "진행중"; // ✅ 시작일이 지나면 진행중
+        LocalDate today = LocalDate.now();
+
+        // 모집 종료일 기준으로 상태 업데이트
+        if (today.isAfter(this.recruitmentEndDate)) {
+            this.status = "진행중"; // 모집 종료일이 지나면 진행중
         } else {
-            this.status = "모집중"; // ✅ 기본값
+            this.status = "모집중"; // 모집 종료일 전에는 모집중
         }
+    }
+
+    // 디데이 계산 메서드
+    public void calculateDDay() {
+        LocalDate today = LocalDate.now();
+
+        // 모집 종료일과 오늘 날짜의 차이 계산
+        this.dDay = ChronoUnit.DAYS.between(today, recruitmentEndDate);
     }
 
     @PrePersist
@@ -95,4 +103,5 @@ public class ProjectEntity {
             this.recruitmentStartDate = LocalDate.now();
         }
     }
+
 }
