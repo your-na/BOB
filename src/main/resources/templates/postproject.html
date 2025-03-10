@@ -20,7 +20,8 @@
 <!-- 제목과 모집현황 -->
 <div class="title-row">
     <div class="title" th:text="${project.title}">프로젝트 제목</div>
-    <span class="deadline" th:text="'D-' + ${project.recruitmentPeriod}">D-14</span>
+    <span class="deadline" th:text="'D-' + ${project.dDay}"></span>
+
     <div class="status">
         모집현황
         <div class="team">

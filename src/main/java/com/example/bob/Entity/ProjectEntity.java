@@ -64,8 +64,8 @@ public class ProjectEntity {
     @Column(length = 500)
     private String description; // 프로젝트 설명
 
-    @Transient
-    private long dDay;  // 디데이 필드 (long으로 변경)
+    @Column(nullable = true)
+    private Long dDay;  // long -> Long로 변경
 
     @ElementCollection
     private List<Long> likedUsers = new ArrayList<>(); // 좋아요 누른 유저들
@@ -75,7 +75,6 @@ public class ProjectEntity {
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectHistoryEntity> projectHistoryEntities = new ArrayList<>();
-
 
     // ✅ 상태를 한글로 자동 설정 (모집중 / 진행중)
     public void updateStatus() {
@@ -89,19 +88,26 @@ public class ProjectEntity {
         }
     }
 
-    // 디데이 계산 메서드
-    public void calculateDDay() {
-        LocalDate today = LocalDate.now();
-
-        // 모집 종료일과 오늘 날짜의 차이 계산
-        this.dDay = ChronoUnit.DAYS.between(today, recruitmentEndDate);
-    }
-
     @PrePersist
-    public void prePersist() {
-        if (this.recruitmentStartDate == null) {
-            this.recruitmentStartDate = LocalDate.now();
+    @PreUpdate
+    public void calculateDDay() {
+        LocalDate today = LocalDate.now();  // 오늘 날짜
+        LocalDate endDate = this.recruitmentEndDate;  // 모집 종료일
+
+        if (endDate == null) {
+            this.dDay = 0L;  // 종료일이 없으면 디데이는 0으로 설정
+            return;
+        }
+
+        long daysBetween = today.until(endDate, ChronoUnit.DAYS);  // 오늘부터 종료일까지의 일수 계산
+
+        if (daysBetween < 0) {
+            this.dDay = 0L;  // 종료일이 이미 지나면 D-Day는 0
+        } else {
+            this.dDay = daysBetween;  // 남은 일수
         }
     }
+    }
 
-}
+
+
