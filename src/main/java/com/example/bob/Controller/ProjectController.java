@@ -271,4 +271,33 @@
             return "redirect:/success?projectId=" + project.getId();  // 프로젝트 ID를 쿼리 파라미터로 전달
         }
 
+        // 성공 페이지 처리
+        @GetMapping("/success")
+        public String showSuccessPage(@RequestParam Long projectId, Model model) {
+            // 프로젝트 정보 가져오기
+            ProjectEntity project = projectService.getProjectById(projectId);
+
+            // 현재 날짜 (제출 날짜)
+            LocalDate submissionDate = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            String formattedStartDate = submissionDate.format(formatter);  // 실시간 날짜
+
+            // 모집 종료일이 null일 경우 기본 값 처리
+            String formattedEndDate = project.getRecruitmentEndDate() != null ?
+                    project.getRecruitmentEndDate().format(formatter) : "미정";  // null이면 '미정' 표시
+
+            // 모델에 프로젝트 정보와 포맷된 날짜 추가
+            model.addAttribute("project", project);
+            model.addAttribute("formattedStartDate", formattedStartDate);
+            model.addAttribute("formattedEndDate", formattedEndDate);
+
+            // 성공 페이지를 반환
+            return "success";
+        }
+
+
+
+
+
+
     }

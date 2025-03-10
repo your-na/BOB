@@ -95,5 +95,4 @@ public class ProjectEntity {
             this.recruitmentStartDate = LocalDate.now();
         }
     }
-
 }

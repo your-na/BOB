@@ -38,22 +38,21 @@
     </div>
     <br>
     <br>
-    <div class="message">
-        <h3><strong>전달 메시지</strong></h3>
-        <!-- 전달 메시지 입력 -->
-        <textarea name="message" class="message-box" placeholder="전달 메시지"></textarea>
-    </div>
     <br>
     <br>
     <form action="/projectapplication" method="post">
-        <!-- 프로젝트 ID와 전달 메시지를 서버로 전송 -->
+        <!-- CSRF 토큰을 포함 -->
+        <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+
         <input type="hidden" name="projectId" th:value="${project.id}">
-        <!-- 하나만 남기고 두 번째 textarea 제거 -->
+        <textarea name="message" class="message-box" placeholder="전달 메시지"></textarea>
+
         <div class="button-container">
             <button type="submit" class="btn btn-primary">신청하기</button>
             <button type="button" class="btn btn-secondary" onclick="window.history.back()">취소</button>
         </div>
     </form>
+
 </div>
 </body>
 </html>
