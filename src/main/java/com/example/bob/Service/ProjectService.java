@@ -33,7 +33,7 @@ public class ProjectService {
      * ✅ 모든 프로젝트를 DTO로 변환하여 반환
      */
     public List<ProjectDTO> getAllProjectsDTO() {
-        return projectRepository.findAll().stream()
+        return projectRepository.findAllActiveProjects().stream()  // ✅ INACTIVE 상태 제외
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
