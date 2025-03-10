@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title th:text="${project.title}">프로젝트 상세보기</title>
+
+    <!-- ✅ CSRF 토큰 추가 -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
     <link rel="stylesheet" href="/css/postproject.css">
     <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
+
 <body>
 <!-- header -->
 <div th:insert="~{header :: header}"></div>
@@ -22,8 +29,8 @@
         </div>
     </div>
     <div class="post-detail">
-        <img class="postdetail" src="/images/postdetail.png" alt="점 세 개" onclick="toggleDropdown()">
-        <div class="dropdownmenu" id="dropdownMenu">
+        <img class="postdetail" src="/images/postdetail.png" alt="점 세 개" onclick="toggleDropdown()" th:if="${isOwner}">
+        <div class="dropdownmenu" id="dropdownMenu" style="display: none;" th:if="${isOwner}">
             <a class="action-button" th:href="@{'/postproject/' + ${project.id} + '/edit'}">수정하기</a>
             <a class="action-button" href="javascript:void(0);" onclick="deleteProject()">삭제하기</a>
         </div>
@@ -35,26 +42,27 @@
 <div class="meta">
     <span class="meta1" th:text="${project.createdBy}">작성자</span>
     <span class="meta2" th:text="'작성일 : ' + ${today}">작성일</span>
-
 </div>
 
 <div class="form-group">
     <label for="project-dates">진행 일정</label>
     <div class="date-inputs">
-        <label id="start-date" name="start-date">2025-03-05</label>
+        <span id="start-date" th:text="${project.startDate}"></span>
         <span>~</span>
-        <label id="end-date" name="end-date">2025-04-05</label>
+        <span id="end-date" th:text="${project.endDate}"></span>
     </div>
 </div>
+
 <div class="form-group">
     <label for="party-dates">모집 일정</label>
     <div class="date-inputs">
-        <label id="startdate" name="start-date">2025-03-05</label>
+        <span id="startdate" th:text="${project.recruitmentStartDate}"></span>
         <span>~</span>
-        <label id="enddate" name="end-date">2025-03-10</label>
+        <span id="enddate" th:text="${project.recruitmentEndDate}"></span>
     </div>
 </div>
-<!--프로젝트 목표-->
+
+<!-- 프로젝트 목표 -->
 <div class="good">
     <p>프로젝트 목표</p>
     <div class="goal">
@@ -65,27 +73,26 @@
 <!-- 프로젝트 설명 -->
 <div class="good">
     <p>프로젝트 내용</p>
-    <div class="content" th:text="${project.description}">
-        프로젝트 설명 내용
-    </div>
+    <div class="content" th:text="${project.description}">프로젝트 설명 내용</div>
 </div>
 
-<!-- 팀 신청 버튼 -->
-<form>
-    <button class="apply-btn">팀 신청하기</button>
+<!-- 프로젝트 신청 페이지로 이동하는 버튼 -->
+<form action="/projectapplication" method="get">
+    <input type="hidden" name="projectId" th:value="${project.id}">
+    <button type="submit" class="apply-btn">팀 신청하기</button>
 </form>
 
+
 <hr>
+
 <!-- 좋아요 & 스크랩 -->
 <div class="interaction">
     <div id="heart" onclick="toggleHeart()">
-        <img id="heartImage" src="/images/heart.png"> <!-- 빈 하트 이미지로 시작 -->
-        <span id="likesCount">0</span> <!-- 좋아요 수 표시 -->
+        <img id="heartImage" src="/images/heart.png">
+        <span id="likesCount">0</span>
     </div>
     <div id="scrap"><img src="/images/scrap.png"> <span>0</span></div>
 </div>
-
-
 
 <!-- 댓글 입력 -->
 <form>
@@ -94,59 +101,69 @@
 </form>
 
 <!-- JavaScript -->
-<script>
-    // 이 예시에서는 'isLiked'라는 변수를 사용하여 사용자가 하트를 눌렀는지 여부를 확인합니다.
-    let isLiked = false; // 하트를 눌렀는지 여부, 기본은 false (하트를 누르지 않은 상태)
-    let likesCount = 10; // 현재 좋아요 수, 실제로는 서버에서 가져와야 함
+<script defer>
 
-    function toggleHeart() {
-        const heartImage = document.getElementById('heartImage');
-        const likesSpan = document.getElementById('likesCount');
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("🚀 JavaScript 로드 완료!");
 
-        // 이미 하트를 눌렀으면 취소하고, 누르지 않았다면 좋아요를 추가
-        if (isLiked) {
-            heartImage.src = '/images/heart.png'; // 빈 하트로 변경
-            likesCount--; // 좋아요 수 감소
-        } else {
-            heartImage.src = '/images/fillheart.png'; // 채워진 하트로 변경
-            likesCount++; // 좋아요 수 증가
-        }
+        // ✅ 점 세 개(...) 버튼 클릭 시 드롭다운 토글
+        window.toggleDropdown = function () {
+            var dropdown = document.getElementById("dropdownMenu");
+            dropdown.style.display = (dropdown.style.display === "none" || dropdown.style.display === "") ? "block" : "none";
+        };
 
-        // 좋아요 상태 변경 후, isLiked 상태 업데이트
-        isLiked = !isLiked;
+        // ✅ 페이지의 다른 곳을 클릭하면 드롭다운 자동 닫힘
+        document.addEventListener("click", function (event) {
+            var dropdown = document.getElementById("dropdownMenu");
+            var button = document.querySelector(".postdetail");
+            if (!dropdown.contains(event.target) && !button.contains(event.target)) {
+                dropdown.style.display = "none";
+            }
+        });
 
-        // 좋아요 수 업데이트
-        likesSpan.textContent = likesCount;
+        // ✅ 프로젝트 삭제 기능
+        window.deleteProject = function () {
+            let projectId = window.location.pathname.split("/")[2];
 
+            if (!confirm("⚠️ 정말 삭제하시겠습니까? 삭제 후 복구할 수 없습니다!")) {
+                return;
+            }
 
-        // 서버에 좋아요 수 갱신 요청
-        fetch(`/postproject/${projectId}/like`, {
-            method: 'POST',
-        })
-            .then(response => response.json())
-            .then(updatedLikes => {
-                // 서버에서 받은 새로운 좋아요 수로 목록 업데이트
-                likesSpan.textContent = updatedLikes;  // 목록에 반영
+            // ✅ CSRF 토큰 가져오기
+            let csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+            let csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+
+            if (!csrfToken || !csrfHeader) {
+                alert("❌ CSRF 토큰을 찾을 수 없습니다. 다시 시도해주세요.");
+                return;
+            }
+
+            console.log(`🚀 삭제 요청: /postproject/${projectId}`);
+
+            fetch(`/postproject/${projectId}`, { // ✅ URL 수정
+                method: "DELETE",
+                headers: {
+                    [csrfHeader]: csrfToken,
+                    "Content-Type": "application/json"
+                }
             })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }
-
-        // 드롭다운 토글 기능
-        function toggleDropdown() {
-        var dropdown = document.getElementById("dropdownMenu");
-        if (dropdown.style.display === "none" || dropdown.style.display === "") {
-        dropdown.style.display = "block";
-    } else {
-        dropdown.style.display = "none";
-    }
-    }
-
-        // 페이지 로드 시 기본적으로 드롭다운을 숨기기
-        document.addEventListener("DOMContentLoaded", function() {
-        var dropdown = document.getElementById("dropdownMenu");
-        dropdown.style.display = "none"; // 기본적으로 숨기기
+                .then(response => {
+                    console.log("🔍 서버 응답 상태 코드:", response.status);
+                    if (response.ok) {
+                        alert("✅ 프로젝트가 삭제되었습니다.");
+                        window.location.href = "/project";
+                    } else {
+                        return response.text().then(text => {
+                            console.error("❌ 서버 응답 내용:", text);
+                            alert("❌ 프로젝트 삭제에 실패했습니다.");
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("❌ 삭제 요청 실패:", error);
+                    alert("❌ 프로젝트 삭제 중 오류 발생");
+                });
+        };
     });
 </script>
 

@@ -3,17 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>프로젝트 목록</title>
-    <link rel="stylesheet" href="/css/project.css">
+    <link rel="stylesheet" href="/css/myproject.css">
     <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 <body>
 <!-- header -->
 <div th:insert="~{header :: header}"></div>
-
-<!-- 메인 배너 -->
-<section class="main-banner">
-    <img src="/images/banner.png" alt="배너 이미지" class="banner-image">
-</section>
 
 <section class="project-list">
     <div class="upupup">
@@ -56,27 +51,51 @@
                         </div>
                     </div>
 
+                    <!-- 역할 -->
+                    <div class="search-field">
+                        <label for="role">역할</label>
+                        <div class="role">
+                            <input type="checkbox" id="주최">
+                            <span>주최</span>
+                            <input type="checkbox" id="참여">
+                            <span>참여</span>
+                        </div>
+                    </div>
+
+                    <!-- 상태 -->
+                    <div class="search-field">
+                        <label for="status">상태</label>
+                        <div class="state">
+                            <input type="checkbox" id="모집중">
+                            <span>모집중</span>
+                            <input type="checkbox" id="진행중">
+                            <span>진행중</span>
+                            <input type="checkbox" id="완료">
+                            <span>완료</span>
+                        </div>
+                    </div>
+
                     <!-- 완료 버튼 -->
                     <button class="submit-btn">완료</button>
                 </div>
             </div>
         </form>
 
+        <!-- 필터 옵션 -->
         <select id="filter" name="filter">
-            <option value="all">최신순</option>
-            <option value="ing">인기순</option>
-            <option value="ed">오래된순</option>
+            <option value="전체">전체</option>
+            <option value="주최한 프로젝트">주최한 프로젝트</option>
+            <option value="참여한 프로젝트">참여한 프로젝트</option>
         </select>
 
         <!-- 프로젝트 생성 버튼 -->
         <form action="/newproject" method="get">
             <button type="submit" class="create-post-button">프로젝트 생성</button>
         </form>
-
-
     </div>
 
-    <!-- 프로젝트 목록 테이블 -->
+    <!-- 내가 만든 프로젝트 테이블 -->
+    <h3>내가 만든 프로젝트</h3>
     <table class="contest-table">
         <thead>
         <tr>
@@ -88,11 +107,12 @@
             <th>좋아요</th>
             <th>모집 인원</th>
             <th>현황</th>
+            <th>역할</th>
         </tr>
         </thead>
         <tbody>
-        <!-- Thymeleaf 반복문으로 프로젝트 데이터 출력 -->
-        <tr th:each="project : ${projects}">
+        <!-- Thymeleaf 반복문으로 내가 만든 프로젝트 데이터 출력 -->
+        <tr th:each="project : ${createdProjects}">
             <td>
                 <a th:href="@{/postproject/{id}(id=${project.id})}" th:text="${project.title}">프로젝트명</a>
             </td>
@@ -101,16 +121,52 @@
             <td th:text="${project.startDate} + ' ~ ' + ${project.endDate}">2025-01-01 ~ 2025-12-31</td>
             <td th:text="${project.views}">0</td>
             <td th:text="${project.likes}">0</td>
-            <!-- 동적으로 모집 인원 표시 -->
             <td>
                 <span th:text="${project.currentParticipants}">0</span>/
                 <span th:text="${project.recruitmentCount}">0</span>
             </td>
             <td th:text="${project.status}">모집중</td>
+            <td th:text="'주최'">주최</td>
         </tr>
         </tbody>
     </table>
 
+    <!-- 내가 참가한 프로젝트 테이블 -->
+    <h3>내가 참가한 프로젝트</h3>
+    <table class="contest-table">
+        <thead>
+        <tr>
+            <th>프로젝트명</th>
+            <th>생성자</th>
+            <th>모집 기간</th>
+            <th>진행 일정</th>
+            <th>조회수</th>
+            <th>좋아요</th>
+            <th>모집 인원</th>
+            <th>현황</th>
+            <th>역할</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Thymeleaf 반복문으로 내가 참가한 프로젝트 데이터 출력 -->
+        <tr th:each="project : ${joinedProjects}">
+            <td>
+                <a th:href="@{/postproject/{id}(id=${project.id})}" th:text="${project.title}">프로젝트명</a>
+            </td>
+            <td th:text="${project.createdBy}">생성자</td>
+            <td th:text="'D-' + ${project.recruitmentPeriod}">D-3</td>
+            <td th:text="${project.startDate} + ' ~ ' + ${project.endDate}">2025-01-01 ~ 2025-12-31</td>
+            <td th:text="${project.views}">0</td>
+            <td th:text="${project.likes}">0</td>
+            <td>
+                <span th:text="${project.currentParticipants}">0</span>/
+                <span th:text="${project.recruitmentCount}">0</span>
+            </td>
+            <td th:text="${project.status}">모집중</td>
+            <td th:text="'참여'">참여</td>
+        </tr>
+        </tbody>
+    </table>
 </section>
 
 <script>

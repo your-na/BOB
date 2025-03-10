@@ -15,6 +15,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
+
 public class SecurityConfig {
 
     private final UserService userService;  // UserService 인젝션
@@ -28,12 +29,12 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // CSRF 활성화 및 쿠키에 토큰 저장
-                        .ignoringRequestMatchers("/login", "/signup", "/profile/update", "/logout", "/bw", "/postproject/**/edit") // 로그인과 회원가입 경로에 대해 CSRF 예외 설정
+                        .ignoringRequestMatchers("/login", "/signup", "/profile/update", "/logout", "/bw", "/postproject/*", "/projectapplication") // 로그인과 회원가입 경로에 대해 CSRF 예외 설정
                 )
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers( "/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**", "/project").permitAll() // 인증 없이 접근 가능 경로 설정
                         .requestMatchers("/login", "/sign").anonymous() // 로그인하지 않은 사용자만 접근 가능
-                        .requestMatchers("/profile/**", "/bw", "/postproject/*/edit").authenticated() // 프로필 페이지는 인증된 사용자만 접근 가능
+                        .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject", "/projectapplication").authenticated() // 프로필 페이지는 인증된 사용자만 접근 가능
                         .requestMatchers( "/signup", "/check-nickname", "/check-username").permitAll()  // 닉네임 중복 확인 요청도 인증 없이 접근 가능
                         .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )

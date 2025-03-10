@@ -6,10 +6,6 @@
   <title>프로젝트 수정</title>
   <link rel="stylesheet" href="/css/newproject.css">
   <link rel="stylesheet" th:href="@{/css/header.css}">
-
-  <!-- ✅ CSRF 토큰 추가 -->
-  <meta name="_csrf" th:content="${_csrf.token}">
-  <meta name="_csrf_header" th:content="${_csrf.headerName}">
 </head>
 <body>
 <!-- header -->
@@ -19,115 +15,144 @@
   <section class="project-create">
     <h1>프로젝트 수정</h1>
     <hr>
-    <form th:action="@{'/postproject/' + ${project.id} + '/edit'}" method="post" class="project-form">
-      <label for="project-dates">진행 일정</label>
+    <form id="editForm" th:action="@{'/postproject/' + ${project.id} + '/edit'}" method="post" class="project-form">
+      <!-- CSRF 토큰 -->
+      <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+
+      <!-- 진행 일정 -->
+      <label for="start-date">진행 일정</label>
       <div class="date-inputs">
-        <input type="date" id="start-date" name="startDate" th:value="${project.startDate}">
+        <input type="date" id="start-date" name="start-date" th:value="${project.startDate}" required>
         <span>~</span>
-        <input type="date" id="end-date" name="endDate" th:value="${project.endDate}">
+        <input type="date" id="end-date" name="end-date" th:value="${project.endDate}" required>
       </div>
 
+      <!-- 모집 일정 -->
       <div class="form-group">
-        <label for="party-dates">모집 일정</label>
+        <label for="recruitment-start-date">모집 일정</label>
         <div class="date-inputs">
-          <input type="date" id="recruit-start-date" name="recruitmentStartDate" th:value="${project.recruitmentStartDate}">
+          <input type="date" id="recruitment-start-date" name="recruitment-start-date" th:value="${project.recruitmentStartDate}" required>
           <span>~</span>
-          <input type="date" id="recruit-end-date" name="recruitmentEndDate" th:value="${project.recruitmentEndDate}">
+          <input type="date" id="recruitment-end-date" name="recruitment-end-date" th:value="${project.recruitmentEndDate}" required>
         </div>
       </div>
 
+      <!-- 모집 인원 -->
       <div class="form-group">
         <label for="recruitment">모집 인원</label>
-        <select id="recruitment" name="recruitmentCount">
+        <select id="recruitment" name="recruitment">  <!-- ✅ name을 그대로 유지 -->
           <option value="0" th:selected="${project.recruitmentCount == 0}">0명</option>
           <option value="1" th:selected="${project.recruitmentCount == 1}">1명</option>
           <option value="2" th:selected="${project.recruitmentCount == 2}">2명</option>
           <option value="3" th:selected="${project.recruitmentCount == 3}">3명</option>
-          <option value="plus">기타</option>
+          <option value="plus">기타</option> <!-- 기타 선택 시 직접 입력 가능 -->
         </select>
-        <div id="custom-input-group" style="display: none;">
-          <input type="text" id="custom-recruitment" name="custom-recruitment" placeholder="직접 입력">
-          <p>명</p>
+        <div id="custom-input-group" style="display: none; align-items: center;">
+          <input type="number" id="custom-recruitment" name="custom-recruitment" placeholder="직접 입력">
+          <p style="margin-left: 5px;">명</p>
         </div>
       </div>
 
+      <!-- 프로젝트 주제 -->
       <div class="form-group">
         <label for="project-name">프로젝트 주제</label>
-        <input type="text" id="project-name" name="title" th:value="${project.title}" required>
+        <input type="text" id="project-name" name="project-name" th:value="${project.title}" placeholder="프로젝트명을 입력하세요." required>
       </div>
 
+      <!-- 프로젝트 목표 -->
       <div class="form-group">
         <label for="project-goal">프로젝트 목표</label>
-        <textarea id="project-goal" name="goal" th:text="${project.goal}" required></textarea>
+        <textarea id="project-goal" name="project-goal" th:text="${project.goal}" placeholder="프로젝트 목표를 입력하세요." required></textarea>
       </div>
 
+      <!-- 프로젝트 내용 -->
       <div class="form-group">
         <label for="project-description">프로젝트 내용</label>
-        <textarea id="project-description" name="description" th:text="${project.description}" required></textarea>
+        <textarea id="project-description" name="project-description" th:text="${project.description}" placeholder="프로젝트 내용을 입력하세요." required></textarea>
       </div>
 
+      <!-- 버튼 -->
       <div class="btn">
         <button type="submit" class="submit-btn">수정</button>
         <button type="button" class="cancel-button">
-          <a href="/project">취소</a>
+          <a href="/project" class="ynbw">취소</a>
         </button>
       </div>
     </form>
   </section>
 </main>
 
+<!-- JavaScript -->
 <script>
-  document.querySelector(".submit-btn").addEventListener("click", function(event) {
-    event.preventDefault();
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("editForm");
+    const recruitmentSelect = document.getElementById("recruitment");
+    const customRecruitmentInput = document.getElementById("custom-recruitment");
+    const customInputGroup = document.getElementById("custom-input-group");
 
-    // ✅ CSRF 토큰 가져오기
-    let csrfTokenElement = document.querySelector("meta[name='_csrf']");
-    let csrfHeaderElement = document.querySelector("meta[name='_csrf_header']");
+    // "기타" 선택 시 입력 필드 표시
+    recruitmentSelect.addEventListener("change", function () {
+      if (recruitmentSelect.value === "plus") {
+        customInputGroup.style.display = "flex";
+      } else {
+        customInputGroup.style.display = "none";
+        customRecruitmentInput.value = ""; // 기존 입력값 초기화
+      }
+    });
 
-    if (!csrfTokenElement || !csrfHeaderElement) {
-      console.error("CSRF 토큰을 찾을 수 없습니다!");
-      alert("CSRF 인증 오류! 페이지를 새로고침하고 다시 시도하세요.");
-      return;
-    }
+    form.addEventListener("submit", function (event) {
+      event.preventDefault(); // 기본 제출 방지
 
-    let csrfToken = csrfTokenElement.getAttribute("content");
-    let csrfHeader = csrfHeaderElement.getAttribute("content");
-    let projectId = window.location.pathname.split("/")[2]; // ✅ URL에서 프로젝트 ID 추출
+      let projectId = window.location.pathname.split("/")[2];
+      if (isNaN(projectId)) {
+        alert("잘못된 프로젝트 ID입니다.");
+        return;
+      }
 
-    let data = {
-      title: document.getElementById("project-name").value,
-      goal: document.getElementById("project-goal").value,
-      description: document.getElementById("project-description").value,
-      startDate: document.getElementById("start-date").value,
-      endDate: document.getElementById("end-date").value,
-      recruitmentStartDate: document.getElementById("recruit-start-date").value,
-      recruitmentEndDate: document.getElementById("recruit-end-date").value,
-      recruitmentCount: document.getElementById("recruitment").value
-    };
+      // 모집 인원 값 처리
+      let recruitmentValue = recruitmentSelect.value;
+      let recruitmentCountValue = "";
+      if (recruitmentValue === "plus") {
+        recruitmentCountValue = customRecruitmentInput.value.trim();
+        if (!recruitmentCountValue || isNaN(recruitmentCountValue) || parseInt(recruitmentCountValue) < 0) {
+          alert("올바른 모집 인원을 입력하세요.");
+          return;
+        }
+      } else {
+        recruitmentCountValue = recruitmentValue;
+      }
 
-    fetch(`/postproject/${projectId}/edit`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        [csrfHeader]: csrfToken  // ✅ CSRF 토큰 추가
-      },
-      body: JSON.stringify(data)
-    })
-            .then(response => {
-              if (!response.ok) {
-                throw new Error("HTTP 오류: " + response.status);
-              }
-              return response.text();  // ✅ 백엔드에서 URL을 반환받음
-            })
-            .then(url => {
-              alert("프로젝트가 성공적으로 수정되었습니다!");
-              window.location.href = url;  // ✅ 수정된 프로젝트 상세보기 페이지로 이동
-            })
-            .catch(error => {
-              console.error("수정 요청 실패:", error);
-              alert("수정 요청 중 오류가 발생했습니다.");
-            });
+      // FormData 사용
+      const formData = new FormData(form);
+      formData.append("project-id", projectId);
+      formData.append("recruitmentCount", recruitmentCountValue); // ✅ 모집 인원 추가
+
+      // 🚀 전송할 데이터 콘솔 확인
+      console.log("🚀 서버로 보내는 데이터:");
+      formData.forEach((value, key) => console.log(`${key}: ${value}`));
+
+      fetch(`/postproject/${projectId}/edit`, {
+        method: "POST",
+        body: formData
+      })
+              .then(response => {
+                if (response.ok) {
+                  alert("✅ 프로젝트가 성공적으로 수정되었습니다!");
+                  window.location.href = `/postproject/${projectId}`;
+                } else {
+                  return response.text().then(text => {
+                    console.error("서버 오류:", text);
+                    alert("❌ 프로젝트 수정에 실패했습니다.");
+                  });
+                }
+              })
+              .catch(error => {
+                console.error("❌ 수정 요청 실패:", error);
+                alert("❌ 수정 요청 중 오류가 발생했습니다.");
+              });
+    });
   });
+
 </script>
 
 </body>
