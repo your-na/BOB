@@ -54,10 +54,12 @@ public class ProjectController {
      */
     @GetMapping("/api/projects/{id}")
     @ResponseBody
-    public ResponseEntity<ProjectEntity> getProjectById(@PathVariable Long id) {
+    public ResponseEntity<ProjectDTO> getProjectById(@PathVariable Long id) {
         ProjectEntity project = projectService.getProjectById(id);
-        return ResponseEntity.ok(project); // JSON 데이터 반환
+        project.updateStatus(); // ✅ 한글 상태 업데이트
+        return ResponseEntity.ok(projectService.convertToDTO(project));
     }
+
 
     /**
      * ✅ 프로젝트 삭제 API (CSRF 토큰 포함)
@@ -122,6 +124,8 @@ public class ProjectController {
                                 @RequestParam("project-goal") String projectGoal,
                                 @RequestParam("start-date") String startDateStr,
                                 @RequestParam("end-date") String endDateStr,
+                                @RequestParam("recruitment-start-date") String recruitmentStartStr, // ✅ 추가
+                                @RequestParam("recruitment-end-date") String recruitmentEndStr, // ✅ 추가
                                 @RequestParam("recruitment") String recruitmentStr,
                                 @RequestParam(value = "recruitmentCount", required = false) String recruitmentCountStr,
                                 @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -129,8 +133,12 @@ public class ProjectController {
 
         String creatorNick = userDetails.getUserNick();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // ✅ 사용자가 입력한 값 변환
         LocalDate startDate = LocalDate.parse(startDateStr, formatter);
         LocalDate endDate = LocalDate.parse(endDateStr, formatter);
+        LocalDate recruitmentStartDate = LocalDate.parse(recruitmentStartStr, formatter); // ✅ 추가
+        LocalDate recruitmentEndDate = LocalDate.parse(recruitmentEndStr, formatter); // ✅ 추가
 
         int recruitment = 0;
         if ("기타".equals(recruitmentStr)) {
@@ -159,6 +167,8 @@ public class ProjectController {
                 .creatorNick(creatorNick)
                 .startDate(startDate)
                 .endDate(endDate)
+                .recruitmentStartDate(recruitmentStartDate) // ✅ 사용자가 입력한 값 사용
+                .recruitmentEndDate(recruitmentEndDate) // ✅ 사용자가 입력한 값 사용
                 .recruitmentPeriod(recruitment)
                 .recruitmentCount(recruitment)
                 .views(0)
@@ -169,6 +179,8 @@ public class ProjectController {
         ProjectEntity savedProject = projectService.saveProject(newProject);
         return "redirect:/postproject/" + savedProject.getId();
     }
+
+
 
     /**
      * ✅ 프로젝트 수정 페이지로 이동

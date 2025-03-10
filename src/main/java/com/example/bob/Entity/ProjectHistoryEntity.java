@@ -67,4 +67,7 @@ public class ProjectHistoryEntity {
 
     @Column(length = 50, nullable = false)
     private String actionType;  // 🔹 "수정됨" 또는 "삭제됨"
+
+    @Column(length = 20, nullable = false)
+    private String status;  // 🔹 모집중 / 모집완료
 }
