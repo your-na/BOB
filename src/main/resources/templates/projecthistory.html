@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>프로젝트 참여 내역</title>
+    <link rel="stylesheet" href="/css/projecthistory.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<section class="project-history">
+    <nav class="tab-menu">
+        <ul>
+            <li class="tab-item" data-target="job-history">구직 내역</li>
+            <li class="tab-item active" data-target="project-history">프로젝트 참여 내역</li>
+            <li class="tab-item" data-target="contest-history">공모전 참여 내역</li>
+            <li class="tab-item" data-target="career-history">이력 내역</li>
+        </ul>
+    </nav>
+
+    <div class="searchcontainer">
+        <form id="searchform">
+            <input type="text" name="sw" id="search_sw" class="searchbar" placeholder="검색어 입력" th:value="${sw}">
+            <span class="searchicon"><img src="/images/search.png" alt=""></span>
+        </form>
+        <button class="external-btn">외부문서 불러오기</button>
+    </div>
+
+    <table class="history-table">
+        <thead>
+        <tr>
+            <th>No.</th>
+            <th>상태</th>
+            <th colspan="2">진행 기간</th>
+            <th>프로젝트</th>
+            <th>제출파일</th>
+            <th>관리</th>
+        </tr>
+        <tr>
+            <th></th>
+            <th></th>
+            <th>시작일자</th>
+            <th>종료일자</th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 기존 제출된 프로젝트 내역 -->
+        <tr th:each="project, iterStat : ${submittedProjects}">
+            <td th:text="${iterStat.count}">1</td>
+            <td th:text="${project.status}">제출</td>
+            <td th:text="${project.startDate}">2024.01.04</td>
+            <td th:text="${project.endDate}">2024.01.09</td>
+            <td th:text="${project.projectName}">밥 소프트웨어 회사</td>
+            <td>
+                <a th:href="@{${project.filePath}}" th:text="${project.fileName}" target="_blank">파일보기</a>
+            </td>
+            <td>
+                <button class="delete-btn">삭제</button>
+            </td>
+        </tr>
+
+        <!-- 추가할 수 있는 빈 행 -->
+        <tr class="new-entry-row" style="display: none;">
+            <td>-</td>
+            <td>
+                <select class="status-select">
+                    <option value="미제출">미제출</option>
+                    <option value="제출">제출</option>
+                </select>
+            </td>
+            <td><input type="date" class="start-date"></td>
+            <td><input type="date" class="end-date"></td>
+            <td><input type="text" class="project-name" placeholder="프로젝트명 입력"></td>
+            <td>
+                <input type="file" class="file-upload">
+                <a href="#" class="file-view" style="display: none;">파일보기</a>
+            </td>
+            <td>
+                <button class="delete-btn">삭제</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 프로젝트 추가 버튼 -->
+    <button class="add-project-btn">+ 프로젝트 내역 추가 하기</button>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const addProjectBtn = document.querySelector(".add-project-btn");
+        const tableBody = document.querySelector(".history-table tbody");
+
+        // ✅ 프로젝트 내역 추가 버튼 클릭 시 빈 행 추가
+        addProjectBtn.addEventListener("click", function () {
+            let newRow = document.querySelector(".new-entry-row").cloneNode(true);
+            newRow.style.display = "";
+            newRow.classList.remove("new-entry-row");
+            tableBody.appendChild(newRow);
+        });
+
+        // ✅ 파일 업로드 시 "파일보기" 링크 활성화
+        document.addEventListener("change", function (event) {
+            if (event.target.classList.contains("file-upload")) {
+                let fileInput = event.target;
+                let fileView = fileInput.closest("td").querySelector(".file-view");
+
+                if (fileInput.files.length > 0) {
+                    fileView.style.display = "inline";
+                    fileView.href = URL.createObjectURL(fileInput.files[0]);
+                    fileView.textContent = "파일보기";
+                }
+            }
+        });
+
+        // ✅ 삭제 버튼 클릭 시 행 삭제
+        document.addEventListener("click", function (event) {
+            if (event.target.classList.contains("delete-btn")) {
+                let row = event.target.closest("tr");
+                row.remove();
+            }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const tabs = document.querySelectorAll(".tab-item");
+
+        tabs.forEach(tab => {
+            tab.addEventListener("click", function () {
+                tabs.forEach(item => item.classList.remove("active"));
+                this.classList.add("active");
+            });
+        });
+    });
+
+</script>
+
+</body>
+</html>

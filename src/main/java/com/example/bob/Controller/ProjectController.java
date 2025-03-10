@@ -257,4 +257,7 @@ public class ProjectController {
     public String projapplicationForm() {
         return "projapplication";
     }
+
+    @GetMapping("/prohistory")
+    public String prohistoryForm() {return "projecthistory";}
 }
