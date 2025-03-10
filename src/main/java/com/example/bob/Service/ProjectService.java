@@ -239,14 +239,15 @@ public class ProjectService {
             throw new IllegalArgumentException("이미 신청한 프로젝트입니다.");
         }
 
-        // 신청자 정보 저장
-        UserProjectEntity userProjectEntity = UserProjectEntity.builder()
+        // 객체 생성
+        UserProjectEntity userProject = UserProjectEntity.builder()
                 .user(user)
                 .project(project)
                 .joinDate(LocalDate.now())
-                .status("참여중")
+                .status(UserProjectEntity.Status.신청중)  // enum 값으로 설정
                 .build();
-        userProjectRepository.save(userProjectEntity);
+        userProjectRepository.save(userProject);  // 변수명을 일관되게 사용
+
 
         // 프로젝트의 모집 인원 업데이트
         project.setCurrentParticipants(project.getCurrentParticipants() + 1);
