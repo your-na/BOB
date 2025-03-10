@@ -1,0 +1,387 @@
+.main-banner {
+    position: relative;
+    text-align: center;
+    margin: 0;
+    margin-top: 100px;
+}
+
+.content {
+    display: flex;
+    margin: 20px auto;
+    max-width: 1200px;
+}
+
+.side-info {
+    width: 30%;
+    padding: 20px;
+    text-align: center;
+}
+
+.poster {
+    width: 200px;
+    height: 250px;
+    margin-bottom: 20px;
+}
+
+.apply-button {
+    display: inline-block;
+    background-color: #66dc66;
+    color: #fff;
+    padding: 10px 20px;
+    font-weight: bold;
+    border: none;
+    border-radius: 20px;
+    cursor: default;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.apply-button:hover {
+    background-color: #70d370;
+    font-weight: bold;
+}
+
+/* 📌 필터 스타일 */
+.filter-wrapper {
+    display: flex;
+    justify-content: space-between; /* 필터와 only BOB 로고 정렬 */
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.filter-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 드롭다운 필터 */
+#sort-filter {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* 날짜 입력 필드 */
+#start-date, #end-date {
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* 검색 버튼 */
+.search-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.search-btn img {
+    width: 30px;
+    height: 30px;
+}
+
+/* only BOB 로고 */
+#bob {
+    width: 60px;
+    height: 30px;
+    margin-left: 10px;
+    align-self: center; /* 가운데 정렬 */
+}
+
+.contest-list {
+    width: 70%;
+    padding: 20px;
+}
+
+.contest-list h2{
+    color: #44d644;
+    font-weight: bold;
+    font-size: 29px;
+}
+
+.contest-table {
+
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.contest-table th,
+.contest-table td {
+    text-align: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.contest-table th {
+    background-color: #F0FFEF;
+    border-top: 2px solid #00b800;
+    text-align: center;
+    color: #404040;
+    font-weight: bold;
+}
+
+.contest-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.contest-table td:last-child {
+    text-align: center;
+}
+
+.contest-table td {
+    color: #555;
+    background-color: #fff;
+}
+
+.contest-table td:last-child {
+    color: #00b100;
+    font-weight: bold;
+}
+
+/* 검색 아이콘 스타일 */
+.search-container {
+    display: inline-block;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.searchicon {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.search-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/* 🔍 검색창 기본 상태 (숨김) */
+.search-box {
+    position: absolute;
+    top: 40px;
+    left: 0; /* 검색 버튼 바로 아래 정렬 */
+    width: 250px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+/* 검색창 활성화 시 */
+.search-box.active {
+    display: block;
+}
+
+/* 🔍 검색 입력 필드 */
+.search-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* 입력 필드 */
+.search-header input {
+    flex: 1;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+}
+
+/* ❌ 닫기 버튼 */
+#search-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #888;
+}
+
+/* 필터 버튼 */
+.filter-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 180px;
+}
+
+.filter-btn img {
+    width: 100px;
+    height: 30px;
+}
+
+/* 📌 필터 창 스타일 */
+.filter-box {
+    position: absolute;
+    top: 80px; /* 버튼과의 간격 조정 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: none;
+    z-index: 1000; /* 다른 요소 위에 표시 */
+    margin-top: 110px;
+}
+
+/* 필터 창 활성화 */
+.filter-box.active {
+    display: block;
+}
+
+/* 📌 필터 탭 버튼 스타일 */
+.filter-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.filter-tab {
+    flex: 1;
+    padding: 10px;
+    background: #ddd;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 5px;
+    font-weight: bold;
+    width: 100px;
+    height: 40px;
+    font-size: 12px;
+}
+
+.filter-tab.active {
+    background: #00b800;
+    color: white;
+}
+
+/* 📌 필터 옵션 스타일 */
+.filter-category {
+    display: none;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.filter-category.active {
+    display: flex;
+}
+
+/* 필터 옵션 버튼 */
+.filter-option {
+    padding: 8px 15px;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.filter-option:hover {
+    background: #e0e0e0;
+}
+
+/* 필터 옵션이 선택되었을 때 스타일 */
+.filter-option.selected {
+    background: #00b800;
+    color: white;
+    border: 1px solid #007500;
+}
+
+/* 📌 선택된 필터 표시 */
+.selected-filters {
+    margin-top: 15px;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 5px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.selected-item {
+    padding: 6px 12px;
+    background: #00b800;
+    color: white;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* 📌 필터 버튼 스타일 */
+.filter-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.view-results {
+    background: #ffd700;
+    color: black;
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.close-filter {
+    background: #888;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.view-results:hover {
+    background: #ffcc00;
+}
+
+.close-filter:hover {
+    background: #666;
+}
+
+.clear-filters {
+    background: white;
+    color: grey;
+    border: 1px solid grey;
+    border-radius: 10px;
+    margin-top: 20px;
+    margin-bottom: -5px;
+    margin-left: 510px;
+    cursor: pointer;
+}
+
+.deletebtn {
+    background: none;
+    color: red;
+    border: 1.5px solid red;
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    height: 30px;
+    margin-left: 620px;
+    margin-top: 30px;
+}
+
+.ohoh {
+    display: flex;
+}
