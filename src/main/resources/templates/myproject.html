@@ -135,6 +135,17 @@
     </tbody>
   </table>
 
+  <!-- 제출하기 모달 (숨겨진 상태) -->
+  <div id="submission-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h3>파일 제출</h3>
+      <input type="file" id="file-upload">
+      <button id="submit-file-btn">제출하기</button>
+    </div>
+  </div>
+
+
 </section>
 
 <script>
@@ -153,6 +164,41 @@
       searchBox.style.display = "none";
     });
   });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    var searchIcon = document.getElementById("searchicon");
+    var searchBox = document.getElementById("search-box");
+    var searchClose = document.getElementById("search-close");
+
+    var submissionModal = document.getElementById("submission-modal");
+    var closeModal = document.querySelector(".close-modal");
+    var submitFileBtn = document.getElementById("submit-file-btn");
+    var fileUpload = document.getElementById("file-upload");
+
+    // 제출하기 버튼 클릭 시 모달 열기
+    document.querySelectorAll(".submit-btn").forEach(button => {
+      button.addEventListener("click", function () {
+        submissionModal.style.display = "block";
+      });
+    });
+
+    // 닫기 버튼 클릭 시 모달 닫기
+    closeModal.addEventListener("click", function () {
+      submissionModal.style.display = "none";
+    });
+
+    // 파일 제출 버튼 클릭 시 동작
+    submitFileBtn.addEventListener("click", function () {
+      if (fileUpload.files.length === 0) {
+        alert("파일을 첨부해주세요!");
+        return;
+      }
+
+      alert("파일이 제출되었습니다!");
+      submissionModal.style.display = "none"; // 제출 후 모달 닫기
+    });
+  });
+
 </script>
 </body>
 </html>

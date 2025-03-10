@@ -247,7 +247,51 @@
     font-size: 16px;
 }
 
-/* ✅ 버튼 구조 변경 */
-<form action="/newproject" method="get">
-<button type="submit" class="create-post-button">프로젝트 생성</button>
-</form>
+
+/* 모달 스타일 */
+.modal {
+    display: none; /* 기본적으로 숨김 */
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* 모달 내부 버튼 스타일 */
+.modal-content {
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+/* 파일 업로드 버튼 */
+#file-upload {
+    margin: 10px 0;
+}
+
+#submit-file-btn {
+    background: #00b800;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#submit-file-btn:hover {
+    background: #008f00;
+}
+
