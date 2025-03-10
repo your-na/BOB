@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers( "/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**", "/project").permitAll() // 인증 없이 접근 가능 경로 설정
                         .requestMatchers("/login", "/sign").anonymous() // 로그인하지 않은 사용자만 접근 가능
-                        .requestMatchers("/profile/**", "/bw", "/postproject/**").authenticated() // 프로필 페이지는 인증된 사용자만 접근 가능
+                        .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject").authenticated() // 프로필 페이지는 인증된 사용자만 접근 가능
                         .requestMatchers( "/signup", "/check-nickname", "/check-username").permitAll()  // 닉네임 중복 확인 요청도 인증 없이 접근 가능
                         .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )

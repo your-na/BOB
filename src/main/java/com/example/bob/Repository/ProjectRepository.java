@@ -26,4 +26,7 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     @Modifying
     @Query("UPDATE ProjectEntity p SET p.status = '진행중' WHERE p.status = 'ACTIVE' AND p.startDate <= :today")
     void updateOldActiveToOngoing(LocalDate today);
+
+    // ✅ 사용자 닉네임으로 프로젝트를 찾는 메서드 추가
+    List<ProjectEntity> findByCreatedBy(String createdBy);
 }
