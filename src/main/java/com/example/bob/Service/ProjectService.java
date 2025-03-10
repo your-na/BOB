@@ -262,4 +262,13 @@ public class ProjectService {
         // 예: 신청 메시지를 저장하거나 추가적인 처리 수행
     }
 
+    // 신청 여부 확인 메서드 추가
+    @Transactional(readOnly = true)
+    public boolean isUserAppliedToProject(Long projectId, UserEntity user) {
+        // Optional을 처리하여, 값이 있으면 UserProjectEntity, 없으면 null 반환
+        UserProjectEntity userProject = userProjectRepository.findByProjectIdAndUserId(projectId, user.getUserId())
+                .orElse(null);
+        return userProject != null;  // 신청 내역이 있으면 true, 없으면 false
+    }
+
 }

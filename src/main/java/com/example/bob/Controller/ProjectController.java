@@ -59,13 +59,23 @@ public class ProjectController {
 
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
 
+        // 로그인한 사용자가 작성자인지 체크
+        boolean isOwner = project.getCreatedBy().equals(userDetails.getUserNick());
+
+        // 이미 신청한 상태인지 확인
+        boolean isApplied = projectService.isUserAppliedToProject(project.getId(), userDetails.getUserEntity());
+
         model.addAttribute("today", today);
         model.addAttribute("goal", project.getGoal());
         model.addAttribute("project", project);
-        model.addAttribute("isOwner", project.getCreatedBy().equals(userDetails.getUserNick())); // 로그인한 사용자가 작성자인지 체크
+        model.addAttribute("isOwner", isOwner);  // 작성자 여부를 모델에 추가
+        model.addAttribute("isApplied", isApplied);  // 신청 여부를 모델에 추가
 
         return "postproject";
     }
+
+
+
 
     // 프로젝트 삭제 API
     @DeleteMapping("/postproject/{id}")
@@ -264,12 +274,19 @@ public class ProjectController {
         // 프로젝트 정보 가져오기
         ProjectEntity project = projectService.getProjectById(projectId);
 
+        // 본인이 만든 프로젝트에는 신청할 수 없도록 막기
+        if (project.getCreatedBy().equals(userEntity.getUserNick())) {
+            model.addAttribute("errorMessage", "본인이 만든 프로젝트에는 신청할 수 없습니다.");
+            return "errorPage"; // 에러 페이지로 리디렉션
+        }
+
         // 신청 내용 저장 (예: 데이터베이스에 저장)
         projectService.submitApplication(userEntity, project, message);
 
         // 신청 완료 후 success 페이지로 리디렉션
         return "redirect:/success?projectId=" + project.getId();  // 프로젝트 ID를 쿼리 파라미터로 전달
     }
+
 
     // 성공 페이지 처리
     @GetMapping("/success")
@@ -294,9 +311,9 @@ public class ProjectController {
         // 성공 페이지를 반환
         return "success";
     }
-
-
-
-
+    @GetMapping("/prohistory")
+    public String showsuccessForm() {
+        return "prohistory";
+    }
 
 }

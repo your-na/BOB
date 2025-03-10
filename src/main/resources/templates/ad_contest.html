@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><!DOCTYPE html>
+        <html lang="ko">
+        <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>BOB 메인 페이지</title>
+    <link rel="stylesheet" href="/css/ad_contest.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<!-- 메인 배너 -->
+<section class="main-banner">
+    <img src="/images/banner.png" alt="배너 이미지" class="banner-image">
+</section>
+
+<div class="content">
+    <aside class="side-info">
+        <img src="/images/banner.png" alt="공모전 이미지" class="poster">
+        <form>
+            <button class="apply-button">공모전 주최 신청</button>
+        </form>
+    </aside>
+
+    <section class="contest-list">
+        <div class="ohoh">
+            <h2>공모전</h2>
+            <button class="deletebtn" id="delete-selected">삭제</button>
+        </div>
+        <hr>
+        <div class="filter-wrapper">
+            <div class="filter-container">
+                <select id="sort-filter">
+                    <option value="latest">최신순</option>
+                    <option value="popular">인기순</option>
+                </select>
+
+                <input type="date" id="start-date">
+                <span>~</span>
+                <input type="date" id="end-date">
+
+                <div class="search-wrapper">
+                    <button class="search-btn" id="searchicon">
+                        <img src="/images/search-icon.png" alt="검색">
+                    </button>
+
+                    <!-- 검색창 (처음엔 숨겨져 있음) -->
+                    <div class="search-box" id="search-box">
+                        <div class="search-header">
+                            <input type="text" placeholder="프로젝트 검색..." id="search-input">
+                            <button id="search-close">&times;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 필터 버튼 추가 -->
+                <button class="filter-btn" id="filtericon">
+                    <img src="/images/filter.png" alt="필터">
+                </button>
+            </div>
+
+            <img src="/images/onlybob.png" id="bob">
+        </div>
+
+        <!-- 필터링 창 -->
+        <div class="filter-box" id="filter-box">
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-target="filter-who">주최</button>
+                <button class="filter-tab" data-target="filter-type">공모전 유형</button>
+                <button class="filter-tab" data-target="filter-lang">코딩 언어</button>
+                <button class="filter-tab" data-target="filter-level">난이도</button>
+                <button class="filter-tab" data-target="filter-prize">상금</button>
+                <button class="filter-tab" data-target="filter-location">지역</button>
+            </div>
+
+            <div class="filter-content">
+                <div class="filter-category active" id="filter-who">
+                    <button class="filter-option">기업</button>
+                    <button class="filter-option">외부</button>
+                </div>
+
+                <div class="filter-category" id="filter-type">
+                    <button class="filter-option">해커톤</button>
+                    <button class="filter-option">알고리즘</button>
+                    <button class="filter-option">오픈소스</button>
+                    <button class="filter-option">앱</button>
+                </div>
+
+                <div class="filter-category" id="filter-lang">
+                    <button class="filter-option">Python</button>
+                    <button class="filter-option">JavaScript</button>
+                    <button class="filter-option">Java</button>
+                    <button class="filter-option">C++</button>
+                    <button class="filter-option">Kotlin</button>
+                    <button class="filter-option">Swift</button>
+                    <button class="filter-option">SQL</button>
+                    <button class="filter-option">React</button>
+                    <button class="filter-option">Node</button>
+                    <button class="filter-option">기타</button>
+                </div>
+
+                <div class="filter-category" id="filter-level">
+                    <button class="filter-option">초급</button>
+                    <button class="filter-option">중급</button>
+                    <button class="filter-option">고급</button>
+                </div>
+
+                <div class="filter-category" id="filter-prize">
+                    <button class="filter-option">100만원 이하</button>
+                    <button class="filter-option">100~500만원</button>
+                    <button class="filter-option">500만원 이상</button>
+                </div>
+
+                <div class="filter-category" id="filter-location">
+                    <button class="filter-option">서울</button>
+                    <button class="filter-option">경기도</button>
+                    <button class="filter-option">인천</button>
+                    <button class="filter-option">부산</button>
+                    <button class="filter-option">대구</button>
+                    <button class="filter-option">인천</button>
+                    <button class="filter-option">광주</button>
+                    <button class="filter-option">대전</button>
+                    <button class="filter-option">울산</button>
+                    <button class="filter-option">세종</button>
+                    <button class="filter-option">강원</button>
+                    <button class="filter-option">충북</button>
+                    <button class="filter-option">충남</button>
+                    <button class="filter-option">전북</button>
+                    <button class="filter-option">전남</button>
+                    <button class="filter-option">경북</button>
+                    <button class="filter-option">경남</button>
+                    <button class="filter-option">제주</button>
+                </div>
+
+                <div class="selected-filters" id="selected-filters"></div>
+
+                <button class="clear-filters" id="clear-filters">설정 초기화</button>
+                <div class="filter-buttons">
+                    <button class="view-results">결과 보기</button>
+
+                    <button class="close-filter" id="filter-close">필터 창 닫기</button>
+                </div>
+            </div>
+        </div>
+
+        <table class="contest-table">
+            <thead>
+            <tr>
+                <th>공모명</th>
+                <th>주최</th>
+                <th>남은 기간</th>
+                <th>진행 일정</th>
+                <th>현황</th>
+            </tr>
+            </thead>
+            <tbody id="contest-body">
+            <!-- Thymeleaf 반복문으로 프로젝트 데이터 출력 -->
+            <tr th:each="contest : ${contests}">
+                <td th:text="${contest.title}">공모전 제목</td>
+                <td th:text="${contest.host}">주최 기관</td>
+                <td th:text="'D-' + ${contest.remainingDays}">D-5456</td>
+                <td th:text="${contest.startDate} + ' ~ ' + ${contest.endDate}">2024.01.01 ~ 2024.06.30</td>
+                <td th:text="${contest.status}">진행 중</td>
+                <td>
+                    <input type="checkbox" class="contest-checkbox">
+                </td> <!-- 체크박스 추가 -->
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var searchIcon = document.getElementById("searchicon");
+        var searchBox = document.getElementById("search-box");
+        var searchClose = document.getElementById("search-close");
+
+        var filterIcon = document.getElementById("filtericon");
+        var filterBox = document.getElementById("filter-box");
+        var filterClose = document.getElementById("filter-close");
+        var selectedFilters = document.getElementById("selected-filters");
+        var filterOptions = document.querySelectorAll(".filter-option");
+        var filterTabs = document.querySelectorAll(".filter-tab");
+        var filterContents = document.querySelectorAll(".filter-category");
+
+        var clearFiltersBtn = document.getElementById("clear-filters"); // 전체 삭제 버튼
+
+        // 검색 버튼 클릭 시 검색창이 필터 옆에 나타남
+        searchIcon.addEventListener("click", function () {
+            searchBox.classList.toggle("active");
+        });
+
+        // 닫기 버튼 클릭 시 검색창 숨기기
+        searchClose.addEventListener("click", function () {
+            searchBox.classList.remove("active");
+        });
+
+        // 필터 버튼 클릭 시 필터 창 표시
+        filterIcon.addEventListener("click", function () {
+            filterBox.classList.toggle("active");
+        });
+
+        // 필터 닫기 버튼 클릭 시 필터 창 숨기기
+        filterClose.addEventListener("click", function () {
+            filterBox.classList.remove("active");
+        });
+
+        // ✅ 필터 옵션 선택 시 추가 (중복 방지 + 제거 기능 추가)
+        filterOptions.forEach(option => {
+            option.addEventListener("click", function () {
+                let existingFilter = document.querySelector(`.selected-item[data-filter="${option.textContent}"]`);
+
+                if (existingFilter) {
+                    // 이미 선택된 경우 → 삭제
+                    option.classList.remove("selected");
+                    existingFilter.remove();
+                } else {
+                    // 선택되지 않은 경우 → 추가
+                    option.classList.add("selected");
+
+                    let selected = document.createElement("div");
+                    selected.classList.add("selected-item");
+                    selected.textContent = option.textContent;
+                    selected.setAttribute("data-filter", option.textContent);
+
+                    // 선택된 필터 클릭 시 삭제 기능 추가
+                    selected.addEventListener("click", function () {
+                        option.classList.remove("selected");
+                        selected.remove();
+                    });
+
+                    selectedFilters.appendChild(selected);
+                }
+            });
+        });
+
+        // ✅ 필터 탭 전환 기능 (한 번에 하나만 표시)
+        filterTabs.forEach(tab => {
+            tab.addEventListener("click", function () {
+                filterTabs.forEach(t => t.classList.remove("active"));
+                this.classList.add("active");
+
+                filterContents.forEach(content => content.classList.remove("active"));
+
+                var target = this.getAttribute("data-target");
+                document.getElementById(target).classList.add("active");
+            });
+        });
+
+        // ✅ 필터 전체 삭제 버튼 기능 추가
+        clearFiltersBtn.addEventListener("click", function () {
+            selectedFilters.innerHTML = ""; // 선택된 필터 전체 삭제
+            filterOptions.forEach(option => option.classList.remove("selected")); // 버튼 선택 해제
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var deleteButton = document.getElementById("delete-selected");
+
+        // 삭제 버튼 클릭 시 선택된 항목 삭제
+        deleteButton.addEventListener("click", function () {
+            var checkboxes = document.querySelectorAll(".contest-checkbox:checked"); // 체크된 항목 찾기
+
+            if (checkboxes.length === 0) {
+                alert("삭제할 항목을 선택해주세요.");
+                return;
+            }
+
+            checkboxes.forEach(function (checkbox) {
+                checkbox.closest("tr").remove(); // 체크된 행 삭제
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
+</title>
+</head>
+<body>
+
+</body>
+</html>

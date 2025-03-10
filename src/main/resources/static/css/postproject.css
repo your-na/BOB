@@ -176,3 +176,9 @@
     display: flex;
     gap: 10px;
 }
+/* 팀 신청 중인 경우 버튼 색상 변경 */
+.apply-btn-applied {
+    background-color: orange;  /* 주황색 */
+    color: white;
+    cursor: not-allowed;  /* 클릭 방지 */
+}
