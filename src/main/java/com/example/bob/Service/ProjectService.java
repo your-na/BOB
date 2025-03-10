@@ -34,21 +34,17 @@ public class ProjectService {
     private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
 
     @PersistenceContext
-<<<<<<< HEAD
+
     private EntityManager entityManager;  // ✅ EntityManager 주입
-=======
-    private EntityManager entityManager;  // EntityManager 주입
->>>>>>> origin/develop
+
+    
 
     /**
      * ✅ 모든 프로젝트를 DTO로 변환하여 반환
      */
     public List<ProjectDTO> getAllProjectsDTO() {
-<<<<<<< HEAD
-        return projectRepository.findAllActiveProjects().stream()  // ✅ INACTIVE 상태 제외
-=======
+
         return projectRepository.findAllActiveProjects().stream()  // INACTIVE 상태 제외
->>>>>>> origin/develop
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -67,15 +63,13 @@ public class ProjectService {
      */
     @Transactional
     public ProjectEntity saveProject(ProjectEntity project) {
-<<<<<<< HEAD
         logger.info("🚀 프로젝트 저장 전 모집 종료일: {}", project.getRecruitmentEndDate()); // 🚀 로그 추가
 
         project.updateStatus(); // ✅ 상태 업데이트
-=======
+
         logger.info("🚀 프로젝트 저장 전 모집 종료일: {}", project.getRecruitmentEndDate()); // 로그 추가
 
         project.updateStatus(); // 상태 업데이트
->>>>>>> origin/develop
         ProjectEntity savedProject = projectRepository.save(project);
 
         logger.info("✅ 저장된 프로젝트의 모집 종료일: {}", savedProject.getRecruitmentEndDate()); // 로그 추가
@@ -135,13 +129,12 @@ public class ProjectService {
                     .build();
 
             projectHistoryRepository.save(history);
-<<<<<<< HEAD
+
             entityManager.flush(); // 🚀 즉시 DB 반영
             entityManager.clear(); // 🚀 Hibernate가 DELETE 시 히스토리를 날리는 것 방지
-=======
+
             entityManager.flush(); // 즉시 DB 반영
             entityManager.clear(); // Hibernate가 DELETE 시 히스토리를 날리는 것 방지
->>>>>>> origin/develop
 
             logger.info("✅ 프로젝트 히스토리 저장됨: " + history);
 
@@ -179,11 +172,10 @@ public class ProjectService {
             project.setRecruitmentCount(recruitmentCount);
         }
 
-<<<<<<< HEAD
         project.updateStatus(); // ✅ 업데이트 후 상태도 변경
-=======
+
         project.updateStatus(); // 업데이트 후 상태도 변경
->>>>>>> origin/develop
+
         ProjectEntity updatedProject = projectRepository.save(project);
         saveProjectHistory(updatedProject, "수정됨");
         return updatedProject;
@@ -250,8 +242,6 @@ public class ProjectService {
                 projectEntity.getRecruitmentEndDate()
         );
     }
-<<<<<<< HEAD
-=======
 
     /**
      * ✅ 사용자가 만든 프로젝트 목록을 반환
@@ -274,5 +264,4 @@ public class ProjectService {
                 .map(userProject -> convertToDTO(userProject.getProject()))
                 .collect(Collectors.toList());
     }
->>>>>>> origin/develop
 }
