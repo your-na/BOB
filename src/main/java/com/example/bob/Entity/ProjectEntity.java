@@ -73,31 +73,6 @@ public class ProjectEntity {
     @Column(nullable = false)
     private int currentParticipants; // 실제 참여 인원
 
-<<<<<<< HEAD
-    @OneToMany(mappedBy = "project", cascade = CascadeType.PERSIST, orphanRemoval = false)
-    private List<ProjectHistoryEntity> history;
-
-    public void setDDay(String dDay) {
-        this.dDay = dDay;
-    }
-
-    // ✅ 상태를 한글로 자동 설정 (모집중 / 진행중)
-    public void updateStatus() {
-        if (this.startDate.isBefore(LocalDate.now())) {
-            this.status = "진행중"; // ✅ 시작일이 지나면 진행중
-        } else {
-            this.status = "모집중"; // ✅ 기본값
-        }
-    }
-
-    @PrePersist
-    public void prePersist() {
-        if (this.recruitmentStartDate == null) {
-            this.recruitmentStartDate = LocalDate.now();
-        }
-    }
-}
-=======
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectHistoryEntity> projectHistoryEntities = new ArrayList<>();
 
@@ -132,8 +107,7 @@ public class ProjectEntity {
             this.dDay = daysBetween;  // 남은 일수
         }
     }
-    }
+}
 
 
 
->>>>>>> origin/main

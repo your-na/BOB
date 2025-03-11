@@ -28,20 +28,13 @@ public class UserProjectEntity {
 
     private LocalDate joinDate; // 사용자가 프로젝트에 참여한 날짜
 
-<<<<<<< HEAD
-    private String status; // 사용자의 참여 상태 (참여중, 완료 등)
-=======
     @Enumerated(EnumType.STRING)
     private Status status = Status.신청중; // 기본값을 신청중으로 설정
->>>>>>> origin/main
 
     // 역할 (프로젝트 생성자라면 주최, 그렇지 않으면 참여)
     public String getRole() {
         return project.getCreatedBy().equals(user.getUserNick()) ? "주최" : "참여";
     }
-<<<<<<< HEAD
-}
-=======
 
     // 상태 값 enum
     public enum Status {
@@ -57,4 +50,3 @@ public class UserProjectEntity {
     }
 }
 
->>>>>>> origin/main

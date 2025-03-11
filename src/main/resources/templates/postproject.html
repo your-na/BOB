@@ -77,14 +77,6 @@
     <div class="content" th:text="${project.description}">프로젝트 설명 내용</div>
 </div>
 
-<<<<<<< HEAD
-<!-- 프로젝트 신청 페이지로 이동하는 버튼 -->
-<form action="/projectapplication" method="get">
-    <input type="hidden" name="projectId" th:value="${project.id}">
-    <button type="submit" class="apply-btn">팀 신청하기</button>
-</form>
-
-=======
 <!-- 팀 신청하기 버튼 -->
 <form action="/projectapplication" method="get">
     <input type="hidden" name="projectId" th:value="${project.id}">
@@ -105,7 +97,6 @@
 
 
 
->>>>>>> origin/main
 
 <hr>
 
