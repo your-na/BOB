@@ -87,16 +87,18 @@
     line-height: 24px; /* 입력 필드 높이와 일치 */
 }
 
+/* 진행일정 날짜 입력 박스 크기 조정 */
 #start-date, #end-date {
-    width: 100px;
+    width: 100px;  /* 크기 조정 */
     height: 24px;
     font-size: 12px;
     padding: 2px;
-    box-sizing: border-box; /* 패딩 포함 크기 계산 */
+    box-sizing: border-box;
 }
 
-#startdate, #enddate {
-    width: 100px;
+/* 모집일정 날짜 박스 크기 조정 */
+#recruitment-start-date, #recruitment-end-date {
+    width: 100px;  /* 크기 동일하게 설정 */
     height: 24px;
     font-size: 12px;
     padding: 2px;
