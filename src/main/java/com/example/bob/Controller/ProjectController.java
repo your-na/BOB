@@ -323,7 +323,7 @@ public class ProjectController {
     }
     @GetMapping("/prohistory")
     public String showsuccessForm() {
-        return "prohistory";
+        return "projecthistory";
     }
 
 }
