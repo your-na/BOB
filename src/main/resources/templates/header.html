@@ -29,7 +29,11 @@
                                 <ul>
                                     <li><a th:href="@{/project}">프로젝트</a></li> <!-- ✅ 기존 "project" 제거하고 올바른 경로로 변경 -->
                                     <li><a href="bw">프로젝트 생성</a></li>
+<<<<<<< HEAD
                                     <li><a href="myproject">MY 프로젝트</a></li>
+=======
+                                    <li><a href="myproject">마이 프로젝트</a></li>
+>>>>>>> origin/main
                                     <li><a href="#">찜한 프로젝트</a></li>
                                 </ul>
                             </div>
@@ -94,18 +98,18 @@
         </nav>
         <!-- 📩 알림창 -->
         <form>
-        <div class="notification-box" id="notification-box">
-            <div class="notification-header">
-                <h3>알림</h3>
-                <button id="close-notification">&times;</button>
+            <div class="notification-box" id="notification-box">
+                <div class="notification-header">
+                    <h3>알림</h3>
+                    <button id="close-notification">&times;</button>
+                </div>
+                <ul id="notification-list">
+                    <!-- 알림 데이터가 여기에 동적으로 추가됨 -->
+                </ul>
+                <div class="notification-footer">
+                    <button id="clear-all">모두 삭제</button>
+                </div>
             </div>
-            <ul id="notification-list">
-                <!-- 알림 데이터가 여기에 동적으로 추가됨 -->
-            </ul>
-            <div class="notification-footer">
-                <button id="clear-all">모두 삭제</button>
-            </div>
-        </div>
         </form>
         <script>
             document.addEventListener("DOMContentLoaded", () => {

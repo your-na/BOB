@@ -239,6 +239,7 @@ public class ProjectService {
             throw new IllegalArgumentException("이미 신청한 프로젝트입니다.");
         }
 
+<<<<<<< HEAD
         // 신청자 정보 저장
         UserProjectEntity userProjectEntity = UserProjectEntity.builder()
                 .user(user)
@@ -247,6 +248,17 @@ public class ProjectService {
                 .status("참여중")
                 .build();
         userProjectRepository.save(userProjectEntity);
+=======
+        // 객체 생성
+        UserProjectEntity userProject = UserProjectEntity.builder()
+                .user(user)
+                .project(project)
+                .joinDate(LocalDate.now())
+                .status(UserProjectEntity.Status.신청중)  // enum 값으로 설정
+                .build();
+        userProjectRepository.save(userProject);  // 변수명을 일관되게 사용
+
+>>>>>>> origin/main
 
         // 프로젝트의 모집 인원 업데이트
         project.setCurrentParticipants(project.getCurrentParticipants() + 1);
@@ -262,4 +274,16 @@ public class ProjectService {
         // 예: 신청 메시지를 저장하거나 추가적인 처리 수행
     }
 
+<<<<<<< HEAD
+=======
+    // 신청 여부 확인 메서드 추가
+    @Transactional(readOnly = true)
+    public boolean isUserAppliedToProject(Long projectId, UserEntity user) {
+        // Optional을 처리하여, 값이 있으면 UserProjectEntity, 없으면 null 반환
+        UserProjectEntity userProject = userProjectRepository.findByProjectIdAndUserId(projectId, user.getUserId())
+                .orElse(null);
+        return userProject != null;  // 신청 내역이 있으면 true, 없으면 false
+    }
+
+>>>>>>> origin/main
 }

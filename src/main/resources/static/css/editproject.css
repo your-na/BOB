@@ -93,7 +93,7 @@
     height: 24px;
     font-size: 12px;
     padding: 2px;
-    box-sizing: border-box;
+    box-sizing: border-box; /* 패딩 포함 크기 계산 */
 }
 
 /* 모집일정 날짜 박스 크기 조정 */
@@ -104,6 +104,7 @@
     padding: 2px;
     box-sizing: border-box;
 }
+
 .bw {
     margin-left: 60%;
 }
@@ -126,6 +127,7 @@
 #custom-input-group {
     margin-top: -20px;
 }
+
 .submit-btn {
     margin-left: 45%;
     display: inline-block;

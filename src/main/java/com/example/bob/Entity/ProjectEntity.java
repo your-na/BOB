@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,8 +64,8 @@ public class ProjectEntity {
     @Column(length = 500)
     private String description; // 프로젝트 설명
 
-    @Transient
-    private String dDay;
+    @Column(nullable = true)
+    private Long dDay;  // long -> Long로 변경
 
     @ElementCollection
     private List<Long> likedUsers = new ArrayList<>(); // 좋아요 누른 유저들
@@ -72,6 +73,7 @@ public class ProjectEntity {
     @Column(nullable = false)
     private int currentParticipants; // 실제 참여 인원
 
+<<<<<<< HEAD
     @OneToMany(mappedBy = "project", cascade = CascadeType.PERSIST, orphanRemoval = false)
     private List<ProjectHistoryEntity> history;
 
@@ -95,3 +97,43 @@ public class ProjectEntity {
         }
     }
 }
+=======
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectHistoryEntity> projectHistoryEntities = new ArrayList<>();
+
+    // ✅ 상태를 한글로 자동 설정 (모집중 / 진행중)
+    public void updateStatus() {
+        LocalDate today = LocalDate.now();
+
+        // 모집 종료일 기준으로 상태 업데이트
+        if (today.isAfter(this.recruitmentEndDate)) {
+            this.status = "진행중"; // 모집 종료일이 지나면 진행중
+        } else {
+            this.status = "모집중"; // 모집 종료일 전에는 모집중
+        }
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void calculateDDay() {
+        LocalDate today = LocalDate.now();  // 오늘 날짜
+        LocalDate endDate = this.recruitmentEndDate;  // 모집 종료일
+
+        if (endDate == null) {
+            this.dDay = 0L;  // 종료일이 없으면 디데이는 0으로 설정
+            return;
+        }
+
+        long daysBetween = today.until(endDate, ChronoUnit.DAYS);  // 오늘부터 종료일까지의 일수 계산
+
+        if (daysBetween < 0) {
+            this.dDay = 0L;  // 종료일이 이미 지나면 D-Day는 0
+        } else {
+            this.dDay = daysBetween;  // 남은 일수
+        }
+    }
+    }
+
+
+
+>>>>>>> origin/main

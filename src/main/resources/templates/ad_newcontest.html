@@ -16,6 +16,7 @@
     <h2>공모전 등록</h2>
 
     <form>
+<<<<<<< HEAD
     <div class="form-container">
         <!-- 공모전 포스터 업로드 -->
         <div class="poster-upload">
@@ -79,11 +80,77 @@
         <button class="register-btn" id="register-btn">등록하기</button>
         <button class="cancel-btn" id="cancel-btn">취소하기</button>
     </div>
+=======
+        <div class="form-container">
+            <!-- 공모전 포스터 업로드 -->
+            <div class="poster-upload">
+                <input type="file" id="poster-input" accept="image/*">
+                <img id="poster-preview" src="/images/placeholder.png" alt="공모전 포스터를 삽입해주세요.">
+            </div>
+
+
+            <!-- 공모전 정보 입력 -->
+            <table class="contest-table">
+                <tr>
+                    <th>공모전명</th>
+                    <td><input type="text" id="contest-title" placeholder="공모전명을 입력하세요"></td>
+                </tr>
+                <tr>
+                    <th>주최/주관</th>
+                    <td><input type="text" id="contest-host"></td>
+                </tr>
+                <tr>
+                    <th>대표분야</th>
+                    <td><input type="text" id="contest-field"></td>
+                </tr>
+                <tr>
+                    <th>참가대상</th>
+                    <td><input type="text" id="contest-target"></td>
+                </tr>
+                <tr>
+                    <th>대회지역</th>
+                    <td><input type="text" id="contest-region"></td>
+                </tr>
+                <tr>
+                    <th>진행기간</th>
+                    <td>
+                        <input type="date" id="contest-start"> ~
+                        <input type="date" id="contest-end">
+                    </td>
+                </tr>
+                <tr>
+                    <th>심사기관</th>
+                    <td><input type="text" id="contest-judge"></td>
+                </tr>
+                <tr>
+                    <th>시상내역</th>
+                    <td><input type="text" id="contest-prize"></td>
+                </tr>
+                <tr>
+                    <th>응모 방법</th>
+                    <td><input type="text" id="contest-method"></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 상세 내용 입력 -->
+        <div class="details-container">
+            <h3>상세 내용</h3>
+            <textarea id="contest-details" placeholder="상세 내용을 입력하세요"></textarea>
+        </div>
+
+        <!-- 등록/취소 버튼 -->
+        <div class="button-container">
+            <button class="register-btn" id="register-btn">등록하기</button>
+            <button class="cancel-btn" id="cancel-btn">취소하기</button>
+        </div>
+>>>>>>> origin/main
     </form>
 </section>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+<<<<<<< HEAD
     const posterInput = document.getElementById("poster-input");
     const posterPreview = document.getElementById("poster-preview");
     const registerBtn = document.getElementById("register-btn");
@@ -129,6 +196,53 @@
         }
     });
 });
+=======
+        const posterInput = document.getElementById("poster-input");
+        const posterPreview = document.getElementById("poster-preview");
+        const registerBtn = document.getElementById("register-btn");
+        const cancelBtn = document.getElementById("cancel-btn");
+
+        // 포스터 이미지 업로드 및 미리보기 기능
+        posterInput.addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    posterPreview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 등록 버튼 클릭 시 데이터 콘솔 출력 (백엔드 연동 시 서버로 전송 가능)
+        registerBtn.addEventListener("click", function () {
+            const contestData = {
+                title: document.getElementById("contest-title").value,
+                host: document.getElementById("contest-host").value,
+                field: document.getElementById("contest-field").value,
+                target: document.getElementById("contest-target").value,
+                region: document.getElementById("contest-region").value,
+                startDate: document.getElementById("contest-start").value,
+                endDate: document.getElementById("contest-end").value,
+                judge: document.getElementById("contest-judge").value,
+                prize: document.getElementById("contest-prize").value,
+                method: document.getElementById("contest-method").value,
+                details: document.getElementById("contest-details").value
+            };
+
+            console.log("공모전 데이터:", contestData);
+            alert("공모전이 등록되었습니다!");
+        });
+
+        // 취소 버튼 클릭 시 입력값 초기화
+        cancelBtn.addEventListener("click", function () {
+            if (confirm("입력한 내용을 모두 초기화하시겠습니까?")) {
+                document.querySelector("form").reset();
+                posterPreview.src = "/images/placeholder.png";
+            }
+        });
+    });
+>>>>>>> origin/main
 </script>
 </body>
 </html>

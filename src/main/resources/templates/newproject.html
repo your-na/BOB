@@ -23,18 +23,18 @@
       <div class="form-group">
         <label for="project-dates">진행 일정</label>
         <div class="date-inputs">
-          <input type="date" id="start-date" name="start-date">
+          <input type="date" id="start-date" name="start-date" required>
           <span>~</span>
-          <input type="date" id="end-date" name="end-date">
+          <input type="date" id="end-date" name="end-date" required>
         </div>
       </div>
 
       <div class="form-group">
         <label for="party-dates">모집 일정</label>
         <div class="date-inputs">
-          <input type="date" id="startdate" name="recruitment-start-date">
+          <input type="date" id="recruitment-start-date" name="recruitment-start-date" required>
           <span>~</span>
-          <input type="date" id="enddate" name="recruitment-end-date">
+          <input type="date" id="recruitment-end-date" name="recruitment-end-date" required>
         </div>
       </div>
 
@@ -46,10 +46,10 @@
             <option value="1">1명</option>
             <option value="2">2명</option>
             <option value="3">3명</option>
-            <option value="plus">기타</option>
+            <option value="plus">기타</option> <!-- 기타 선택 시 직접 입력 가능 -->
           </select>
           <div id="custom-input-group" style="display: none; display: flex; align-items: center;">
-            <input type="text" id="custom-recruitment" name="custom-recruitment" placeholder="직접 입력">
+            <input type="number" id="custom-recruitment" name="custom-recruitment" placeholder="직접 입력" />
             <p style="margin-left: 5px;">명</p>
           </div>
         </div>
@@ -58,18 +58,18 @@
       <br>
       <div class="form-group">
         <label for="project-name">프로젝트 주제</label>
-        <input type="text" id="project-name" name="project-name" placeholder="프로젝트명을 입력하세요.">
+        <input type="text" id="project-name" name="project-name" placeholder="프로젝트명을 입력하세요." required>
       </div>
 
       <br>
       <div class="form-group">
         <label for="project-goal">프로젝트 목표</label>
-        <textarea id="project-goal" name="project-goal" placeholder="프로젝트 목표를 간단히 입력해주세요."></textarea>
+        <textarea id="project-goal" name="project-goal" placeholder="프로젝트 목표를 간단히 입력해주세요." required></textarea>
       </div>
 
       <div class="form-group">
         <label for="project-description">프로젝트 내용</label>
-        <textarea id="project-description" name="project-description" placeholder="프로젝트 내용을 입력해주세요."></textarea>
+        <textarea id="project-description" name="project-description" placeholder="프로젝트 내용을 입력해주세요." required></textarea>
       </div>
 
       <br>
@@ -84,8 +84,7 @@
 </main>
 
 <script>
-  // ✅ 페이지 로드 후 실행
-  document.addEventListener("DOMContentLoaded", function() {
+  document.addEventListener("DOMContentLoaded", function () {
     let today = new Date().toISOString().split("T")[0];
 
     let startDateInput = document.getElementById("start-date");
@@ -93,7 +92,7 @@
 
     startDateInput.setAttribute("min", today);
 
-    startDateInput.addEventListener("change", function() {
+    startDateInput.addEventListener("change", function () {
       let startDate = startDateInput.value;
       if (startDate < today) {
         alert("시작 날짜는 오늘 이후로 선택해야 합니다!");
@@ -103,7 +102,7 @@
       endDateInput.setAttribute("min", startDate);
     });
 
-    endDateInput.addEventListener("change", function() {
+    endDateInput.addEventListener("change", function () {
       let startDate = startDateInput.value;
       let endDate = endDateInput.value;
       if (endDate < startDate) {
@@ -112,6 +111,7 @@
       }
     });
 
+    // 기본값 설정
     if (startDateInput.value < today) {
       startDateInput.value = today;
     }
@@ -123,10 +123,9 @@
       customInputGroup.style.display = "none";
     }
 
-    recruitmentSelect.addEventListener("change", function() {
+    recruitmentSelect.addEventListener("change", function () {
       if (this.value === "plus") {
         customInputGroup.style.display = "flex";
-        customInputGroup.style.alignItems = "center";
       } else {
         customInputGroup.style.display = "none";
       }

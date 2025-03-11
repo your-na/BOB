@@ -19,7 +19,7 @@ import java.util.List;
 public class UserEntity {
 
     @Id // PK
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //자동 증가 id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // 자동 증가 id
     private Long userId;
 
     @Column(length = 100, unique = true)
@@ -50,7 +50,7 @@ public class UserEntity {
     private String Birthday;
 
     @Column(length = 255)
-    private String profileImageUrl = "/images/user.png"; //기본 이미지 경로
+    private String profileImageUrl = "/images/user.png"; // 기본 이미지 경로
 
     @Column(name = "account_created_at")
     private LocalDateTime accountCreatedAt; // 계정 생성 날짜
@@ -83,7 +83,7 @@ public class UserEntity {
         return userEntity;
     }
 
-    //프로필 이미지 URL을 설정하는 메서드
+    // 프로필 이미지 URL을 설정하는 메서드
     public void setProfileImage(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
     }
@@ -91,5 +91,10 @@ public class UserEntity {
     // UserHistory 추가
     public void addHistory(UserHistoryEntity history) {
         this.userHistories.add(history);
+    }
+
+    // 사용자 ID 반환하는 메서드 추가
+    public Long getId() {
+        return this.userId;
     }
 }
