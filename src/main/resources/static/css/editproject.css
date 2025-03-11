@@ -102,28 +102,59 @@
     padding: 2px;
     box-sizing: border-box;
 }
-.bw {
-    margin-left: 60%;
-}
+
+/* 모집 인원 */
 #recruitment {
-    width: 80px;
-    height: 24px;
+    width: 120px;
+    height: 30px;
     font-size: 14px;
-    padding: 2px;
+    padding: 5px;
     box-sizing: border-box;
 }
 
 #custom-recruitment {
-    width: 80px;
-    height: 24px;
+    width: 100px;
+    height: 30px;
     font-size: 14px;
-    padding: 2px;
+    padding: 5px;
     box-sizing: border-box;
 }
 
 #custom-input-group {
-    margin-top: -20px;
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
 }
+
+#custom-input-group input {
+    margin-left: 5px;
+}
+
+/* 모집 인원 네모 박스 스타일 */
+.form-group select, #custom-recruitment {
+    background-color: rgba(188, 188, 188, 0.18); /* 배경색 */
+    border: 1px solid #ddd;
+    font-size: 14px;
+    color: #333;
+    padding: 10px;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+/* 추가된 날짜 입력 필드와 일관되게 스타일 적용 */
+#recruitment {
+    width: 120px;
+    height: 30px;
+    font-size: 14px;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.bwbw {
+    display: flex;
+    gap: 10px;
+}
+
 .submit-btn {
     margin-left: 45%;
     display: inline-block;
@@ -158,10 +189,6 @@
 .ynbw {
     text-decoration: none;
     color: #838383;
-}
-
-.bwbw {
-    display: flex;
 }
 
 .btn {

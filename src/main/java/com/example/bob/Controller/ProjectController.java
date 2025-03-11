@@ -13,6 +13,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -123,6 +125,7 @@ public class ProjectController {
     }
 
     // 프로젝트 생성 처리
+    // 프로젝트 생성 처리
     @PostMapping("/bw")
     public String createProject(@RequestParam("project-name") String projectName,
                                 @RequestParam("project-description") String projectDescription,
@@ -132,7 +135,7 @@ public class ProjectController {
                                 @RequestParam("recruitment-start-date") String recruitmentStartStr,
                                 @RequestParam("recruitment-end-date") String recruitmentEndStr,
                                 @RequestParam("recruitment") String recruitmentStr,
-                                @RequestParam(value = "recruitmentCount", required = false) String recruitmentCountStr,
+                                @RequestParam(value = "custom-recruitment", required = false) String recruitmentCountStr,
                                 @AuthenticationPrincipal UserDetailsImpl userDetails,
                                 Model model) {
 
@@ -144,11 +147,14 @@ public class ProjectController {
         LocalDate recruitmentStartDate = LocalDate.parse(recruitmentStartStr, formatter);
         LocalDate recruitmentEndDate = LocalDate.parse(recruitmentEndStr, formatter);
 
+        // 모집 인원 처리
         int recruitment = 0;
-        if ("기타".equals(recruitmentStr)) {
+
+        if ("plus".equals(recruitmentStr)) {
+            // '기타'가 선택되었을 경우, 커스텀 입력을 받은 값 처리
             try {
                 if (recruitmentCountStr != null && !recruitmentCountStr.isEmpty()) {
-                    recruitment = Integer.parseInt(recruitmentCountStr);
+                    recruitment = Integer.parseInt(recruitmentCountStr); // 숫자 변환
                 }
             } catch (NumberFormatException e) {
                 model.addAttribute("error", "잘못된 모집 인원 값입니다.");
@@ -156,13 +162,14 @@ public class ProjectController {
             }
         } else {
             try {
-                recruitment = Integer.parseInt(recruitmentStr);
+                recruitment = Integer.parseInt(recruitmentStr); // 기존 방식
             } catch (NumberFormatException e) {
                 model.addAttribute("error", "잘못된 모집 인원 값입니다.");
                 return "newproject";
             }
         }
 
+        // 프로젝트 생성
         ProjectEntity newProject = ProjectEntity.builder()
                 .title(projectName)
                 .description(projectDescription)
@@ -174,7 +181,7 @@ public class ProjectController {
                 .recruitmentStartDate(recruitmentStartDate)
                 .recruitmentEndDate(recruitmentEndDate)
                 .recruitmentPeriod(recruitment)
-                .recruitmentCount(recruitment)
+                .recruitmentCount(recruitment) // 올바르게 설정
                 .views(0)
                 .likes(0)
                 .status("모집중")
@@ -183,6 +190,9 @@ public class ProjectController {
         ProjectEntity savedProject = projectService.saveProject(newProject);
         return "redirect:/postproject/" + savedProject.getId();
     }
+
+
+
 
     // 프로젝트 수정 페이지로 이동
     @GetMapping("/postproject/{id}/edit")
