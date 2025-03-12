@@ -224,31 +224,31 @@ public class ProjectService {
      * ✅ 사용자가 참가한 프로젝트 목록을 반환
      */
     public List<ProjectDTO> getJoinedProjects(UserEntity user) {
-        // UserEntity를 사용하여 사용자가 참가한 프로젝트 목록을 조회
-        List<UserProjectEntity> userProjects = userProjectRepository.findByUser(user);
+        List<UserProjectEntity> userProjects = userProjectRepository.findByUserAndStatus(user, "accepted"); // ✅ 승인된 프로젝트만 조회
         return userProjects.stream()
                 .map(userProject -> convertToDTO(userProject.getProject()))
                 .collect(Collectors.toList());
     }
 
+
     public void applyForProject(Long projectId, UserEntity user) {
         ProjectEntity project = getProjectById(projectId);
 
-        // 이미 신청한 사용자가 아닌지 확인 (필요 시)
-        if (userProjectRepository.findByUser(user).stream().anyMatch(up -> up.getProject().equals(project))) {
+        // ✅ 신청한 적이 있는지 확인 (쿼리 한 번으로 처리)
+        if (userProjectRepository.existsByUserAndProject(user, project)) {
             throw new IllegalArgumentException("이미 신청한 프로젝트입니다.");
         }
 
-        // 신청자 정보 저장
+        // ✅ 신청 정보 저장 (처음에는 "승인 대기" 상태)
         UserProjectEntity userProjectEntity = UserProjectEntity.builder()
                 .user(user)
                 .project(project)
                 .joinDate(LocalDate.now())
-                .status("참여중")
+                .status("pending") // ✅ 처음에는 "승인 대기" 상태
                 .build();
         userProjectRepository.save(userProjectEntity);
 
-        // 프로젝트의 모집 인원 업데이트
+        // ✅ 프로젝트의 모집 인원 업데이트
         project.setCurrentParticipants(project.getCurrentParticipants() + 1);
         projectRepository.save(project);
     }
