@@ -1,99 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOB 사이트</title>
     <link rel="stylesheet" th:href="@{/css/header.css}">
+    <!-- CSRF 토큰을 위한 meta 태그 추가 (중복 제거) -->
+    <meta name="_csrf" content="${_csrf.token}" />
 </head>
-<div th:fragment="header">
-    <header>
-        <nav class="navigator">
-            <div class="nav-left">
-                <h3 class="site-name"><a href="/main">BOB</a></h3>
-                <ul class="nav-list">
-                    <li class="nav-item">
-                        <a href="#" class="nav-menu">공모전</a>
-                        <div class="all-dropdown-menu">
-                            <div class="dropdown-section">
-                                <ul>
-                                    <li><a href="contest">전체 공모전</a></li>
-                                    <li><a href="#">기업 공모전</a></li>
-                                    <li><a href="#">외부 공모전</a></li>
-                                    <li><a href="#">공모전 팀 모집</a></li>
-                                    <li><a href="#">공모전 활동</a></li>
-                                    <li><a href="#">찜한 공모전</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-menu">프로젝트</a>
-                        <div class="all-dropdown-menu">
-                            <div class="dropdown-section">
-                                <ul>
-                                    <li><a th:href="@{/project}">프로젝트</a></li> <!-- ✅ 기존 "project" 제거하고 올바른 경로로 변경 -->
-                                    <li><a href="bw">프로젝트 생성</a></li>
-                                    <li><a href="myproject">내가 쓴 프로젝트</a></li>
-                                    <li><a href="#">찜한 프로젝트</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-menu">구직</a>
-                        <div class="all-dropdown-menu">
-                            <div class="dropdown-section">
-                                <ul>
-                                    <li><a href="#">구인 공고</a></li>
-                                    <li><a href="#">포트폴리오 모음방</a></li>
-                                    <li><a href="#">신청한 구직 내역</a></li>
-                                    <li><a href="#">찜한 공고</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-menu">이력서</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-menu">게시판</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="nav-right">
-                <div class="search-bar-container">
-                    <form id="searchForm">
-                        <input type="text" name="kw" id="search_kw" class="search-bar" placeholder="검색어 입력" th:value="${kw}">
-                        <span class="search-icon"><img src="/images/search.png" alt=""></span>
-                    </form>
-                </div>
-                <a class="chatting-icon">
-                    <img src="/images/chatting.png" alt="">
-                </a>
-                <div class="nav-item1">
-                    <a class="user-icon">
-                        <img src="/images/user.png" alt="Profile Image">
-                    </a>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<header>
+    <nav class="navigator">
+        <div class="nav-left">
+            <h3 class="site-name"><a href="/main">BOB</a></h3>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="#" class="nav-menu">공모전</a>
                     <div class="all-dropdown-menu">
                         <div class="dropdown-section">
                             <ul>
-                                <!-- 로그인 상태일 때 -->
-                                <li th:if="${user != null}"><a href="/profile">내 정보 / 평점</a></li>
-                                <li th:if="${user != null}"><a href="#" class="notification-icon" id="notification-icon">알림</a><span class="notification-badge" id="notification-badge"></span></li>
-                                <li th:if="${user != null}"><a href="#">경력 내역</a></li>
-                                <li th:if="${user != null}"><a href="#">지원 현황</a></li>
-                                <li th:if="${user != null}">
-                                    <form id="logoutForm" th:action="@{/logout}" method="post">
-                                        <button type="submit" class="logout">로그아웃</button>
-                                    </form>
-                                </li>
-
-                                <!-- 비로그인 상태일 때 -->
-                                <li th:unless="${user != null}"><a href="/login" id="plz"><img src="/images/login.png">로그인 해주세요</a></li>
+                                <li><a href="contest">전체 공모전</a></li>
+                                <li><a href="#">기업 공모전</a></li>
+                                <li><a href="#">외부 공모전</a></li>
+                                <li><a href="#">공모전 팀 모집</a></li>
+                                <li><a href="#">공모전 활동</a></li>
+                                <li><a href="#">찜한 공모전</a></li>
                             </ul>
                         </div>
                     </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-menu">프로젝트</a>
+                    <div class="all-dropdown-menu">
+                        <div class="dropdown-section">
+                            <ul>
+                                <li><a th:href="@{/project}">프로젝트</a></li>
+                                <li><a href="bw">프로젝트 생성</a></li>
+                                <li><a href="myproject">MY 프로젝트</a></li>
+                                <li><a href="#">찜한 프로젝트</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-menu">구직</a>
+                    <div class="all-dropdown-menu">
+                        <div class="dropdown-section">
+                            <ul>
+                                <li><a href="#">구인 공고</a></li>
+                                <li><a href="#">포트폴리오 모음방</a></li>
+                                <li><a href="#">신청한 구직 내역</a></li>
+                                <li><a href="#">찜한 공고</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-menu">이력서</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-menu">게시판</a>
+                </li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <div class="search-bar-container">
+                <form id="searchForm">
+                    <input type="text" name="kw" id="search_kw" class="search-bar" placeholder="검색어 입력" th:value="${kw}">
+                    <span class="search-icon"><img src="/images/search.png" alt=""></span>
+                </form>
+            </div>
+            <a class="chatting-icon">
+                <img src="/images/chatting.png" alt="">
+            </a>
+            <div class="nav-item1">
+                <a class="user-icon">
+                    <img src="/images/user.png" alt="Profile Image">
+                </a>
+                <div class="all-dropdown-menu">
+                    <div class="dropdown-section">
+                        <ul>
+                            <!-- 로그인 상태일 때 -->
+                            <li th:if="${user != null}"><a href="/profile">내 정보 / 평점</a></li>
+                            <li th:if="${user != null}"><a href="#" class="notification-icon" id="notification-icon">알림</a><span class="notification-badge" id="notification-badge"></span></li>
+                            <li th:if="${user != null}"><a href="#">경력 내역</a></li>
+                            <li th:if="${user != null}"><a href="#">지원 현황</a></li>
+                            <li th:if="${user != null}">
+                                <form id="logoutForm" th:action="@{/logout}" method="post">
+                                    <button type="submit" class="logout">로그아웃</button>
+                                </form>
+                            </li>
+
+                            <!-- 비로그인 상태일 때 -->
+                            <li th:unless="${user != null}"><a href="/login" id="plz"><img src="/images/login.png">로그인 해주세요</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </nav>
-        <!-- 📩 알림창 -->
-        <form>
+        </div>
+    </nav>
+
+    <!-- 📩 알림창 -->
+    <form>
         <div class="notification-box" id="notification-box">
             <div class="notification-header">
                 <h3>알림</h3>
@@ -106,96 +117,176 @@
                 <button id="clear-all">모두 삭제</button>
             </div>
         </div>
-        </form>
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                const dropdownToggles = document.querySelectorAll(".dropdown-toggle");
+    </form>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const notificationIcon = document.getElementById("notification-icon");
+            const notificationBox = document.getElementById("notification-box");
+            const closeNotification = document.getElementById("close-notification");
+            const notificationList = document.getElementById("notification-list");
+            const notificationBadge = document.getElementById("notification-badge");
+            const clearAllButton = document.getElementById("clear-all");
 
-                dropdownToggles.forEach(toggle => {
-                    toggle.addEventListener("click", (e) => {
-                        e.preventDefault(); // 기본 동작 막기
-                        const parent = toggle.parentElement;
+            // ✅ 알림 목록 불러오기
+            fetchNotifications();
 
-                        // 다른 드롭다운 닫기
-                        document.querySelectorAll(".dropdown").forEach(dropdown => {
-                            if (dropdown !== parent) {
-                                dropdown.classList.remove("show");
-                            }
-                        });
+            // 🔔 알림 목록 렌더링
+            function renderNotifications(notifications) {
+                notificationList.innerHTML = ""; // 기존 목록 초기화
 
-                        // 현재 드롭다운 열기/닫기
-                        parent.classList.toggle("show");
-                    });
-                });
+                if (!Array.isArray(notifications)) {
+                    console.error("❌ 알림 목록 데이터가 배열이 아닙니다:", notifications);
+                    notificationList.innerHTML = "<li class='notification-item'>알림 목록을 불러올 수 없습니다.</li>";
+                    return;
+                }
 
-                // 페이지 클릭 시 드롭다운 닫기
-                document.addEventListener("click", (e) => {
-                    if (!e.target.closest(".dropdown")) {
-                        document.querySelectorAll(".dropdown").forEach(dropdown => {
-                            dropdown.classList.remove("show");
-                        });
-                    }
-                });
-            });
+                if (notifications.length === 0) {
+                    notificationList.innerHTML = "<li class='notification-item'>알림이 없습니다.</li>";
+                    notificationBadge.style.display = "none"; // 알림 배지 숨기기
+                    return;
+                }
 
-            //알림부분
-            document.addEventListener("DOMContentLoaded", function () {
-                const notificationIcon = document.getElementById("notification-icon");
-                const notificationBox = document.getElementById("notification-box");
-                const closeNotification = document.getElementById("close-notification");
-                const notificationList = document.getElementById("notification-list");
-                const notificationBadge = document.getElementById("notification-badge");
-                const clearAllButton = document.getElementById("clear-all");
+                notifications.forEach(notification => {
+                    console.log("📌 알림 데이터:", notification); // ✅ 알림 데이터 확인
 
-                // 가짜 알림 데이터 (백엔드에서 가져올 수 있음)
-                let notifications = [
-                    { id: 1, message: "새로운 댓글이 달렸습니다!", link: "/comments/1" },
-                    { id: 2, message: "새로운 프로젝트가 생성되었습니다!", link: "/projects/2" },
-                    { id: 3, message: "모집 마감이 임박했습니다!", link: "/projects/3" }
-                ];
-
-                // 🔔 알림 목록 렌더링
-                function renderNotifications() {
-                    notificationList.innerHTML = ""; // 기존 목록 초기화
-                    if (notifications.length === 0) {
-                        notificationList.innerHTML = "<li class='notification-item'>알림이 없습니다.</li>";
-                        notificationBadge.style.display = "none"; // 알림 배지 숨기기
+                    if (!notification.id) {
+                        console.error("❌ 알림 ID가 없습니다!", notification);
                         return;
                     }
 
-                    notifications.forEach(notification => {
-                        let item = document.createElement("li");
-                        item.classList.add("notification-item");
-                        item.textContent = notification.message;
-                        item.onclick = function () {
-                            window.location.href = notification.link; // 해당 페이지로 이동
-                        };
-                        notificationList.appendChild(item);
+                    let item = document.createElement("li");
+                    item.classList.add("notification-item");
+                    item.textContent = notification.message;
+
+                    // ✅ 알림 ID 및 프로젝트 ID를 data 속성에 저장
+                    item.setAttribute("data-id", notification.id);
+                    item.setAttribute("data-project-id", notification.projectId || "");
+                    item.setAttribute("data-user-id", notification.userId || "");
+
+                    // ✅ 알림 클릭 시 읽음 상태로 업데이트하고 페이지 이동
+                    item.onclick = function () {
+                        const notificationId = this.getAttribute("data-id");
+                        const projectId = this.getAttribute("data-project-id");
+                        const userId = this.getAttribute("data-user-id");
+
+                        console.log("🔍 클릭한 알림 ID:", notificationId);
+                        console.log("🔍 클릭한 프로젝트 ID:", projectId);
+                        console.log("🔍 클릭한 사용자 ID:", userId);
+
+                        if (!notificationId || notificationId === "undefined") {
+                            console.error("❌ 알림 ID가 유효하지 않습니다!");
+                            return;
+                        }
+
+                        markAsRead(notificationId); // 알림 읽음 처리
+
+                        // ✅ 프로젝트 ID가 있으면 팀 신청 수락/거절 페이지로 이동
+                        if (projectId && projectId !== "undefined") {
+                            console.log("✅ 이동할 프로젝트 ID:", projectId);
+                            window.location.href = `/teamrequest?projectId=${projectId}&userId=${userId}`;  // /teamrequest로 수정
+                        } else if (notification.link && notification.link !== "undefined") {
+                            console.log("✅ 이동할 링크:", notification.link);
+                            window.location.href = notification.link;
+                        } else {
+                            console.error("🚨 알림 링크가 설정되지 않았습니다.");
+                        }
+
+                    };
+
+
+                    notificationList.appendChild(item);
+                });
+
+                notificationBadge.style.display = "flex"; // 알림 배지 보이기
+                notificationBadge.textContent = notifications.length; // 알림 개수 표시
+            }
+
+            // ✅ 알림 수 및 목록을 가져오는 함수
+            function fetchNotifications() {
+                // 📌 알림 수 가져오기
+                fetch("/api/notifications/count")
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("📢 알림 수:", data); // ✅ 알림 수 확인
+                        const notificationCount = data.notificationCount;
+
+                        if (notificationCount > 0) {
+                            notificationBadge.style.display = "flex"; // 배지 보이기
+                            notificationBadge.textContent = notificationCount; // 알림 수 표시
+                        } else {
+                            notificationBadge.style.display = "none"; // 알림 수가 없으면 배지 숨기기
+                        }
+                    })
+                    .catch(error => {
+                        console.error("❌ 알림 수 가져오기 실패", error);
                     });
 
-                    notificationBadge.style.display = "flex"; // 알림 배지 보이기
-                    notificationBadge.textContent = notifications.length; // 알림 개수 표시
+                // 📌 알림 목록 가져오기
+                fetch("/api/notifications/list?page=0&size=10") // 페이지네이션을 위한 쿼리 파라미터 추가
+                    .then(response => response.json())
+                    .then(notifications => {
+                        console.log("📢 알림 목록:", notifications); // ✅ 알림 목록 확인
+                        renderNotifications(notifications); // 알림 목록 렌더링
+                    })
+                    .catch(error => {
+                        console.error("❌ 알림 목록 가져오기 실패", error);
+                    });
+            }
+
+            // ✅ 알림을 읽음 상태로 처리하는 함수
+            function markAsRead(notificationId) {
+                console.log("📢 읽음 처리 요청: ID =", notificationId);
+
+                fetch(`/api/notifications/mark-as-read/${notificationId}`, {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": getCsrfToken() // ✅ CSRF 토큰 추가
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`서버 오류: ${response.status}`);
+                        }
+                        return response.json(); // ✅ JSON 응답을 반환하도록 변경
+                    })
+                    .then(data => {
+                        console.log("✅ 알림 상태 업데이트 성공:", data);
+                        fetchNotifications(); // 알림 리스트 다시 렌더링
+                    })
+                    .catch(error => console.error("❌ 알림 상태 업데이트 실패", error));
+            }
+
+            // ✅ CSRF 토큰을 가져오는 함수
+            function getCsrfToken() {
+                const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute("content");
+                if (!csrfToken) {
+                    console.error("❌ CSRF 토큰을 찾을 수 없습니다!");
+                    return ""; // CSRF 토큰이 없을 경우 빈 문자열 반환
                 }
+                return csrfToken;
+            }
 
-                // 🔥 알림 아이콘 클릭 시 알림창 표시/숨김
-                notificationIcon.addEventListener("click", function () {
-                    notificationBox.style.display = (notificationBox.style.display === "none" || notificationBox.style.display === "") ? "flex" : "none";
-                });
-
-                // ❌ 알림창 닫기 버튼
-                closeNotification.addEventListener("click", function () {
-                    notificationBox.style.display = "none";
-                });
-
-                // 🗑 "모두 삭제" 버튼
-                clearAllButton.addEventListener("click", function () {
-                    notifications = [];
-                    renderNotifications();
-                });
-
-                // 페이지 로드 시 알림 렌더링
-                renderNotifications();
+            // 🔥 알림 아이콘 클릭 시 알림창 표시/숨김
+            notificationIcon.addEventListener("click", function () {
+                notificationBox.style.display = (notificationBox.style.display === "none" || notificationBox.style.display === "") ? "flex" : "none";
             });
-        </script>
-    </header>
+
+            // ❌ 알림창 닫기 버튼
+            closeNotification.addEventListener("click", function () {
+                notificationBox.style.display = "none";
+            });
+
+            // 🗑 "모두 삭제" 버튼
+            clearAllButton.addEventListener("click", function () {
+                notificationList.innerHTML = "<li class='notification-item'>알림이 없습니다.</li>"; // ✅ UI 업데이트
+                notificationBadge.style.display = "none"; // ✅ 배지 숨기기
+            });
+        });
+    </script>
+
+</header>
 </div>
+x
+</body>
+</html>

@@ -3,49 +3,132 @@
 <head>
   <meta charset="UTF-8">
   <title>프로젝트 목록</title>
-  <link rel="stylesheet" href="/css/projapplication.css">
+  <link rel="stylesheet" href="/css/project.css">
   <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 <body>
-<!---header--->
+<!-- header -->
 <div th:insert="~{header :: header}"></div>
 
-<h2>프로젝트 참가신청서</h2>
-<div class="container">
-  <div class="profile-img"></div>
-  <div class="profile-header">
-    <h3><strong>지원정보 확인</strong></h3>
+<!-- 메인 배너 -->
+<section class="main-banner">
+  <img src="/images/banner.png" alt="배너 이미지" class="banner-image">
+</section>
+
+<section class="project-list">
+  <div class="upupup">
+    <form>
+      <!-- 검색 아이콘 -->
+      <div class="search-container">
+        <div class="searchicon" id="searchicon">
+          <img src="/images/search-icon.png" alt="검색">
+        </div>
+
+        <!-- 검색창 (기본적으로 숨김) -->
+        <div class="search-box" id="search-box">
+          <!-- 검색창 상단 -->
+          <div class="search-header">
+            <button type="button" id="search-close">&times;</button>
+          </div>
+
+          <!-- 프로젝트 제목 검색 -->
+          <div class="search-field">
+            <input type="text" id="search-input" placeholder="검색어 입력">
+          </div>
+
+          <!-- 모집 기간 -->
+          <div class="search-field">
+            <label for="recruit-start">모집기간</label>
+            <div class="date-group">
+              <input type="date" id="recruit-start">
+              <span>~</span>
+              <input type="date" id="recruit-end">
+            </div>
+          </div>
+
+          <!-- 진행 기간 -->
+          <div class="search-field">
+            <label for="progress-start">진행기간</label>
+            <div class="date-group">
+              <input type="date" id="progress-start">
+              <span>~</span>
+              <input type="date" id="progress-end">
+            </div>
+          </div>
+
+          <!-- 완료 버튼 -->
+          <button class="submit-btn">완료</button>
+        </div>
+      </div>
+    </form>
+
+    <select id="filter" name="filter">
+      <option value="all">최신순</option>
+      <option value="ing">인기순</option>
+      <option value="ed">오래된순</option>
+    </select>
+
+    <!-- 프로젝트 생성 버튼 -->
+    <form action="/newproject" method="get">
+      <button type="submit" class="create-post-button">프로젝트 생성</button>
+    </form>
+
+
   </div>
-  <br>
-  <div class="info">
-    <p><strong>이름</strong> <span>임채민</span><span>(여, 22세)</span></p>
-    <p><strong>휴대폰</strong> <span>010-1234-5678</span></p>
-    <p><strong>이메일</strong> <span>abc@defg.com</span></p>
-    <p><strong>주언어</strong> <span>C언어</span></p>
-    <p><strong>평균 평점</strong> <span>5.0</span></p>
-  </div>
-  <br>
-  <br>
-  <div class="project-header">
-    <h3><strong>지원프로젝트 확인</strong></h3>
-  </div>
-  <div class="info2">
-    <p><strong>프로젝트명</strong> <span>공모전A 함께할 팀원 모집합니다!</span></p>
-    <p><strong>프로젝트 내용</strong></p>
-    <span>저는 프론트 쪽이고, 제 경력은 프로필 보기로 확인해 주세요. 저는 경력보단 참여 잘 할 자신 있으신 분을 위주로 뽑을 예정입니다^_^</span>
-  </div>
-  <br>
-  <br>
-  <div class="message">
-    <h3><strong>전달 메시지</strong></h3>
-    <textarea class="message-box" placeholder="전달 메시지"></textarea>
-  </div>
-  <br>
-  <br>
-  <div class="button-container">
-    <button class="btn btn-primary">수락</button>
-    <button class="btn btn-secondary">거절</button>
-  </div>
-</div>
+
+  <!-- 프로젝트 목록 테이블 -->
+  <table class="contest-table">
+    <thead>
+    <tr>
+      <th>프로젝트명</th>
+      <th>생성자</th>
+      <th>모집 기간</th>
+      <th>진행 일정</th>
+      <th>조회수</th>
+      <th>좋아요</th>
+      <th>모집 인원</th>
+      <th>현황</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Thymeleaf 반복문으로 프로젝트 데이터 출력 -->
+    <tr th:each="project : ${projects}">
+      <td>
+        <a th:href="@{/postproject/{id}(id=${project.id})}" th:text="${project.title}">프로젝트명</a>
+      </td>
+      <td th:text="${project.createdBy}">생성자</td>
+      <td th:text="'D-' + ${project.recruitmentPeriod}">D-3</td>
+      <td th:text="${project.startDate} + ' ~ ' + ${project.endDate}">2025-01-01 ~ 2025-12-31</td>
+      <td th:text="${project.views}">0</td>
+      <td th:text="${project.likes}">0</td>
+      <!-- 동적으로 모집 인원 표시 -->
+      <td>
+        <span th:text="${project.currentParticipants}">0</span>/
+        <span th:text="${project.recruitmentCount}">0</span>
+      </td>
+      <td th:text="${project.status}">모집중</td>
+    </tr>
+    </tbody>
+  </table>
+
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var searchIcon = document.getElementById("searchicon");
+    var searchBox = document.getElementById("search-box");
+    var searchClose = document.getElementById("search-close");
+
+    // 검색 아이콘 클릭 시 검색창 표시
+    searchIcon.addEventListener("click", function () {
+      searchBox.style.display = "block";
+    });
+
+    // 닫기 버튼 클릭 시 검색창 숨기기
+    searchClose.addEventListener("click", function () {
+      searchBox.style.display = "none";
+    });
+  });
+</script>
 </body>
 </html>

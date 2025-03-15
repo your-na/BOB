@@ -4,33 +4,151 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>팀 참가 신청</title>
+
+  <!-- ✅ CSRF 토큰을 HTML에 추가 -->
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
   <link rel="stylesheet" href="/css/teamrequest.css">
   <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
+
 <body>
 <!-- header -->
 <div th:insert="~{header :: header}"></div>
 
-<div class="request-container">
+<!-- ✅ 프로젝트 ID와 유저 ID를 Thymeleaf를 이용해 data 속성으로 저장 -->
+<div class="request-container"
+     th:data-project-id="${projectId}"
+     th:data-user-id="${userId != null ? userId : ''}">  <!-- ✅ userId가 null이면 빈 문자열로 설정 -->
+
   <p class="request-message">
-    <strong>하은남친</strong>님께서 '<strong>미니프젝1</strong>' 팀 참가를 신청하셨습니다.
+    <strong th:text="${userNick}"></strong>님께서
+    '<strong th:text="${projectTitle}"></strong>' 팀 참가를 신청하셨습니다.
     <br>
-    <a href="#">해당 게시글 보기 &gt;</a>
+    <a th:href="@{'/postproject/' + ${projectId}}">해당 게시글 보기 &gt;</a>
   </p>
 
-  <form action="/team-request" method="POST">
-    <div class="profile-section">
-      <img src="/images/profile.png" alt="프로필 사진" class="profile-image">
-      <p class="user-name">하은남친</p>
-      <button type="button" class="view-application">신청서 보기</button>
-    </div>
+  <div class="profile-section">
+    <img src="/images/profile.png" alt="프로필 사진" class="profile-image">
+    <p class="user-name" th:text="${userNick}">사용자 이름</p>
+    <button type="button" class="view-application">신청서 보기</button>
+  </div>
 
-    <div class="action-buttons">
-      <button type="submit" name="action" value="accept" class="accept-btn">수락</button>
-      <button type="submit" name="action" value="reject" class="reject-btn">거절</button>
-    </div>
-  </form>
+  <div class="action-buttons">
+    <!-- ✅ 버튼 클릭 시 API 호출 -->
+    <button type="button" class="accept-btn">수락</button>
+    <button type="button" class="reject-btn">거절</button>
+  </div>
 </div>
+
+<script>
+  function getCsrfToken() {
+    // ✅ 1. `meta` 태그에서 CSRF 토큰 가져오기 (Spring Security 기본 방식)
+    let metaToken = document.querySelector("meta[name='_csrf']");
+    if (metaToken) {
+      return metaToken.getAttribute("content");
+    }
+
+    // ✅ 2. 쿠키에서 `XSRF-TOKEN` 가져오기
+    let csrfMatch = document.cookie.match(new RegExp('(^| )XSRF-TOKEN=([^;]+)'));
+    return csrfMatch ? csrfMatch[2] : '';
+  }
+
+  window.addEventListener("load", function() {
+    const requestContainer = document.querySelector(".request-container");
+
+    // ✅ 프로젝트 ID와 유저 ID 가져오기
+    const projectId = requestContainer.getAttribute("data-project-id");
+    let userId = requestContainer.getAttribute("data-user-id");
+
+    console.log("✅ [DEBUG] Project ID:", projectId);
+    console.log("✅ [DEBUG] User ID:", userId);
+
+    if (!userId || userId === "null" || userId.trim() === "") {
+      alert("❌ 오류: User ID가 유효하지 않습니다.");
+      return;
+    }
+
+    userId = parseInt(userId);
+    if (isNaN(userId) || userId === 0) {
+      alert("❌ 오류: 올바른 사용자 ID가 아닙니다.");
+      return;
+    }
+
+    // ✅ CSRF 토큰 가져오기
+    const csrfToken = getCsrfToken();
+    console.log("✅ [DEBUG] CSRF Token:", csrfToken);
+
+    // ✅ 수락 버튼 이벤트
+    const acceptButton = document.querySelector(".accept-btn");
+    if (acceptButton) {
+      acceptButton.addEventListener("click", function() {
+        fetch("http://localhost:8888/teamrequest/accept", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": csrfToken  // ✅ CSRF 토큰을 헤더에 추가
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            projectId: projectId,
+            userId: userId
+          })
+        })
+                .then(response => {
+                  if (!response.ok) {
+                    return response.text().then(errorMessage => {
+                      throw new Error(`❌ 오류 발생 (${response.status}): ${errorMessage}`);
+                    });
+                  }
+                  return response.text();
+                })
+                .then(data => {
+                  alert("✅ 팀원 신청이 승인되었습니다!");
+                  location.reload();
+                })
+                .catch(error => {
+                  alert("❌ 요청 실패: " + error.message);
+                });
+      });
+    }
+
+    // ✅ 거절 버튼 이벤트
+    const rejectButton = document.querySelector(".reject-btn");
+    if (rejectButton) {
+      rejectButton.addEventListener("click", function() {
+        fetch("http://localhost:8888/teamrequest/reject", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-XSRF-TOKEN": getCsrfToken()  // ✅ CSRF 토큰 추가
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            projectId: projectId,
+            userId: userId
+          })
+        })
+                .then(response => {
+                  if (!response.ok) {
+                    return response.text().then(errorMessage => {
+                      throw new Error(`❌ 오류 발생 (${response.status}): ${errorMessage}`);
+                    });
+                  }
+                  return response.text();
+                })
+                .then(data => {
+                  alert("🚫 " + data);
+                  location.reload();
+                })
+                .catch(error => {
+                  alert("❌ 요청 실패: " + error.message);
+                });
+      });
+    }
+  });
+</script>
 
 </body>
 </html>

@@ -1,6 +1,6 @@
 package com.example.bob.DTO;
 
-import  com.example.bob.Entity.UserEntity;
+import com.example.bob.Entity.UserEntity;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @Builder
 public class UserDTO {
 
-    // 이름 아이디 비밀번호 이메일 전화번호 성별 주언어 생년월일
     private Long userId;
     private String userName;        // 이름
     private String userIdLogin;          // 아이디
@@ -27,6 +26,12 @@ public class UserDTO {
     private LocalDateTime accountCreatedAt; // 계정 생성 날짜
     private String profileImageUrl;
     private String bio;
+
+    // UserDTO(Long, String) 생성자 명시적으로 추가
+    public UserDTO(Long userId, String userName) {
+        this.userId = userId;
+        this.userName = userName;
+    }
 
     public static UserDTO toUserDTO(UserEntity userEntity) {
         UserDTO userDTO = new UserDTO();
