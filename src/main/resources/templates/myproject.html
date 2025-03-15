@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
   <title>프로젝트 목록</title>
@@ -7,94 +7,24 @@
   <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 <body>
+
 <!-- header -->
 <div th:insert="~{header :: header}"></div>
 
 <section class="project-list">
   <div class="upupup">
-    <form>
-      <!-- 검색 아이콘 -->
-      <div class="search-container">
-        <div class="searchicon" id="searchicon">
-          <img src="/images/search-icon.png" alt="검색">
-        </div>
-
-        <!-- 검색창 (기본적으로 숨김) -->
-        <div class="search-box" id="search-box">
-          <!-- 검색창 상단 -->
-          <div class="search-header">
-            <button type="button" id="search-close">&times;</button>
-          </div>
-
-          <!-- 프로젝트 제목 검색 -->
-          <div class="search-field">
-            <input type="text" id="search-input" placeholder="검색어 입력">
-          </div>
-
-          <!-- 모집 기간 -->
-          <div class="search-field">
-            <label for="recruit-start">모집기간</label>
-            <div class="date-group">
-              <input type="date" id="recruit-start">
-              <span>~</span>
-              <input type="date" id="recruit-end">
-            </div>
-          </div>
-
-          <!-- 진행 기간 -->
-          <div class="search-field">
-            <label for="progress-start">진행기간</label>
-            <div class="date-group">
-              <input type="date" id="progress-start">
-              <span>~</span>
-              <input type="date" id="progress-end">
-            </div>
-          </div>
-
-          <!-- 역할 -->
-          <div class="search-field">
-            <label for="role">역할</label>
-            <div class="role">
-              <input type="checkbox" id="주최">
-              <span>주최</span>
-              <input type="checkbox" id="참여">
-              <span>참여</span>
-            </div>
-          </div>
-
-          <!-- 상태 -->
-          <div class="search-field">
-            <label for="status">상태</label>
-            <div class="state">
-              <input type="checkbox" id="모집중">
-              <span>모집중</span>
-              <input type="checkbox" id="진행중">
-              <span>진행중</span>
-              <input type="checkbox" id="완료">
-              <span>완료</span>
-            </div>
-          </div>
-
-          <!-- 완료 버튼 -->
-          <button class="submit-btn">완료</button>
-        </div>
-      </div>
-    </form>
-
-    <!-- 필터 옵션 -->
     <select id="filter" name="filter">
       <option value="전체">전체</option>
       <option value="주최한 프로젝트">주최한 프로젝트</option>
       <option value="참여한 프로젝트">참여한 프로젝트</option>
     </select>
 
-    <!-- 프로젝트 생성 버튼 -->
     <form action="/newproject" method="get">
       <button type="submit" class="create-post-button">프로젝트 생성</button>
     </form>
   </div>
 
-  <!-- 내가 만든 프로젝트 테이블 -->
+  <!-- ✅ 내가 만든 프로젝트 -->
   <h3>내가 만든 프로젝트</h3>
   <table class="contest-table">
     <thead>
@@ -122,34 +52,23 @@
       <td th:text="${project.views}">0</td>
       <td th:text="${project.likes}">0</td>
       <td>
-        <span th:text="${project.currentParticipants}">0</span>/
+        <span th:text="${project.currentParticipants}">0</span> /
         <span th:text="${project.recruitmentCount}">0</span>
       </td>
       <td th:text="${project.status}">모집중</td>
-
       <td>주최</td>
-
-      <!-- 역할이 '주최'일 때만 제출 버튼 표시 -->
       <td>
-        <button class="submit-btn open-modal-btn">제출하기</button>
+        <!-- 파일 제출 또는 변경 -->
+        <button class="submit-btn open-file-picker-btn" th:attr="data-project-id=${project.id}">제출하기</button>
+        <!-- 제출된 파일 표시 (클릭하면 수정 가능) -->
+        <span th:id="'file-name-display-' + ${project.id}" class="file-name-display clickable"
+              style="margin-left: 10px; cursor: pointer;"></span>
       </td>
-
     </tr>
     </tbody>
   </table>
 
-  <!-- 제출하기 모달 (숨겨진 상태) -->
-  <div id="submission-modal" class="modal">
-    <div class="modal-content">
-      <span class="close-modal">&times;</span>
-      <h3>파일 제출</h3>
-      <input type="file" id="file-upload">
-      <button id="submit-file-btn">제출하기</button>
-    </div>
-  </div>
-
-
-  <!-- 내가 참가한 프로젝트 테이블 -->
+  <!-- ✅ 내가 참가한 프로젝트 -->
   <h3>내가 참가한 프로젝트</h3>
   <table class="contest-table">
     <thead>
@@ -185,59 +104,87 @@
     </tr>
     </tbody>
   </table>
+
+  <!-- ✅ 파일 제출 폼 -->
+  <form id="file-upload-form" enctype="multipart/form-data" style="display:none;">
+    <input type="file" name="file" id="file-upload" required>
+    <input type="hidden" name="projectId" id="projectId">
+  </form>
 </section>
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    var searchIcon = document.getElementById("searchicon");
-    var searchBox = document.getElementById("search-box");
-    var searchClose = document.getElementById("search-close");
-
-    // 검색 아이콘 클릭 시 검색창 표시
-    searchIcon.addEventListener("click", function () {
-      searchBox.style.display = "block";
-    });
-
-    // 닫기 버튼 클릭 시 검색창 숨기기
-    searchClose.addEventListener("click", function () {
-      searchBox.style.display = "none";
-    });
-  });
-
-  document.addEventListener("DOMContentLoaded", function () {
-    var searchIcon = document.getElementById("searchicon");
-    var searchBox = document.getElementById("search-box");
-    var searchClose = document.getElementById("search-close");
-
-    var submissionModal = document.getElementById("submission-modal");
-    var closeModal = document.querySelector(".close-modal");
-    var submitFileBtn = document.getElementById("submit-file-btn");
     var fileUpload = document.getElementById("file-upload");
 
-    // 제출하기 버튼 클릭 시 모달 열기
-    document.querySelectorAll(".submit-btn").forEach(button => {
+    // ✅ 서버에서 제출된 파일 목록 가져와서 표시
+    fetch("/file/submitted-files")
+            .then(response => response.json())
+            .then(data => {
+              Object.keys(data).forEach(projectId => {
+                let fileName = data[projectId];
+                let fileNameDisplay = document.getElementById("file-name-display-" + projectId);
+                let button = document.querySelector(".open-file-picker-btn[data-project-id='" + projectId + "']");
+
+                if (fileNameDisplay && fileName) {
+                  fileNameDisplay.textContent = "제출한 파일: " + fileName;
+                  fileNameDisplay.setAttribute("data-project-id", projectId);
+                  fileNameDisplay.classList.add("clickable");
+                  if (button) {
+                    button.style.display = "none";
+                  }
+                }
+              });
+            })
+            .catch(error => console.error("제출된 파일 조회 중 오류:", error));
+
+    // ✅ 제출하기 버튼 클릭 시 파일 선택 창 열기
+    document.querySelectorAll(".open-file-picker-btn").forEach(button => {
       button.addEventListener("click", function () {
-        submissionModal.style.display = "block";
+        var projectId = this.getAttribute("data-project-id");
+        document.getElementById("projectId").value = projectId;
+        fileUpload.click();
       });
     });
 
-    // 닫기 버튼 클릭 시 모달 닫기
-    closeModal.addEventListener("click", function () {
-      submissionModal.style.display = "none";
+    // ✅ 제출된 파일명을 클릭하면 파일을 변경할 수 있도록 함
+    document.querySelectorAll(".file-name-display").forEach(fileNameDisplay => {
+      fileNameDisplay.addEventListener("click", function () {
+        var projectId = this.getAttribute("data-project-id");
+        document.getElementById("projectId").value = projectId;
+        fileUpload.click();
+      });
     });
 
-    // 파일 제출 버튼 클릭 시 동작
-    submitFileBtn.addEventListener("click", function () {
-      if (fileUpload.files.length === 0) {
-        alert("파일을 첨부해주세요!");
+    // ✅ 파일 선택 후 제출 API 호출
+    fileUpload.addEventListener("change", function () {
+      var projectId = document.getElementById("projectId").value;
+      var file = fileUpload.files[0];
+
+      if (!file) {
+        alert("파일을 선택하세요.");
         return;
       }
 
-      alert("파일이 제출되었습니다!");
-      submissionModal.style.display = "none"; // 제출 후 모달 닫기
+      var formData = new FormData();
+      formData.append("file", file);
+      formData.append("projectId", projectId);
+
+      fetch("/file/project/submit", {
+        method: "POST",
+        body: formData
+      })
+              .then(response => response.text())
+              .then(data => {
+                alert("✅ 파일 제출 완료!");
+                location.reload(); // 제출 후 새로고침
+              })
+              .catch(error => {
+                console.error("❌ 파일 제출 중 오류 발생:", error);
+                alert("❌ 파일 제출 중 오류가 발생했습니다.");
+              });
     });
   });
-
 </script>
+
 </body>
 </html>

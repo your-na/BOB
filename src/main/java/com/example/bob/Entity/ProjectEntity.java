@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +27,7 @@ public class ProjectEntity {
     private String goal;  // 프로젝트 목표
 
     @Column(length = 255, nullable = false)
-    private String createdBy; // 작성자
+    private String createdBy; // 프로젝트 생성자 (유저 닉네임)
 
     @Column(length = 255, nullable = false)
     private String creatorNick; // 생성자 닉네임
@@ -59,13 +58,13 @@ public class ProjectEntity {
 
     @Column(length = 50, nullable = false)
     @Builder.Default
-    private String status = "모집중"; // ✅ 기본값을 한글로 설정 ("모집중", "진행중")
+    private String status = "모집중"; // ✅ 기본값 ("모집중", "진행중", "완료")
 
     @Column(length = 500)
     private String description; // 프로젝트 설명
 
-    @Column(nullable = true)
-    private Long dDay;  // long -> Long로 변경
+    @Transient
+    private String dDay;
 
     @ElementCollection
     private List<Long> likedUsers = new ArrayList<>(); // 좋아요 누른 유저들
@@ -74,40 +73,74 @@ public class ProjectEntity {
     private int currentParticipants; // 실제 참여 인원
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserProjectEntity> userProjects = new ArrayList<>();  // ✅ 초기화 추가
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectHistoryEntity> projectHistoryEntities = new ArrayList<>();
 
-    // ✅ 상태를 한글로 자동 설정 (모집중 / 진행중)
-    public void updateStatus() {
-        LocalDate today = LocalDate.now();
+    // ✅ 프로젝트 진행 시작 시, 주최자만 `"진행중"`으로 변경
+    public void startProject() {
+        if (LocalDate.now().isEqual(this.startDate)) { // 진행일 시작되면
+            this.status = "진행중";
 
-        // 모집 종료일 기준으로 상태 업데이트
-        if (today.isAfter(this.recruitmentEndDate)) {
-            this.status = "진행중"; // 모집 종료일이 지나면 진행중
-        } else {
-            this.status = "모집중"; // 모집 종료일 전에는 모집중
+            for (UserProjectEntity userProject : userProjects) {
+                if (userProject.getUser().getUserNick().equals(this.createdBy)) {
+                    userProject.setStatus("진행중"); // 주최자만 "진행중"
+                }
+            }
+        }
+    }
+
+    // ✅ 특정 팀원이 수락되면 그 팀원만 `"진행중"`으로 변경
+    public void approveTeamMember(UserEntity user) {
+        for (UserProjectEntity userProject : userProjects) {
+            if (userProject.getUser().equals(user) && userProject.getStatus().equals("신청중")) {
+                userProject.setStatus("진행중");
+            }
+        }
+    }
+
+    // ✅ 주최자가 제출을 하면 "진행중" 상태의 팀원들만 `"완료"`로 변경
+    public void completeProject() {
+        for (UserProjectEntity userProject : userProjects) {
+            // 🔥 "진행중" 상태의 팀원만 "완료"로 변경
+            if (userProject.getUser().getUserNick().equals(this.createdBy)
+                    && userProject.getSubmittedFileName() != null) {
+                this.status = "완료"; // 프로젝트 상태 변경
+
+                for (UserProjectEntity member : userProjects) {
+                    if (member.getStatus().equals("진행중")) {
+                        member.setStatus("완료"); // 🔥 "진행중"인 팀원만 "완료"
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    // ✅ 주최자의 상태에 따라 프로젝트 상태 업데이트
+    public void updateStatus() {
+        // 주최자의 상태에 따라 프로젝트 상태 업데이트
+        UserProjectEntity ownerProject = userProjects.stream()
+                .filter(userProject -> userProject.getUser().getUserNick().equals(this.createdBy))
+                .findFirst()
+                .orElse(null);
+
+        if (ownerProject != null) {
+            String ownerStatus = ownerProject.getStatus();
+            if ("진행중".equals(ownerStatus)) {
+                this.status = "진행중";
+            } else if ("완료".equals(ownerStatus)) {
+                this.status = "완료";
+            }
         }
     }
 
     @PrePersist
-    @PreUpdate
-    public void calculateDDay() {
-        LocalDate today = LocalDate.now();  // 오늘 날짜
-        LocalDate endDate = this.recruitmentEndDate;  // 모집 종료일
-
-        if (endDate == null) {
-            this.dDay = 0L;  // 종료일이 없으면 디데이는 0으로 설정
-            return;
-        }
-
-        long daysBetween = today.until(endDate, ChronoUnit.DAYS);  // 오늘부터 종료일까지의 일수 계산
-
-        if (daysBetween < 0) {
-            this.dDay = 0L;  // 종료일이 이미 지나면 D-Day는 0
-        } else {
-            this.dDay = daysBetween;  // 남은 일수
+    public void prePersist() {
+        if (this.recruitmentStartDate == null) {
+            this.recruitmentStartDate = LocalDate.now();
         }
     }
 }
-
-
 
