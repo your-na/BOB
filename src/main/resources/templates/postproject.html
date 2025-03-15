@@ -20,8 +20,7 @@
 <!-- 제목과 모집현황 -->
 <div class="title-row">
     <div class="title" th:text="${project.title}">프로젝트 제목</div>
-    <span class="deadline" th:text="'D-' + ${project.dDay}"></span>
-
+    <span class="deadline" th:text="'D-' + ${project.dDay}">D-14</span>
     <div class="status">
         모집현황
         <div class="team">
@@ -77,25 +76,11 @@
     <div class="content" th:text="${project.description}">프로젝트 설명 내용</div>
 </div>
 
-<!-- 팀 신청하기 버튼 -->
+<!-- 프로젝트 신청 페이지로 이동하는 버튼 -->
 <form action="/projectapplication" method="get">
     <input type="hidden" name="projectId" th:value="${project.id}">
-
-    <!-- 이미 신청한 상태인지 확인하여 버튼 텍스트와 스타일 변경 -->
-    <button type="submit" class="apply-btn"
-            th:classappend="${isApplied ? 'applied-btn' : ''}">
-        <span th:text="${isApplied ? '신청중' : '팀 신청하기'}"></span>
-    </button>
+    <button type="submit" class="apply-btn">팀 신청하기</button>
 </form>
-
-<!-- 작성자일 경우 팀 신청 버튼을 숨기기 -->
-<div th:if="${isOwner}">
-    <!-- 작성자인 경우, '작성자'라고 표시하거나 다른 내용을 추가할 수 있습니다. -->
-    <p>이 프로젝트는 당신이 생성한 프로젝트입니다.</p>
-</div>
-
-
-
 
 
 <hr>

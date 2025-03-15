@@ -6,6 +6,8 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.temporal.ChronoUnit;
+
 
 @Entity
 @Getter
@@ -63,8 +65,8 @@ public class ProjectEntity {
     @Column(length = 500)
     private String description; // 프로젝트 설명
 
-    @Transient
-    private String dDay;
+    @Column(name = "d_day")
+    private Integer dDay;  // ✅ int → Integer 변경 (null 값 허용)
 
     @ElementCollection
     private List<Long> likedUsers = new ArrayList<>(); // 좋아요 누른 유저들
@@ -136,11 +138,19 @@ public class ProjectEntity {
         }
     }
 
-    @PrePersist
-    public void prePersist() {
-        if (this.recruitmentStartDate == null) {
-            this.recruitmentStartDate = LocalDate.now();
+    public void calculateDDay() {
+        if (this.recruitmentEndDate != null) {
+            this.dDay = Math.toIntExact(ChronoUnit.DAYS.between(LocalDate.now(), this.recruitmentEndDate));
+        } else {
+            this.dDay = 0;
         }
     }
+    @PrePersist
+    @PreUpdate
+    public void prePersistAndUpdate() {
+        calculateDDay();  // ✅ D-Day 수동 계산 호출
+    }
+
 }
+
 
