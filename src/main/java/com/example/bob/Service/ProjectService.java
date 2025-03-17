@@ -433,13 +433,27 @@ public class ProjectService {
     public void submitProjectFile(UserEntity user, ProjectEntity project, String fileName, MultipartFile file) {
         logger.debug("제출할 파일명: " + fileName);
 
-        // 프로젝트의 사용자 프로젝트 엔티티 찾기
+        // 주최자는 UserProjectEntity가 존재하지 않으므로, 이를 체크하여 예외처리
         UserProjectEntity userProject = userProjectRepository.findByUser_UserIdAndProject_Id(user.getUserId(), project.getId())
-                .orElseThrow(() -> new IllegalArgumentException("❌ 해당 프로젝트에 대한 신청 정보가 없습니다."));
+                .orElseGet(() -> {
+                    if (user.getUserNick().equals(project.getCreatedBy())) {
+                        // 주최자의 경우 UserProjectEntity를 생성하지 않음, 그냥 반환
+                        return null;
+                    } else {
+                        throw new IllegalArgumentException("❌ 해당 프로젝트에 대한 신청 정보가 없습니다.");
+                    }
+                });
 
-        // 제출 날짜를 현재 날짜로 설정
+        if (userProject == null) {
+            // 주최자는 파일을 제출하는 경우만, 바로 상태 변경하고 파일 처리
+            userProject = new UserProjectEntity();
+            userProject.setUser(user);
+            userProject.setProject(project);
+            userProject.setStatus("진행중");  // 기본 상태 설정 (필요에 따라 다르게 설정)
+        }
+
+        // 제출 날짜 및 파일명 저장
         userProject.setSubmissionDate(LocalDate.now());
-        // 제출한 파일명 저장
         userProject.setSubmittedFileName(fileName);
 
         // 파일 경로 확인
@@ -459,6 +473,7 @@ public class ProjectService {
         userProjectRepository.save(userProject);
         logger.debug("DB에 저장 완료: " + userProject.getSubmittedFileName());
     }
+
 
 }
 
