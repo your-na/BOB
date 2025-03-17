@@ -269,13 +269,16 @@ public class ProjectService {
      * ✅ 사용자가 참가한 프로젝트 목록을 반환
      */
     public List<ProjectDTO> getJoinedProjects(UserEntity user) {
-        // ✅ "진행중" 또는 "완료" 상태의 프로젝트 조회
+        // "진행중" 또는 "완료" 상태의 프로젝트 조회, "모집중" 상태도 포함
         List<UserProjectEntity> userProjects = userProjectRepository.findByUserAndStatusIn(user, List.of("진행중", "완료", "모집중"));
 
         return userProjects.stream()
-                .map(userProject -> convertToDTO(userProject.getProject()))
+                .map(userProject -> userProject.getProject())
+                .filter(project -> !project.getCreatedBy().equals(user.getUserNick())) // 주최자는 제외
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
 
     @Transactional
     public void completeProjectInService(Long projectId) {
