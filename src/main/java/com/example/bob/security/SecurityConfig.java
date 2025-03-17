@@ -33,7 +33,7 @@ public class SecurityConfig {
                         .ignoringRequestMatchers("/login", "/signup", "/profile/update", "/logout", "/teamrequest", "/teamrequest/accept", "/teamrequest/reject", "/file/project/submit")  // CSRF 예외 처리
                 )
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**").permitAll()  // 모든 사용자 접근 허용
+                        .requestMatchers("/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**", "project").permitAll()  // 모든 사용자 접근 허용
                         .requestMatchers("/login", "/sign").anonymous()  // 로그인 페이지는 익명 접근 허용
                         .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject").authenticated()  // 인증된 사용자만 접근 가능
                         .requestMatchers("/signup", "/check-nickname", "/check-username").permitAll()  // 회원가입 페이지는 익명 접근 허용
