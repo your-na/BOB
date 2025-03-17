@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**", "/project").permitAll()  // 모든 사용자 접근 허용
                         .requestMatchers("/login", "/sign").anonymous()  // 로그인 페이지는 익명 접근 허용
-                        .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject").authenticated()  // 인증된 사용자만 접근 가능
+                        .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject").authenticated()  // 인증된 사"용자만 접근 가능
                         .requestMatchers("/signup", "/check-nickname", "/check-username").permitAll()  // 회원가입 페이지는 익명 접근 허용
                         .anyRequest().authenticated()  // 나머지 요청은 인증된 사용자만 접근 가능
                 )
