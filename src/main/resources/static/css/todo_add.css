@@ -1,0 +1,169 @@
+/* 기본 설정 */
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.1);
+    margin: 0;
+}
+
+/* 컨테이너 */
+.container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* 모달 창 크기를 todo_plan과 동일하게 설정 */
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 500px; /* todo_plan과 동일한 너비 */
+    height: 700px; /* todo_plan과 동일한 높이 */
+}
+
+/* 입력 필드와 버튼을 포함하는 컨테이너 */
+.input-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 500px;  /* todo_plan과 동일한 크기 */
+    height: 700px; /* todo_plan과 동일한 크기 */
+    text-align: left; /* 기존 중앙 정렬에서 왼쪽 정렬로 변경 */
+    display: block; /* flex를 해제하여 기본 흐름을 유지 */
+}
+
+/* 헤더 */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    font-size: 22px;
+    font-weight: bold;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.header h2 {
+    margin: 0;
+    font-weight: bold;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.back-btn, .close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 10px;
+}
+
+/* 입력 섹션 */
+.input-section {
+    margin: 20px 0;
+    padding: 0 20px;
+}
+
+.input-section label {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.input-section input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* 버튼 섹션  */
+.button-section {
+    display: flex;
+    gap: 10px;
+    margin-top: 500px;
+    padding-left: 20px;
+    justify-content: center;
+}
+
+/* 버튼 스타일 */
+.create-btn {
+    background-color: #ffffff;
+    color: #19CB13;
+    font-size: 16px;
+    width: 80px;
+    cursor: pointer;
+    border-radius: 10px;
+    border: 2px solid #19CB13;
+    padding: 8px;
+}
+
+.cancel-btn {
+    background-color: #ffffff;
+    color: #b4b4b4;
+    font-size: 16px;
+    width: 80px;
+    cursor: pointer;
+    border-radius: 10px;
+    border: 2px solid #b4b4b4;
+    padding: 8px;
+}
+
+/* 버튼 호버 효과 */
+.create-btn:hover {
+    background-color: #19CB13;
+    color: #ffffff;
+}
+
+.cancel-btn:hover {
+    background-color: #b4b4b4;
+    color: #ffffff;
+}
+
+/* 사이드바 (오른쪽 고정) */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    height: fit-content;
+    margin-left: 10px;
+}
+
+/* 사이드바 버튼 */
+.sidebar-btn {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.3s;
+    width: 80px;
+}
+
+/* 선택된 버튼 */
+.sidebar-btn.active {
+    background: gray;
+    color: white;
+    font-weight: bold;
+}
+
+/* 버튼 호버 효과 */
+.sidebar-btn:hover {
+    background: #f0f0f0;
+}

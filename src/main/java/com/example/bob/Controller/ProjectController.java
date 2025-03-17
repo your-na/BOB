@@ -13,8 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -325,5 +323,17 @@ public class ProjectController {
     public String showsuccessForm() {
         return "projecthistory";
     }
+
+    @GetMapping("/todo_plan")
+    public String todo_planForm() { return "todo_plan"; }
+
+    @GetMapping("/todo_add")
+    public String todo_addForm() { return "todo_add"; }
+
+    @GetMapping("/todo_home")
+    public String todo_homeForm() { return "todo_home"; }
+
+    @GetMapping("/todo_crud")
+    public String todo_crudForm() { return "todo_crud"; }
 
 }

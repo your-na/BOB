@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로젝트</title>
+    <link rel="stylesheet" href="css/todo_add.css">
+</head>
+<body>
+<div class="container"> <!-- 프로젝트 제목과 입력 칸을 포함하는 컨테이너 -->
+    <div class="modal">
+        <div class="input-container">
+            <div class="header">
+                <button class="back-btn">&lt;</button> <!-- 뒤로가기 버튼 -->
+                <h2>프로젝트A</h2> <!-- 프로젝트 제목 -->
+                <button class="close-btn">&times;</button> <!-- 닫기 버튼 -->
+            </div>
+
+            <!-- 입력 필드 -->
+            <div class="input-section">
+                <label for="newIndex">새 인덱스 생성하기</label>
+                <input type="text" id="newIndex" placeholder="새로운 인덱스를 입력하세요">
+            </div>
+
+            <!-- 버튼 섹션 -->
+            <div class="button-section">
+                <button class="create-btn">생성</button>
+                <button class="cancel-btn">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 사이드바 (프로젝트A 모달의 오른쪽에 위치) -->
+    <div class="sidebar">
+        <button class="sidebar-btn">홈</button>
+        <button class="sidebar-btn">할 일</button>
+        <button class="sidebar-btn">CRUD</button>
+        <button class="sidebar-btn active">+</button> <!-- + 버튼을 선택된 상태로 변경 -->
+    </div>
+</div>
+</body>
+</html>
