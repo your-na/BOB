@@ -68,26 +68,26 @@ public class ProjectService {
      * ✅ 프로젝트 저장 후 반환
      */
     @Transactional
-    public ProjectEntity saveProject(ProjectEntity project) {
+    public ProjectEntity saveProject(ProjectEntity project, String customRecruitmentCount) {
         logger.info("🚀 프로젝트 저장 전 모집 종료일: {}", project.getRecruitmentEndDate());
 
-        // ✅ 1. 기본 상태를 "모집중"으로 설정
+        // 기본 상태를 "모집중"으로 설정
         if (project.getStatus() == null || project.getStatus().isEmpty()) {
             project.setStatus("모집중");
         }
 
-        // ✅ 2. userProjects가 null이면 빈 리스트로 초기화
+        // userProjects가 null이면 빈 리스트로 초기화
         if (project.getUserProjects() == null) {
-            project.setUserProjects(new ArrayList<>());  // ✅ Null 방지
+            project.setUserProjects(new ArrayList<>());  // Null 방지
         }
 
-        // ✅ 3. 주최자의 상태 가져오기
+        // 주최자의 상태 가져오기
         UserProjectEntity ownerProject = project.getUserProjects().stream()
                 .filter(userProject -> userProject.getUser().getUserNick().equals(project.getCreatedBy()))
                 .findFirst()
                 .orElse(null);
 
-        // ✅ 4. 주최자의 상태에 따라 프로젝트 상태 업데이트
+        // 주최자의 상태에 따라 프로젝트 상태 업데이트
         if (ownerProject != null) {
             String ownerStatus = ownerProject.getStatus();
             if ("진행중".equals(ownerStatus)) {
@@ -97,16 +97,39 @@ public class ProjectService {
             }
         }
 
-        // ✅ 5. 상태 최종 업데이트 (모집중 ↔ 진행중 판별)
-        project.updateStatus();  // 🔥 updateStatus()를 안전하게 호출 가능
+        // 상태 최종 업데이트
+        project.updateStatus();  // updateStatus()를 안전하게 호출 가능
 
+        // "기타"일 경우 custom-recruitment 값으로 모집 인원 설정
+        if (customRecruitmentCount != null && !customRecruitmentCount.isEmpty()) {
+            try {
+                int recruitmentCount = Integer.parseInt(customRecruitmentCount);  // 수동 입력 값 반영
+                project.setRecruitmentCount(recruitmentCount);  // 모집 인원 설정
+            } catch (NumberFormatException e) {
+                logger.error("❌ 모집 인원 입력 값이 유효하지 않습니다.");
+                throw new IllegalArgumentException("모집 인원 입력 값이 유효하지 않습니다.");
+            }
+        } else {
+            // "기타"가 아닌 경우에도 기본적인 처리
+            if (project.getRecruitmentCount() <= 0) {
+                throw new IllegalArgumentException("모집 인원 수는 1명 이상이어야 합니다.");
+            }
+        }
+
+        // 프로젝트 저장
         ProjectEntity savedProject = projectRepository.save(project);
 
         logger.info("✅ 저장된 프로젝트의 상태: {}", savedProject.getStatus());
 
+        // 프로젝트 히스토리 저장
         saveProjectHistory(savedProject, "생성됨");
+
         return savedProject;
     }
+
+
+
+
 
 
     /**
