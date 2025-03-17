@@ -60,43 +60,15 @@ public class FileController {
 
             // 파일명 및 저장 경로 설정
             String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename(); // 중복 방지
-            Path directoryPath = Paths.get(projectFilePath);
 
-            // 디렉토리 존재 여부 확인 및 생성
-            if (!Files.exists(directoryPath)) {
-                Files.createDirectories(directoryPath);
-            }
+            // submitProjectFile 메서드를 호출하여 파일 제출 처리
+            projectService.submitProjectFile(user, project, fileName, file); // 호출
 
-            // 파일을 지정된 경로에 저장
-            Path filePath = directoryPath.resolve(fileName);
-            file.transferTo(filePath);
-
-            // ✅ 기존 제출 여부 확인 (사용자 + 프로젝트 기준)
-            Optional<UserProjectEntity> existingSubmission = userProjectRepository.findByUserAndProject(user, project);
-
-            UserProjectEntity userProject;
-            if (existingSubmission.isPresent()) {
-                // 기존 데이터 업데이트
-                userProject = existingSubmission.get();
-                userProject.setSubmittedFileName(fileName);
-                userProject.setSubmissionDate(LocalDate.now());
-            } else {
-                // 새로 제출 데이터 생성
-                userProject = new UserProjectEntity();
-                userProject.setUser(user);
-                userProject.setProject(project);
-                userProject.setSubmittedFileName(fileName);
-                userProject.setSubmissionDate(LocalDate.now());
-            }
-
-            // ✅ 여기에서 상태를 "완료"로 변경!
-            userProject.setStatus("완료");
-
-            // 저장 (새로운 데이터면 insert, 기존 데이터면 update)
-            userProjectRepository.save(userProject);
+            // 프로젝트 상태를 "완료"로 변경
+            project.setStatus("완료");
+            projectRepository.save(project);  // 프로젝트 상태 업데이트
 
             logger.debug("파일 제출 완료: " + fileName);
-            logger.debug("프로젝트 상태 업데이트 완료: " + userProject.getStatus());
 
             return ResponseEntity.ok("✅ 파일 제출이 완료되었습니다!");
         } catch (Exception e) {
@@ -104,6 +76,8 @@ public class FileController {
             return ResponseEntity.status(500).body("❌ 파일 제출 중 오류 발생: " + e.getMessage());
         }
     }
+
+
 
 
 

@@ -80,45 +80,32 @@ public class ProjectEntity {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectHistoryEntity> projectHistoryEntities = new ArrayList<>();
 
-    // ✅ 프로젝트 진행 시작 시, 주최자만 `"진행중"`으로 변경
-    public void startProject() {
-        if (LocalDate.now().isEqual(this.startDate)) { // 진행일 시작되면
-            this.status = "진행중";
 
-            for (UserProjectEntity userProject : userProjects) {
-                if (userProject.getUser().getUserNick().equals(this.createdBy)) {
-                    userProject.setStatus("진행중"); // 주최자만 "진행중"
-                }
-            }
-        }
-    }
-
-    // ✅ 특정 팀원이 수락되면 그 팀원만 `"진행중"`으로 변경
-    public void approveTeamMember(UserEntity user) {
-        for (UserProjectEntity userProject : userProjects) {
-            if (userProject.getUser().equals(user) && userProject.getStatus().equals("신청중")) {
-                userProject.setStatus("진행중");
-            }
-        }
-    }
-
-    // ✅ 주최자가 제출을 하면 "진행중" 상태의 팀원들만 `"완료"`로 변경
+    // ✅ 주최자가 제출을 하면 수락된 상태의 팀원들만 `"완료"`로 변경
     public void completeProject() {
-        for (UserProjectEntity userProject : userProjects) {
-            // 🔥 "진행중" 상태의 팀원만 "완료"로 변경
-            if (userProject.getUser().getUserNick().equals(this.createdBy)
-                    && userProject.getSubmittedFileName() != null) {
-                this.status = "완료"; // 프로젝트 상태 변경
+        // 주최자가 파일을 제출한 경우만 프로젝트 상태 변경
+        if (userProjects != null) {
+            for (UserProjectEntity userProject : userProjects) {
+                // 주최자가 파일을 제출한 경우만 프로젝트 상태 변경
+                if (userProject.getUser().getUserNick().equals(this.createdBy) && userProject.getSubmittedFileName() != null) {
+                    this.status = "완료"; // 프로젝트 상태 변경
 
-                for (UserProjectEntity member : userProjects) {
-                    if (member.getStatus().equals("진행중")) {
-                        member.setStatus("완료"); // 🔥 "진행중"인 팀원만 "완료"
+                    // 수락된 모든 팀원들의 상태를 "완료"로 변경
+                    for (UserProjectEntity member : userProjects) {
+                        // "신청중", "진행중" 상태인 팀원들만 "완료"로 변경
+                        if (member.getStatus().equals("진행중") || member.getStatus().equals("신청중")) {
+                            member.setStatus("완료"); // 상태를 "완료"로 변경
+                        }
                     }
+                    break; // 주최자가 완료로 변경되면 바로 상태 변경을 완료
                 }
-                break;
             }
         }
+
+        // 프로젝트 테이블 상태 업데이트는 서비스 레이어에서 처리
+        // projectRepository.save(this); // 이 부분을 서비스 레이어로 이동
     }
+
 
     // ✅ 주최자의 상태에 따라 프로젝트 상태 업데이트
     public void updateStatus() {

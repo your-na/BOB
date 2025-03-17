@@ -23,18 +23,18 @@
       <div class="form-group">
         <label for="project-dates">진행 일정</label>
         <div class="date-inputs">
-          <input type="date" id="start-date" name="start-date" required>
+          <input type="date" id="start-date" name="start-date">
           <span>~</span>
-          <input type="date" id="end-date" name="end-date" required>
+          <input type="date" id="end-date" name="end-date">
         </div>
       </div>
 
       <div class="form-group">
         <label for="party-dates">모집 일정</label>
         <div class="date-inputs">
-          <input type="date" id="recruitment-start-date" name="recruitment-start-date" required>
+          <input type="date" id="startdate" name="recruitment-start-date">
           <span>~</span>
-          <input type="date" id="recruitment-end-date" name="recruitment-end-date" required>
+          <input type="date" id="enddate" name="recruitment-end-date">
         </div>
       </div>
 
@@ -46,10 +46,10 @@
             <option value="1">1명</option>
             <option value="2">2명</option>
             <option value="3">3명</option>
-            <option value="plus">기타</option> <!-- 기타 선택 시 직접 입력 가능 -->
+            <option value="plus">기타</option>
           </select>
           <div id="custom-input-group" style="display: none; display: flex; align-items: center;">
-            <input type="number" id="custom-recruitment" name="custom-recruitment" placeholder="직접 입력" />
+            <input type="number" id="custom-recruitment" name="recruitmentCount" placeholder="직접 입력" min="1">
             <p style="margin-left: 5px;">명</p>
           </div>
         </div>
@@ -58,18 +58,18 @@
       <br>
       <div class="form-group">
         <label for="project-name">프로젝트 주제</label>
-        <input type="text" id="project-name" name="project-name" placeholder="프로젝트명을 입력하세요." required>
+        <input type="text" id="project-name" name="project-name" placeholder="프로젝트명을 입력하세요.">
       </div>
 
       <br>
       <div class="form-group">
         <label for="project-goal">프로젝트 목표</label>
-        <textarea id="project-goal" name="project-goal" placeholder="프로젝트 목표를 간단히 입력해주세요." required></textarea>
+        <textarea id="project-goal" name="project-goal" placeholder="프로젝트 목표를 간단히 입력해주세요."></textarea>
       </div>
 
       <div class="form-group">
         <label for="project-description">프로젝트 내용</label>
-        <textarea id="project-description" name="project-description" placeholder="프로젝트 내용을 입력해주세요." required></textarea>
+        <textarea id="project-description" name="project-description" placeholder="프로젝트 내용을 입력해주세요."></textarea>
       </div>
 
       <br>
@@ -84,15 +84,14 @@
 </main>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", function() {
     let today = new Date().toISOString().split("T")[0];
-
     let startDateInput = document.getElementById("start-date");
     let endDateInput = document.getElementById("end-date");
 
     startDateInput.setAttribute("min", today);
 
-    startDateInput.addEventListener("change", function () {
+    startDateInput.addEventListener("change", function() {
       let startDate = startDateInput.value;
       if (startDate < today) {
         alert("시작 날짜는 오늘 이후로 선택해야 합니다!");
@@ -102,7 +101,7 @@
       endDateInput.setAttribute("min", startDate);
     });
 
-    endDateInput.addEventListener("change", function () {
+    endDateInput.addEventListener("change", function() {
       let startDate = startDateInput.value;
       let endDate = endDateInput.value;
       if (endDate < startDate) {
@@ -111,26 +110,87 @@
       }
     });
 
-    // 기본값 설정
     if (startDateInput.value < today) {
       startDateInput.value = today;
     }
 
     var recruitmentSelect = document.getElementById("recruitment");
     var customInputGroup = document.getElementById("custom-input-group");
+    var customRecruitmentInput = document.getElementById("custom-recruitment");
 
+    // 기본적으로 "기타" 선택 시 숨기기
     if (recruitmentSelect.value !== "plus") {
       customInputGroup.style.display = "none";
     }
 
-    recruitmentSelect.addEventListener("change", function () {
+    // "기타" 선택 시 입력 필드 보이기
+    recruitmentSelect.addEventListener("change", function() {
       if (this.value === "plus") {
         customInputGroup.style.display = "flex";
+        customInputGroup.style.alignItems = "center";
+        customRecruitmentInput.setAttribute("type", "number");  // 숫자만 입력받기
       } else {
         customInputGroup.style.display = "none";
       }
     });
+
+    // 폼 제출 시
+    document.querySelector("form").addEventListener("submit", function(event) {
+      const recruitmentValue = recruitmentSelect.value;
+      let recruitmentCountValue = "";
+
+      // "기타" 선택시 직접 입력 값 처리
+      if (recruitmentValue === "plus") {
+        recruitmentCountValue = customRecruitmentInput.value.trim();
+        if (!recruitmentCountValue || isNaN(recruitmentCountValue) || parseInt(recruitmentCountValue) < 1) {
+          alert("올바른 모집 인원을 입력하세요.");
+          event.preventDefault(); // 제출 방지
+          return;
+        }
+      } else {
+        recruitmentCountValue = recruitmentValue; // 기본 선택 값 처리
+      }
+
+      // FormData를 사용해 제출
+      const formData = new FormData(this);
+      formData.append("recruitmentCount", recruitmentCountValue); // 추가된 모집 인원 값
+
+      // 로그: 제출 전에 데이터를 출력하여 확인
+      console.log("🚀 서버로 보내는 데이터:");
+      formData.forEach((value, key) => {
+        console.log(`${key}: ${value}`);  // 제출하는 데이터 확인
+      });
+
+      // fetch로 서버로 데이터 전송
+      fetch(this.action, {
+        method: "POST",
+        body: formData
+      })
+              .then(response => {
+                if (response.ok) {
+                  return response.json(); // JSON 응답을 받기
+                } else {
+                  return response.text().then(text => {
+                    alert("❌ 프로젝트 생성에 실패했습니다.");
+                    console.error("서버 응답 오류:", text);
+                  });
+                }
+              })
+              .then(data => {
+                if (data.id) {
+                  alert("✅ 프로젝트가 성공적으로 생성되었습니다!");
+                  window.location.href = `/postproject/${data.id}`; // 서버에서 받은 ID로 리다이렉션
+                }
+              })
+              .catch(error => {
+                alert("❌ 요청 실패!");
+                console.error("서버 요청 실패:", error);
+              });
+
+      event.preventDefault(); // 기본 제출 방지
+    });
   });
+
 </script>
 
 </body>

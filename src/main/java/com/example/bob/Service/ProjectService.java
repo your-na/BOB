@@ -24,13 +24,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.nio.file.Files;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
@@ -47,10 +42,7 @@ public class ProjectService {
     private final NotificationRepository notificationRepository;
     // 멤버 변수로 projectFilePath를 선언
     private final String projectFilePath = "C:/uploads/project/";
-
-
     private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
-
     @PersistenceContext
     private EntityManager entityManager;  // EntityManager 주입
 
@@ -76,26 +68,26 @@ public class ProjectService {
      * ✅ 프로젝트 저장 후 반환
      */
     @Transactional
-    public ProjectEntity saveProject(ProjectEntity project) {
+    public ProjectEntity saveProject(ProjectEntity project, String customRecruitmentCount) {
         logger.info("🚀 프로젝트 저장 전 모집 종료일: {}", project.getRecruitmentEndDate());
 
-        // ✅ 1. 기본 상태를 "모집중"으로 설정
+        // 기본 상태를 "모집중"으로 설정
         if (project.getStatus() == null || project.getStatus().isEmpty()) {
             project.setStatus("모집중");
         }
 
-        // ✅ 2. userProjects가 null이면 빈 리스트로 초기화
+        // userProjects가 null이면 빈 리스트로 초기화
         if (project.getUserProjects() == null) {
-            project.setUserProjects(new ArrayList<>());  // ✅ Null 방지
+            project.setUserProjects(new ArrayList<>());  // Null 방지
         }
 
-        // ✅ 3. 주최자의 상태 가져오기
+        // 주최자의 상태 가져오기
         UserProjectEntity ownerProject = project.getUserProjects().stream()
                 .filter(userProject -> userProject.getUser().getUserNick().equals(project.getCreatedBy()))
                 .findFirst()
                 .orElse(null);
 
-        // ✅ 4. 주최자의 상태에 따라 프로젝트 상태 업데이트
+        // 주최자의 상태에 따라 프로젝트 상태 업데이트
         if (ownerProject != null) {
             String ownerStatus = ownerProject.getStatus();
             if ("진행중".equals(ownerStatus)) {
@@ -105,16 +97,37 @@ public class ProjectService {
             }
         }
 
-        // ✅ 5. 상태 최종 업데이트 (모집중 ↔ 진행중 판별)
-        project.updateStatus();  // 🔥 updateStatus()를 안전하게 호출 가능
+        // 상태 최종 업데이트
+        project.updateStatus();  // updateStatus()를 안전하게 호출 가능
 
+        // "기타"일 경우 custom-recruitment 값으로 모집 인원 설정
+        if (customRecruitmentCount != null && !customRecruitmentCount.isEmpty()) {
+            try {
+                int recruitmentCount = Integer.parseInt(customRecruitmentCount);  // 수동 입력 값 반영
+                project.setRecruitmentCount(recruitmentCount);  // 모집 인원 설정
+            } catch (NumberFormatException e) {
+                logger.error("❌ 모집 인원 입력 값이 유효하지 않습니다.");
+                throw new IllegalArgumentException("모집 인원 입력 값이 유효하지 않습니다.");
+            }
+        } else {
+            // "기타"가 아닌 경우에도 기본적인 처리
+            if (project.getRecruitmentCount() <= 0) {
+                throw new IllegalArgumentException("모집 인원 수는 1명 이상이어야 합니다.");
+            }
+        }
+
+        // 프로젝트 저장
         ProjectEntity savedProject = projectRepository.save(project);
 
         logger.info("✅ 저장된 프로젝트의 상태: {}", savedProject.getStatus());
 
+        // 프로젝트 히스토리 저장
         saveProjectHistory(savedProject, "생성됨");
+
         return savedProject;
     }
+
+
 
 
 
@@ -132,6 +145,12 @@ public class ProjectService {
         if (!owner.equals(userNick)) {
             throw new SecurityException("❌ 삭제 권한이 없습니다.");
         }
+
+        // 1. 프로젝트와 관련된 모든 팀 신청 삭제
+        userProjectRepository.deleteByProject(project);
+
+        // 2. 프로젝트와 관련된 모든 알림 삭제
+        notificationRepository.deleteByProject(project);
 
         // 프로젝트 삭제 전 히스토리 저장
         saveProjectHistory(project, "삭제됨");
@@ -273,12 +292,31 @@ public class ProjectService {
      * ✅ 사용자가 참가한 프로젝트 목록을 반환
      */
     public List<ProjectDTO> getJoinedProjects(UserEntity user) {
-        // ✅ "진행중" 또는 "완료" 상태의 프로젝트 조회
-        List<UserProjectEntity> userProjects = userProjectRepository.findByUserAndStatusIn(user, List.of("진행중", "완료"));
+        // "진행중" 또는 "완료" 상태의 프로젝트 조회, "모집중" 상태도 포함
+        List<UserProjectEntity> userProjects = userProjectRepository.findByUserAndStatusIn(user, List.of("진행중", "완료", "모집중"));
 
         return userProjects.stream()
-                .map(userProject -> convertToDTO(userProject.getProject()))
+                .map(userProject -> userProject.getProject())
+                .filter(project -> !project.getCreatedBy().equals(user.getUserNick())) // 주최자는 제외
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+
+    @Transactional
+    public void completeProjectInService(Long projectId) {
+        // 프로젝트 찾기
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("❌ 프로젝트를 찾을 수 없습니다."));
+
+        // 프로젝트 상태를 완료로 변경
+        project.completeProject();  // ProjectEntity에서 상태 변경
+
+        // 프로젝트 상태 변경 후, 팀원들의 상태도 완료로 업데이트
+        updateProjectCompletionStatus(projectId);  // 프로젝트 상태와 팀원 상태 업데이트
+
+        // 변경된 프로젝트 저장
+        projectRepository.save(project);  // DB에 반영
     }
 
 
@@ -315,39 +353,44 @@ public class ProjectService {
     }
 
 
-    // ✅ 신청 수락 로직
+    // 신청 수락 로직
     @Transactional
     public void acceptTeamRequest(Long projectId, Long userId, UserEntity hostUser) {
-        // ✅ 프로젝트 조회
         ProjectEntity project = getProjectById(projectId);
 
-        System.out.println("✅ [DEBUG] 프로젝트 ID: " + projectId);
-        System.out.println("✅ [DEBUG] 신청한 사용자 ID: " + userId);
-        System.out.println("✅ [DEBUG] 프로젝트 생성자 닉네임: " + project.getCreatedBy());
-        System.out.println("✅ [DEBUG] 현재 로그인한 유저 닉네임: " + hostUser.getUserNick());
-
-        // ✅ 프로젝트 생성자만 수락 가능
+        // 프로젝트 생성자만 수락 가능
         if (!project.getCreatedBy().equals(hostUser.getUserNick())) {
             throw new IllegalArgumentException("❌ 프로젝트 생성자만 신청을 수락할 수 있습니다.");
         }
 
-        // ✅ 신청한 사용자 조회
         UserEntity applicant = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("❌ 존재하지 않는 사용자입니다."));
 
-        // ✅ 신청 내역 가져오기
         UserProjectEntity userProject = userProjectRepository.findByUserAndProject(applicant, project)
                 .orElseThrow(() -> new IllegalArgumentException("❌ 신청 내역이 없습니다."));
 
-        // ✅ 상태를 "진행중"으로 변경
-        System.out.println("✅ [DEBUG] 변경 전 상태: " + userProject.getStatus());
-        userProject.setStatus("진행중");
+        // 주최자의 상태를 가져와서 신청자의 상태로 설정
+        String hostStatus = project.getUserProjects().stream()
+                .filter(up -> up.getUser().getUserNick().equals(project.getCreatedBy()))
+                .map(UserProjectEntity::getStatus)
+                .findFirst()
+                .orElse("모집중"); // 기본값 "모집중" 설정
+
+        // 신청자의 상태를 주최자의 상태로 설정
+        userProject.setStatus(hostStatus);
         userProjectRepository.save(userProject);
-        System.out.println("✅ [DEBUG] 변경 후 상태: " + userProject.getStatus());
+
+        // 프로젝트 상태 업데이트 (필요시 주최자의 상태를 반영)
+        project.updateStatus(); // 프로젝트 상태 갱신
+        projectRepository.save(project);
+
+        // 완료 상태 처리 (주최자가 제출을 완료했으면, 팀원들 상태도 완료로 변경)
+        completeProjectInService(projectId);  // 주최자가 완료로 변경 시 팀원도 완료로 변경
     }
 
 
-    // ❌ 신청 거절 로직
+
+    // 신청 거절 로직
     @Transactional
     public void rejectTeamRequest(Long projectId, Long userId, UserEntity hostUser) {
         // 프로젝트 조회
@@ -365,6 +408,23 @@ public class ProjectService {
         userProject.setStatus("거절됨");
         userProjectRepository.save(userProject);
     }
+
+    // 프로젝트 상태 변경 (주최자가 완료로 변경 시 팀원들도 완료로)
+    @Transactional
+    public void updateProjectCompletionStatus(Long projectId) {
+        ProjectEntity project = getProjectById(projectId);
+
+        if ("완료".equals(project.getStatus())) {
+            List<UserProjectEntity> userProjects = userProjectRepository.findByProject(project);
+            for (UserProjectEntity userProject : userProjects) {
+                userProject.setStatus("완료");
+                userProjectRepository.save(userProject);
+            }
+            project.setStatus("완료");
+            projectRepository.save(project);
+        }
+    }
+
 
     @Transactional
     public void sendTeamRequestNotification(Long projectId, String userNick) {
@@ -399,13 +459,27 @@ public class ProjectService {
     public void submitProjectFile(UserEntity user, ProjectEntity project, String fileName, MultipartFile file) {
         logger.debug("제출할 파일명: " + fileName);
 
-        // 프로젝트의 사용자 프로젝트 엔티티 찾기
+        // 주최자는 UserProjectEntity가 존재하지 않으므로, 이를 체크하여 예외처리
         UserProjectEntity userProject = userProjectRepository.findByUser_UserIdAndProject_Id(user.getUserId(), project.getId())
-                .orElseThrow(() -> new IllegalArgumentException("❌ 해당 프로젝트에 대한 신청 정보가 없습니다."));
+                .orElseGet(() -> {
+                    if (user.getUserNick().equals(project.getCreatedBy())) {
+                        // 주최자의 경우 UserProjectEntity를 생성하지 않음, 그냥 반환
+                        return null;
+                    } else {
+                        throw new IllegalArgumentException("❌ 해당 프로젝트에 대한 신청 정보가 없습니다.");
+                    }
+                });
 
-        // 제출 날짜를 현재 날짜로 설정
+        if (userProject == null) {
+            // 주최자는 파일을 제출하는 경우만, 바로 상태 변경하고 파일 처리
+            userProject = new UserProjectEntity();
+            userProject.setUser(user);
+            userProject.setProject(project);
+            userProject.setStatus("진행중");  // 기본 상태 설정 (필요에 따라 다르게 설정)
+        }
+
+        // 제출 날짜 및 파일명 저장
         userProject.setSubmissionDate(LocalDate.now());
-        // 제출한 파일명 저장
         userProject.setSubmittedFileName(fileName);
 
         // 파일 경로 확인
@@ -425,6 +499,7 @@ public class ProjectService {
         userProjectRepository.save(userProject);
         logger.debug("DB에 저장 완료: " + userProject.getSubmittedFileName());
     }
+
 
 }
 

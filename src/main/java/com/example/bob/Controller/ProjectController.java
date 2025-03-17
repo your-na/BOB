@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import com.example.bob.Repository.UserRepository;
 import com.example.bob.Repository.ProjectRepository;
+import java.util.Collections;
+
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -123,17 +125,20 @@ public class ProjectController {
 
     // 프로젝트 생성 처리
     @PostMapping("/bw")
-    public String createProject(@RequestParam("project-name") String projectName,
-                                @RequestParam("project-description") String projectDescription,
-                                @RequestParam("project-goal") String projectGoal,
-                                @RequestParam("start-date") String startDateStr,
-                                @RequestParam("end-date") String endDateStr,
-                                @RequestParam("recruitment-start-date") String recruitmentStartStr,
-                                @RequestParam("recruitment-end-date") String recruitmentEndStr,
-                                @RequestParam("recruitment") String recruitmentStr,
-                                @RequestParam(value = "recruitmentCount", required = false) String recruitmentCountStr,
-                                @AuthenticationPrincipal UserDetailsImpl userDetails,
-                                Model model) {
+    public String createProject(
+            @RequestParam("project-name") String projectName,
+            @RequestParam("project-description") String projectDescription,
+            @RequestParam("project-goal") String projectGoal,
+            @RequestParam("start-date") String startDateStr,
+            @RequestParam("end-date") String endDateStr,
+            @RequestParam("recruitment-start-date") String recruitmentStartStr,
+            @RequestParam("recruitment-end-date") String recruitmentEndStr,
+            @RequestParam("recruitment") String recruitmentStr,
+            @RequestParam(value = "recruitmentCount", required = false) String recruitmentCountStr,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        // 확인 로그
+        System.out.println("Received recruitmentCount: " + recruitmentCountStr);
 
         String creatorNick = userDetails.getUserNick();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -143,22 +148,23 @@ public class ProjectController {
         LocalDate recruitmentStartDate = LocalDate.parse(recruitmentStartStr, formatter);
         LocalDate recruitmentEndDate = LocalDate.parse(recruitmentEndStr, formatter);
 
-        int recruitment = 0;
-        if ("기타".equals(recruitmentStr)) {
-            try {
-                if (recruitmentCountStr != null && !recruitmentCountStr.isEmpty()) {
-                    recruitment = Integer.parseInt(recruitmentCountStr);
+        int recruitmentCount = 0;
+
+        if ("plus".equals(recruitmentStr)) {
+            if (recruitmentCountStr != null && !recruitmentCountStr.isEmpty()) {
+                try {
+                    recruitmentCount = Integer.parseInt(recruitmentCountStr);
+                } catch (NumberFormatException e) {
+                    return "redirect:/bw";  // 잘못된 값일 경우 리다이렉트
                 }
-            } catch (NumberFormatException e) {
-                model.addAttribute("error", "잘못된 모집 인원 값입니다.");
-                return "newproject";
+            } else {
+                return "redirect:/bw";  // 모집 인원 미입력 시 리다이렉트
             }
         } else {
             try {
-                recruitment = Integer.parseInt(recruitmentStr);
+                recruitmentCount = Integer.parseInt(recruitmentStr);
             } catch (NumberFormatException e) {
-                model.addAttribute("error", "잘못된 모집 인원 값입니다.");
-                return "newproject";
+                return "redirect:/bw";  // 잘못된 값일 경우 리다이렉트
             }
         }
 
@@ -172,16 +178,21 @@ public class ProjectController {
                 .endDate(endDate)
                 .recruitmentStartDate(recruitmentStartDate)
                 .recruitmentEndDate(recruitmentEndDate)
-                .recruitmentPeriod(recruitment)
-                .recruitmentCount(recruitment)
+                .recruitmentCount(recruitmentCount)
                 .views(0)
                 .likes(0)
                 .status("모집중")
                 .build();
 
-        ProjectEntity savedProject = projectService.saveProject(newProject);
+        // 프로젝트 저장
+        ProjectEntity savedProject = projectService.saveProject(newProject, recruitmentCountStr);
+
+        // 프로젝트 상세 페이지로 리다이렉트
         return "redirect:/postproject/" + savedProject.getId();
     }
+
+
+
 
     // 프로젝트 수정 페이지로 이동
     @GetMapping("/postproject/{id}/edit")
