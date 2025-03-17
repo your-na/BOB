@@ -117,8 +117,6 @@ public class ProjectService {
     }
 
 
-
-
     /**
      * ✅ 프로젝트 삭제 (히스토리 저장 후 실제로 삭제)
      */
@@ -132,6 +130,12 @@ public class ProjectService {
         if (!owner.equals(userNick)) {
             throw new SecurityException("❌ 삭제 권한이 없습니다.");
         }
+
+        // 1. 프로젝트와 관련된 모든 팀 신청 삭제
+        userProjectRepository.deleteByProject(project);
+
+        // 2. 프로젝트와 관련된 모든 알림 삭제
+        notificationRepository.deleteByProject(project);
 
         // 프로젝트 삭제 전 히스토리 저장
         saveProjectHistory(project, "삭제됨");

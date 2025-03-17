@@ -6,6 +6,7 @@ import com.example.bob.Entity.ProjectEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.Modifying;
 
 import java.util.Optional;
 import java.util.List;
@@ -33,4 +34,8 @@ public interface UserProjectRepository extends JpaRepository<UserProjectEntity, 
 
     List<UserProjectEntity> findByUserAndStatusIn(UserEntity user, List<String> statuses);
 
+    // ✅ 프로젝트와 관련된 팀 신청 삭제
+    @Modifying
+    @Query("DELETE FROM UserProjectEntity up WHERE up.project = :project")
+    void deleteByProject(@Param("project") ProjectEntity project);
 }
