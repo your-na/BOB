@@ -38,4 +38,7 @@ public interface UserProjectRepository extends JpaRepository<UserProjectEntity, 
     @Modifying
     @Query("DELETE FROM UserProjectEntity up WHERE up.project = :project")
     void deleteByProject(@Param("project") ProjectEntity project);
+
+    // ✅ 특정 프로젝트에 속한 모든 UserProjectEntity 조회
+    List<UserProjectEntity> findByProject(ProjectEntity project);
 }

@@ -24,13 +24,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.nio.file.Files;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
@@ -47,10 +42,7 @@ public class ProjectService {
     private final NotificationRepository notificationRepository;
     // 멤버 변수로 projectFilePath를 선언
     private final String projectFilePath = "C:/uploads/project/";
-
-
     private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
-
     @PersistenceContext
     private EntityManager entityManager;  // EntityManager 주입
 
@@ -278,11 +270,27 @@ public class ProjectService {
      */
     public List<ProjectDTO> getJoinedProjects(UserEntity user) {
         // ✅ "진행중" 또는 "완료" 상태의 프로젝트 조회
-        List<UserProjectEntity> userProjects = userProjectRepository.findByUserAndStatusIn(user, List.of("진행중", "완료"));
+        List<UserProjectEntity> userProjects = userProjectRepository.findByUserAndStatusIn(user, List.of("진행중", "완료", "모집중"));
 
         return userProjects.stream()
                 .map(userProject -> convertToDTO(userProject.getProject()))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void completeProjectInService(Long projectId) {
+        // 프로젝트 찾기
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("❌ 프로젝트를 찾을 수 없습니다."));
+
+        // 프로젝트 상태를 완료로 변경
+        project.completeProject();  // ProjectEntity에서 상태 변경
+
+        // 프로젝트 상태 변경 후, 팀원들의 상태도 완료로 업데이트
+        updateProjectCompletionStatus(projectId);  // 프로젝트 상태와 팀원 상태 업데이트
+
+        // 변경된 프로젝트 저장
+        projectRepository.save(project);  // DB에 반영
     }
 
 
@@ -319,39 +327,44 @@ public class ProjectService {
     }
 
 
-    // ✅ 신청 수락 로직
+    // 신청 수락 로직
     @Transactional
     public void acceptTeamRequest(Long projectId, Long userId, UserEntity hostUser) {
-        // ✅ 프로젝트 조회
         ProjectEntity project = getProjectById(projectId);
 
-        System.out.println("✅ [DEBUG] 프로젝트 ID: " + projectId);
-        System.out.println("✅ [DEBUG] 신청한 사용자 ID: " + userId);
-        System.out.println("✅ [DEBUG] 프로젝트 생성자 닉네임: " + project.getCreatedBy());
-        System.out.println("✅ [DEBUG] 현재 로그인한 유저 닉네임: " + hostUser.getUserNick());
-
-        // ✅ 프로젝트 생성자만 수락 가능
+        // 프로젝트 생성자만 수락 가능
         if (!project.getCreatedBy().equals(hostUser.getUserNick())) {
             throw new IllegalArgumentException("❌ 프로젝트 생성자만 신청을 수락할 수 있습니다.");
         }
 
-        // ✅ 신청한 사용자 조회
         UserEntity applicant = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("❌ 존재하지 않는 사용자입니다."));
 
-        // ✅ 신청 내역 가져오기
         UserProjectEntity userProject = userProjectRepository.findByUserAndProject(applicant, project)
                 .orElseThrow(() -> new IllegalArgumentException("❌ 신청 내역이 없습니다."));
 
-        // ✅ 상태를 "진행중"으로 변경
-        System.out.println("✅ [DEBUG] 변경 전 상태: " + userProject.getStatus());
-        userProject.setStatus("진행중");
+        // 주최자의 상태를 가져와서 신청자의 상태로 설정
+        String hostStatus = project.getUserProjects().stream()
+                .filter(up -> up.getUser().getUserNick().equals(project.getCreatedBy()))
+                .map(UserProjectEntity::getStatus)
+                .findFirst()
+                .orElse("모집중"); // 기본값 "모집중" 설정
+
+        // 신청자의 상태를 주최자의 상태로 설정
+        userProject.setStatus(hostStatus);
         userProjectRepository.save(userProject);
-        System.out.println("✅ [DEBUG] 변경 후 상태: " + userProject.getStatus());
+
+        // 프로젝트 상태 업데이트 (필요시 주최자의 상태를 반영)
+        project.updateStatus(); // 프로젝트 상태 갱신
+        projectRepository.save(project);
+
+        // 완료 상태 처리 (주최자가 제출을 완료했으면, 팀원들 상태도 완료로 변경)
+        completeProjectInService(projectId);  // 주최자가 완료로 변경 시 팀원도 완료로 변경
     }
 
 
-    // ❌ 신청 거절 로직
+
+    // 신청 거절 로직
     @Transactional
     public void rejectTeamRequest(Long projectId, Long userId, UserEntity hostUser) {
         // 프로젝트 조회
@@ -369,6 +382,23 @@ public class ProjectService {
         userProject.setStatus("거절됨");
         userProjectRepository.save(userProject);
     }
+
+    // 프로젝트 상태 변경 (주최자가 완료로 변경 시 팀원들도 완료로)
+    @Transactional
+    public void updateProjectCompletionStatus(Long projectId) {
+        ProjectEntity project = getProjectById(projectId);
+
+        if ("완료".equals(project.getStatus())) {
+            List<UserProjectEntity> userProjects = userProjectRepository.findByProject(project);
+            for (UserProjectEntity userProject : userProjects) {
+                userProject.setStatus("완료");
+                userProjectRepository.save(userProject);
+            }
+            project.setStatus("완료");
+            projectRepository.save(project);
+        }
+    }
+
 
     @Transactional
     public void sendTeamRequestNotification(Long projectId, String userNick) {
