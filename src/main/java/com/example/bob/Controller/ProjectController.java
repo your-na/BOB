@@ -421,4 +421,24 @@ public class ProjectController {
         return "projecthistory"; // 🔥 프로젝트 히스토리 페이지
     }
 
+    @GetMapping("/todoadd")
+    public String showAddPage() {
+        return "todo_add";
+    }
+
+    @GetMapping("/todocrud")
+    public String showCrudPage() {
+        return "todo_crud";
+    }
+
+    @GetMapping("/todohome")
+    public String showHomePage() {
+        return "todo_home";
+    }
+
+    @GetMapping("/todoplan")
+    public String showPlanPage() {
+        return "todo_plan";
+    }
 }
+
