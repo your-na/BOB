@@ -161,6 +161,10 @@ public class UserController {
     @GetMapping("/adcontest")
     public String adcontestform() {return "ad_contest";}
 
-    @GetMapping("adnewcon")
+    @GetMapping("/adnewcon")
     public String adnewform() {return "ad_newcontest";}
+
+    //기업 회원가입&메인 작업중 임의 주소
+    @GetMapping("/cosignup")
+    public String cosignupform() {return "co_signup";}
 }

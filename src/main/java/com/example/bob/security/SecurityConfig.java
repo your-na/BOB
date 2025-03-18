@@ -30,13 +30,13 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())  // CSRF 활성화 및 쿠키 저장
-                        .ignoringRequestMatchers("/login", "/signup", "/profile/update", "/logout", "/teamrequest", "/teamrequest/accept", "/teamrequest/reject", "/file/project/submit")  // CSRF 예외 처리
+                        .ignoringRequestMatchers("/login", "/signup", "/cosignup","/profile/update", "/logout", "/teamrequest", "/teamrequest/accept", "/teamrequest/reject", "/file/project/submit")  // CSRF 예외 처리
                 )
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**", "/project").permitAll()  // 모든 사용자 접근 허용
                         .requestMatchers("/login", "/sign").anonymous()  // 로그인 페이지는 익명 접근 허용
                         .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject").authenticated()  // 인증된 사"용자만 접근 가능
-                        .requestMatchers("/signup", "/check-nickname", "/check-username").permitAll()  // 회원가입 페이지는 익명 접근 허용
+                        .requestMatchers("/signup", "/cosignup", "/check-nickname", "/check-username").permitAll()  // 회원가입 페이지는 익명 접근 허용
                         .anyRequest().authenticated()  // 나머지 요청은 인증된 사용자만 접근 가능
                 )
                 .formLogin(form -> form
