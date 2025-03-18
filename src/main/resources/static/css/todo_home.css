@@ -1,0 +1,234 @@
+/* 기본 설정 */
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.1);
+    margin: 0;
+}
+
+/* 컨테이너 */
+.container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* 모달 */
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 500px;
+    height: 700px;
+}
+
+/* 모달 내부 컨테이너 */
+.input-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 500px;
+    height: 700px;
+    display: block;
+}
+
+/* 헤더 */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.header h2 {
+    margin: 0;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.back-btn, .close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 10px;
+}
+
+/* 프로젝트 정보 */
+.project-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    font-size: 16px;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc; /* ✅ 구분선 추가 */
+    padding-bottom: 1px; /* ✅ 선과 내용 사이 간격 */
+}
+
+.project-info h3{
+    margin-left: 20px;
+}
+
+.date {
+    font-size: 14px;
+    color: gray;
+}
+
+/* 버튼 그룹 */
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+    margin-left: 250px;
+}
+
+.submit-btn, .chat-btn {
+    background-color: white;
+    color: #19CB13;
+    font-size: 16px;
+    border: 2px solid #19CB13;
+    border-radius: 20px;
+    padding: 8px 15px;
+    cursor: pointer;
+}
+
+.submit-btn:hover, .chat-btn:hover {
+    background-color: #19CB13;
+    color: white;
+}
+
+/* 공지사항 */
+.notice-section {
+    margin: 20px 0;
+    padding: 0 10px;
+}
+
+.notice-section textarea {
+    width: 95%;
+    height: 80px;
+    padding: 10px;
+    border: 1px solid gray;
+    border-radius: 8px;
+    font-size: 14px;
+    resize: none;
+}
+
+/* 멤버 섹션 */
+.member-section {
+    margin-top: 20px;
+    padding: 0 10px;
+}
+
+.member-section h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+/* 멤버 리스트 */
+.member-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* 개별 멤버 항목 */
+.member-item {
+    display: flex;
+    align-items: center; /* ✅ 텍스트와 아이콘을 같은 높이로 */
+    justify-content: space-between;
+    font-size: 16px;
+    padding: 5px 0;
+}
+
+/* 왕관과 이름을 감싸는 컨테이너 */
+.member-info {
+    display: flex;
+    align-items: center; /* ✅ 왕관과 이름을 나란히 */
+}
+
+.member-section li {
+    display: flex;
+    align-items: center; /* ✅ 수직 정렬 */
+    justify-content: space-between;
+    font-size: 16px;
+    padding: 5px 0;
+}
+
+/* 왕관 스타일 */
+.crown {
+    font-size: 16px; /* ✅ 왕관 크기 줄이기 */
+    display: flex; /* ✅ 높이 맞추기 */
+    align-items: center;
+    justify-content: center;
+    margin-right: 3px; /* ✅ 왕관과 이름 사이 간격 줄이기 */
+}
+
+/* 멤버 이름 */
+.member-name {
+    font-size: 16px;
+    display: inline-block; /* ✅ 불필요한 공백 방지 */
+    vertical-align: middle; /* ✅ 왕관과 높이 맞추기 */
+}
+
+/* 채팅 보내기 버튼 */
+.chat-send {
+    background: none;
+    border: none;
+    color: gray;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.chat-send:hover {
+    color: black;
+}
+
+/* 사이드바 (오른쪽 고정) */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    height: fit-content;
+    margin-left: 10px;
+}
+
+/* 사이드바 버튼 */
+.sidebar-btn {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.3s;
+    width: 80px;
+}
+
+/* 선택된 버튼 */
+.sidebar-btn.active {
+    background: gray;
+    color: white;
+    font-weight: bold;
+}
+
+/* 버튼 호버 효과 */
+.sidebar-btn:hover {
+    background: #f0f0f0;
+}
+
