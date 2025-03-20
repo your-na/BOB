@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>찜한 공모전</title>
+    <link rel="stylesheet" href="/css/liked_contest.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<div class="container">
+    <h1>찜한 공모전</h1>
+    <hr>
+
+    <!-- 검색 & 전체 선택 -->
+    <div class="filter-container">
+        <input type="text" id="search-box" placeholder="공모전 검색..." onkeyup="filterContests()">
+        <label>
+            <input type="checkbox" id="select-all" onclick="toggleSelectAll()"> 전체 선택
+        </label>
+        <button id="delete-button" onclick="deleteSelected()">삭제</button>
+    </div>
+
+    <!-- 공모전 목록 -->
+    <div class="contest-grid">
+        <!-- 공모전 카드 (반복) -->
+        <div class="contest-card">
+            <input type="checkbox" class="contest-checkbox">
+            <img src="/images/contest1.jpg" alt="공모전 포스터">
+            <h2 class="contest-title">2025제 1회 홀체대회</h2>
+            <p>(주)공모 | 2025.12.12</p>
+        </div>
+
+        <div class="contest-card">
+            <input type="checkbox" class="contest-checkbox">
+            <img src="/images/contest2.jpg" alt="공모전 포스터">
+            <h2 class="contest-title">프로그램 공모전</h2>
+            <p>(주)공모 | 2025.10.05</p>
+        </div>
+
+        <div class="contest-card">
+            <input type="checkbox" class="contest-checkbox">
+            <img src="/images/contest3.jpg" alt="공모전 포스터">
+            <h2 class="contest-title">아이디어 공모전</h2>
+            <p>(주)공모 | 2025.11.30</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/liked_contest.js"></script>
+
+</body>
+</html>

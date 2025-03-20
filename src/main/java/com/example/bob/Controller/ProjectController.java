@@ -440,5 +440,8 @@ public class ProjectController {
     public String showPlanPage() {
         return "todo_plan";
     }
+
+    @GetMapping("/appstatus")
+    public String showstatusform() {return "application_status";}
 }
 

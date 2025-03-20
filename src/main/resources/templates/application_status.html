@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>지원 현황</title>
+    <link rel="stylesheet" href="/css/application_status.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<h2 class="page-title">지원 현황</h2>
+<hr>
+
+<!-- ✅ 필터 -->
+<div class="filter-container">
+    <input type="text" id="search-box" placeholder="검색하기" onkeyup="filterApplications()">
+    <select id="filter-select" onchange="filterApplications()">
+        <option value="all">전체</option>
+        <option value="contest">공모전</option>
+        <option value="job">구직</option>
+        <option value="project">프로젝트</option>
+    </select>
+</div>
+
+<!-- ✅ 지원 현황 리스트 -->
+<div class="application-list">
+    <!-- 공모전 지원 -->
+    <div class="application-card contest">
+        <h3>[공모전] 이름이 들어갈 자리</h3>
+        <p class="date">📅 제출일 2025.02.10</p>
+        <button class="status-button pending">⏳ 지원 전 대기중</button>
+    </div>
+
+    <!-- 구직 지원 -->
+    <div class="application-card job">
+        <h3>[구직] 이력서 제출 완료</h3>
+        <p class="date">📅 제출일 2025.02.10</p>
+        <button class="status-button pending">⏳ 지원 후 대기중</button>
+    </div>
+
+    <!-- 프로젝트 지원 -->
+    <div class="application-card project">
+        <h3>[프로젝트] 개발자 모집 지원</h3>
+        <p class="date">📅 제출일 2025.02.10</p>
+        <button class="status-button pending">⏳ 지원 후 대기중</button>
+    </div>
+</div>
+
+<script src="/js/application_status.js"></script>
+</body>
+</html>
