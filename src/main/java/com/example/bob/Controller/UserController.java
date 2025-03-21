@@ -160,6 +160,8 @@ public class UserController {
     public String conactform() {return "contestact";}
     @GetMapping("/likedcontest")
     public String likedform() {return "liked_contest";}
+    @GetMapping("/conhistory")
+    public String conhistoryform() {return "contest_history";}
 
     //관리자 공모전 임의 주소
     @GetMapping("/adcontest")
@@ -168,6 +170,9 @@ public class UserController {
     @GetMapping("/adnewcon")
     public String adnewform() {return "ad_newcontest";}
 
+    //관리자^_^
+    @GetMapping("/sidebar")
+    public String adsideform() {return "ad_sidebar";}
     //기업 회원가입&메인 작업중 임의 주소
     @GetMapping("/cosignup")
     public String cosignupform() {return "co_signup";}

@@ -2,43 +2,15 @@
     position: relative;
     text-align: center;
     margin: 0;
-    margin-top: 100px;
+    margin-top: 10px;
 }
 
 .content {
     display: flex;
-    margin: 20px auto;
+    margin-left: 20%;
     max-width: 1200px;
-}
-
-.side-info {
-    width: 30%;
-    padding: 20px;
-    text-align: center;
-}
-
-.poster {
-    width: 200px;
-    height: 250px;
-    margin-bottom: 20px;
-}
-
-.apply-button {
-    display: inline-block;
-    background-color: #66dc66;
-    color: #fff;
-    padding: 10px 20px;
-    font-weight: bold;
-    border: none;
-    border-radius: 20px;
-    cursor: default;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-.apply-button:hover {
-    background-color: #70d370;
-    font-weight: bold;
+    align-items: center;
+    white-space: nowrap;
 }
 
 /* 📌 필터 스타일 */
@@ -104,7 +76,6 @@
 }
 
 .contest-table {
-
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
@@ -211,7 +182,7 @@
     border: none;
     cursor: pointer;
     padding: 5px;
-    margin-left: 180px;
+    margin-left: 100px;
 }
 
 .filter-btn img {
@@ -378,7 +349,7 @@
     text-align: center;
     cursor: pointer;
     height: 30px;
-    margin-left: 620px;
+    margin-left: 560px;
     margin-top: 30px;
 }
 

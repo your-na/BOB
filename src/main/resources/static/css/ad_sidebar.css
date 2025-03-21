@@ -1,0 +1,94 @@
+/* ✅ 전체 스타일 */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    display: flex;
+    background-color: #f9f9f9;
+}
+
+/* ✅ 사이드바 스타일 */
+.sidebar {
+    width: 300px;
+    height: 100vh; /* ✅ 화면 전체 높이 유지 */
+    background-color: #fff;
+    border-right: 1px solid #ddd;
+    position: fixed;
+    left: 0;
+    top: 0;
+    transition: transform 0.3s ease-in-out;
+    overflow-y: auto; /* ✅ 스크롤 가능하도록 변경 */
+}
+
+/* ✅ 사이드바 숨기기 */
+.sidebar.closed {
+    transform: translateX(-100%);
+}
+
+/* ✅ 사이드바 헤더 */
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #ddd;
+}
+
+/* ✅ 메뉴 스타일 */
+.menu {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+/* ✅ 메뉴 제목 스타일 */
+.menu-title {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px 20px;
+    color: #666;
+    background: #f7f7f7;
+    border-bottom: 1px solid #ddd;
+}
+
+/* ✅ 기본 메뉴 스타일 */
+.menu li {
+    padding: 10px 20px;
+}
+
+.menu li a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+    padding: 8px 15px;
+    transition: background 0.3s, color 0.3s;
+}
+
+/* ✅ 메뉴 Hover 효과 */
+.menu li a:hover {
+    background-color: #f0f0f0;
+    border-radius: 5px;
+}
+
+/* ✅ 현재 활성화된 페이지 스타일 */
+.menu li a.active {
+    color: green;
+    font-weight: bold;
+}
+
+/* ✅ 로그아웃 버튼 */
+.logout a {
+    color: #676767;
+    font-weight: bold;
+}
+
+/* ✅ main-content 스타일 */
+.main-content {
+    margin-left: 270px;
+    padding: 20px;
+    flex: 1;
+    width: calc(100% - 270px); /* 사이드바를 제외한 너비 */
+}
