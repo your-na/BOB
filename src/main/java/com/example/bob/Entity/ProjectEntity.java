@@ -69,15 +69,18 @@ public class ProjectEntity {
     private Integer dDay;  // ✅ int → Integer 변경 (null 값 허용)
 
     @ElementCollection
+    @Builder.Default
     private List<Long> likedUsers = new ArrayList<>(); // 좋아요 누른 유저들
 
     @Column(nullable = false)
     private int currentParticipants; // 실제 참여 인원
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<UserProjectEntity> userProjects = new ArrayList<>();  // ✅ 초기화 추가
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ProjectHistoryEntity> projectHistoryEntities = new ArrayList<>();
 
 

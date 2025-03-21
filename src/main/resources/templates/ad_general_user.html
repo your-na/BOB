@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>일반 회원 목록</title>
+  <link rel="stylesheet" href="/css/ad_general_user.css">
+  <script defer src="/js/ad_general_user.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <h1>일반 회원 목록</h1>
+
+  <!-- 필터 & 검색 -->
+  <div class="top-bar">
+    <div class="filter-dropdown">
+      <button class="filter-btn">필터 ▼</button>
+      <ul class="filter-menu">
+        <li data-filter="date-desc">최신순</li>
+        <li data-filter="date-asc">오래된순</li>
+      </ul>
+    </div>
+
+    <div class="search-wrapper">
+      <input type="text" id="search-input" placeholder="회원 검색">
+    </div>
+
+    <button class="delete-btn" id="delete-selected">삭제</button>
+  </div>
+
+  <table class="user-table">
+    <thead>
+    <tr>
+      <th>번호</th>
+      <th><input type="checkbox" id="select-all"></th>
+      <th>회원 아이디</th>
+      <th>닉네임</th>
+      <th>사용자 이름</th>
+      <th>이메일</th>
+      <th>전화번호</th>
+      <th>가입일</th>
+      <th>정보</th>
+    </tr>
+    </thead>
+    <tbody id="user-body">
+    <!-- ✅ Thymeleaf 반복문으로 회원 목록 출력 -->
+    <tr th:each="user, iterStat : ${users.content}">
+      <td th:text="${iterStat.count}"></td>
+      <td><input type="checkbox" class="user-checkbox" th:data-id="${user.userId}"></td>
+      <td th:text="${user.userIdLogin}"></td>
+      <td th:text="${user.userNick}"></td>
+      <td th:text="${user.userName}"></td>
+      <td th:text="${user.userEmail} ?: '이메일 없음'"></td>
+      <td th:text="${user.userPhone} ?: '전화번호 없음'"></td>
+      <td th:text="${#temporals.format(user.accountCreatedAt, 'yyyy-MM-dd')}"></td>
+      <td><button class="detail-btn" th:data-id="${user.userId}">상세보기</button></td>
+    </tr>
+    </tbody>
+  </table>
+
+  <!-- 페이지네이션 -->
+  <div class="pagination">
+    <button id="prev-page" disabled>◀</button>
+    <span id="page-numbers"></span>
+    <button id="next-page">▶</button>
+  </div>
+</div>
+
+</body>
+</html>

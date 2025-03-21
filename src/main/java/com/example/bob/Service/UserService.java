@@ -8,6 +8,8 @@ import com.example.bob.Repository.UserHistoryRepository;
 import com.example.bob.Repository.UserRepository;
 import com.example.bob.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -193,6 +195,24 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new RuntimeException("Notification not found"));
         notification.setIsRead(true);  // setRead -> setIsRead로 수정
         notificationRepository.save(notification);
+    }
+
+    // ✅ 일반 회원 목록 조회 (페이징 처리)
+    public Page<UserDTO> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable)
+                .map(UserDTO::fromEntity);
+    }
+
+    // ✅ 특정 회원 조회
+    public UserDTO getUserById(Long userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("해당 사용자가 없습니다."));
+        return UserDTO.fromEntity(user);
+    }
+
+    // ✅ 회원 삭제 (관리자용)
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
     }
 
 }
