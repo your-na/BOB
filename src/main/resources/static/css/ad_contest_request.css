@@ -1,0 +1,99 @@
+/* 공모전 요청 페이지 스타일 */
+.contest-request {
+    margin-top: 90px;
+    width: 80%;
+    margin-left: 80px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid grey;
+}
+
+/* 폼 컨테이너 */
+.form-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+/* 공모전 포스터 (읽기 전용) */
+.poster-preview {
+    margin-left: 100px;
+    margin-top: 40px;
+    width: 200px;
+    height: 300px;
+    background: #f0fff0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+}
+
+.poster-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 공모전 정보 테이블 */
+.contest-table {
+    width: 50%;
+    margin-left: 160px;
+    border-collapse: collapse;
+}
+
+.contest-table th, .contest-table td {
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.contest-table th {
+    width: 150px;
+    font-weight: bold;
+}
+
+/* 상세 내용 */
+.details-container {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f9f9f9;
+}
+
+/* 버튼 스타일 */
+.button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.approve-btn {
+    background: #00b800;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.reject-btn {
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.approve-btn:hover {
+    background: #008f00;
+}
+
+.reject-btn:hover {
+    background: #cc0000;
+}

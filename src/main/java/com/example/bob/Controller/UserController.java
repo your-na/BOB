@@ -170,6 +170,9 @@ public class UserController {
     @GetMapping("/adnewcon")
     public String adnewform() {return "ad_newcontest";}
 
+    @GetMapping("adconlist")
+    public String conlistform() {return "ad_contest_list";}
+
     //관리자^_^
     @GetMapping("/sidebar")
     public String adsideform() {return "ad_sidebar";}
