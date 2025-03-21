@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+        <html lang="ko">
+        <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>기업 회원 가입 요청</title>
+    <link rel="stylesheet" href="/css/ad_company_request.css">
+    <script defer src="/js/ad_company_request.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h1>기업 회원 가입 요청</h1>
+
+    <!-- 필터 & 검색 -->
+    <div class="top-bar">
+        <select id="sort-filter">
+            <option value="latest">최신순</option>
+            <option value="oldest">오래된 순</option>
+        </select>
+
+        <div class="search-wrapper">
+            <input type="text" id="search-input" placeholder="기업 검색">
+        </div>
+
+        <button class="delete-btn" id="delete-selected">삭제</button>
+    </div>
+
+    <!-- 기업 회원 목록 -->
+    <table class="company-table">
+        <thead>
+        <tr>
+            <th>번호</th>
+            <th><input type="checkbox" id="select-all"></th>
+            <th>기업 회원 아이디</th>
+            <th>기업명</th>
+            <th>사용자 이름</th>
+            <th>이메일</th>
+            <th>전화번호</th>
+            <th>등록일</th>
+            <th>가입 상태</th>
+        </tr>
+        </thead>
+        <tbody id="company-body">
+        <!-- 데이터가 여기에 들어감 -->
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
+</title>
+</head>
+<body>
+
+</body>
+</html>

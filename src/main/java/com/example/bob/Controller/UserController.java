@@ -173,6 +173,9 @@ public class UserController {
     //관리자^_^
     @GetMapping("/sidebar")
     public String adsideform() {return "ad_sidebar";}
+
+    @GetMapping("adcomrequest")
+    public String adrequestform() {return "ad_company_request";}
     //기업 회원가입&메인 작업중 임의 주소
     @GetMapping("/cosignup")
     public String cosignupform() {return "co_signup";}
