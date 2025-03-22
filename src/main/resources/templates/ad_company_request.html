@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-        <html lang="ko">
-        <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>기업 회원 가입 요청</title>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>기업 회원 가입 요청</title>
     <link rel="stylesheet" href="/css/ad_company_request.css">
     <script defer src="/js/ad_company_request.js"></script>
 </head>
@@ -14,37 +14,55 @@
 
     <!-- 필터 & 검색 -->
     <div class="top-bar">
-        <select id="sort-filter">
-            <option value="latest">최신순</option>
-            <option value="oldest">오래된 순</option>
-        </select>
+        <form method="get" th:action="@{/admin/company/request}" class="filter-form">
+            <select id="sort-filter" name="sort">
+                <option value="latest" th:selected="${sort == 'latest'}">최신순</option>
+                <option value="oldest" th:selected="${sort == 'oldest'}">오래된 순</option>
+            </select>
 
-        <div class="search-wrapper">
-            <input type="text" id="search-input" placeholder="기업 검색">
-        </div>
+            <div class="search-wrapper">
+                <input type="text" id="search-input" name="keyword" th:value="${keyword}" placeholder="기업 검색">
+            </div>
+        </form>
 
         <button class="delete-btn" id="delete-selected">삭제</button>
     </div>
 
-    <!-- 기업 회원 목록 -->
-    <table class="company-table">
-        <thead>
-        <tr>
-            <th>번호</th>
-            <th><input type="checkbox" id="select-all"></th>
-            <th>기업 회원 아이디</th>
-            <th>기업명</th>
-            <th>사용자 이름</th>
-            <th>이메일</th>
-            <th>전화번호</th>
-            <th>등록일</th>
-            <th>가입 상태</th>
-        </tr>
-        </thead>
-        <tbody id="company-body">
-        <!-- 데이터가 여기에 들어감 -->
-        </tbody>
-    </table>
+    <!-- 기업 회원 목록 테이블 -->
+    <form method="post" th:action="@{/admin/company/delete-selected}">
+        <table class="company-table">
+            <thead>
+            <tr>
+                <th>번호</th>
+                <th><input type="checkbox" id="select-all"></th>
+                <th>아이디</th>
+                <th>기업명</th>
+                <th>대표자명</th>
+                <th>이메일</th>
+                <th>전화번호</th>
+                <th>신청일</th>
+                <th>가입 상태</th>
+            </tr>
+            </thead>
+            <tbody id="company-body">
+            <tr th:each="company, stat : ${companyList}">
+                <td th:text="${stat.count}"></td>
+                <td>
+                    <input type="checkbox" name="selectedIds" th:value="${company.id}" class="company-checkbox">
+                </td>
+                <td th:text="${company.userIdLogin}"></td>
+                <td th:text="${company.companyName}"></td>
+                <td th:text="${company.ceoName}"></td>
+                <td th:text="${company.email} ?: '이메일 없음'"></td>
+                <td th:text="${company.phone} ?: '번호 없음'"></td>
+                <td th:text="${#temporals.format(company.createdAt, 'yyyy-MM-dd')}"></td>
+                <td>
+                    <a th:href="@{/admin/company/approve/{id}(id=${company.id})}" class="status-btn">승인대기</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
 </div>
 
 </body>

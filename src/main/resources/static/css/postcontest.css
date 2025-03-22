@@ -98,8 +98,68 @@
     border: none;
     border-radius: 10px;
     cursor: pointer;
+    margin-left: 25%;
 }
 
 .apply-btn:hover {
     background: #008f00;
+}
+
+/* 버튼 2개 나란히 배치 */
+.button-box {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 20px;
+}
+
+.recruit-btn {
+    width: 200px;
+    height: 47px;
+    color: green;
+    border: 2px solid green;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-right: 25%;
+    margin-top: 18px;
+
+}
+
+.recruit-btn:hover {
+    background: #005fcc;
+}
+
+/* 팀원 모집 글 리스트 */
+.recruit-list {
+    margin-top: 40px;
+    border-top: 2px solid #ddd;
+    padding-top: 20px;
+}
+
+.recruit-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.recruit-table th,
+.recruit-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.recruit-table th {
+    background-color: #f2f2f2;
+}
+
+.detail-link {
+    text-decoration: none;
+    color: #0078ff;
+    font-weight: bold;
+}
+
+.detail-link:hover {
+    text-decoration: underline;
 }

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>기업 가입 승인</title>
+  <link rel="stylesheet" href="/css/ad_company_approve.css">
+</head>
+<body>
+
+<div class="approve-container">
+  <h2>기업 회원 가입 승인</h2>
+
+  <form method="post" th:action="@{/admin/company/approve/{id}(id=${company.id})}">
+    <div class="form-group">
+      <label>기업명</label>
+      <input type="text" name="companyName" th:value="${company.name}" readonly>
+    </div>
+
+    <div class="form-group">
+      <label>사업자 등록 번호</label>
+      <input type="text" name="businessNumber" th:value="${company.businessNumber}" readonly>
+    </div>
+
+    <div class="form-group">
+      <label>대표명</label>
+      <input type="text" name="ceoName" th:value="${company.ceoName}" readonly>
+    </div>
+
+    <div class="form-group">
+      <label>이메일</label>
+      <input type="text" name="email" th:value="${company.email}" readonly>
+    </div>
+
+    <div class="form-group">
+      <label>신청 날짜</label>
+      <input type="text" name="requestDate" th:value="${#temporals.format(company.createdAt, 'yyyy-MM-dd')}" readonly>
+    </div>
+
+    <!-- ✅ 거절 사유 입력칸 -->
+    <div class="form-group">
+      <label>거절 사유 (거절 시 입력)</label>
+      <textarea name="rejectReason" rows="3" placeholder="예: 등록 정보 불일치로 인해 승인되지 않았습니다."></textarea>
+    </div>
+
+    <div class="button-group">
+      <button type="submit" class="approve-btn">가입 승인</button>
+      <a th:href="@{/admin/company/reject/{id}(id=${company.id})}" class="reject-btn">거절</a>
+    </div>
+  </form>
+</div>
+
+</body>
+</html>

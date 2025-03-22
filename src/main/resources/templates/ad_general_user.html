@@ -15,11 +15,10 @@
   <!-- 필터 & 검색 -->
   <div class="top-bar">
     <div class="filter-dropdown">
-      <button class="filter-btn">필터 ▼</button>
-      <ul class="filter-menu">
-        <li data-filter="date-desc">최신순</li>
-        <li data-filter="date-asc">오래된순</li>
-      </ul>
+      <select id="sort-filter" name="sort">
+        <option value="latest" th:selected="${sort == 'latest'}">최신순</option>
+        <option value="oldest" th:selected="${sort == 'oldest'}">오래된 순</option>
+      </select>
     </div>
 
     <div class="search-wrapper">
