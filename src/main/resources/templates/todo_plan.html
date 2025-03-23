@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>프로젝트</title>
+  <link rel="stylesheet" href="css/todo_plan.css">
+</head>
+<body>
+
+<div class="container"> <!-- 캘린더와 사이드바를 감싸는 컨테이너 -->
+  <!-- 캘린더 모달 -->
+  <div class="modal">
+    <div class="calendar-container">
+      <div class="header">
+        <button class="back-btn">&lt;</button>
+        <h2>프로젝트A</h2>
+        <button class="close-btn">&times;</button>
+      </div>
+      <div class="calendar-header">
+        <button id="prev-month">&lt;</button>
+        <h3 id="current-month">2024년 12월</h3>
+        <button id="next-month">&gt;</button>
+      </div>
+      <table class="calendar">
+        <thead>
+        <tr>
+          <th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
+        </tr>
+        </thead>
+        <tbody id="calendar-body">
+        <!-- 캘린더 동적 생성 -->
+        </tbody>
+      </table>
+      <div class="task-header">
+        <h3>12월 19일 할 일</h3>
+        <button class="add-task-btn">할 일 등록</button>
+      </div>
+      <ul class="todo-list">
+        <li><input type="checkbox"> (프론트) 회원가입 HTML 제작 <span class="d-day">D-5</span></li>
+        <li><input type="checkbox"> (프론트) 로그인 HTML 제작 <span class="d-day">D-10</span></li>
+        <li><input type="checkbox"> 메인페이지 구현하기 위해 JS 공부하기 <span class="d-day">D-15</span></li>
+      </ul>
+    </div>
+
+    <!-- 사이드바 (프로젝트A 모달의 오른쪽에 위치) -->
+    <div class="sidebar">
+      <button class="sidebar-btn">홈</button>
+      <button class="sidebar-btn active">할 일</button>
+      <button class="sidebar-btn">CRUD</button>
+      <button class="sidebar-btn">+</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/todo_plan.js"></script>
+</body>
+</html>

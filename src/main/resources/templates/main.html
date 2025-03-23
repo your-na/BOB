@@ -90,7 +90,13 @@
 
 
 <!-- 플로팅 캘린더 버튼 -->
-<button class="floating-calendar" onclick="openCalendarPopup()"><img src="/images/schedule.png" alt=""></button>
+<button class="floating-calendar" onclick="toggleTaskPlanButtons()"><img src="/images/schedule.png" alt=""></button>
+
+<!-- 새롭게 나타날 버튼들 (초기에는 숨김 상태) -->
+<div id="task-plan-buttons" class="hidden">
+    <button class="task-button" onclick="openTaskPopup()">✔<br>TODO</button>
+    <button class="plan-button" onclick="openPlanPopup()">✏<br>PLAN</button>
+</div>
 
 <!-- 푸터 -->
 <footer class="footer">
@@ -98,46 +104,29 @@
 </footer>
 
 <script>
-    // 팝업 열기 함수
-    function openCalendarPopup() {
-        const popup = document.getElementById("calendarPopup");
-        if (popup) {
-            popup.style.display = "block";
+    function toggleTaskPlanButtons() {
+        var buttons = document.getElementById("task-plan-buttons");
+        if (buttons.style.display === "none" || buttons.style.display === "") {
+            buttons.style.display = "flex"; // 버튼 보이기
+        } else {
+            buttons.style.display = "none"; // 버튼 숨기기
         }
     }
 
-    // 팝업 닫기 함수
-    function closeCalendarPopup() {
-        const popup = document.getElementById("calendarPopup");
-        if (popup) {
-            popup.style.display = "none";
-        }
+    function openTaskPopup() {
+        let popup = window.open("/popup", "PopupWindow", "width=500,height=600,resizable=no,scrollbars=no");
+
+        // 팝업 창 크기를 내부 컨텐츠에 맞게 조정
+        popup.onload = function () {
+            popup.resizeTo(popup.document.body.scrollWidth, popup.document.body.scrollHeight);
+        };
     }
 
-    // 팝업 동적 로드
-    document.addEventListener("DOMContentLoaded", () => {
-        fetch("calendarpopup.html")
-            .then(response => response.text())
-            .then(data => {
-                // 동적으로 HTML 삽입
-                document.getElementById("calendar-container").innerHTML = data;
+    function openPlanPopup() {
+        window.open('/plan', 'planPopup', 'width=400,height=500,resizable=no,scrollbars=no');
+    }
 
-                // 닫기 버튼 이벤트 추가
-                const closeBtn = document.getElementById("closePopup");
-                if (closeBtn) {
-                    closeBtn.addEventListener("click", closeCalendarPopup);
-                }
 
-                // 팝업 외부 클릭 시 닫기
-                window.addEventListener("click", (event) => {
-                    const popup = document.getElementById("calendarPopup");
-                    if (event.target === popup) {
-                        closeCalendarPopup();
-                    }
-                });
-            })
-            .catch(error => console.error("Failed to load calendar popup:", error));
-    });
     //배너 수정할거양 흥.
     document.addEventListener('DOMContentLoaded', () => {
         const prevBtn = document.querySelector('.prev-btn');

@@ -1,0 +1,214 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.1);
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* 사이드바와 캘린더 사이 여백 */
+}
+
+/* 캘린더 모달 */
+.calendar-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 500px;
+    height: 800px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    font-size: 22px;
+    font-weight: bold;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.header h2 {
+    margin: 0;
+    font-weight: bold;
+    flex-grow: 1; /* 중앙 정렬 */
+    text-align: center;
+}
+
+.back-btn, .close-btn {
+    background: none;
+    border: none;
+    font-size: 24px; /* 버튼 크기 */
+    cursor: pointer;
+    padding: 10px;
+}
+
+.back-btn {
+    font-weight: bold;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 30px; /* 기존 28px에서 두 배로 증가 */
+    cursor: pointer;
+    padding: 20px; /* 클릭 영역 확대 */
+    line-height: 1; /* 버튼이 커져도 정렬 유지 */
+}
+
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px; /* 좌우 버튼과 텍스트 간격 */
+}
+
+#prev-month, #next-month {
+    background: none;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.calendar {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.calendar th {
+    background-color: #06B600; /* 어두운 초록색 */
+    color: white; /* 하얀색 글자 */
+    padding: 10px;
+    text-align: center;
+}
+
+.calendar td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    height: 40px;
+}
+
+.todo-list {
+    list-style: none;
+    padding: 0;
+}
+
+.todo-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 0;
+}
+
+.d-day {
+    font-weight: bold;
+    color: green;
+}
+
+.task-section{
+    margin: 20px 0;
+}
+
+.task-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* 요소를 양 끝으로 정렬 */
+    margin: 20px 0;
+    width: 100%;
+}
+
+.task-header h3 {
+    margin: 0;
+}
+
+.add-task-btn {
+    background-color: #19CB13;
+    color: white;
+    font-size: 14px;
+    width: 100px;
+    cursor: pointer;
+    border-radius: 10px;
+    border: none;
+    padding: 5px 8px;
+
+    display: inline-block; /* 버튼이 제목과 같은 줄에 위치하도록 설정 */
+}
+
+.calendar-cell {
+    cursor: pointer;
+}
+
+.calendar-cell:hover {
+    background-color: #d4f1d4; /* 마우스 오버 시 색상 변경 */
+}
+
+.selected {
+    background-color: #19CB13; /* 선택된 날짜 강조 */
+    color: white;
+    font-weight: bold;
+}
+
+/* 사이드바 (캘린더 오른쪽 고정) */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    height: fit-content;
+}
+
+/* 사이드바 버튼 */
+.sidebar-btn {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.3s;
+    width: 80px;
+}
+
+/* 선택된 버튼 */
+.sidebar-btn.active {
+    background: gray;
+    color: white;
+    font-weight: bold;
+}
+
+/* 버튼 호버 효과 */
+.sidebar-btn:hover {
+    background: #f0f0f0;
+}

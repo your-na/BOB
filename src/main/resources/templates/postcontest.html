@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>공모전 상세 페이지</title>
-    <link rel="stylesheet" href="/css/postcontest.css">
-    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" href="/css/postcontest.css" />
+    <link rel="stylesheet" th:href="@{/css/header.css}" />
 </head>
 <body>
+
 <!-- header -->
 <div th:insert="~{header :: header}"></div>
 
@@ -21,46 +22,19 @@
 
     <div class="contest-content">
         <!-- 공모전 대표 이미지 -->
-        <img src="/images/contest-banner.png" alt="공모전 배너" class="contest-banner">
+        <img src="/images/contest-banner.png" alt="공모전 배너" class="contest-banner" />
 
         <!-- 공모전 정보 테이블 -->
         <table class="contest-table">
-            <tr>
-                <th>주최/주관</th>
-                <td>한국정보기술융합회</td>
-            </tr>
-            <tr>
-                <th>대표 분야</th>
-                <td>논문</td>
-            </tr>
-            <tr>
-                <th>참가 대상</th>
-                <td>청소년, 어린이</td>
-            </tr>
-            <tr>
-                <th>대회 지역</th>
-                <td>대전지역</td>
-            </tr>
-            <tr>
-                <th>접수 기간</th>
-                <td>2024.11.14 ~ 2025.03.12</td>
-            </tr>
-            <tr>
-                <th>심사 기관</th>
-                <td>서울 소재 대학교</td>
-            </tr>
-            <tr>
-                <th>시상 내역</th>
-                <td>장학금(대학진학 혜택)</td>
-            </tr>
-            <tr>
-                <th>웹사이트</th>
-                <td><a href="http://korea.org/research/conference/2025x" target="_blank">공식 홈페이지</a></td>
-            </tr>
-            <tr>
-                <th>참가비용</th>
-                <td>110,000원</td>
-            </tr>
+            <tr><th>주최/주관</th><td>한국정보기술융합회</td></tr>
+            <tr><th>대표 분야</th><td>논문</td></tr>
+            <tr><th>참가 대상</th><td>청소년, 어린이</td></tr>
+            <tr><th>대회 지역</th><td>대전지역</td></tr>
+            <tr><th>접수 기간</th><td>2024.11.14 ~ 2025.03.12</td></tr>
+            <tr><th>심사 기관</th><td>서울 소재 대학교</td></tr>
+            <tr><th>시상 내역</th><td>장학금(대학진학 혜택)</td></tr>
+            <tr><th>웹사이트</th><td><a href="http://korea.org/research/conference/2025x" target="_blank">공식 홈페이지</a></td></tr>
+            <tr><th>참가비용</th><td>110,000원</td></tr>
         </table>
     </div>
 
@@ -68,19 +42,15 @@
     <section class="contest-details">
         <h3>상세내용</h3>
         <p>2025 통계 청소년 IT 학술대회</p>
-
         <h4>📌 참가 자격</h4>
         <p>고등학교 3학년 또는 그 이하 청소년 (2007년생 ~ 2010년생)</p>
-
         <h4>📌 특전</h4>
         <ul>
             <li>IT 스타트업/데이터센터 드림 교육캠프 혜택</li>
             <li>논문 1:1 교육 지원 제공</li>
         </ul>
-
         <h4>📌 접수 기간</h4>
         <p>2024.11.14 ~ 2025.01.12</p>
-
         <h4>📌 시상 내역</h4>
         <ul>
             <li>대상 (1명) - 200만원</li>
@@ -88,43 +58,74 @@
             <li>은상 (3명) - 50만원</li>
             <li>장려상 (5명) - 30만원</li>
         </ul>
-
         <h4>📌 문의</h4>
         <p>이메일: contact@eduKIBA.org</p>
     </section>
 
-    <!-- 참여하기 버튼 -->
-    <button class="apply-btn">참여하기</button>
+    <!-- 버튼 영역 -->
+    <div class="button-box">
+        <button class="apply-btn">참여하기</button>
+        <button class="recruit-btn">팀원 모집글 작성하기</button>
+    </div>
+
+    <!-- 팀원 모집글 리스트 -->
+    <section class="recruit-list">
+        <h3>📋 팀원 모집 글</h3>
+        <table class="recruit-table">
+            <thead>
+            <tr>
+                <th>제목</th>
+                <th>작성자</th>
+                <th>모집 인원</th>
+                <th>등록일</th>
+                <th>상세보기</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="recruit : ${recruitList}">
+                <td th:text="${recruit.title}">AI 공모전 함께하실 분!</td>
+                <td th:text="${recruit.writer}">홍길동</td>
+                <td th:text="${recruit.recruitCount}">3명</td>
+                <td th:text="${#temporals.format(recruit.createdAt, 'yyyy.MM.dd')}">2025.03.20</td>
+                <td><a th:href="@{'/recruit/' + ${recruit.id}}" class="detail-link">보기</a></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(recruitList)}">
+                <td colspan="5" style="text-align:center; color:gray;">모집 글이 없습니다.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
 </section>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // ⭐ 북마크(즐겨찾기) 기능
-        document.getElementById("bookmark-btn").addEventListener("click", function() {
+    document.addEventListener("DOMContentLoaded", function () {
+        // 북마크 토글
+        document.getElementById("bookmark-btn").addEventListener("click", function () {
             this.classList.toggle("active");
         });
 
-        // 🟢 상태 자동 변경 기능 (접수기간 종료 시 "진행완료"로 변경)
+        // 상태 뱃지 변경
         const statusBadge = document.getElementById("status-badge");
-        const registrationEndDate = new Date("2025-01-12"); // 접수 종료 날짜 (YYYY-MM-DD 형식)
-        const today = new Date(); // 현재 날짜
-
+        const registrationEndDate = new Date("2025-01-12");
+        const today = new Date();
         if (today > registrationEndDate) {
-            // 현재 날짜가 접수 종료일을 넘으면 "진행완료"로 상태 변경
             statusBadge.textContent = "진행완료";
-            statusBadge.style.backgroundColor = "#ff4040"; // 빨간색
+            statusBadge.style.backgroundColor = "#ff4040";
         } else {
-            // 접수 기간이 남아 있으면 "진행중" 유지
             statusBadge.textContent = "진행중";
-            statusBadge.style.backgroundColor = "#0078ff"; // 파란색
+            statusBadge.style.backgroundColor = "#0078ff";
         }
 
-        // 🚀 참여하기 버튼 클릭 이벤트 (추후 백엔드 연동 가능)
-        document.querySelector(".apply-btn").addEventListener("click", function() {
+        // 참여하기 버튼
+        document.querySelector(".apply-btn").addEventListener("click", function () {
             alert("공모전 참여 신청 페이지로 이동합니다.");
+        });
+
+        // 팀원 모집글 작성
+        document.querySelector(".recruit-btn").addEventListener("click", function () {
+            alert("팀원 모집글 작성 페이지로 이동합니다.");
         });
     });
 </script>
-
 </body>
 </html>

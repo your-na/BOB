@@ -28,25 +28,32 @@ public class UserProjectEntity {
 
     private LocalDate joinDate; // 사용자가 프로젝트에 참여한 날짜
 
-    @Enumerated(EnumType.STRING)
-    private Status status = Status.신청중; // 기본값을 신청중으로 설정
+    private LocalDate submissionDate; // 🔥 제출 날짜
 
-    // 역할 (프로젝트 생성자라면 주최, 그렇지 않으면 참여)
+    private String submittedFileName; // 🔥 제출된 파일 이름
+
+    private String status; // 사용자의 참여 상태 (모집중, 신청중, 진행중, 완료)
+
+    // ✅ 상태 변경 시 프로젝트도 함께 변경
+    public void setStatusAndSyncProject(String status) {
+        this.status = status;
+        if (this.project != null) {
+            this.project.completeProject(); // 프로젝트 완료 체크
+        }
+    }
+
+    // ✅ 팀원이 파일 제출 시 상태 업데이트
+    public void submitFile(String fileName) {
+        this.submittedFileName = fileName;
+        this.submissionDate = LocalDate.now();
+
+        if (this.user.getUserNick().equals(this.project.getCreatedBy())) {
+            this.project.completeProject(); // 주최자가 제출하면 프로젝트 완료
+        }
+    }
+
+    // 역할 (주최/참여)
     public String getRole() {
         return project.getCreatedBy().equals(user.getUserNick()) ? "주최" : "참여";
     }
-
-    // 상태 값 enum
-    public enum Status {
-        신청중,참여중
-    }
-
-    // 엔티티가 저장되기 전에 기본값 설정
-    @PrePersist
-    public void prePersist() {
-        if (this.status == null) {
-            this.status = Status.신청중; // 기본값으로 신청중 설정
-        }
-    }
 }
-

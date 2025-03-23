@@ -1,0 +1,96 @@
+/* 전체 스타일 */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #2ea44f;
+    text-align: left;
+}
+
+/* 필터 & 검색 */
+.top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+#sort-filter {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: white;
+    width: 220px;
+    margin-left: 800px;
+    margin-bottom: 21px;
+}
+
+.search-wrapper input {
+    border: none;
+    outline: none;
+    padding: 5px;
+}
+
+/* 삭제 버튼 */
+.delete-btn {
+    background-color: red;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.delete-btn:hover {
+    background-color: darkred;
+}
+
+/* 기업 회원 테이블 */
+.company-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.company-table th, .company-table td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.company-table th {
+    background-color: #eafbea;
+    color: #2ea44f;
+    font-weight: bold;
+}
+
+.status-btn {
+    padding: 4px 10px;
+    border-radius: 4px;
+    color: dimgrey;
+    text-decoration: none;
+    border: 1px solid dimgrey;
+    font-weight: bold;
+    font-size: 13px;
+    cursor: pointer;
+}

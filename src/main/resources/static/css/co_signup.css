@@ -1,0 +1,123 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0 10%;
+    background-color: #fff;
+}
+
+.container {
+    max-width: 1600px; /* 창 크기 변경에도 고정 */
+    margin: 0 auto; /* 가운데 정렬 */
+}
+
+.logo {
+    font-size: 36px;
+    font-weight: bold;
+    color: #00b050;
+    text-align: left;
+    padding: 20px 0;
+}
+
+.signup-box {
+    margin: 0 17%;
+    border: 1px solid #b6b6b6;
+    border-radius: 10px;
+    padding: 30px;
+    background-color: #ffffff;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    white-space: nowrap;
+}
+
+.form-group label {
+    width: 100px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+    text-align: right;
+    margin-right: 15px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group input[type="email"],
+.form-group select {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 14px;
+    width: 140px;
+    background: #ffffff;
+}
+
+.inline-group {
+    display: flex;
+    gap: 10px;
+}
+
+.inline-group input {
+    flex: 1;
+}
+
+.terms {
+    margin-bottom: 20px;
+    margin: 0 17%;
+}
+
+.terms-content {
+    border: 1px solid #ccc;
+    padding: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: #ffffff;
+}
+
+.terms-content p {
+    margin-bottom: 10px;
+}
+
+.btn-submit {
+    background-color: #00b050;
+    color: white;
+    border: none;
+    padding: 15px 18px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    width: 40%;
+    margin-top: 20px;
+    display: block; /* block으로 변경 */
+    margin-left: auto; /* 왼쪽 자동 여백 */
+    margin-right: auto; /* 오른쪽 자동 여백 */
+    text-align: center; /* 텍스트 가운데 정렬 */
+}
+
+
+.btn-submit:hover {
+    background-color: #008037;
+}
+
+.signup-container {
+    margin: 0 auto;
+}
+
+.signup-header {
+    margin-bottom: 20px;
+}
+
+.required {
+    color: red;
+}
+
+/* ✅ 사업자등록번호 안내 문구 스타일 */
+.info-text {
+    font-size: 12px;
+    color: #888;
+    margin-left: 115px; /* ✅ 입력란과 맞추기 위해 조정 */
+    margin-top: -10px; /* ✅ 입력칸과 너무 떨어지지 않도록 조정 */
+}

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>SPACE</title>
+    <link rel="stylesheet" href="/css/plan.css">
+</head>
+<body>
+
+<div class="modal-header">
+    <span>SPACE</span>
+    <span class="close-btn" onclick="window.close();">&times;</span>
+</div>
+
+<ul class="plan-list">
+    <li>
+        <span>개인</span>
+        <i class="star-icon" onclick="toggleStar(this)">&#9734;</i>
+    </li>
+    <li>
+        <span>프로젝트A</span>
+        <i class="star-icon" onclick="toggleStar(this)">&#9734;</i>
+    </li>
+    <li>
+        <span>공모전1</span>
+        <i class="star-icon" onclick="toggleStar(this)">&#9734;</i>
+    </li>
+</ul>
+
+<script>
+    function toggleStar(element) {
+        if (element.innerHTML === "★") {
+            element.innerHTML = "☆"; // 빈 별
+            element.style.color = "gray";
+        } else {
+            element.innerHTML = "★"; // 채운 별
+            element.style.color = "gold";
+        }
+    }
+</script>
+
+</body>
+</html>

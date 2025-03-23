@@ -3,6 +3,8 @@ package com.example.bob.Controller;
 import com.example.bob.DTO.ProjectDTO;
 import com.example.bob.Entity.ProjectEntity;
 import com.example.bob.Entity.UserEntity;
+import com.example.bob.Entity.UserProjectEntity;
+import com.example.bob.Repository.UserProjectRepository;
 import com.example.bob.Service.ProjectService;
 import com.example.bob.security.UserDetailsImpl;
 import jakarta.transaction.Transactional;
@@ -13,12 +15,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.example.bob.Repository.UserRepository;
+import com.example.bob.Repository.ProjectRepository;
+import java.util.Collections;
+
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @Transactional
@@ -26,14 +31,18 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
+    private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
+    private final UserProjectRepository userProjectRepository;
 
     // 프로젝트 목록 페이지로 이동
     @GetMapping("/project")
-    public String showProjects(Model model) {
-        List<ProjectDTO> projectDTOs = projectService.getAllProjectsDTO();
-        model.addAttribute("projects", projectDTOs);
-        return "project";
+    public String projectList(Model model) {
+        List<ProjectDTO> activeProjects = projectService.getAllProjectsDTO();  // ✅ 완료 제외된 프로젝트만 가져옴
+        model.addAttribute("projects", activeProjects);
+        return "project"; // ✅ 프로젝트 목록 페이지 반환
     }
+
 
     // 내가 만든 프로젝트와 내가 참가한 프로젝트 페이지
     @GetMapping("/myproject")
@@ -61,23 +70,13 @@ public class ProjectController {
 
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
 
-        // 로그인한 사용자가 작성자인지 체크
-        boolean isOwner = project.getCreatedBy().equals(userDetails.getUserNick());
-
-        // 이미 신청한 상태인지 확인
-        boolean isApplied = projectService.isUserAppliedToProject(project.getId(), userDetails.getUserEntity());
-
         model.addAttribute("today", today);
         model.addAttribute("goal", project.getGoal());
         model.addAttribute("project", project);
-        model.addAttribute("isOwner", isOwner);  // 작성자 여부를 모델에 추가
-        model.addAttribute("isApplied", isApplied);  // 신청 여부를 모델에 추가
+        model.addAttribute("isOwner", project.getCreatedBy().equals(userDetails.getUserNick())); // 로그인한 사용자가 작성자인지 체크
 
         return "postproject";
     }
-
-
-
 
     // 프로젝트 삭제 API
     @DeleteMapping("/postproject/{id}")
@@ -125,19 +124,21 @@ public class ProjectController {
     }
 
     // 프로젝트 생성 처리
-    // 프로젝트 생성 처리
     @PostMapping("/bw")
-    public String createProject(@RequestParam("project-name") String projectName,
-                                @RequestParam("project-description") String projectDescription,
-                                @RequestParam("project-goal") String projectGoal,
-                                @RequestParam("start-date") String startDateStr,
-                                @RequestParam("end-date") String endDateStr,
-                                @RequestParam("recruitment-start-date") String recruitmentStartStr,
-                                @RequestParam("recruitment-end-date") String recruitmentEndStr,
-                                @RequestParam("recruitment") String recruitmentStr,
-                                @RequestParam(value = "custom-recruitment", required = false) String recruitmentCountStr,
-                                @AuthenticationPrincipal UserDetailsImpl userDetails,
-                                Model model) {
+    public String createProject(
+            @RequestParam("project-name") String projectName,
+            @RequestParam("project-description") String projectDescription,
+            @RequestParam("project-goal") String projectGoal,
+            @RequestParam("start-date") String startDateStr,
+            @RequestParam("end-date") String endDateStr,
+            @RequestParam("recruitment-start-date") String recruitmentStartStr,
+            @RequestParam("recruitment-end-date") String recruitmentEndStr,
+            @RequestParam("recruitment") String recruitmentStr,
+            @RequestParam(value = "recruitmentCount", required = false) String recruitmentCountStr,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        // 확인 로그
+        System.out.println("Received recruitmentCount: " + recruitmentCountStr);
 
         String creatorNick = userDetails.getUserNick();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -147,29 +148,26 @@ public class ProjectController {
         LocalDate recruitmentStartDate = LocalDate.parse(recruitmentStartStr, formatter);
         LocalDate recruitmentEndDate = LocalDate.parse(recruitmentEndStr, formatter);
 
-        // 모집 인원 처리
-        int recruitment = 0;
+        int recruitmentCount = 0;
 
         if ("plus".equals(recruitmentStr)) {
-            // '기타'가 선택되었을 경우, 커스텀 입력을 받은 값 처리
-            try {
-                if (recruitmentCountStr != null && !recruitmentCountStr.isEmpty()) {
-                    recruitment = Integer.parseInt(recruitmentCountStr); // 숫자 변환
+            if (recruitmentCountStr != null && !recruitmentCountStr.isEmpty()) {
+                try {
+                    recruitmentCount = Integer.parseInt(recruitmentCountStr);
+                } catch (NumberFormatException e) {
+                    return "redirect:/bw";  // 잘못된 값일 경우 리다이렉트
                 }
-            } catch (NumberFormatException e) {
-                model.addAttribute("error", "잘못된 모집 인원 값입니다.");
-                return "newproject";
+            } else {
+                return "redirect:/bw";  // 모집 인원 미입력 시 리다이렉트
             }
         } else {
             try {
-                recruitment = Integer.parseInt(recruitmentStr); // 기존 방식
+                recruitmentCount = Integer.parseInt(recruitmentStr);
             } catch (NumberFormatException e) {
-                model.addAttribute("error", "잘못된 모집 인원 값입니다.");
-                return "newproject";
+                return "redirect:/bw";  // 잘못된 값일 경우 리다이렉트
             }
         }
 
-        // 프로젝트 생성
         ProjectEntity newProject = ProjectEntity.builder()
                 .title(projectName)
                 .description(projectDescription)
@@ -180,14 +178,16 @@ public class ProjectController {
                 .endDate(endDate)
                 .recruitmentStartDate(recruitmentStartDate)
                 .recruitmentEndDate(recruitmentEndDate)
-                .recruitmentPeriod(recruitment)
-                .recruitmentCount(recruitment) // 올바르게 설정
+                .recruitmentCount(recruitmentCount)
                 .views(0)
                 .likes(0)
                 .status("모집중")
                 .build();
 
-        ProjectEntity savedProject = projectService.saveProject(newProject);
+        // 프로젝트 저장
+        ProjectEntity savedProject = projectService.saveProject(newProject, recruitmentCountStr);
+
+        // 프로젝트 상세 페이지로 리다이렉트
         return "redirect:/postproject/" + savedProject.getId();
     }
 
@@ -284,14 +284,11 @@ public class ProjectController {
         // 프로젝트 정보 가져오기
         ProjectEntity project = projectService.getProjectById(projectId);
 
-        // 본인이 만든 프로젝트에는 신청할 수 없도록 막기
-        if (project.getCreatedBy().equals(userEntity.getUserNick())) {
-            model.addAttribute("errorMessage", "본인이 만든 프로젝트에는 신청할 수 없습니다.");
-            return "errorPage"; // 에러 페이지로 리디렉션
-        }
-
         // 신청 내용 저장 (예: 데이터베이스에 저장)
         projectService.submitApplication(userEntity, project, message);
+
+        // 신청 후 알림 생성
+        projectService.sendTeamRequestNotification(projectId, userEntity.getUserNick());  // 수정된 부분
 
         // 신청 완료 후 success 페이지로 리디렉션
         return "redirect:/success?projectId=" + project.getId();  // 프로젝트 ID를 쿼리 파라미터로 전달
@@ -321,9 +318,130 @@ public class ProjectController {
         // 성공 페이지를 반환
         return "success";
     }
-    @GetMapping("/prohistory")
-    public String showsuccessForm() {
-        return "projecthistory";
+
+    // ✅ 신청 수락 API
+    @PostMapping("/teamrequest/accept")
+    @ResponseBody
+    public ResponseEntity<String> acceptTeamRequest(@RequestBody Map<String, Object> requestData,
+                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            // ✅ 요청 데이터 디버깅
+            System.out.println("✅ [DEBUG] 요청 데이터: " + requestData);
+
+            // ✅ 값이 null이 아니고 숫자로 변환 가능한지 확인
+            if (!requestData.containsKey("projectId") || !requestData.containsKey("userId")) {
+                throw new IllegalArgumentException("❌ projectId 또는 userId가 요청에 없습니다.");
+            }
+
+            Long projectId = Long.valueOf(requestData.get("projectId").toString());
+            Long userId = Long.valueOf(requestData.get("userId").toString());
+
+            System.out.println("✅ [DEBUG] 수락 요청 - projectId: " + projectId + ", userId: " + userId);
+
+            projectService.acceptTeamRequest(projectId, userId, userDetails.getUserEntity());
+            return ResponseEntity.ok("✅ 신청이 수락되었습니다!");
+        } catch (NullPointerException | NumberFormatException e) {
+            return ResponseEntity.badRequest().body("❌ 요청 데이터가 올바르지 않습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("❌ 신청 수락 중 오류 발생");
+        }
     }
 
+    // ❌ 신청 거절 API
+    @PostMapping("/teamrequest/reject")
+    @ResponseBody
+    public ResponseEntity<String> rejectTeamRequest(@RequestBody Map<String, Object> requestData,
+                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            // ✅ 요청 데이터 디버깅
+            System.out.println("✅ [DEBUG] 요청 데이터: " + requestData);
+
+            // ✅ 값이 null이 아니고 숫자로 변환 가능한지 확인
+            if (!requestData.containsKey("projectId") || !requestData.containsKey("userId")) {
+                throw new IllegalArgumentException("❌ projectId 또는 userId가 요청에 없습니다.");
+            }
+
+            Long projectId = Long.valueOf(requestData.get("projectId").toString());
+            Long userId = Long.valueOf(requestData.get("userId").toString());
+
+            System.out.println("✅ [DEBUG] 거절 요청 - projectId: " + projectId + ", userId: " + userId);
+
+            // ✅ 신청 거절 로직 실행 (수락 로직을 베끼는 대신 거절 메서드 호출!)
+            projectService.rejectTeamRequest(projectId, userId, userDetails.getUserEntity());
+
+            return ResponseEntity.ok("🚫 신청이 거절되었습니다!");
+        } catch (NullPointerException | NumberFormatException e) {
+            return ResponseEntity.badRequest().body("❌ 요청 데이터가 올바르지 않습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("❌ 신청 거절 중 오류 발생");
+        }
+    }
+
+
+    // ✅ 신청서 페이지 렌더링 (이걸 추가해야 함!)
+    @GetMapping("/teamrequest/{projectId}/{senderId}")
+    public String showTeamRequestPage(@PathVariable Long projectId,
+                                      @PathVariable Long senderId,
+                                      Model model) {
+        // ✅ 신청한 유저 정보 가져오기
+        UserEntity user = userRepository.findById(senderId)
+                .orElseThrow(() -> new IllegalArgumentException("❌ 해당 사용자를 찾을 수 없습니다. (ID: " + senderId + ")"));
+
+        // ✅ 프로젝트 정보 가져오기
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("❌ 해당 프로젝트를 찾을 수 없습니다. (ID: " + projectId + ")"));
+
+        // ✅ 디버깅 로그 추가
+        System.out.println("✅ [DEBUG] 프로젝트 ID: " + projectId);
+        System.out.println("✅ [DEBUG] 신청자 ID: " + senderId);
+        System.out.println("✅ [DEBUG] 신청자 닉네임: " + user.getUserNick());
+        System.out.println("✅ [DEBUG] 프로젝트 제목: " + project.getTitle());
+
+        // ✅ 모델에 데이터 추가 (Thymeleaf에서 사용할 수 있도록!)
+        model.addAttribute("userNick", user.getUserNick());  // 신청자 닉네임
+        model.addAttribute("projectTitle", project.getTitle());  // 프로젝트 제목
+        model.addAttribute("projectId", projectId); // 프로젝트 ID
+        model.addAttribute("userId", senderId); // ✅ 신청한 유저 ID (수정: senderId → userId)
+
+        return "teamrequest"; // ✅ teamrequest.html 페이지 렌더링
+    }
+
+    @GetMapping("/projecthistory")
+    public String showProjectHistory(@AuthenticationPrincipal UserDetailsImpl userDetails, Model model) {
+        Long userId = userDetails.getUserEntity().getUserId(); // 🔥 변경: getId() → getUserId()
+
+        // 🔥 제출된 파일이 있는 프로젝트만 가져오기
+        List<UserProjectEntity> submittedProjects = userProjectRepository.findByUser_UserIdAndSubmittedFileNameIsNotNull(userId);
+
+        model.addAttribute("submittedProjects", submittedProjects);
+        return "projecthistory"; // 🔥 프로젝트 히스토리 페이지
+    }
+
+    @GetMapping("/todoadd")
+    public String showAddPage() {
+        return "todo_add";
+    }
+
+    @GetMapping("/todocrud")
+    public String showCrudPage() {
+        return "todo_crud";
+    }
+
+    @GetMapping("/todohome")
+    public String showHomePage() {
+        return "todo_home";
+    }
+
+    @GetMapping("/todoplan")
+    public String showPlanPage() {
+        return "todo_plan";
+    }
+
+    @GetMapping("/appstatus")
+    public String showstatusform() {return "application_status";}
 }
+

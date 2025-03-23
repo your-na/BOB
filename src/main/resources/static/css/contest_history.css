@@ -1,0 +1,174 @@
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 70px;
+}
+
+.history-table th, .history-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.history-table th {
+    background-color: #f5f5f5;
+}
+
+/* ✅ 입력 필드 크기 조정 */
+.status-select,
+.start-date,
+.end-date,
+.contest-name,
+.file-upload {
+    width: 100%;
+    height: 30px;
+    font-size: 14px;
+    border: none;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+/* ✅ 드롭다운 스타일 */
+.status-select {
+    background-color: white;
+    cursor: pointer;
+}
+
+/* ✅ 파일 업로드 버튼 */
+.file-upload {
+    border: none;
+}
+
+/* ✅ 버튼 스타일 */
+.add-project-btn {
+    margin-top: 10px;
+    padding: 8px 15px;
+    background: #f8f8f8;
+    color: #7e7e7e;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+}
+
+.delete-btn {
+    background: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+/* ✅ "파일보기" 링크 */
+.file-view {
+    color: blue;
+    text-decoration: underline;
+    font-size: 14px;
+    display: none;
+}
+
+/* 탭 메뉴 스타일 */
+.tab-menu {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    margin-top: 90px;
+}
+
+.tab-menu ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+    padding: 0;
+}
+
+.tab-menu .tab-item {
+    font-size: 16px;
+    cursor: pointer;
+    padding-bottom: 5px;
+    position: relative;
+}
+
+/* 활성화된 탭 스타일 */
+.tab-menu .tab-item.active {
+    font-weight: bold;
+    color: black;
+}
+
+.tab-menu .tab-item.active::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: green;
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+}
+
+/* 검색 입력창 및 버튼 스타일 */
+.searchcontainer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-input {
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.search-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.external-btn {
+    padding: 5px 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.searchbar {
+    margin-top: 3px;
+    width: 150px;
+    padding: 8px 20px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 12px;
+}
+
+.searchbar:focus {
+    margin-top: 3px;
+    border-color: #19CB13;
+    width: 150px;
+    padding: 8px 20px;
+    border-radius: 10px;
+    border: 1px solid #19CB13;
+    font-size: 12px;
+}
+
+.searchicon {
+    position: absolute;
+    top: 187px;
+    left: 320px;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    background-color: #cccccc;
+    border-radius: 50%;
+}
+
+.searchicon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
