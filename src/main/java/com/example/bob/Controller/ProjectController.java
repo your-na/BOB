@@ -82,7 +82,7 @@ public class ProjectController {
     @DeleteMapping("/postproject/{id}")
     @ResponseBody
     public ResponseEntity<String> deleteProject(@PathVariable Long id,
-                                                @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
         try {
             projectService.deleteProject(id, userDetails.getUserNick());
             return ResponseEntity.ok("✅ 프로젝트가 삭제되었습니다.");

@@ -2,6 +2,7 @@ package com.example.bob.Controller;
 
 import com.example.bob.DTO.UserDTO;
 import com.example.bob.Entity.UserEntity;
+import com.example.bob.Repository.CompanyRepository;
 import com.example.bob.Repository.UserRepository;
 import com.example.bob.Service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -28,6 +29,7 @@ import java.util.Optional;
 public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
+    private final CompanyRepository companyRepository;
 
     @GetMapping("/")
     public String redirectToMain(){
@@ -74,8 +76,10 @@ public class UserController {
     @GetMapping("/check-username")
     public ResponseEntity<Map<String, Object>> checkUsername(@RequestParam String user_id_login) {
         Map<String, Object> response = new HashMap<>();
-        boolean exists = userRepository.existsByUserIdLogin(user_id_login); // userID가 이미 존재하는지 확인
-        response.put("exists", exists);
+
+        boolean existsInUsers = userRepository.existsByUserIdLogin(user_id_login); // userID가 이미 존재하는지 확인
+        boolean existsInCompanies = companyRepository.existsByCoIdLogin(user_id_login); //기업 사용자
+        response.put("exists", existsInUsers || existsInCompanies); // 두가지 경우 모두 확인
         return ResponseEntity.ok(response);
     }
 

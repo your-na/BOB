@@ -2,8 +2,11 @@ package com.example.bob.Controller;
 
 import com.example.bob.DTO.UserDTO;
 import com.example.bob.DTO.UserUpdateDTO;
+import com.example.bob.Entity.CompanyEntity;
 import com.example.bob.Entity.UserEntity;
 import com.example.bob.Service.UserService;
+import com.example.bob.security.CompanyDetailsImpl;
+import com.example.bob.security.CustomUserDetails;
 import com.example.bob.security.UserDetailsImpl;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -39,40 +42,44 @@ public class ProfileController {
     }
 
     @GetMapping("/main")
-    public String mainPage(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails != null) {
-            UserEntity userEntity = ((UserDetailsImpl) userDetails).getUserEntity();
-            model.addAttribute("user", userEntity);
-            model.addAttribute("profileLink", "/profile");
-        } else {
+    public String mainPage(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null){
             model.addAttribute("user", null);
             model.addAttribute("profileLink", "/login");
+            return "main";
         }
+
+        if (userDetails.getUserType().equals("user")) {
+            UserEntity user = ((UserDetailsImpl) userDetails).getUserEntity();
+            model.addAttribute("user", user);
+            model.addAttribute("profileLink", "/profile");
+        } else if (userDetails.getUserType().equals("company")) {
+            CompanyEntity company = ((CompanyDetailsImpl) userDetails).getCompanyEntity();
+            model.addAttribute("user", company);
+            model.addAttribute("profileLink", "/company/profile"); // 기업 전용 프로필 페이지 (추후 링크 수정)
+        }
+
         return "main";
     }
 
+
     @GetMapping("/profile")
-    public String profilePage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        if (userDetails == null) {
-            return "redirect:/login";
+    public String profilePage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        if (userDetails == null) return "redirect:/login";
+
+        if (userDetails instanceof UserDetailsImpl user) {
+            UserEntity userEntity = user.getUserEntity();
+            model.addAttribute("user", userEntity);
+            model.addAttribute("profileImageUrl", userEntity.getProfileImageUrl());
+            return "profile"; // 일반 사용자용 profile.html
+        } else if (userDetails instanceof CompanyDetailsImpl company) {
+            CompanyEntity companyEntity = company.getCompanyEntity();
+            model.addAttribute("company", companyEntity);
+            model.addAttribute("profileImageUrl", companyEntity.getCoImageUrl());
+            return "company_profile"; // 기업 사용자용 별도 페이지가 있다면
         }
 
-        if (!(userDetails instanceof UserDetailsImpl)) {
-            return "redirect:/error";
-        }
-
-        UserDetailsImpl userDetailsImpl = (UserDetailsImpl) userDetails;
-        Long userId = userDetailsImpl.getUserEntity().getUserId();
-
-        if (userId == null) {
-            return "redirect:/error";
-        }
-
-        UserEntity userEntity = userService.findUserById(userId);
-        model.addAttribute("user", userEntity);
-        model.addAttribute("profileImageUrl", userEntity.getProfileImageUrl());
-
-        return "profile";
+        return "redirect:/error";
     }
 
 
@@ -82,15 +89,15 @@ public class ProfileController {
                                 @RequestParam String bio,
                                 @RequestParam("language") List<String> languages,
                                 @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
-                                @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                @AuthenticationPrincipal CustomUserDetails userDetails,
                                 RedirectAttributes redirectAttributes) {
 
-        if (userDetails == null || userDetails.getUserEntity().getUserId() == null) {
+        if (!(userDetails instanceof UserDetailsImpl user) || user.getUserEntity().getUserId() == null) {
             System.out.println("⚠ updateProfile: userId가 null 또는 인증 정보 없음.");
             return "redirect:/login"; // 인증이 없으면 로그인 페이지로 이동
         }
 
-        Long userId = userDetails.getUserEntity().getUserId();
+        Long userId = user.getUserEntity().getUserId();
         UserUpdateDTO userUpdateDTO = new UserUpdateDTO();
         userUpdateDTO.setUserNick(nickname);
         userUpdateDTO.setUserEmail(email);
@@ -99,24 +106,25 @@ public class ProfileController {
 
         if (profileImage != null && !profileImage.isEmpty()) {
             try {
-                userService.updateProfileImage(profileImage, userDetails.getUserEntity());
-                userUpdateDTO.setProfileImageUrl(userDetails.getUserEntity().getProfileImageUrl());
+                userService.updateProfileImage(profileImage, user.getUserEntity());
+                userUpdateDTO.setProfileImageUrl(user.getUserEntity().getProfileImageUrl());
             } catch (Exception e) {
                 e.printStackTrace();
                 userUpdateDTO.setProfileImageUrl("/images/profile.png");
             }
         } else {
-            userUpdateDTO.setProfileImageUrl(userDetails.getUserEntity().getProfileImageUrl());
+            userUpdateDTO.setProfileImageUrl(user.getUserEntity().getProfileImageUrl());
         }
 
         // 사용자 정보 업데이트
         UserDTO updatedUserDTO = userService.updateUserInfo(userUpdateDTO, profileImage, userId);
 
         // SecurityContext 업데이트
-        UserDetailsImpl updatedUserDetails = new UserDetailsImpl(updatedUserDTO.toUserEntity());
+        CustomUserDetails newAuth = new UserDetailsImpl(updatedUserDTO.toUserEntity());
         UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(updatedUserDetails, updatedUserDetails.getPassword(), updatedUserDetails.getAuthorities());
+                new UsernamePasswordAuthenticationToken(newAuth, newAuth.getPassword(), newAuth.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
 
         String finalImageUrl = userUpdateDTO.getProfileImageUrl() + "?timestamp=" + System.currentTimeMillis();
         redirectAttributes.addFlashAttribute("profileImageUrl", finalImageUrl);

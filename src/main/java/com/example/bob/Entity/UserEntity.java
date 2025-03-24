@@ -2,10 +2,7 @@ package com.example.bob.Entity;
 
 import com.example.bob.DTO.UserDTO;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +62,6 @@ public class UserEntity {
         UserEntity userEntity = new UserEntity();
 
         userEntity.userId = userDTO.getUserId();
-        // userID는 자동으로 설정되므로 DTO에서 받아오지 않습니다.
         userEntity.userNick = userDTO.getUserNick();
         userEntity.userName = userDTO.getUserName();
         userEntity.userIdLogin = userDTO.getUserIdLogin();

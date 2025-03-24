@@ -1,5 +1,6 @@
 package com.example.bob.Service;
 
+import com.example.bob.Entity.CompanyEntity;
 import com.example.bob.Entity.NotificationEntity;
 import com.example.bob.Entity.UserEntity;
 import com.example.bob.Repository.NotificationRepository;
@@ -27,9 +28,14 @@ public class NotificationService {
     private UserRepository userRepository; // UserRepository 주입
 
     // 알림 수를 계산하는 메서드
-    public int getNotificationCount(UserEntity userEntity) {
+    public int getUserNotificationCount(UserEntity userEntity) {
         // 사용자가 읽지 않은 알림의 개수를 계산 (알림 테이블에서)
         return notificationRepository.countByUserAndIsRead(userEntity, false);
+    }
+
+    // 기업 사용자 알림 수 조회
+    public int getCompanyNotificationCount(CompanyEntity company){
+        return notificationRepository.countByCompanyAndIsRead(company , false);
     }
 
     // 알림 목록을 가져오는 메서드 (페이지네이션 추가)

@@ -24,6 +24,10 @@ public class NotificationEntity {
     @JoinColumn(name = "user_id")  // 알림을 받는 사용자
     private UserEntity user;
 
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private CompanyEntity company; // 기업 사용자의 알림
+
     private LocalDateTime timestamp;  // 알림 시간
 
     @ManyToOne

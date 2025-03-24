@@ -1,6 +1,8 @@
 package com.example.bob.security;
 
+import com.example.bob.Service.CompanyService;
 import com.example.bob.Service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -19,10 +21,10 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final UserService userService;
+    private final CombinedUserDetailsService combinedUserDetailsService;
 
-    public SecurityConfig(@Lazy UserService userService) {
-        this.userService = userService;
+    public SecurityConfig(@Lazy CombinedUserDetailsService combinedUserDetailsService) {
+        this.combinedUserDetailsService = combinedUserDetailsService;
     }
 
     @Bean
@@ -30,13 +32,13 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())  // CSRF 활성화 및 쿠키 저장
-                        .ignoringRequestMatchers("/login", "/signup", "/cosignup","/profile/update", "/logout", "/teamrequest", "/teamrequest/accept", "/teamrequest/reject", "/file/project/submit")  // CSRF 예외 처리
+                        .ignoringRequestMatchers("/login", "/signup", "/co_signup","/profile/update", "/logout", "/teamrequest", "/teamrequest/accept", "/teamrequest/reject", "/file/project/submit")  // CSRF 예외 처리
                 )
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**", "/project").permitAll()  // 모든 사용자 접근 허용
+                        .requestMatchers("/","/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**", "/project").permitAll()  // 모든 사용자 접근 허용
                         .requestMatchers("/login", "/sign").anonymous()  // 로그인 페이지는 익명 접근 허용
-                        .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject").authenticated()  // 인증된 사"용자만 접근 가능
-                        .requestMatchers("/signup", "/cosignup", "/check-nickname", "/check-username").permitAll()  // 회원가입 페이지는 익명 접근 허용
+                        .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject").authenticated()  // 인증된 사용자만 접근 가능
+                        .requestMatchers("/signup", "/co_signup", "/check-nickname", "/check-username").permitAll()  // 회원가입 페이지는 익명 접근 허용
                         .anyRequest().authenticated()  // 나머지 요청은 인증된 사용자만 접근 가능
                 )
                 .formLogin(form -> form
@@ -65,17 +67,18 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+    public AuthenticationManager authenticationManager(HttpSecurity http, CustomAuthenticationProvider customAuthProvider) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.userDetailsService(userService)
+        authenticationManagerBuilder
+                .userDetailsService(combinedUserDetailsService)
                 .passwordEncoder(passwordEncoder());
         return authenticationManagerBuilder.build();
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return userService;
+        return combinedUserDetailsService;
     }
 }
 

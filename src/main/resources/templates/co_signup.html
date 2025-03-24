@@ -31,7 +31,7 @@
 
                 <div class="form-group">
                     <label for="pwd"><span class="required">*</span>비밀번호</label>
-                    <input type="password" id="pwd" name="pwd" Required>
+                    <input type="password" id="pwd" name="coPwd" Required>
                 </div>
 
                 <div class="form-group">
@@ -125,99 +125,53 @@
                 const coIdLogin = document.getElementById('coIdLogin').value;
                 const messageElement = document.getElementById('username-message');
                 if (coIdLogin === '') {
-                    messageElement.textContent = '아이디를 입력해주세요.';
+                    messageElement.textContent = '아이디를 입력해 주세요.';
                     messageElement.style.color = 'red';
                     disableSignupButton(true);
                     return;
                 }
 
                 // 서버로 아이디 중복 확인 요청
-                fetch('/check-username?user_id_login=' + encodeURIComponent(userIdLogin))
+                fetch('/check-username?user_id_login=' + encodeURIComponent(coIdLogin))
                     .then(response => response.json())
                     .then(data => {
                         if (data.exists) {
                             messageElement.textContent = '이미 가입된 아이디입니다.';
                             messageElement.style.color = 'red';
                             disableSignupButton(true);
-                            alert('아이디가 이미 존재합니다. 다른 아이디를 사용해주세요.'); // 중복 ID 알림
-                            document.getElementById('userIdLogin').focus(); // 포커스 이동
+                            alert('아이디가 이미 존재합니다. 다른 아이디를 사용해 주세요.');
+                            document.getElementById('coIdLogin').focus();
                         } else {
                             messageElement.textContent = '사용 가능한 아이디입니다.';
                             messageElement.style.color = 'green';
                             disableSignupButton(false);
                         }
                     })
-                    .catch(error => console.error('아이디 중복 확인 중 오류 발생:', error));
+                    .catch(error => console.error('아이디 중복 확인 중 오류가 발생했습니다:', error));
             });
 
-            // 닉네임 중복 확인 (실시간)
-            document.getElementById('userNick').addEventListener('input', function () {
-                const userNick = document.getElementById('userNick').value;
-                const messageElement = document.getElementById('nickname-message');
-                if (userNick === '') {
-                    messageElement.textContent = '닉네임을 입력해주세요.';
-                    messageElement.style.color = 'red';
-                    disableSignupButton(true);
-                    return;
-                }
-                fetch('/check-nickname?user_nick=' + encodeURIComponent(userNick))
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.exists) {
-                            messageElement.textContent = '이미 사용 중인 닉네임입니다.';
-                            messageElement.style.color = 'red';
-                            disableSignupButton(true);
-                        } else {
-                            messageElement.textContent = '사용 가능한 닉네임입니다.';
-                            messageElement.style.color = 'green';
-                            disableSignupButton(false);
-                        }
-                    })
-                    .catch(error => console.error('닉네임 중복 확인 중 오류 발생:', error));
-            });
-
-            // 아이디 입력 시, 중복 확인 초기화
-            document.getElementById('userIdLogin').addEventListener('input', function () {
+            // 아이디 입력 시, 메시지 초기화
+            document.getElementById('coIdLogin').addEventListener('input', function () {
                 const messageElement = document.getElementById('username-message');
-                messageElement.textContent = ''; // 메시지 초기화
-                disableSignupButton(true); // 다시 중복 확인을 하도록 비활성화
+                messageElement.textContent = '';
+                disableSignupButton(true);
             });
         });
 
         // 폼 제출 시 유효성 검사
         document.querySelector('form').addEventListener('submit', function(event) {
-            const userIdLogin = document.getElementById('userIdLogin').value;
             const usernameMessage = document.getElementById('username-message').textContent;
-            const nicknameMessage = document.getElementById('nickname-message').textContent;
 
-            // 아이디 중복 확인 여부 체크
-            if (usernameMessage !== '' && usernameMessage === '이미 가입된 아이디입니다.') {
-                event.preventDefault(); // 폼 제출 방지
-                alert('아이디가 이미 존재합니다. 다른 아이디를 사용해주세요.'); // 중복 ID 알림
-                document.getElementById('userIdLogin').focus(); // 포커스 이동
+            if (usernameMessage === '이미 가입된 아이디입니다.') {
+                event.preventDefault();
+                alert('아이디가 이미 존재합니다. 다른 아이디를 사용해 주세요.');
+                document.getElementById('coIdLogin').focus();
                 return;
             }
 
-            // 닉네임 중복 확인 여부 체크
-            if (nicknameMessage === '' || nicknameMessage === '이미 사용 중인 닉네임입니다.') {
-                event.preventDefault(); // 폼 제출 방지
-                alert('닉네임 중복 확인을 해주세요.'); // 닉네임 중복 확인 alert
-                document.getElementById('userNick').focus(); // 닉네임 입력 필드로 포커스 이동
-                return;
-            }
-
-            // 생년월일 조합
-            const birthdate = document.getElementById('birth-year').value + '-' +
-                document.getElementById('birth-month').value + '-' +
-                document.getElementById('birth-day').value;
-
-            // hidden 필드에 값 설정
-            document.getElementById('birthday').value = birthdate;
-
-            // 실제 폼 제출
+            // 폼 정상 제출
             this.submit();
         });
-
     </script>
 
 </div>

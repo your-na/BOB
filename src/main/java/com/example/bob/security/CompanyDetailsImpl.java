@@ -1,38 +1,33 @@
 package com.example.bob.security;
 
-import  com.example.bob.Entity.UserEntity;
+import com.example.bob.Entity.CompanyEntity;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 @Getter
-public class UserDetailsImpl implements CustomUserDetails {
-    private final UserEntity userEntity;
+public class CompanyDetailsImpl implements CustomUserDetails {
+    private final CompanyEntity companyEntity;
 
-    public UserDetailsImpl(UserEntity userEntity) {
-        this.userEntity = userEntity;
+    public CompanyDetailsImpl(CompanyEntity companyEntity) {
+        this.companyEntity = companyEntity;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_COMPANY"));
     }
 
     @Override
     public String getPassword() {
-        return userEntity.getPwd();
+        return companyEntity.getPwd();
     }
 
     @Override
     public String getUsername() {
-        return userEntity.getUserIdLogin();
-    }
-
-    public String getUserNick(){
-        return userEntity.getUserNick();
+        return companyEntity.getCoIdLogin();
     }
 
     @Override
@@ -46,15 +41,15 @@ public class UserDetailsImpl implements CustomUserDetails {
 
     @Override
     public Long getId() {
-        return userEntity.getUserId();
+        return companyEntity.getCompanyId();
     }
 
     @Override
     public String getUserType() {
-        return "user";
+        return "company";
     }
 
-    public UserEntity getUserEntity() {
-        return userEntity;
+    public CompanyEntity getCompanyEntity() {
+        return companyEntity;
     }
 }
