@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>기업 공모전 홈</title>
+    <link rel="stylesheet" href="/css/comhost.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<div class="form-container">
+    <div class="image-upload">
+        <div class="image-box">
+            <span>포스터 이미지</span>
+        </div>
+        <p class="warning">해당 공모전 포스터 이미지를 업로드 해주세요.</p>
+    </div>
+
+    <form>
+        <label>공모전명</label>
+        <input type="text" placeholder="공모명을 입력해주세요.">
+
+        <label>대표분야</label>
+        <select>
+            <option disabled selected>프론트 / 웹, 앱 디자인</option>
+            <option>IT / 소프트웨어</option>
+            <option>기타</option>
+        </select>
+
+        <label>참가대상</label>
+        <input type="text" placeholder="참가 대상을 입력해주세요.">
+
+        <label>대회지역</label>
+        <input type="text" placeholder="대회 지역을 입력해주세요.">
+
+        <label>진행 일정</label>
+        <div class="date-row">
+            <input type="date"> ~ <input type="date">
+        </div>
+
+        <label>심사기관</label>
+        <input type="text" placeholder="심사 기간을 입력해주세요.">
+
+        <label>시상내역</label>
+        <input type="text" placeholder="시상 내용을 입력해주세요.">
+
+        <label>주최 신청 날짜</label>
+        <input type="date">
+
+        <label>공모전 설명</label>
+        <textarea placeholder="공모전 설명을 적어주세요."></textarea>
+
+        <div class="button-group">
+            <button type="submit" class="submit">신청</button>
+            <button type="button" class="cancel">취소</button>
+        </div>
+    </form>
+</div>
+<!-- footer -->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-links">
+            <span class="policy">[<span class="green-text">개인정보 처리방침</span>]</span>
+            <span class="notice">[공지사항]</span>
+        </div>
+        <div class="footer-info">
+            회사 이름 전화번호 주소 이메일 기타등등 세줄 회사 이름 전화번호 주소 이메일 기타등등 두줄<br>
+            회사 이름 전화번호 주소 이메일 기타등등 세줄 회사 이름 전화번호 주소 이메일 기타등등 두줄
+        </div>
+    </div>
+</footer>
+</body>
+</html>

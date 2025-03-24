@@ -1,0 +1,317 @@
+.main-banner {
+    margin-top: 70px;
+    position: relative;
+    text-align: center;
+    margin: 0 -12.5%;
+}
+
+.project-list {
+    width: 70%;
+    padding: 20px;
+    margin: 0 10%;
+}
+
+/* 📌 필터와 검색 아이콘을 같은 줄에 정렬 */
+.upupup {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 필터, 검색 아이콘, 생성 버튼 간격 조정 */
+}
+
+.searchicon {
+    margin-left: 10px;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+}
+
+.searchicon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 🔍 검색 아이콘 & 검색창을 감싸는 컨테이너 */
+.search-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+/* 🔍 검색창 스타일 (기본적으로 숨김) */
+.search-box {
+    position: absolute;
+    left: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 15px;
+    width: 320px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: none; /* 기본적으로 숨김 */
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* 🔍 검색창 상단 */
+.search-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.search-title {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#search-close {
+    margin-left: 300px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #888;
+}
+
+/* 📅 입력 필드 스타일 */
+.search-field {
+    display: flex;
+    align-items: center; /* 한 줄 정렬 */
+    justify-content: space-between; /* 내부 요소 정렬 */
+    gap: 10px;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.search-field label {
+    font-size: 12px;
+    font-weight: bold;
+    width: 80px; /* 라벨 고정 너비 */
+}
+
+#search-input {
+    width: 300px;
+    height: 30px;
+    border-radius: 10px;
+    border: 1px solid forestgreen;
+    padding-left: 10px;
+}
+/* 📅 기간 입력 필드 한 줄 정렬 */
+.date-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex: 1;
+}
+
+.date-group input {
+    flex: 1;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+    width: 50px;
+}
+
+/* ✅ 완료 버튼 */
+.submit-btn {
+    width: 100%;
+    background-color: #00b800;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.submit-btn:hover {
+    background-color: #008f00;
+}
+
+/* 검색창 활성화될 때 */
+.search-box.active {
+    right: 0;
+}
+
+/* 필터 스타일 */
+#filter {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+    cursor: pointer;
+    margin-left: 500px;
+    height: 35px;
+}
+
+#filter:focus {
+    border: 1px solid green;
+}
+
+.contest-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.contest-table th,
+.contest-table td {
+    text-align: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.contest-table th {
+    background-color: #F0FFEF;
+    border-top: 2px solid #00b800;
+    text-align: center;
+    color: #404040;
+    font-weight: bold;
+    white-space: nowrap; /* ✅ 헤더 줄바꿈 방지 */
+}
+
+.contest-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.contest-table td:last-child {
+    text-align: center;
+}
+
+.contest-table td {
+    color: #555;
+    background-color: #fff;
+    text-decoration: none; /* 링크 밑줄 제거 */
+}
+
+.contest-table td:first-child {
+    text-decoration: none;
+}
+
+.contest-table td:last-child {
+    color: #00b100;
+    font-weight: bold;
+}
+
+/* ✅ 버튼 스타일 유지 */
+.BOB {
+    margin-left: 50px;
+    border: 2px solid #19CB13;
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 16px; /* 글자 크기 유지 */
+    font-weight: bold;
+    color: #19CB13; /* 흰색 유지 */
+}
+
+/* ✅ 버튼 내부 링크 스타일 */
+.BOB a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* 좌우 섹션을 나누는 전체 wrapper */
+.contest-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    margin: 30px auto;
+    width: 90%;
+}
+
+/* 왼쪽 섹션 스타일 */
+.left-section {
+    width: 250px;
+    text-align: center;
+}
+
+.hot-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.hot-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.apply-btn {
+    background-color: #00b800;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+}
+
+.apply-btn:hover {
+    background-color: #009900;
+}
+
+/* 오른쪽 섹션 (기존 테이블 포함된 곳) */
+.right-section {
+    flex: 1;
+}
+
+/* footer 전체 박스 */
+.footer {
+    width: 100%;
+    border-top: 1px solid #ddd;
+    padding: 20px 0;
+    background-color: #ffffff;
+    margin-top: 60px;
+    font-size: 13px;
+    color: #666;
+}
+
+/* footer 안의 콘텐츠 정렬 */
+.footer-content {
+    width: 90%;
+    margin: 0 auto;
+}
+
+/* 상단 링크 (정책, 공지사항) */
+.footer-links {
+    margin-bottom: 10px;
+}
+
+.footer-links span {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+/* 초록색 텍스트 */
+.green-text {
+    color: #00b800;
+}
+
+/* 하단 회색 설명 텍스트 */
+.footer-info {
+    line-height: 1.6;
+    font-weight: normal;
+    color: #999;
+}
+
+/* ✅ 버튼 구조 변경 */
+<form action="/onlyBOB" method="get">
+<button type="submit" class="BOB">only BOB</button>
+</form>

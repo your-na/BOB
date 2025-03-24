@@ -1,0 +1,141 @@
+.form-container {
+    font-family: "Arial", sans-serif;
+    background-color: #fff;
+    padding: 40px;
+    width: 500px;
+    margin: 100px auto 0; /* 여기에 margin-top: 60px 추가된 거예요 */
+}
+
+.image-upload {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.image-box {
+    width: 100%;
+    height: 450px;
+    border: 1px solid #00c851;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #00c851;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.warning {
+    color: red;
+    font-size: 12px;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form label {
+    font-size: 14px;
+    margin: 6px 0 4px;
+    color: #333;
+}
+
+form input[type="text"],
+form input[type="date"],
+form select,
+form textarea {
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.date-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+form textarea {
+    height: 120px;
+    resize: vertical;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.submit {
+    padding: 10px 30px;
+    background-color: #ffffff;
+    color: #19CB13;
+    border: 1px solid #19CB13;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.submit:hover {
+    background-color: #19CB13;
+    color: #ffffff;
+}
+
+.cancel {
+    padding: 10px 30px;
+    background-color: #ffffff;
+    color: red;
+    border: 1px solid red;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.cancel:hover {
+    background-color: red;
+    color: #ffffff;
+}
+
+/* footer 전체 박스 */
+.footer {
+    width: 100%;
+    border-top: 1px solid #ddd;
+    padding: 20px 0;
+    background-color: #ffffff;
+    margin-top: 60px;
+    font-size: 13px;
+    color: #666;
+}
+
+/* footer 안의 콘텐츠 정렬 */
+.footer-content {
+    width: 90%;
+    margin: 0 auto;
+}
+
+/* 상단 링크 (정책, 공지사항) */
+.footer-links {
+    margin-bottom: 10px;
+}
+
+.footer-links span {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+/* 초록색 텍스트 */
+.green-text {
+    color: #00b800;
+}
+
+/* 하단 회색 설명 텍스트 */
+.footer-info {
+    line-height: 1.6;
+    font-weight: normal;
+    color: #999;
+}

@@ -1,0 +1,339 @@
+body {
+    margin: 0 10%;
+    font-family: 'Arial', sans-serif;
+}
+
+
+.navigator {
+    position: fixed; /* 상단에 고정 */
+    top: 0; /* 화면의 맨 위에 위치 */
+    left: 0; /* 화면의 왼쪽에 위치 */
+    width: 100%; /* 화면 너비에 맞게 확장 */
+    z-index: 1000; /* 다른 요소들보다 위에 표시되도록 설정 */
+    background-color: #fff; /* 배경색 설정 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.site-name {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif; /*폰트 추가 필요*/
+    font-weight: bold;
+    color: #19CB13;
+    font-size: 35px;
+    float: left;
+}
+
+.site-name a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.nav-list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    float: left;
+    gap: 5px;
+}
+
+.nav-list li {
+    margin-left: 20px;
+}
+
+.nav-menu {
+    float: left;
+    text-decoration: none;
+    color: black;
+    font-size: 17px;
+    transition: color 0.3s ease;
+}
+
+.nav-menu:hover {
+    font-weight: bold;
+    color: #19CB13;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center; /* 수직 정렬 */
+    gap: 20px; /* site-name과 nav-list 간의 간격 */
+    margin: 0 10%;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+    margin: 0 10%;
+}
+
+.search-bar-container {
+    position: relative;
+    flex-grow: 1;
+    max-width: 800px;
+    margin: 0 20px;
+}
+
+
+.search-bar {
+    margin-top: 3px; /* 요소를 아래로 10px 이동 */
+    width: 100%;
+    padding: 8px 20px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 12px;
+}
+
+.search-bar:focus {
+    margin-top: 3px;
+    border-color: #19CB13;
+    width: 100%;
+    padding: 8px 20px;
+    border-radius: 10px;
+    border: 1px solid #19CB13;
+    font-size: 12px;
+}
+
+.search-icon {
+    position: absolute;
+    top: 50%;
+    left: 210px;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    background-color: #cccccc;
+    border-radius: 50%;
+}
+
+.search-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-icon, .chatting-icon {
+    font-size: 10px;
+    text-decoration: none;
+    color: black;
+    width: 23px;
+    height: 23px;
+}
+
+.user-icon img, .chatting-icon img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 드롭다운 메뉴 숨김 기본값 */
+.nav-item .all-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%; /* 네비게이션 아래로 배치 */
+    left: 0; /* 드롭다운을 부모 요소의 왼쪽에 맞춤 */
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 150px; /* 드롭다운 크기 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 5px 0; /* 위, 아래 간격만 추가 */
+    z-index: 1000;
+    text-align: left; /* 텍스트를 왼쪽 정렬 */
+}
+
+/* 드롭다운 메뉴 숨김 기본값 */
+.nav-item1 .all-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%; /* 네비게이션 아래로 배치 */
+    left: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 120px; /* 드롭다운 크기 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    z-index: 1000;
+}
+.nav-item {
+    position: relative;
+}
+
+.nav-item1 {
+    position: relative;
+    width: 23px;
+    height: 23px;
+}
+
+/* 개별 메뉴에 마우스를 올릴 때 드롭다운 표시 */
+.nav-item:hover .all-dropdown-menu {
+    display: block;
+}
+
+.nav-item1:hover .all-dropdown-menu {
+    display: block;
+}
+
+/* 드롭다운 메뉴 섹션 */
+.all-dropdown-menu .dropdown-section {
+    flex: 1;
+}
+
+.all-dropdown-menu h4 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.all-dropdown-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.all-dropdown-menu ul li {
+    padding: 5px 0;
+}
+
+.all-dropdown-menu ul li a {
+    text-decoration: none;
+    color: black;
+    font-size: 14px;
+}
+
+.all-dropdown-menu ul li a:hover {
+    color: #19CB13;
+}
+/*여기까지 헤더*/
+
+#plz {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* 이미지와 텍스트 사이 간격 */
+    text-decoration: none; /* 링크 밑줄 제거 */
+    color: #757575;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+#plz img{
+    width: 20px;
+    height: 20px;
+}
+
+#plz:hover {
+    color : #757575;
+    font-weight: bold;
+}
+
+.logout {
+    background: white;
+    border: none;
+    font-size: 14px;
+    text-align: left;
+    margin-left: -5px;
+}
+
+.logout:hover {
+    color: #19CB13;
+    cursor: pointer;
+}
+
+/* 알림 배지 (새로운 알림 표시) */
+.notification-badge {
+    position: absolute;
+    top: 48px;
+    right: 85px;
+    background-color: red;
+    color: white;
+    font-size: 12px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    display: none; /* 기본적으로 숨김 */
+    justify-content: center;
+    align-items: center;
+}
+
+/* 알림창 스타일 */
+.notification-box {
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    width: 300px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    display: none; /* 기본적으로 숨김 */
+    flex-direction: column;
+    z-index: 1000;
+}
+
+/* 알림창 헤더 */
+.notification-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background: #f8f8f8;
+    border-bottom: 1px solid #ddd;
+}
+
+.notification-header h3 {
+    margin: 0;
+    font-size: 16px;
+}
+
+/* 닫기 버튼 */
+#close-notification {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* 알림 목록 */
+#notification-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+/* 개별 알림 스타일 */
+.notification-item {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.notification-item:hover {
+    background: #f1f1f1;
+}
+
+/* 알림창 하단 */
+.notification-footer {
+    padding: 10px;
+    text-align: center;
+    background: #f8f8f8;
+    border-top: 1px solid #ddd;
+}
+
+#clear-all {
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+}

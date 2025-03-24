@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>기업 공모전 홈</title>
+    <link rel="stylesheet" href="/css/comhome.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<!-- 메인 배너 -->
+<section class="main-banner">
+    <img src="/images/banner.png" alt="배너 이미지" class="banner-image">
+</section>
+
+<!-- 콘텐츠 영역을 좌우로 나누기 -->
+<section class="contest-wrapper">
+    <!-- 왼쪽 사이드: 지금 핫한 공모전 -->
+    <div class="left-section">
+        <h3 class="hot-title">지금 핫한 공모전!!</h3>
+        <img src="/images/hot.png" alt="핫한 공모전" class="hot-image">
+        <button class="apply-btn">공모전 주최 신청</button>
+    </div>
+
+    <!-- 오른쪽 메인: 검색, 필터, only BOB 버튼, 테이블 -->
+    <div class="right-section">
+        <div class="upupup">
+            <form>
+                <!-- 검색 아이콘 -->
+                <div class="search-container">
+                    <div class="searchicon" id="searchicon">
+                        <img src="/images/search-icon.png" alt="검색">
+                    </div>
+
+                    <!-- 검색창 (기본적으로 숨김) -->
+                    <div class="search-box" id="search-box">
+                        <div class="search-header">
+                            <button type="button" id="search-close">&times;</button>
+                        </div>
+                        <div class="search-field">
+                            <input type="text" id="search-input" placeholder="검색어 입력">
+                        </div>
+                        <div class="search-field">
+                            <label for="recruit-start">모집기간</label>
+                            <div class="date-group">
+                                <input type="date" id="recruit-start">
+                                <span>~</span>
+                                <input type="date" id="recruit-end">
+                            </div>
+                        </div>
+                        <div class="search-field">
+                            <label for="progress-start">진행기간</label>
+                            <div class="date-group">
+                                <input type="date" id="progress-start">
+                                <span>~</span>
+                                <input type="date" id="progress-end">
+                            </div>
+                        </div>
+                        <button class="submit-btn">완료</button>
+                    </div>
+                </div>
+            </form>
+
+            <select id="filter" name="filter">
+                <option value="all">최신순</option>
+                <option value="ing">인기순</option>
+                <option value="ed">오래된순</option>
+            </select>
+
+            <form action="/onlyBOB" method="get">
+                <button type="submit" class="BOB">only BOB</button>
+            </form>
+        </div>
+
+        <!-- 목록 테이블 -->
+        <table class="contest-table">
+            <thead>
+            <tr>
+                <th>공모명</th>
+                <th>주최</th>
+                <th>남은 기간</th>
+                <th>진행 일정</th>
+                <th>현황</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var searchIcon = document.getElementById("searchicon");
+        var searchBox = document.getElementById("search-box");
+        var searchClose = document.getElementById("search-close");
+
+        searchIcon.addEventListener("click", function () {
+            searchBox.style.display = "block";
+        });
+
+        searchClose.addEventListener("click", function () {
+            searchBox.style.display = "none";
+        });
+    });
+</script>
+<!-- footer -->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-links">
+            <span class="policy">[<span class="green-text">개인정보 처리방침</span>]</span>
+            <span class="notice">[공지사항]</span>
+        </div>
+        <div class="footer-info">
+            회사 이름 전화번호 주소 이메일 기타등등 세줄 회사 이름 전화번호 주소 이메일 기타등등 두줄<br>
+            회사 이름 전화번호 주소 이메일 기타등등 세줄 회사 이름 전화번호 주소 이메일 기타등등 두줄
+        </div>
+    </div>
+</footer>
+</body>
+</html>

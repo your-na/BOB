@@ -187,4 +187,13 @@ public class UserController {
     //기업 회원가입&메인 작업중 임의 주소
     @GetMapping("/cosignup")
     public String cosignupform() {return "co_signup";}
+
+    @GetMapping("/header2")
+    public String header2form() {return "header2";}
+
+    @GetMapping("/comhome")
+    public String comhomeform() {return "comhome";}
+
+    @GetMapping("/comhost")
+    public String comhostform() {return "comhost";}
 }
