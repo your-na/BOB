@@ -412,14 +412,17 @@ public class ProjectController {
 
     @GetMapping("/projecthistory")
     public String showProjectHistory(@AuthenticationPrincipal UserDetailsImpl userDetails, Model model) {
-        Long userId = userDetails.getUserEntity().getUserId(); // 🔥 변경: getId() → getUserId()
+        Long userId = userDetails.getUserEntity().getUserId();  // 로그인한 유저의 ID
 
-        // 🔥 제출된 파일이 있는 프로젝트만 가져오기
-        List<UserProjectEntity> submittedProjects = userProjectRepository.findByUser_UserIdAndSubmittedFileNameIsNotNull(userId);
+        // 완료된 프로젝트 가져오기
+        List<UserProjectEntity> completedUserProjects = userProjectRepository.findByUser_UserIdAndStatus(userId, "완료");
 
-        model.addAttribute("submittedProjects", submittedProjects);
-        return "projecthistory"; // 🔥 프로젝트 히스토리 페이지
+        // DTO로 변환된 프로젝트 리스트를 모델에 담아줍니다.
+        model.addAttribute("completedProjects", completedUserProjects);
+
+        return "projecthistory";  // projecthistory.html로 전달
     }
+
 
     @GetMapping("/todoadd")
     public String showAddPage() {
