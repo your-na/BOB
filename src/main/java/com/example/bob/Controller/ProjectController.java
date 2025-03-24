@@ -441,4 +441,7 @@ public class ProjectController {
         return "todo_plan";
     }
 
+    @GetMapping("/appstatus")
+    public String showstatusform() {return "application_status";}
 }
+

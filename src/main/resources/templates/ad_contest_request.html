@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>공모전 주최 요청</title>
+    <link rel="stylesheet" href="/css/ad_contest_request.css">
+</head>
+<body>
+
+<!-- 공모전 요청 상세 -->
+<section class="contest-request">
+    <h2>공모전 주최 요청</h2>
+
+    <div class="form-container">
+        <!-- 공모전 포스터 (읽기 전용) -->
+        <div class="poster-preview">
+            <img id="poster-img" src="/images/sample_poster.png" alt="공모전 포스터">
+        </div>
+
+        <!-- 공모전 정보 -->
+        <table class="contest-table">
+            <tr>
+                <th>공모전명</th>
+                <td id="contest-title">2025 동계 청소년 IT 학술대회</td>
+            </tr>
+            <tr>
+                <th>주최/주관</th>
+                <td id="contest-host">(한)청지</td>
+            </tr>
+            <tr>
+                <th>대표분야</th>
+                <td id="contest-field">논문</td>
+            </tr>
+            <tr>
+                <th>참가대상</th>
+                <td id="contest-target">청소년, 어린이</td>
+            </tr>
+            <tr>
+                <th>대회지역</th>
+                <td id="contest-region">전국</td>
+            </tr>
+            <tr>
+                <th>진행기간</th>
+                <td id="contest-period">2024.11.14 ~ 2025.01.12</td>
+            </tr>
+            <tr>
+                <th>심사기관</th>
+                <td id="contest-judge">서울 소재 대학교</td>
+            </tr>
+            <tr>
+                <th>시상내역</th>
+                <td id="contest-prize">총 상금 (다양한 혜택)</td>
+            </tr>
+            <tr>
+                <th>주최 신청 날짜</th>
+                <td id="request-date">2025.01.06</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 공모전 설명 -->
+    <div class="details-container">
+        <h3>공모전 설명</h3>
+        <p id="contest-details">공모전 설명이 적혀 있습니다.</p>
+    </div>
+
+    <!-- 승인/거절 버튼 -->
+    <div class="button-container">
+        <button class="approve-btn" id="approve-btn">승인</button>
+        <button class="reject-btn" id="reject-btn">거절</button>
+    </div>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const approveBtn = document.getElementById("approve-btn");
+        const rejectBtn = document.getElementById("reject-btn");
+
+        // 승인 버튼 클릭 시
+        approveBtn.addEventListener("click", function () {
+            if (confirm("이 공모전을 승인하시겠습니까?")) {
+                alert("공모전이 승인되었습니다.");
+                // ✅ 서버에 승인 요청을 보낼 수 있음
+            }
+        });
+
+        // 거절 버튼 클릭 시
+        rejectBtn.addEventListener("click", function () {
+            if (confirm("이 공모전을 거절하시겠습니까?")) {
+                alert("공모전이 거절되었습니다.");
+                // ✅ 서버에 거절 요청을 보낼 수 있음
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

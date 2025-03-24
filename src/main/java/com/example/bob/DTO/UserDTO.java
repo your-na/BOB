@@ -56,4 +56,23 @@ public class UserDTO {
     public UserEntity toUserEntity() {
         return UserEntity.toUserEntity(this);
     }
+
+    public static UserDTO fromEntity(UserEntity userEntity) {
+        return UserDTO.builder()
+                .userId(userEntity.getUserId())
+                .userName(userEntity.getUserName())
+                .userIdLogin(userEntity.getUserIdLogin())
+                .pwd(userEntity.getPwd())
+                .userEmail(userEntity.getUserEmail())
+                .userPhone(userEntity.getUserPhone())
+                .sex(userEntity.getSex())
+                .mainLanguage(userEntity.getMainLanguage())
+                .birthday(userEntity.getBirthday())
+                .userNick(userEntity.getUserNick())
+                .profileImageUrl(userEntity.getProfileImageUrl() != null ? userEntity.getProfileImageUrl() : "/images/user.png")
+                .bio(userEntity.getUserBio() != null ? userEntity.getUserBio() : "소개를 작성해보세요.")
+                .accountCreatedAt(userEntity.getAccountCreatedAt() != null ? userEntity.getAccountCreatedAt() : LocalDateTime.now())
+                .build();
+    }
+
 }

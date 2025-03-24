@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>기업 회원 목록</title>
+    <link rel="stylesheet" href="/css/ad_company_list.css">
+    <script defer src="/js/ad_company_list.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h1>기업 회원 목록</h1>
+
+    <!-- 🔍 정렬, 검색, 삭제 -->
+    <div class="top-bar">
+        <div class="filter-dropdown">
+            <select id="sort-filter" name="sort">
+                <option value="latest" th:selected="${sort == 'latest'}">최신순</option>
+                <option value="oldest" th:selected="${sort == 'oldest'}">오래된 순</option>
+            </select>
+        </div>
+
+        <div class="search-wrapper">
+            <input type="text" id="search-input" name="keyword" th:value="${keyword}" placeholder="기업 검색">
+        </div>
+
+        <button class="delete-btn" id="delete-selected">삭제</button>
+    </div>
+
+    <!-- ✅ 기업 회원 목록 테이블 -->
+    <table class="user-table">
+        <thead>
+        <tr>
+            <th>번호</th>
+            <th><input type="checkbox" id="select-all"></th>
+            <th>회원 아이디</th>
+            <th>기업명</th>
+            <th>대표자명</th>
+            <th>이메일</th>
+            <th>전화번호</th>
+            <th>가입일</th>
+            <th>정보</th>
+        </tr>
+        </thead>
+        <tbody id="user-body">
+        <tr th:each="company, iterStat : ${companyList.content}">
+            <td th:text="${iterStat.count}"></td>
+            <td><input type="checkbox" class="user-checkbox" th:data-id="${company.id}"></td>
+            <td th:text="${company.userIdLogin}"></td>
+            <td th:text="${company.companyName}"></td>
+            <td th:text="${company.ceoName}"></td>
+            <td th:text="${company.email} ?: '이메일 없음'"></td>
+            <td th:text="${company.phone} ?: '전화번호 없음'"></td>
+            <td th:text="${#temporals.format(company.createdAt, 'yyyy-MM-dd')}"></td>
+            <td><a class="detail-btn" th:href="@{/admin/company/info/{id}(id=${company.id})}">정보 확인</a></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- ✅ 페이지네이션 -->
+    <div class="pagination">
+        <button th:if="${!companyList.first}" th:onclick="|location.href='@{/admin/company/list(page=${companyList.number - 1}, keyword=${keyword}, sort=${sort})}'|">◀</button>
+
+        <span th:each="pageNum : ${#numbers.sequence(1, companyList.totalPages)}">
+      <button th:classappend="${pageNum == companyList.number + 1} ? 'active' : ''"
+              th:onclick="|location.href='@{/admin/company/list(page=${pageNum - 1}, keyword=${keyword}, sort=${sort})}'|"
+              th:text="${pageNum}">1</button>
+    </span>
+
+        <button th:if="${!companyList.last}" th:onclick="|location.href='@{/admin/company/list(page=${companyList.number + 1}, keyword=${keyword}, sort=${sort})}'|">▶</button>
+    </div>
+</div>
+
+</body>
+</html>

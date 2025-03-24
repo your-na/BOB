@@ -1,0 +1,68 @@
+/* 페이지 제목 */
+.page-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: left;
+    margin-left: 20px;
+    margin-top: 150px;
+}
+
+/* ✅ 검색창 스타일 */
+#search-box {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    width: 200px;
+    margin-right: 20px;
+}
+
+.filter-container label {
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* 필터 선택 */
+.filter-container {
+    text-align: right;
+    margin: 10px 20px;
+}
+
+#filter-select {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #dfffcf;
+    cursor: pointer;
+}
+
+/* 지원 카드 스타일 */
+.application-list {
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.application-card {
+    background-color: #ffffff;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+/* 지원 상태 버튼 */
+.status-button {
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: default;
+}
+
+.pending {
+    background-color: #e0f0ff;
+    color: #007bff;
+}

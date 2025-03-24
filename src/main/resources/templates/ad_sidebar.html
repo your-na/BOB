@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 페이지</title>
+    <link rel="stylesheet" href="/css/ad_sidebar.css">
+    <script defer src="/js/ad_sidebar.js"></script>
+</head>
+<body>
+
+<!-- ✅ 사이드바 -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <h2 class="sidebar-title">관리자 Tool bar</h2>
+    </div>
+
+    <ul class="menu">
+        <li class="menu-title">관리자</li>
+        <li><a href="/admin/info.html" data-page="info">내 정보</a></li>
+        <li><a href="/admin/stats.html" data-page="stats">통계</a></li>
+        <li><a href="/admin/inquiries.html" data-page="inquiries">문의 내역</a></li>
+        <li><a href="/admin/reports.html" data-page="reports">신고 내역</a></li>
+
+        <li class="menu-title">공모전</li>
+        <li><a href="/adcontest" data-page="ad_contest">전체 공모전</a></li>
+        <li><a href="/contests/company.html" data-page="company-contests">기업 공모전</a></li>
+        <li><a href="/contests/external.html" data-page="external-contests">외부 공모전</a></li>
+        <li><a href="/adconlist" data-page="ad_contest_list">주최 신청 목록</a></li>
+        <li><a href="/adnewcon" data-page="ad_newcontest">공모전 주최 하기</a></li>
+
+        <li class="menu-title">구인</li>
+        <li><a href="/jobs/postings.html" data-page="job-postings">구인 공고</a></li>
+        <li><a href="/jobs/postings.html" data-page="job-postings">구인 공고 승인</a></li>
+        <li><a href="/jobs/portfolio.html" data-page="portfolio">포트폴리오 모음</a></li>
+
+        <li class="menu-title">회원</li>
+        <li><a href="/adcomrequest" data-page="ad_company_request">기업 회원가입 요청</a></li>
+        <li><a href="/admin/company" data-page="ad_company_list">기업 회원 목록</a></li>
+        <li><a href="/admin/users" data-page="ad_general_user">일반 회원 목록</a></li>
+
+        <li class="menu-title">게시판</li>
+        <li><a href="/board/manage.html" data-page="board-manage">게시글 관리</a></li>
+
+        <form>
+            <li class="logout"><a href="/logout.html" data-page="logout">로그아웃</a></li>
+        </form>
+    </ul>
+</div>
+
+<!-- ✅ 메인 콘텐츠 (여기에 동적으로 불러올 페이지 내용이 표시됨) -->
+<div class="main-content" id="main-content">
+    <h1>관리자 대시보드</h1>
+    <p>이곳에서 관리자 기능을 사용할 수 있습니다.</p>
+</div>
+
+</body>
+</html>

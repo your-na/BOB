@@ -156,11 +156,31 @@ public class UserController {
     public String contestform() {return "contest";}
     @GetMapping("/postcontest")
     public String postcform() {return "postcontest";}
+    @GetMapping("/contestact")
+    public String conactform() {return "contestact";}
+    @GetMapping("/likedcontest")
+    public String likedform() {return "liked_contest";}
+    @GetMapping("/conhistory")
+    public String conhistoryform() {return "contest_history";}
 
     //관리자 공모전 임의 주소
     @GetMapping("/adcontest")
     public String adcontestform() {return "ad_contest";}
 
-    @GetMapping("adnewcon")
+    @GetMapping("/adnewcon")
     public String adnewform() {return "ad_newcontest";}
+
+    @GetMapping("adconlist")
+    public String conlistform() {return "ad_contest_list";}
+
+    //관리자^_^
+    @GetMapping("/sidebar")
+    public String adsideform() {return "ad_sidebar";}
+
+    @GetMapping("adcomrequest")
+    public String adrequestform() {return "ad_company_request";}
+
+    //기업 회원가입&메인 작업중 임의 주소
+    @GetMapping("/cosignup")
+    public String cosignupform() {return "co_signup";}
 }
