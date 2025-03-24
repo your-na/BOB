@@ -95,8 +95,8 @@ public class ProjectEntity {
 
                     // 수락된 모든 팀원들의 상태를 "완료"로 변경
                     for (UserProjectEntity member : userProjects) {
-                        // "신청중", "진행중" 상태인 팀원들만 "완료"로 변경
-                        if (member.getStatus().equals("진행중") || member.getStatus().equals("신청중")) {
+                        // "진행중" 또는 "모집중" 상태인 팀원들만 "완료"로 변경
+                        if ((member.getStatus().equals("진행중") || member.getStatus().equals("모집중")) && !member.getStatus().equals("신청중")) {
                             member.setStatus("완료"); // 상태를 "완료"로 변경
                         }
                     }
@@ -104,10 +104,8 @@ public class ProjectEntity {
                 }
             }
         }
-
-        // 프로젝트 테이블 상태 업데이트는 서비스 레이어에서 처리
-        // projectRepository.save(this); // 이 부분을 서비스 레이어로 이동
     }
+
 
 
     // ✅ 주최자의 상태에 따라 프로젝트 상태 업데이트

@@ -51,21 +51,18 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="project, iterStat : ${submittedProjects}">
-            <td th:text="${iterStat.count}">1</td>
-            <td th:text="${project.status}">제출</td>
-            <td th:text="${project.project.startDate}"></td>
-            <!-- ✅ 종료일자 대신 제출날짜(`submissionDate`)를 표시 -->
-            <td th:text="${project.submissionDate} ?: '미제출'"></td>
-            <!-- ✅ 프로젝트 ID 대신 프로젝트 제목 표시 -->
-            <td th:text="${project.project.title}"></td>
+        <tr th:each="userProject, iterStat : ${completedProjects}">
+            <td th:text="${iterStat.count}">1</td>  <!-- 제출된 순서 (No) -->
+            <td th:text="${userProject.status}">완료</td>  <!-- 상태 -->
+            <td th:text="${userProject.project.startDate}">2025-03-17</td>  <!-- 프로젝트 시작 날짜 -->
+            <td th:text="${userProject.submissionDate}">2025-03-17</td>  <!-- 제출 날짜 -->
+            <td th:text="${userProject.project.title}">프로젝트 제목</td>  <!-- 프로젝트 제목 -->
             <td>
-                <!-- ✅ 제출된 파일이 있으면 다운로드 링크 표시 -->
-                <a th:if="${project.submittedFileName}"
-                   th:href="@{'/download/' + ${project.submittedFileName}}"
-                   th:text="${project.submittedFileName}"
+                <a th:if="${userProject.submittedFileName}"
+                   th:href="@{'/download/' + ${userProject.submittedFileName}}"
+                   th:text="${userProject.submittedFileName}"
                    target="_blank">파일보기</a>
-                <span th:unless="${project.submittedFileName}">미제출</span>
+                <span th:unless="${userProject.submittedFileName}">미제출</span>
             </td>
             <td>
                 <button class="delete-btn">삭제</button>

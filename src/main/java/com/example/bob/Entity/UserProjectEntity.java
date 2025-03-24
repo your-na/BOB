@@ -34,26 +34,16 @@ public class UserProjectEntity {
 
     private String status; // 사용자의 참여 상태 (모집중, 신청중, 진행중, 완료)
 
-    // ✅ 상태 변경 시 프로젝트도 함께 변경
-    public void setStatusAndSyncProject(String status) {
-        this.status = status;
-        if (this.project != null) {
-            this.project.completeProject(); // 프로젝트 완료 체크
-        }
-    }
+    private Long teamMemberId; // 🔥 팀원 아이디 추가
 
-    // ✅ 팀원이 파일 제출 시 상태 업데이트
-    public void submitFile(String fileName) {
-        this.submittedFileName = fileName;
-        this.submissionDate = LocalDate.now();
-
-        if (this.user.getUserNick().equals(this.project.getCreatedBy())) {
-            this.project.completeProject(); // 주최자가 제출하면 프로젝트 완료
-        }
-    }
 
     // 역할 (주최/참여)
     public String getRole() {
         return project.getCreatedBy().equals(user.getUserNick()) ? "주최" : "참여";
+    }
+
+    // 팀원 아이디를 가져오는 메서드
+    public Long getTeamMemberId() {
+        return this.user != null ? this.user.getUserId() : null; // user가 존재하면 teamMemberId를 가져옴
     }
 }

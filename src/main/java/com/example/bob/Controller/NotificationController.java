@@ -63,6 +63,7 @@ public class NotificationController {
         return responseList;
     }
 
+    // 알림 읽음 상태로 변경
     @PatchMapping("/mark-as-read/{id}")
     public ResponseEntity<String> markAsRead(@PathVariable Long id) {
         boolean success = notificationService.markAsRead(id);
