@@ -1,11 +1,7 @@
 package com.example.bob.security;
 
-import com.example.bob.Service.CompanyService;
-import com.example.bob.Service.UserService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,7 +11,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 @Configuration
 @EnableWebSecurity
@@ -23,7 +20,13 @@ public class SecurityConfig {
 
     private final CombinedUserDetailsService combinedUserDetailsService;
 
-    public SecurityConfig(@Lazy CombinedUserDetailsService combinedUserDetailsService) {
+    // @Lazy 추가하여 순환 의존성 해결
+    @Autowired
+    @Lazy  // CustomAuthenticationProvider에 @Lazy 추가
+    private CustomAuthenticationProvider customAuthProvider;  // CustomAuthenticationProvider 주입
+
+    // Constructor 의존성 주입 방식
+    public SecurityConfig(CombinedUserDetailsService combinedUserDetailsService) {
         this.combinedUserDetailsService = combinedUserDetailsService;
     }
 
@@ -67,11 +70,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http, CustomAuthenticationProvider customAuthProvider) throws Exception {
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder
-                .userDetailsService(combinedUserDetailsService)
+                .userDetailsService(combinedUserDetailsService)  // CombinedUserDetailsService 사용
                 .passwordEncoder(passwordEncoder());
         return authenticationManagerBuilder.build();
     }
@@ -81,5 +84,3 @@ public class SecurityConfig {
         return combinedUserDetailsService;
     }
 }
-
-

@@ -9,13 +9,18 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Lazy;
 
 @Component
 @RequiredArgsConstructor
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
+    @Lazy // 순환 의존성 해결을 위해 @Lazy 추가
     private final UserDetailsService userService; // 일반 사용자
+
+    @Lazy // 순환 의존성 해결을 위해 @Lazy 추가
     private final CompanyDetailsService companyDetailsService; // 기업 사용자
+
     private final PasswordEncoder passwordEncoder;
 
     @Override

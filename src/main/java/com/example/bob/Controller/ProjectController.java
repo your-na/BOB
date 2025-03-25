@@ -425,7 +425,7 @@ public class ProjectController {
     }
 
 
-    @GetMapping("/todoadd")
+        @GetMapping("/todoadd")
     public String showAddPage() {
         return "todo_add";
     }
@@ -438,11 +438,6 @@ public class ProjectController {
     @GetMapping("/todohome")
     public String showHomePage() {
         return "todo_home";
-    }
-
-    @GetMapping("/todoplan")
-    public String showPlanPage() {
-        return "todo_plan";
     }
 
     @GetMapping("/appstatus")
