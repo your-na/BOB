@@ -23,6 +23,7 @@ public class UserDTO {
     private String mainLanguage;    // 주 언어
     private String birthday;        // 생년월일
     private String userNick;        // 유저 닉네임
+    private String role;
     private LocalDateTime accountCreatedAt; // 계정 생성 날짜
     private String profileImageUrl;
     private String bio;
@@ -32,6 +33,8 @@ public class UserDTO {
         this.userId = userId;
         this.userName = userName;
     }
+
+
 
     public static UserDTO toUserDTO(UserEntity userEntity) {
         UserDTO userDTO = new UserDTO();
@@ -46,6 +49,7 @@ public class UserDTO {
         userDTO.setMainLanguage(userEntity.getMainLanguage());
         userDTO.setBirthday(userEntity.getBirthday());
         userDTO.setUserNick(userEntity.getUserNick());
+        userDTO.setRole(userEntity.getRole());
         userDTO.setProfileImageUrl(userEntity.getProfileImageUrl() != null ? userEntity.getProfileImageUrl() : "/images/user.png");
         userDTO.setBio(userEntity.getUserBio() != null ? userEntity.getUserBio() : "소개를 작성해보세요.");
         userDTO.setAccountCreatedAt(userEntity.getAccountCreatedAt() != null ? userEntity.getAccountCreatedAt() : LocalDateTime.now());

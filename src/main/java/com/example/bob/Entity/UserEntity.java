@@ -45,6 +45,10 @@ public class UserEntity {
     @Column(length = 100)
     private String Birthday;
 
+    //관리자 유저 구분
+    @Column(nullable = false)
+    private String role = "USER";
+
     @Column(length = 255)
     private String profileImageUrl = "/images/user.png"; // 기본 이미지 경로
 
