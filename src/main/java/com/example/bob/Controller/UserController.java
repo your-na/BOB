@@ -196,4 +196,7 @@ public class UserController {
 
     @GetMapping("/comhost")
     public String comhostform() {return "comhost";}
+
+    @GetMapping("/newcontest")
+    public String newcontestform() {return "newcontest";}
 }

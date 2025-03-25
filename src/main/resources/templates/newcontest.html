@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>팀 모집하기</title>
+    <link rel="stylesheet" href="/css/newcontest.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<main class="main-content">
+    <section class="contest-create">
+        <h1>팀 모집하기</h1>
+        <hr>
+
+        <form action="/bw" method="post" class="contest-form">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+            <!-- 진행 일정 -->
+            <div class="form-group">
+                <label for="start-date">진행 일정</label>
+                <div class="date-inputs">
+                    <input type="date" id="start-date" name="start-date">
+                    <span>~</span>
+                    <input type="date" id="end-date" name="end-date">
+                </div>
+            </div>
+
+            <!-- 모집 일정 -->
+            <div class="form-group">
+                <label for="recruitment-start-date">모집 일정</label>
+                <div class="date-inputs">
+                    <input type="date" id="recruitment-start-date" name="recruitment-start-date">
+                    <span>~</span>
+                    <input type="date" id="recruitment-end-date" name="recruitment-end-date">
+                </div>
+            </div>
+
+            <!-- 모집 인원 -->
+            <div class="form-group">
+                <label for="recruitment">모집 인원</label>
+                <select id="recruitment" name="recruitment">
+                    <option value="0">0명</option>
+                    <option value="1">1명</option>
+                    <option value="2">2명</option>
+                    <option value="3">3명</option>
+                    <option value="plus">기타</option>
+                </select>
+                <div id="custom-input-group" style="display: none; align-items: center;">
+                    <input type="number" id="custom-recruitment" name="recruitmentCount" placeholder="직접 입력" min="1">
+                    <p style="margin-left: 5px;">명</p>
+                </div>
+            </div>
+
+            <!-- 공모전명 -->
+            <div class="form-group">
+                <label for="contest-name">공모전명</label>
+                <input type="text" id="contest-name" name="contest-name" placeholder="공모전명을 입력하세요.">
+            </div>
+
+            <!-- 상세 내용 -->
+            <div class="form-group">
+                <label for="contest-description">상세내용</label>
+                <textarea id="contest-description" name="contest-description" placeholder="내용을 입력해주세요."></textarea>
+            </div>
+
+            <!-- 버튼 -->
+            <div class="btn">
+                <button type="submit" class="submit-btn">등록</button>
+                <a href="/contest" class="cancel-button">취소</a>
+            </div>
+        </form>
+    </section>
+</main>
+
+<!-- 스크립트 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let today = new Date().toISOString().split("T")[0];
+        let startDateInput = document.getElementById("start-date");
+        let endDateInput = document.getElementById("end-date");
+
+        startDateInput.setAttribute("min", today);
+
+        startDateInput.addEventListener("change", function () {
+            let startDate = startDateInput.value;
+            if (startDate < today) {
+                alert("시작 날짜는 오늘 이후로 선택해야 합니다!");
+                startDateInput.value = today;
+                startDate = today;
+            }
+            endDateInput.setAttribute("min", startDate);
+        });
+
+        endDateInput.addEventListener("change", function () {
+            let startDate = startDateInput.value;
+            let endDate = endDateInput.value;
+            if (endDate < startDate) {
+                alert("끝나는 날짜는 시작 날짜보다 빠를 수 없습니다!");
+                endDateInput.value = startDate;
+            }
+        });
+
+        if (startDateInput.value < today) {
+            startDateInput.value = today;
+        }
+
+        let recruitmentSelect = document.getElementById("recruitment");
+        let customInputGroup = document.getElementById("custom-input-group");
+        let customRecruitmentInput = document.getElementById("custom-recruitment");
+
+        if (recruitmentSelect.value !== "plus") {
+            customInputGroup.style.display = "none";
+        }
+
+        recruitmentSelect.addEventListener("change", function() {
+            if (this.value === "plus") {
+                customInputGroup.style.display = "flex";
+                customRecruitmentInput.setAttribute("type", "number");
+            } else {
+                customInputGroup.style.display = "none";
+            }
+        });
+    });
+</script>
+</body>
+</html>

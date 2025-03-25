@@ -1,0 +1,181 @@
+/* 메인 컨텐츠 스타일 */
+.main-content {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 10%;
+    margin-top: 70px;
+}
+
+.contest-create h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.contest-create hr {
+    margin: 10px 0;
+    border: none;
+    border-top: 1px solid #ddd;
+}
+
+.contest-form {
+    align-items: center;
+    margin-top: 20px;
+}
+
+#contest-name {
+    background-color: rgba(188, 188, 188, 0.18);
+    margin-top: -10px;
+}
+
+#contest-description {
+    margin-top: -10px;
+}
+
+#contest-goal {
+    margin-top: -10px;
+    height: 60px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #333;
+    white-space: nowrap;
+}
+
+.form-group input[type="text"],
+.form-group textarea,
+.form-group input[type="date"],
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.form-group input[type="date"],
+.form-group select {
+    font-size: 14px;
+}
+.form-group input[type="text"],
+.form-group textarea {
+    margin-top: 10px;
+    font-size: 16px;
+}
+.form-group textarea {
+    height: 300px;
+    resize: none;
+    font-size: 16px;
+}
+
+.date-inputs {
+    display: flex;
+    gap: 10px; /* 간격 조절 */
+}
+
+.date-inputs span {
+    font-size: 14px; /* 글자 크기 */
+    line-height: 24px; /* 입력 필드 높이와 일치 */
+}
+
+/* 진행일정 날짜 입력 박스 크기 조정 */
+#start-date, #end-date {
+    width: 100px;  /* 크기 조정 */
+    height: 24px;
+    font-size: 12px;
+    padding: 2px;
+    box-sizing: border-box;
+}
+
+/* 모집일정 날짜 박스 크기 조정 */
+#recruitment-start-date, #recruitment-end-date {
+    width: 100px;  /* 크기 동일하게 설정 */
+    height: 24px;
+    font-size: 12px;
+    padding: 2px;
+    box-sizing: border-box;
+}
+.bw {
+    margin-left: 60%;
+}
+#recruitment {
+    width: 80px;
+    height: 24px;
+    font-size: 14px;
+    padding: 2px;
+    box-sizing: border-box;
+}
+
+#custom-recruitment {
+    width: 80px;
+    height: 24px;
+    font-size: 14px;
+    padding: 2px;
+    box-sizing: border-box;
+}
+
+#custom-input-group {
+    margin-top: -20px;
+}
+.submit-btn {
+    margin-left: 45%;
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #19CB13;
+    background-color: #ffffff;
+    border: 1px solid #19CB13;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.cancel-button {
+    margin-left: 10%;
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #838383;
+    background: white;
+    border: 1px solid #838383;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+    text-decoration-line: none;
+}
+
+.ynbw {
+    text-decoration: none;
+    color: #838383;
+}
+
+.bwbw {
+    display: flex;
+}
+
+.btn {
+    display: flex;
+}
+
+.submit-btn:hover {
+    background-color: #19CB13;
+    color: #ffffff;
+}
+
+.cancel-button:hover {
+    background-color: #838383;
+    color: #ffffff;
+}
