@@ -50,6 +50,10 @@ public class UserService implements UserDetailsService {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
+    public boolean userIdExists(String userIdLogin) {
+        return userRepository.existsByUserIdLogin(userIdLogin);
+    }
+
     public UserEntity findUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
     }
