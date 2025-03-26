@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>이력서 양식</title>
+  <link rel="stylesheet" href="/css/co_resume.css">
+  <link rel="stylesheet" th:href="@{/css/header2.css}">
+  <script defer src="/js/co_resume.js"></script>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div th:insert="~{header2 :: header}"></div>
+
+<div class="resume-wrapper">
+  <!-- 왼쪽 작성 영역 -->
+  <div class="resume-container">
+    <h1>이력서 제작</h1>
+    <div class="resume-title">
+      <label>이력서 제목</label>
+      <input type="text" id="resumeTitle" placeholder="제목을 입력해주세요.">
+      <p class="warn">* 제목이 없으면 저장이 불가능합니다.</p>
+    </div>
+
+    <!-- 일반회원 정보 -->
+    <section class="resume-section selected" id="section1">
+      <div class="section-header"><span>1. 일반회원 정보</span></div>
+      <p class="section-note">사이트 등록 정보를 기반으로 보여집니다.</p>
+    </section>
+
+    <!-- 학력사항 -->
+    <section class="resume-section" id="section2">
+      <div class="section-header">
+        <span>2. 학력사항</span>
+        <button class="delete-btn">✕</button>
+      </div>
+      <div class="tag-list">
+        <span class="tag">초등학교</span>
+        <span class="tag">중학교</span>
+        <span class="tag">고등학교</span>
+        <span class="tag">대학교</span>
+        <span class="tag">대학원</span>
+        <span class="tag">최종</span>
+      </div>
+      <input type="text" placeholder="학교명"><br>
+      <input type="text" placeholder="학과">
+      <select><option>재학</option><option>졸업</option></select>
+      <div class="date-group">
+        <select><option>2020</option></select> ~ <select><option>2023</option></select>
+      </div>
+    </section>
+
+    <!-- 희망직무 -->
+    <section class="resume-section" id="section3">
+      <div class="section-header">
+        <span>3. 희망직무</span>
+        <button class="delete-btn">✕</button>
+      </div>
+      <div class="tag-mode">
+        <button id="multi-on" class="mode-btn selected-tag">복수선택 ⭕</button>
+        <button id="multi-off" class="mode-btn">복수선택 ❌</button>
+      </div>
+      <input type="text" id="job-input" placeholder="직무 입력 후 엔터">
+      <div class="tag-list job-tags">
+        <span class="tag"><span class="tag-label">프론트엔드</span><span class="tag-remove">✕</span></span>
+        <span class="tag"><span class="tag-label">백엔드</span><span class="tag-remove">✕</span></span>
+      </div>
+    </section>
+
+    <!-- 경력사항 -->
+    <section class="resume-section" id="section4">
+      <div class="section-header">
+        <span>4. 경력사항</span>
+        <button class="delete-btn">✕</button>
+      </div>
+      <div class="tag-list" data-single="true">
+        <span class="tag">1년 이내</span>
+        <span class="tag">3개월 이내</span>
+        <span class="tag">6개월 이내</span>
+        <span class="tag direct-input-tag">직접입력</span>
+      </div>
+      <textarea placeholder="경력 입력"></textarea>
+    </section>
+
+    <!-- 포트폴리오 -->
+    <section class="resume-section" id="section5">
+      <div class="section-header">
+        <span>5. 포트폴리오</span>
+        <button class="delete-btn">✕</button>
+      </div>
+      <div class="tag-list" data-single="true">
+        <span class="tag">1개 이하</span>
+        <span class="tag">3개 이상</span>
+        <span class="tag">5개 이상</span>
+        <span class="tag direct-input-tag">직접입력</span>
+      </div>
+      <textarea placeholder="포트폴리오 설명"></textarea>
+    </section>
+
+    <!-- 자기소개 -->
+    <section class="resume-section" id="section6">
+      <div class="section-header">
+        <span>6. 자기소개</span>
+        <button class="delete-btn">✕</button>
+      </div>
+      <div class="tag-list" data-single="true">
+        <span class="tag">50자 이상</span>
+        <span class="tag">200자 이상</span>
+        <span class="tag">500자 이상</span>
+        <span class="tag direct-input-tag">직접입력</span>
+      </div>
+      <textarea placeholder="자기소개 입력"></textarea>
+    </section>
+
+    <div class="add-section">
+      <button id="add-section">➕</button>
+    </div>
+  </div>
+
+  <!-- 오른쪽 사이드 (목차 & 템플릿) -->
+  <div class="resume-side sticky">
+    <div class="outline-box">
+      <p class="outline-title">📋 목차</p>
+      <ul class="outline-list">
+        <li><a href="#section1">1. 일반회원 정보</a></li>
+        <li><a href="#section2">2. 학력사항</a></li>
+        <li><a href="#section3">3. 희망직무</a></li>
+        <li><a href="#section4">4. 경력사항</a></li>
+        <li><a href="#section5">5. 포트폴리오</a></li>
+        <li><a href="#section6">6. 자기소개</a></li>
+      </ul>
+      <button class="add-outline">질문 추가</button>
+      <button class="save-btn">저장</button>
+    </div>
+
+    <div class="template-box">
+      <p>🧩 템플릿</p>
+      <div class="template-grid">
+        <div class="template-card">미리보기</div>
+        <div class="template-card">미리보기</div>
+        <div class="template-card">미리보기</div>
+        <div class="template-card">미리보기</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>프로젝트</title>
-    <link rel="stylesheet" href="css/todo_home.css">
+    <link rel="stylesheet" href="/css/todo_home.css">
 </head>
 <body>
 
@@ -13,14 +13,17 @@
         <div class="input-container">
             <div class="header">
                 <button class="back-btn">&lt;</button>
-                <h2>프로젝트A</h2>
+                <!-- 프로젝트 제목을 동적으로 출력 -->
+                <h2 th:text="${project.title}">프로젝트 제목</h2>
                 <button class="close-btn">&times;</button>
             </div>
 
             <!-- 프로젝트 정보 -->
             <div class="project-info">
                 <h3><strong>홈</strong></h3>
-                <p>쇼핑몰 만들기 <span class="date">2025.01.13 ~ 2025.02.13</span></p>
+                <!-- 프로젝트 목표와 진행일정을 동적으로 출력 -->
+                <p th:text="'목표: ' + ${goal}"></p>
+                <p><span th:text="'진행일정: ' + ${project.startDate} + ' ~ ' + ${project.endDate}"></span></p>
             </div>
 
             <!-- 버튼 섹션 -->
@@ -38,16 +41,27 @@
             <div class="member-section">
                 <h3>멤버</h3>
                 <ul>
-                    <li class="member-item">
-                        <div class="member-info">
-                            <span class="crown">👑</span>
-                            <span class="member-name">은하이</span>
-                        </div>
-                        <button class="chat-send">채팅 보내기 ></button>
-                    </li>
-                    <li>나유정 <button class="chat-send">채팅 보내기 ></button></li>
-                    <li>진유서 <button class="chat-send">채팅 보내기 ></button></li>
-                    <li>민채임 <button class="chat-send">채팅 보내기 ></button></li>
+                    <!-- 주최자 정보 출력 -->
+                    <th:block th:if="${owner != null}">
+                        <li class="member-item">
+                            <div class="member-info">
+                                <span class="member-name" th:text="${owner.userNick}"></span> <!-- 주최자 이름 -->
+                                <span class="crown">👑</span> <!-- 왕관 아이콘을 닉네임 뒤에 배치 -->
+                            </div>
+                            <button class="chat-send">채팅 보내기 ></button>
+                        </li>
+                    </th:block>
+
+                    <!-- 팀원 목록을 동적으로 출력 -->
+                    <th:block th:each="member : ${teamMembers}">
+                        <li class="member-item">
+                            <div class="member-info">
+                                <!-- 팀원에게는 왕관 아이콘을 표시하지 않음 -->
+                                <span class="member-name" th:text="${member}"></span> <!-- 팀원 이름 -->
+                            </div>
+                            <button class="chat-send">채팅 보내기 ></button>
+                        </li>
+                    </th:block>
                 </ul>
             </div>
         </div>
@@ -61,5 +75,6 @@
         <button class="sidebar-btn">+</button>
     </div>
 </div>
+
 </body>
 </html>

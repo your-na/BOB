@@ -2,8 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>프로젝트 CRUD</title>
+    <title>프로젝트 WBS</title>
     <link rel="stylesheet" href="css/todo_crud.css">
 </head>
 <body>
@@ -17,72 +16,30 @@
                 <button class="close-btn">&times;</button>
             </div>
 
-            <!-- CRUD 제목 -->
             <div class="crud-title">
-                <h3>CRUD</h3>
+                <h3>WBS</h3>
             </div>
 
-            <!-- 프로젝트 일정표 -->
             <div class="table-container">
-                <table>
+                <table id="crud-table">
                     <thead>
-                    <tr>
-                        <th rowspan="2">프로젝트명을 입력해주세요</th>
-                        <th colspan="4">1월</th>
-                        <th colspan="4">2월</th>
-                        <th colspan="4">3월</th>
-                        <th rowspan="2" class="add-month">월 추가하기</th>
+                    <tr id="month-row">
+                        <th rowspan="2" colspan="2" class="project-title">프로젝트명을 입력해주세요</th>
+                        <th colspan="5">1월</th>
+                        <th colspan="5">2월</th>
+                        <th colspan="5">3월</th>
+                        <th rowspan="2" class="add-month">월 추가</th>
                     </tr>
-                    <tr>
-                        <td>1</td><td>2</td><td>3</td><td>4</td>
-                        <td>1</td><td>2</td><td>3</td><td>4</td>
-                        <td>1</td><td>2</td><td>3</td><td>4</td>
-                    </tr>
+                    <tr id="week-row"></tr>
                     </thead>
-                    <tbody>
-                    <tr>
-                        <td rowspan="4"><strong>설계</strong></td>
-                        <td>DB</td><td colspan="4"></td><td colspan="4"></td><td colspan="4"></td>
-                    </tr>
-                    <tr>
-                        <td>기능도</td><td colspan="4"></td><td colspan="4"></td><td colspan="4"></td>
-                    </tr>
-                    <tr>
-                        <td>UI</td><td colspan="4"></td><td colspan="4"></td><td colspan="4"></td>
-                    </tr>
-                    <tr>
-                        <td class="new-entry" colspan="13">새로 만들기</td>
-                    </tr>
-                    <tr>
-                        <td rowspan="3"><strong>프론트</strong></td>
-                        <td>회원가입/로그인</td><td colspan="4"></td><td colspan="4"></td><td colspan="4"></td>
-                    </tr>
-                    <tr>
-                        <td>프로필 보기/정보 수정</td><td colspan="4"></td><td colspan="4"></td><td colspan="4"></td>
-                    </tr>
-                    <tr>
-                        <td class="new-entry" colspan="13">새로 만들기</td>
-                    </tr>
-                    <tr>
-                        <td rowspan="4"><strong>백엔드</strong></td>
-                        <td>메뉴1</td><td colspan="4"></td><td colspan="4"></td><td colspan="4"></td>
-                    </tr>
-                    <tr>
-                        <td>메뉴2</td><td colspan="4"></td><td colspan="4"></td><td colspan="4"></td>
-                    </tr>
-                    <tr>
-                        <td>메뉴3</td><td colspan="4"></td><td colspan="4"></td><td colspan="4"></td>
-                    </tr>
-                    <tr>
-                        <td class="new-entry" colspan="13">새로 만들기</td>
-                    </tr>
-                    </tbody>
+                    <tbody id="crud-body"></tbody>
                 </table>
+                <button id="add-category" class="category-btn">+ 항목 추가</button>
             </div>
         </div>
     </div>
 </div>
 
-<script src="/js/project_crud.js"></script>
+<script src="js/todo_crud.js"></script>
 </body>
 </html>
