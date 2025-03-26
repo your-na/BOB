@@ -528,9 +528,13 @@ public class ProjectService {
             }
         }
     }
+    // 주최자 닉네임을 기준으로 UserEntity를 반환하는 메서드
+    public UserEntity getUserByNick(String userNick) {
+        return userRepository.findByUserNick(userNick)
+                .orElseThrow(() -> new IllegalArgumentException("❌ 해당 닉네임을 가진 사용자가 없습니다. userNick=" + userNick));
 
 
-
+    }
 }
 
 
