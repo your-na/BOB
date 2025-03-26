@@ -38,18 +38,31 @@ public class SecurityConfig {
                         .ignoringRequestMatchers("/login", "/signup", "/co_signup","/profile/update", "/logout", "/teamrequest", "/teamrequest/accept", "/teamrequest/reject", "/file/project/submit")  // CSRF 예외 처리
                 )
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/","/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**", "/project").permitAll()  // 모든 사용자 접근 허용
+                        .requestMatchers("/","/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**", "/project", "/contest").permitAll()  // 모든 사용자 접근 허용
                         .requestMatchers("/login", "/sign").anonymous()  // 로그인 페이지는 익명 접근 허용
                         .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject").authenticated()  // 인증된 사용자만 접근 가능
                         .requestMatchers("/signup", "/co_signup", "/check-nickname", "/check-username").permitAll()  // 회원가입 페이지는 익명 접근 허용
-                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/admin/**", "/sidebar" ).hasAuthority("ADMIN")
+                        .requestMatchers("/contest/create", "/contest/submit").hasAnyAuthority("ADMIN", "COMPANY")
                         .anyRequest().authenticated()  // 나머지 요청은 인증된 사용자만 접근 가능
                 )
                 .formLogin(form -> form
                         .loginPage("/login")  // 로그인 페이지 URL
                         .loginProcessingUrl("/login")  // 로그인 처리 URL
-                        .defaultSuccessUrl("/main", true)  // 로그인 성공 후 리디렉션 URL
-                        .failureUrl("/login?error=true")  // 로그인 실패 시 리디렉션 URL
+                        .successHandler((request, response, authentication) -> {
+                            Object principal = authentication.getPrincipal();
+                            String redirectUrl = "/main";
+
+                            // 관리자면 관리자 페이지로 이동
+                            if (principal instanceof com.example.bob.security.UserDetailsImpl user) {
+                                if ("ADMIN".equals(user.getUserEntity().getRole())) {
+                                    redirectUrl = "/sidebar";
+                                }
+                            }
+
+                            response.sendRedirect(redirectUrl);
+                        })
+                        .failureUrl("/login?error=true")
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")  // 로그아웃 URL

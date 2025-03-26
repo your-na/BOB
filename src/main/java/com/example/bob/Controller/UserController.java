@@ -156,8 +156,6 @@ public class UserController {
     @GetMapping("/job")
     public String jobform() {return "job";}
     //공모전 임의 주소 여기다 할 예정
-    @GetMapping("/contest")
-    public String contestform() {return "contest";}
     @GetMapping("/postcontest")
     public String postcform() {return "postcontest";}
     @GetMapping("/contestact")
