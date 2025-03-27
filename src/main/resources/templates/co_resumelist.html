@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>이력서 저장 목록</title>
+    <link rel="stylesheet" href="/css/co_resumelist.css">
+    <link rel="stylesheet" th:href="@{/css/header2.css}">
+</head>
+<body>
+<!-- 헤더 -->
+<div th:insert="~{header2 :: header}"></div>
+
+<div class="container">
+    <h2>이력서 저장 목록</h2>
+
+    <!-- 검색 & 날짜 필터 -->
+    <div class="filter-bar">
+        <div class="search-wrapper">
+            <input type="text" id="search-input" placeholder="이력서 검색">
+        </div>
+
+        <div class="date-range">
+            <label>작성 기간</label>
+            <input type="date"> ~ <input type="date">
+        </div>
+
+        <div class="filter-buttons">
+            <button class="edit-btn">수정하기</button>
+            <button class="create-btn">양식 작성하기</button>
+        </div>
+    </div>
+
+    <!-- 이력서 리스트 -->
+    <div class="resume-list">
+        <!-- 이 영역은 반복 렌더링됨 -->
+        <div class="resume-card">
+            <input type="checkbox">
+            <div class="resume-info">
+                <div class="resume-title">백엔드 모집용 이력서</div>
+                <div class="resume-date">작성일: 2024-06-20</div>
+            </div>
+            <button class="delete-btn">🗑️</button>
+        </div>
+
+        <!-- 반복 렌더링되는 resume-card 백엔드 연동 시 이걸로... -->
+        <div class="resume-card" th:each="resume : ${resumeList}">
+            <input type="checkbox">
+            <div class="resume-info">
+                <div class="resume-title" th:text="${resume.title}">이력서 제목</div>
+                <div class="resume-date" th:text="'작성일: ' + ${resume.createdAt}">작성일</div>
+            </div>
+            <button class="delete-btn" th:onclick="'deleteResume(' + ${resume.id} + ')'">🗑️</button>
+        </div>
+
+        <!-- 여기에 백엔드에서 반복 렌더링 -->
+    </div>
+</div>
+</body>
+</html>
