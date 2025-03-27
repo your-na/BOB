@@ -29,13 +29,12 @@ public class ContestEntity {
     private LocalDate startDate;        // 진행 시작일
     private LocalDate endDate;          // 진행 종료일
 
-    private LocalDate judgeStartDate;   // 심사 시작일
-    private LocalDate judgeEndDate;     // 심사 종료일
-
     @Lob
     private String awardDetails;        // 시상내역 (길어질 수 있음)
 
     private String applicationMethod;   // 응모방법
+
+    private String judge;               // 심사 기관
 
     @Lob
     private String description;         // 상세내용
@@ -79,8 +78,7 @@ public class ContestEntity {
                 .region(this.region)
                 .startDate(this.startDate)
                 .endDate(this.endDate)
-                .judgeStartDate(this.judgeStartDate)
-                .judgeEndDate(this.judgeEndDate)
+                .judge(this.judge)
                 .awardDetails(this.awardDetails)
                 .applicationMethod(this.applicationMethod)
                 .description(this.description)

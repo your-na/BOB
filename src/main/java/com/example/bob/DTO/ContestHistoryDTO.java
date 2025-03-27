@@ -24,8 +24,7 @@ public class ContestHistoryDTO {
 
     private LocalDate startDate;
     private LocalDate endDate;
-    private LocalDate judgeStartDate;
-    private LocalDate judgeEndDate;
+    private String judge;
 
     private String awardDetails;
     private String applicationMethod;
@@ -50,8 +49,7 @@ public class ContestHistoryDTO {
                 .region(entity.getRegion())
                 .startDate(entity.getStartDate())
                 .endDate(entity.getEndDate())
-                .judgeStartDate(entity.getJudgeStartDate())
-                .judgeEndDate(entity.getJudgeEndDate())
+                .judge(entity.getJudge())
                 .awardDetails(entity.getAwardDetails())
                 .applicationMethod(entity.getApplicationMethod())
                 .description(entity.getDescription())

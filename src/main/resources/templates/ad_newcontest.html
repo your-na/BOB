@@ -12,11 +12,12 @@
 <section class="contest-form">
     <h2>공모전 등록</h2>
 
-    <form>
+    <form action="/contest/create" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="_csrf" value="${_csrf.token}">
         <div class="form-container">
             <!-- 공모전 포스터 업로드 -->
             <div class="poster-upload">
-                <input type="file" id="poster-input" accept="image/*">
+                <input type="file" id="poster-input" name="imageUrl" accept="image/*">
                 <img id="poster-preview" src="/images/placeholder.png" alt="공모전 포스터를 삽입해주세요.">
             </div>
 
@@ -25,42 +26,42 @@
             <table class="contest-table">
                 <tr>
                     <th>공모전명</th>
-                    <td><input type="text" id="contest-title" placeholder="공모전명을 입력하세요"></td>
+                    <td><input type="text" id="contest-title" name="title" placeholder="공모전명을 입력하세요"></td>
                 </tr>
                 <tr>
                     <th>주최/주관</th>
-                    <td><input type="text" id="contest-host"></td>
+                    <td><input type="text" id="contest-host" name="organizer"></td>
                 </tr>
                 <tr>
                     <th>대표분야</th>
-                    <td><input type="text" id="contest-field"></td>
+                    <td><input type="text" id="contest-field" name="category"></td>
                 </tr>
                 <tr>
                     <th>참가대상</th>
-                    <td><input type="text" id="contest-target"></td>
+                    <td><input type="text" id="contest-target" name="target"></td>
                 </tr>
                 <tr>
                     <th>대회지역</th>
-                    <td><input type="text" id="contest-region"></td>
+                    <td><input type="text" id="contest-region" name="region"></td>
                 </tr>
                 <tr>
                     <th>진행기간</th>
                     <td>
-                        <input type="date" id="contest-start"> ~
-                        <input type="date" id="contest-end">
+                        <input type="date" id="contest-start" name="startDate"> ~
+                        <input type="date" id="contest-end" name="endDate">
                     </td>
                 </tr>
                 <tr>
                     <th>심사기관</th>
-                    <td><input type="text" id="contest-judge"></td>
+                    <td><input type="text" id="contest-judge" name="judge"></td>
                 </tr>
                 <tr>
                     <th>시상내역</th>
-                    <td><input type="text" id="contest-prize"></td>
+                    <td><input type="text" id="contest-prize" name="awardDetails"></td>
                 </tr>
                 <tr>
                     <th>응모 방법</th>
-                    <td><input type="text" id="contest-method"></td>
+                    <td><input type="text" id="contest-method" name="applicationMethod"></td>
                 </tr>
             </table>
         </div>
@@ -68,7 +69,7 @@
         <!-- 상세 내용 입력 -->
         <div class="details-container">
             <h3>상세 내용</h3>
-            <textarea id="contest-details" placeholder="상세 내용을 입력하세요"></textarea>
+            <textarea id="contest-details" name="description" placeholder="상세 내용을 입력하세요"></textarea>
         </div>
 
         <!-- 등록/취소 버튼 -->

@@ -6,9 +6,22 @@ import com.example.bob.Entity.ContestHistoryEntity;
 import com.example.bob.Repository.ContestHistoryRepository;
 import com.example.bob.Repository.ContestRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -64,4 +77,36 @@ public class ContestService {
     public ContestEntity getById(Long id) {
         return contestRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 공모전 없음"));
     }
+
+    private final String uploadDir = "uploads/contestImages/";
+
+    public String saveContestImage(MultipartFile file) {
+        try {
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Path savePath = Paths.get(uploadDir + fileName);
+            Files.createDirectories(savePath.getParent());
+            Files.copy(file.getInputStream(), savePath, StandardCopyOption.REPLACE_EXISTING);
+            return "/uploads/contestImages/" + fileName;
+        } catch (IOException e) {
+            throw new RuntimeException("공모전 이미지를 저장할 수 없습니다.", e);
+        }
+    }
+
+    public ResponseEntity<Resource> getContestImage(String fileName) {
+        try {
+            String decodedName = URLDecoder.decode(fileName, StandardCharsets.UTF_8.toString());
+            Path path = Paths.get(uploadDir + decodedName);
+
+            if (Files.exists(path)) {
+                Resource file = new UrlResource(path.toUri());
+                return ResponseEntity.ok().body(file);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
 }

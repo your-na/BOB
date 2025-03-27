@@ -7,12 +7,21 @@ import com.example.bob.security.CompanyDetailsImpl;
 import com.example.bob.security.CustomUserDetails;
 import com.example.bob.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -43,10 +52,10 @@ public class ContestController {
     // 공모전 등록 처리 (관리자 or 기업)
     @PostMapping("/contest/create")
     public String createContest(@ModelAttribute ContestDTO dto,
-                                @RequestParam("imageFile") MultipartFile imageFile,
+                                @RequestParam("imageUrl") MultipartFile imageUrl,
                                 @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        // ✅ 사용자 유형 판단
+        // 사용자 유형 판단
         String creatorType = "UNKNOWN";
         boolean isOnlyBOB = false;
         boolean isApproved = false;
@@ -65,8 +74,24 @@ public class ContestController {
 
         String status = dto.getStartDate().isAfter(LocalDate.now()) ? "대기중" : "모집중";
 
-        // ✅ 이미지 저장
-        String imageUrl = "/images/sample.png";
+        String imageFile = "/images/sample.png";  // 기본값
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            try {
+                String originalName = imageUrl.getOriginalFilename();
+                String fileName = System.currentTimeMillis() + "_" + originalName;
+                Path folderPath = Paths.get("uploads/contestImages");
+                Files.createDirectories(folderPath); // 디렉토리 생성
+
+                Path savePath = folderPath.resolve(fileName);
+                Files.copy(imageUrl.getInputStream(), savePath);
+
+                imageFile = "/uploads/contestImages/" + fileName; // 웹에서 접근할 경로
+
+                System.out.println("✅ 이미지 저장됨: " + imageFile); // 로그 확인
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         ContestEntity contest = ContestEntity.builder()
                 .title(dto.getTitle())
@@ -76,12 +101,11 @@ public class ContestController {
                 .region(dto.getRegion())
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
-                .judgeStartDate(dto.getJudgeStartDate())
-                .judgeEndDate(dto.getJudgeEndDate())
+                .judge(dto.getJudge())
                 .awardDetails(dto.getAwardDetails())
                 .applicationMethod(dto.getApplicationMethod())
                 .description(dto.getDescription())
-                .imageUrl(imageUrl)
+                .imageUrl(imageFile)
                 .status(status)
                 .creatorType(creatorType)
                 .isOnlyBOB(isOnlyBOB)
@@ -92,11 +116,15 @@ public class ContestController {
         return "redirect:/contest";
     }
 
-
     // 공모전 승인
     @PostMapping("/admin/contest/approve/{id}")
     public String approveContest(@PathVariable Long id) {
         contestService.approve(id);
         return "redirect:/ad_contest";
+    }
+
+    @GetMapping("/uploads/contestImages/{fileName}")
+    public ResponseEntity<Resource> serveContestImage(@PathVariable String fileName) {
+        return contestService.getContestImage(fileName);
     }
 }

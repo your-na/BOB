@@ -24,8 +24,7 @@ public class ContestDTO {
     private LocalDate startDate;
     private LocalDate endDate;
 
-    private LocalDate judgeStartDate;
-    private LocalDate judgeEndDate;
+    private String judge;
 
     private String awardDetails;
     private String applicationMethod;
@@ -52,8 +51,7 @@ public class ContestDTO {
                 .region(region)
                 .startDate(startDate)
                 .endDate(endDate)
-                .judgeStartDate(judgeStartDate)
-                .judgeEndDate(judgeEndDate)
+                .judge(judge)
                 .awardDetails(awardDetails)
                 .applicationMethod(applicationMethod)
                 .description(description)
@@ -80,8 +78,7 @@ public class ContestDTO {
                 .region(entity.getRegion())
                 .startDate(entity.getStartDate())
                 .endDate(entity.getEndDate())
-                .judgeStartDate(entity.getJudgeStartDate())
-                .judgeEndDate(entity.getJudgeEndDate())
+                .judge(entity.getJudge())
                 .awardDetails(entity.getAwardDetails())
                 .applicationMethod(entity.getApplicationMethod())
                 .description(entity.getDescription())

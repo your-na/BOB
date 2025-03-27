@@ -116,10 +116,6 @@ public class UserController {
 
     @GetMapping("/login")
     public String login() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && !(authentication.getPrincipal() instanceof String)) {
-            return "redirect:/main"; // 이미 로그인 상태라면 메인 페이지로 리디렉션
-        }
         return "login";
     }
 

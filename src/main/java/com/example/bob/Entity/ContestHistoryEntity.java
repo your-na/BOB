@@ -32,8 +32,7 @@ public class ContestHistoryEntity {
 
     private LocalDate startDate;
     private LocalDate endDate;
-    private LocalDate judgeStartDate;
-    private LocalDate judgeEndDate;
+    private String judge;
 
     @Lob
     private String awardDetails;
@@ -61,8 +60,7 @@ public class ContestHistoryEntity {
                 .region(contest.getRegion())
                 .startDate(contest.getStartDate())
                 .endDate(contest.getEndDate())
-                .judgeStartDate(contest.getJudgeStartDate())
-                .judgeEndDate(contest.getJudgeEndDate())
+                .judge(contest.getJudge())
                 .awardDetails(contest.getAwardDetails())
                 .applicationMethod(contest.getApplicationMethod())
                 .description(contest.getDescription())
