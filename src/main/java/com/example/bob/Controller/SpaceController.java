@@ -40,7 +40,6 @@ public class SpaceController {
         return "plan"; // plan.html 템플릿 렌더링
     }
 
-    // /todohome/{id} 페이지를 처리하는 메서드
     @GetMapping("/todohome/{id}")
     public String showProjectDetail(@PathVariable("id") Long projectId, Model model, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         UserEntity userEntity = userDetails.getUserEntity();
@@ -55,14 +54,18 @@ public class SpaceController {
         String createdBy = project.getCreatedBy();  // 프로젝트의 주최자 닉네임
         System.out.println("프로젝트 주최자: " + createdBy);  // 디버그: 주최자 닉네임 확인
 
-
         for (UserProjectEntity userProject : userProjects) {
-            teamMembers.add(userProject.getUser().getUserNick()); // 팀원 추가
+            String status = userProject.getStatus(); // 상태 확인
+            System.out.println("참여자: " + userProject.getUser().getUserNick() + " / 상태: " + status);
 
-            // 주최자 정보 (createdBy 필드로 주최자 닉네임 찾기)
-            System.out.println("팀원 닉네임: " + userProject.getUser().getUserNick());  // 디버그: 팀원 닉네임 확인
-            if (userProject.getUser().getUserNick().equals(createdBy)) {
-                owner = userProject.getUser(); // 주최자 정보
+            // ✅ 모집중 또는 진행중인 사람만 추가
+            if ("모집중".equals(status) || "진행중".equals(status)) {
+                teamMembers.add(userProject.getUser().getUserNick()); // 팀원 추가
+
+                // 주최자인지 확인
+                if (userProject.getUser().getUserNick().equals(createdBy)) {
+                    owner = userProject.getUser(); // 주최자 정보 저장
+                }
             }
         }
 
