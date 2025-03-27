@@ -64,7 +64,7 @@
 
     <!-- 버튼 영역 -->
     <div class="button-box">
-        <button class="apply-btn">참여하기</button>
+        <button class="apply-btn" id="openModalBtn">공모전 참가하기</button>
         <button class="recruit-btn">팀원 모집글 작성하기</button>
     </div>
 
@@ -97,6 +97,29 @@
     </section>
 </section>
 
+<div id="contestModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>공모전 참가하기</h2>
+
+        <div class="invite-section">
+            <label for="invite-input" id="invite-title">팀원 닉네임 또는 ID</label>
+            <input type="text" id="invite-input" placeholder="Enter nickname or ID" />
+
+            <!-- 자동완성 리스트 -->
+            <ul id="autocomplete-list" class="autocomplete-list"></ul>
+
+            <!-- 선택된 팀원들 -->
+            <div id="selected-members" class="selected-members"></div>
+        </div>
+
+        <button class="btn invite-btn">👥 친구와 함께 참가하기</button>
+        <button class="btn solo-btn">🧍 혼자 참가하기</button>
+
+        <p class="terms">혼자 참가하기 눌러서 팀 모집을 통해 다른 사용자와 함께 참가 가능합니다.</p>
+    </div>
+</div>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         // 북마크 토글
@@ -126,6 +149,101 @@
             alert("팀원 모집글 작성 페이지로 이동합니다.");
         });
     });
+
+    //모달창><
+    document.addEventListener("DOMContentLoaded", () => {
+        const modal = document.getElementById("contestModal");
+        const openBtn = document.getElementById("openModalBtn");
+        const closeBtn = document.querySelector(".close-btn");
+        const inviteBtn = document.querySelector(".invite-btn");
+        const soloBtn = document.querySelector(".solo-btn");
+        const nicknameInput = document.getElementById("nickname");
+
+        openBtn.addEventListener("click", () => {
+            modal.style.display = "block";
+        });
+
+        closeBtn.addEventListener("click", () => {
+            modal.style.display = "none";
+        });
+
+        window.addEventListener("click", (e) => {
+            if (e.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+
+        inviteBtn.addEventListener("click", () => {
+            const nickname = nicknameInput.value.trim();
+            if (!nickname) {
+                alert("닉네임 또는 ID를 입력해주세요.");
+                return;
+            }
+            alert(`팀원 초대 링크가 ${nickname} 님에게 전송되었습니다.`);
+            modal.style.display = "none";
+        });
+
+        soloBtn.addEventListener("click", () => {
+            alert("참가 신청 완료되었습니다. 팀 모집을 통해 팀 참여도 가능합니다.");
+            modal.style.display = "none";
+        });
+    });
+
+    const users = [
+        { nickname: '나는윤냥', id: 'wannaturi', email: 'wannaturi@gmail.com', avatar: 'https://via.placeholder.com/20?text=윤' },
+        { nickname: '코딩냥이', id: 'devcat', email: 'devcat@gmail.com', avatar: 'https://via.placeholder.com/20?text=냥' },
+        { nickname: '윤디자이너', id: 'yoondesign', email: 'yoon@gmail.com', avatar: 'https://via.placeholder.com/20?text=디' }
+    ];
+
+    const input = document.getElementById('invite-input');
+    const list = document.getElementById('autocomplete-list');
+    const selected = document.getElementById('selected-members');
+    let selectedList = [];
+
+    input.addEventListener('input', () => {
+        const query = input.value.toLowerCase();
+        list.innerHTML = '';
+
+        if (!query) return;
+
+        const filtered = users.filter(u =>
+            u.nickname.toLowerCase().includes(query) || u.id.toLowerCase().includes(query)
+        );
+
+        filtered.forEach(user => {
+            const li = document.createElement('li');
+            li.textContent = `${user.nickname} (${user.id})`;
+            li.addEventListener('click', () => {
+                if (!selectedList.some(sel => sel.id === user.id)) {
+                    selectedList.push(user);
+                    renderSelectedMembers();
+                }
+                input.value = '';
+                list.innerHTML = '';
+            });
+            list.appendChild(li);
+        });
+    });
+
+    function renderSelectedMembers() {
+        selected.innerHTML = '';
+        selectedList.forEach(user => {
+            const tag = document.createElement('div');
+            tag.className = 'member-tag';
+            tag.innerHTML = `
+      <img src="${user.avatar}" alt="avatar" />
+      ${user.nickname}
+      <button onclick="removeMember('${user.id}')">&times;</button>
+    `;
+            selected.appendChild(tag);
+        });
+    }
+
+    function removeMember(id) {
+        selectedList = selectedList.filter(u => u.id !== id);
+        renderSelectedMembers();
+    }
+
 </script>
 </body>
 </html>
