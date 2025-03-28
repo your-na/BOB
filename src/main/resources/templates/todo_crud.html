@@ -192,16 +192,29 @@
         }
     });
 
+    // ✅ 여기부터 "월 추가" 버튼 클릭 이벤트 수정된 부분입니다!
     document.querySelector(".add-month").addEventListener("click", () => {
         monthCount++;
+
+        // 1. month-row에 새 월 추가
         const newTh = document.createElement("th");
         newTh.colSpan = weeksPerMonth;
         newTh.textContent = `${monthCount}월`;
         monthRow.insertBefore(newTh, document.querySelector(".add-month"));
-        renderWeeks();
 
+        // 2. week-row에 새 주차 추가 (1~5주)
+        for (let w = 1; w <= weeksPerMonth; w++) {
+            const td = document.createElement("td");
+            td.textContent = w;
+            weekRow.appendChild(td);
+        }
+
+        // 3. 각 데이터 행에 5개의 새로운 셀(td) 추가
         crudBody.querySelectorAll("tr").forEach(tr => {
-            if (!tr.querySelector(".new-entry")) {
+            // "새로 만들기" 줄이면 colspan만 수정
+            if (tr.querySelector(".new-entry")) {
+                tr.firstChild.colSpan = monthCount * weeksPerMonth + 1;
+            } else {
                 for (let i = 0; i < weeksPerMonth; i++) {
                     const td = document.createElement("td");
                     td.classList.add("clickable-cell");
@@ -209,6 +222,8 @@
                 }
             }
         });
+
+        autoSave(); // 저장 트리거
     });
 
     document.getElementById("add-category").addEventListener("click", () => {
@@ -287,6 +302,42 @@
         fetch(`/api/wbs?type=project&id=${projectId}`)
             .then(res => res.json())
             .then(data => {
+                // ✅ max month 계산
+                const maxMonth = Math.max(...data.map(item => item.month));
+                if (maxMonth > monthCount) {
+                    monthCount = maxMonth;
+
+                    // 1. month-row 업데이트
+                    const addMonthTh = document.querySelector(".add-month");
+                    for (let m = 4; m <= monthCount; m++) {
+                        const th = document.createElement("th");
+                        th.colSpan = weeksPerMonth;
+                        th.textContent = `${m}월`;
+                        monthRow.insertBefore(th, addMonthTh);
+                    }
+
+                    // 2. 주차 재렌더링
+                    renderWeeks();
+
+                    // 3. 기존 행들에 td 추가
+                    crudBody.querySelectorAll("tr").forEach(tr => {
+                        if (!tr.querySelector(".new-entry")) {
+                            const existingCells = tr.querySelectorAll("td.clickable-cell").length;
+                            const requiredCells = monthCount * weeksPerMonth;
+
+                            for (let i = existingCells; i < requiredCells; i++) {
+                                const td = document.createElement("td");
+                                td.classList.add("clickable-cell");
+                                tr.appendChild(td);
+                            }
+                        } else {
+                            // new-entry row colspan 갱신
+                            tr.firstChild.colSpan = monthCount * weeksPerMonth + 1;
+                        }
+                    });
+                }
+
+                // 기존 로직 (카테고리/작업 렌더링)
                 const grouped = {};
                 data.forEach(item => {
                     const { category, task } = item;
@@ -320,9 +371,14 @@
             .catch(err => console.error("❌ WBS 불러오기 실패:", err));
     }
 
+
     renderWeeks();
     loadWbsFromServer();
 </script>
+
+
+
+
 
 
 </body>
