@@ -16,7 +16,8 @@
         <div class="crud-container">
             <div class="header">
                 <button class="back-btn">&lt;</button>
-                <h2 id="project-name">프로젝트A</h2>
+                <!-- 프로젝트 제목을 동적으로 불러오기 -->
+                <h2 id="project-name" th:text="${project.title}">프로젝트 제목</h2>
                 <button class="close-btn">&times;</button>
             </div>
 
@@ -28,7 +29,7 @@
                 <table id="crud-table">
                     <thead>
                     <tr id="month-row">
-                        <th rowspan="2" colspan="2" class="project-title">프로젝트명을 입력해주세요</th>
+                        <th rowspan="2" colspan="2" class="project-title" th:text="${project.goal}">프로젝트 목표</th>
                         <th colspan="5">1월</th>
                         <th colspan="5">2월</th>
                         <th colspan="5">3월</th>
@@ -44,342 +45,346 @@
     </div>
 </div>
 
+</body>
+</html>
+
+
 <script th:inline="javascript">
-    const projectId = /*[[${project.id}]]*/ 0;
-    const weeksPerMonth = 5;
-    let monthCount = 3;
-    let isMouseDown = false;
+        const projectId = /*[[${project.id}]]*/ 0;
+        const weeksPerMonth = 5;
+        let monthCount = 3;
+        let isMouseDown = false;
 
-    const csrfToken = /*[[${_csrf.token}]]*/ "";
-    const csrfHeader = /*[[${_csrf.headerName}]]*/ "";
+        const csrfToken = /*[[${_csrf.token}]]*/ "";
+        const csrfHeader = /*[[${_csrf.headerName}]]*/ "";
 
-    const crudBody = document.getElementById("crud-body");
-    const weekRow = document.getElementById("week-row");
-    const monthRow = document.getElementById("month-row");
+        const crudBody = document.getElementById("crud-body");
+        const weekRow = document.getElementById("week-row");
+        const monthRow = document.getElementById("month-row");
 
-    function renderWeeks() {
-        weekRow.innerHTML = '';
-        for (let i = 0; i < monthCount; i++) {
+        function renderWeeks() {
+            weekRow.innerHTML = '';
+            for (let i = 0; i < monthCount; i++) {
+                for (let w = 1; w <= weeksPerMonth; w++) {
+                    const td = document.createElement("td");
+                    td.textContent = w;
+                    weekRow.appendChild(td);
+                }
+            }
+        }
+
+        function makeEditable(td) {
+            td.addEventListener("dblclick", () => {
+                const input = document.createElement("input");
+                input.type = "text";
+                input.value = td.textContent;
+                td.innerHTML = '';
+                td.appendChild(input);
+                input.focus();
+
+                input.addEventListener("blur", () => {
+                    td.textContent = input.value;
+                    autoSave();
+                });
+
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        td.textContent = input.value;
+                        autoSave();
+                    }
+                });
+            });
+        }
+
+        function addTaskRow(categoryTd, taskName = "작업명", insertBeforeRow = null) {
+            const tr = document.createElement("tr");
+            const taskTd = document.createElement("td");
+            taskTd.textContent = taskName;
+            taskTd.classList.add("task-cell");
+            makeEditable(taskTd);
+            tr.appendChild(taskTd);
+
+            for (let i = 0; i < monthCount * weeksPerMonth; i++) {
+                const td = document.createElement("td");
+                td.classList.add("clickable-cell");
+                tr.appendChild(td);
+            }
+
+            if (!insertBeforeRow) {
+                let current = categoryTd.parentElement.nextElementSibling;
+                let newEntryRow = null;
+                while (current) {
+                    if (current.querySelector(".category-cell")) break;
+                    if (current.querySelector(".new-entry")) {
+                        newEntryRow = current;
+                        break;
+                    }
+                    current = current.nextElementSibling;
+                }
+                crudBody.insertBefore(tr, newEntryRow || categoryTd.parentElement.nextElementSibling);
+            } else {
+                crudBody.insertBefore(tr, insertBeforeRow);
+            }
+
+            categoryTd.rowSpan += 1;
+        }
+
+        function addNewEntryRow(categoryTd) {
+            const newRow = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = monthCount * weeksPerMonth + 1;
+            td.className = "new-entry";
+            td.textContent = "새로 만들기";
+            td.addEventListener("click", () => {
+                addTaskRow(categoryTd, "작업명", newRow);
+                autoSave();
+            });
+            newRow.appendChild(td);
+
+            let currentRow = categoryTd.parentElement;
+            while (currentRow.nextElementSibling && !currentRow.nextElementSibling.querySelector(".category-cell")) {
+                currentRow = currentRow.nextElementSibling;
+            }
+            crudBody.insertBefore(newRow, currentRow.nextElementSibling);
+        }
+
+        function renderCategory(category, taskList = ["작업명"]) {
+            const firstRow = document.createElement("tr");
+
+            const categoryTd = document.createElement("td");
+            categoryTd.classList.add("category-cell");
+            categoryTd.textContent = category;
+            categoryTd.rowSpan = 1;
+            makeEditable(categoryTd);
+
+            const firstTaskTd = document.createElement("td");
+            firstTaskTd.textContent = taskList[0];
+            firstTaskTd.classList.add("task-cell");
+            makeEditable(firstTaskTd);
+
+            firstRow.appendChild(categoryTd);
+            firstRow.appendChild(firstTaskTd);
+
+            for (let i = 0; i < monthCount * weeksPerMonth; i++) {
+                const td = document.createElement("td");
+                td.classList.add("clickable-cell");
+                firstRow.appendChild(td);
+            }
+
+            crudBody.appendChild(firstRow);
+
+            for (let i = 1; i < taskList.length; i++) {
+                addTaskRow(categoryTd, taskList[i]);
+            }
+
+            addNewEntryRow(categoryTd);
+        }
+
+        document.addEventListener("mousedown", () => isMouseDown = true);
+        document.addEventListener("mouseup", () => isMouseDown = false);
+
+        crudBody.addEventListener("click", (e) => {
+            if (e.target.classList.contains("clickable-cell")) {
+                e.target.classList.toggle("active-cell");
+                autoSave();
+            }
+        });
+
+        crudBody.addEventListener("mouseover", (e) => {
+            if (isMouseDown && e.target.classList.contains("clickable-cell")) {
+                e.target.classList.toggle("active-cell");
+                autoSave();
+            }
+        });
+
+        // ✅ 여기부터 "월 추가" 버튼 클릭 이벤트 수정된 부분입니다!
+        document.querySelector(".add-month").addEventListener("click", () => {
+            monthCount++;
+
+            // 1. month-row에 새 월 추가
+            const newTh = document.createElement("th");
+            newTh.colSpan = weeksPerMonth;
+            newTh.textContent = `${monthCount}월`;
+            monthRow.insertBefore(newTh, document.querySelector(".add-month"));
+
+            // 2. week-row에 새 주차 추가 (1~5주)
             for (let w = 1; w <= weeksPerMonth; w++) {
                 const td = document.createElement("td");
                 td.textContent = w;
                 weekRow.appendChild(td);
             }
-        }
-    }
 
-    function makeEditable(td) {
-        td.addEventListener("dblclick", () => {
-            const input = document.createElement("input");
-            input.type = "text";
-            input.value = td.textContent;
-            td.innerHTML = '';
-            td.appendChild(input);
-            input.focus();
+            // 3. 각 데이터 행에 5개의 새로운 셀(td) 추가
+            crudBody.querySelectorAll("tr").forEach(tr => {
+                // "새로 만들기" 줄이면 colspan만 수정
+                if (tr.querySelector(".new-entry")) {
+                    tr.firstChild.colSpan = monthCount * weeksPerMonth + 1;
+                } else {
+                    for (let i = 0; i < weeksPerMonth; i++) {
+                        const td = document.createElement("td");
+                        td.classList.add("clickable-cell");
+                        tr.appendChild(td);
+                    }
+                }
+            });
 
-            input.addEventListener("blur", () => {
-                td.textContent = input.value;
+            autoSave(); // 저장 트리거
+        });
+
+        document.getElementById("add-category").addEventListener("click", () => {
+            const name = prompt("카테고리 이름 입력:");
+            if (name) {
+                renderCategory(name);
                 autoSave();
-            });
+            }
+        });
 
-            input.addEventListener("keydown", (e) => {
-                if (e.key === "Enter") {
-                    td.textContent = input.value;
-                    autoSave();
+        function collectWbsData() {
+            const wbsList = [];
+            const rows = document.querySelectorAll("#crud-body tr");
+            let currentCategory = "";
+            let currentTask = "";
+
+            rows.forEach((row) => {
+                const categoryCell = row.querySelector(".category-cell");
+                const taskCell = row.querySelector(".task-cell");
+
+                if (!taskCell) return;
+
+                if (categoryCell && categoryCell.textContent.trim()) {
+                    currentCategory = categoryCell.textContent.trim();
                 }
-            });
-        });
-    }
 
-    function addTaskRow(categoryTd, taskName = "작업명", insertBeforeRow = null) {
-        const tr = document.createElement("tr");
-        const taskTd = document.createElement("td");
-        taskTd.textContent = taskName;
-        taskTd.classList.add("task-cell");
-        makeEditable(taskTd);
-        tr.appendChild(taskTd);
+                if (taskCell && taskCell.textContent.trim()) {
+                    currentTask = taskCell.textContent.trim();
 
-        for (let i = 0; i < monthCount * weeksPerMonth; i++) {
-            const td = document.createElement("td");
-            td.classList.add("clickable-cell");
-            tr.appendChild(td);
-        }
+                    const clickableTds = [...row.querySelectorAll("td")].filter(td => td.classList.contains("clickable-cell"));
+                    clickableTds.forEach((cell, i) => {
+                        const month = Math.floor(i / weeksPerMonth) + 1;
+                        const week = (i % weeksPerMonth) + 1;
 
-        if (!insertBeforeRow) {
-            let current = categoryTd.parentElement.nextElementSibling;
-            let newEntryRow = null;
-            while (current) {
-                if (current.querySelector(".category-cell")) break;
-                if (current.querySelector(".new-entry")) {
-                    newEntryRow = current;
-                    break;
-                }
-                current = current.nextElementSibling;
-            }
-            crudBody.insertBefore(tr, newEntryRow || categoryTd.parentElement.nextElementSibling);
-        } else {
-            crudBody.insertBefore(tr, insertBeforeRow);
-        }
-
-        categoryTd.rowSpan += 1;
-    }
-
-    function addNewEntryRow(categoryTd) {
-        const newRow = document.createElement("tr");
-        const td = document.createElement("td");
-        td.colSpan = monthCount * weeksPerMonth + 1;
-        td.className = "new-entry";
-        td.textContent = "새로 만들기";
-        td.addEventListener("click", () => {
-            addTaskRow(categoryTd, "작업명", newRow);
-            autoSave();
-        });
-        newRow.appendChild(td);
-
-        let currentRow = categoryTd.parentElement;
-        while (currentRow.nextElementSibling && !currentRow.nextElementSibling.querySelector(".category-cell")) {
-            currentRow = currentRow.nextElementSibling;
-        }
-        crudBody.insertBefore(newRow, currentRow.nextElementSibling);
-    }
-
-    function renderCategory(category, taskList = ["작업명"]) {
-        const firstRow = document.createElement("tr");
-
-        const categoryTd = document.createElement("td");
-        categoryTd.classList.add("category-cell");
-        categoryTd.textContent = category;
-        categoryTd.rowSpan = 1;
-        makeEditable(categoryTd);
-
-        const firstTaskTd = document.createElement("td");
-        firstTaskTd.textContent = taskList[0];
-        firstTaskTd.classList.add("task-cell");
-        makeEditable(firstTaskTd);
-
-        firstRow.appendChild(categoryTd);
-        firstRow.appendChild(firstTaskTd);
-
-        for (let i = 0; i < monthCount * weeksPerMonth; i++) {
-            const td = document.createElement("td");
-            td.classList.add("clickable-cell");
-            firstRow.appendChild(td);
-        }
-
-        crudBody.appendChild(firstRow);
-
-        for (let i = 1; i < taskList.length; i++) {
-            addTaskRow(categoryTd, taskList[i]);
-        }
-
-        addNewEntryRow(categoryTd);
-    }
-
-    document.addEventListener("mousedown", () => isMouseDown = true);
-    document.addEventListener("mouseup", () => isMouseDown = false);
-
-    crudBody.addEventListener("click", (e) => {
-        if (e.target.classList.contains("clickable-cell")) {
-            e.target.classList.toggle("active-cell");
-            autoSave();
-        }
-    });
-
-    crudBody.addEventListener("mouseover", (e) => {
-        if (isMouseDown && e.target.classList.contains("clickable-cell")) {
-            e.target.classList.toggle("active-cell");
-            autoSave();
-        }
-    });
-
-    // ✅ 여기부터 "월 추가" 버튼 클릭 이벤트 수정된 부분입니다!
-    document.querySelector(".add-month").addEventListener("click", () => {
-        monthCount++;
-
-        // 1. month-row에 새 월 추가
-        const newTh = document.createElement("th");
-        newTh.colSpan = weeksPerMonth;
-        newTh.textContent = `${monthCount}월`;
-        monthRow.insertBefore(newTh, document.querySelector(".add-month"));
-
-        // 2. week-row에 새 주차 추가 (1~5주)
-        for (let w = 1; w <= weeksPerMonth; w++) {
-            const td = document.createElement("td");
-            td.textContent = w;
-            weekRow.appendChild(td);
-        }
-
-        // 3. 각 데이터 행에 5개의 새로운 셀(td) 추가
-        crudBody.querySelectorAll("tr").forEach(tr => {
-            // "새로 만들기" 줄이면 colspan만 수정
-            if (tr.querySelector(".new-entry")) {
-                tr.firstChild.colSpan = monthCount * weeksPerMonth + 1;
-            } else {
-                for (let i = 0; i < weeksPerMonth; i++) {
-                    const td = document.createElement("td");
-                    td.classList.add("clickable-cell");
-                    tr.appendChild(td);
-                }
-            }
-        });
-
-        autoSave(); // 저장 트리거
-    });
-
-    document.getElementById("add-category").addEventListener("click", () => {
-        const name = prompt("카테고리 이름 입력:");
-        if (name) {
-            renderCategory(name);
-            autoSave();
-        }
-    });
-
-    function collectWbsData() {
-        const wbsList = [];
-        const rows = document.querySelectorAll("#crud-body tr");
-        let currentCategory = "";
-        let currentTask = "";
-
-        rows.forEach((row) => {
-            const categoryCell = row.querySelector(".category-cell");
-            const taskCell = row.querySelector(".task-cell");
-
-            if (!taskCell) return;
-
-            if (categoryCell && categoryCell.textContent.trim()) {
-                currentCategory = categoryCell.textContent.trim();
-            }
-
-            if (taskCell && taskCell.textContent.trim()) {
-                currentTask = taskCell.textContent.trim();
-
-                const clickableTds = [...row.querySelectorAll("td")].filter(td => td.classList.contains("clickable-cell"));
-                clickableTds.forEach((cell, i) => {
-                    const month = Math.floor(i / weeksPerMonth) + 1;
-                    const week = (i % weeksPerMonth) + 1;
-
-                    if (cell.classList.contains("active-cell")) {
-                        wbsList.push({
-                            type: "project",
-                            targetId: projectId,
-                            category: currentCategory,
-                            task: currentTask,
-                            month: month,
-                            week: week,
-                            active: true
-                        });
-                    }
-                });
-            }
-        });
-
-        return wbsList;
-    }
-
-    function saveWbsData(wbsList) {
-        fetch("/api/wbs", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                [csrfHeader]: csrfToken
-            },
-            body: JSON.stringify(wbsList)
-        })
-            .then(() => console.log("✅ WBS 저장 완료"))
-            .catch(err => console.error("❌ 저장 실패:", err));
-    }
-
-    let wbsSaveTimer = null;
-    function autoSave() {
-        if (wbsSaveTimer) clearTimeout(wbsSaveTimer);
-        wbsSaveTimer = setTimeout(() => {
-            const wbsList = collectWbsData();
-            saveWbsData(wbsList);
-        }, 1500);
-    }
-
-    function loadWbsFromServer() {
-        fetch(`/api/wbs?type=project&id=${projectId}`)
-            .then(res => res.json())
-            .then(data => {
-                // ✅ max month 계산
-                const maxMonth = Math.max(...data.map(item => item.month));
-                if (maxMonth > monthCount) {
-                    monthCount = maxMonth;
-
-                    // 1. month-row 업데이트
-                    const addMonthTh = document.querySelector(".add-month");
-                    for (let m = 4; m <= monthCount; m++) {
-                        const th = document.createElement("th");
-                        th.colSpan = weeksPerMonth;
-                        th.textContent = `${m}월`;
-                        monthRow.insertBefore(th, addMonthTh);
-                    }
-
-                    // 2. 주차 재렌더링
-                    renderWeeks();
-
-                    // 3. 기존 행들에 td 추가
-                    crudBody.querySelectorAll("tr").forEach(tr => {
-                        if (!tr.querySelector(".new-entry")) {
-                            const existingCells = tr.querySelectorAll("td.clickable-cell").length;
-                            const requiredCells = monthCount * weeksPerMonth;
-
-                            for (let i = existingCells; i < requiredCells; i++) {
-                                const td = document.createElement("td");
-                                td.classList.add("clickable-cell");
-                                tr.appendChild(td);
-                            }
-                        } else {
-                            // new-entry row colspan 갱신
-                            tr.firstChild.colSpan = monthCount * weeksPerMonth + 1;
+                        if (cell.classList.contains("active-cell")) {
+                            wbsList.push({
+                                type: "project",
+                                targetId: projectId,
+                                category: currentCategory,
+                                task: currentTask,
+                                month: month,
+                                week: week,
+                                active: true
+                            });
                         }
                     });
                 }
+            });
 
-                // 기존 로직 (카테고리/작업 렌더링)
-                const grouped = {};
-                data.forEach(item => {
-                    const { category, task } = item;
-                    if (!grouped[category]) grouped[category] = [];
-                    if (!grouped[category].includes(task)) grouped[category].push(task);
-                });
+            return wbsList;
+        }
 
-                for (const [category, taskList] of Object.entries(grouped)) {
-                    renderCategory(category, taskList);
-                }
+        function saveWbsData(wbsList) {
+            fetch("/api/wbs", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify(wbsList)
+            })
+                .then(() => console.log("✅ WBS 저장 완료"))
+                .catch(err => console.error("❌ 저장 실패:", err));
+        }
 
-                data.forEach(item => {
-                    const { category, task, month, week } = item;
+        let wbsSaveTimer = null;
+        function autoSave() {
+            if (wbsSaveTimer) clearTimeout(wbsSaveTimer);
+            wbsSaveTimer = setTimeout(() => {
+                const wbsList = collectWbsData();
+                saveWbsData(wbsList);
+            }, 1500);
+        }
 
-                    const row = [...crudBody.querySelectorAll("tr")].find(tr => {
-                        const cat = tr.querySelector(".category-cell");
-                        const tsk = tr.querySelector(".task-cell");
-                        return (
-                            (!cat || cat.textContent.trim() === category) &&
-                            tsk && tsk.textContent.trim() === task
-                        );
+        function loadWbsFromServer() {
+            fetch(`/api/wbs?type=project&id=${projectId}`)
+                .then(res => res.json())
+                .then(data => {
+                    // ✅ max month 계산
+                    const maxMonth = Math.max(...data.map(item => item.month));
+                    if (maxMonth > monthCount) {
+                        monthCount = maxMonth;
+
+                        // 1. month-row 업데이트
+                        const addMonthTh = document.querySelector(".add-month");
+                        for (let m = 4; m <= monthCount; m++) {
+                            const th = document.createElement("th");
+                            th.colSpan = weeksPerMonth;
+                            th.textContent = `${m}월`;
+                            monthRow.insertBefore(th, addMonthTh);
+                        }
+
+                        // 2. 주차 재렌더링
+                        renderWeeks();
+
+                        // 3. 기존 행들에 td 추가
+                        crudBody.querySelectorAll("tr").forEach(tr => {
+                            if (!tr.querySelector(".new-entry")) {
+                                const existingCells = tr.querySelectorAll("td.clickable-cell").length;
+                                const requiredCells = monthCount * weeksPerMonth;
+
+                                for (let i = existingCells; i < requiredCells; i++) {
+                                    const td = document.createElement("td");
+                                    td.classList.add("clickable-cell");
+                                    tr.appendChild(td);
+                                }
+                            } else {
+                                // new-entry row colspan 갱신
+                                tr.firstChild.colSpan = monthCount * weeksPerMonth + 1;
+                            }
+                        });
+                    }
+
+                    // 기존 로직 (카테고리/작업 렌더링)
+                    const grouped = {};
+                    data.forEach(item => {
+                        const { category, task } = item;
+                        if (!grouped[category]) grouped[category] = [];
+                        if (!grouped[category].includes(task)) grouped[category].push(task);
                     });
 
-                    if (row) {
-                        const cells = row.querySelectorAll(".clickable-cell");
-                        const index = (month - 1) * weeksPerMonth + (week - 1);
-                        if (cells[index]) cells[index].classList.add("active-cell");
+                    for (const [category, taskList] of Object.entries(grouped)) {
+                        renderCategory(category, taskList);
                     }
-                });
-            })
-            .catch(err => console.error("❌ WBS 불러오기 실패:", err));
-    }
+
+                    data.forEach(item => {
+                        const { category, task, month, week } = item;
+
+                        const row = [...crudBody.querySelectorAll("tr")].find(tr => {
+                            const cat = tr.querySelector(".category-cell");
+                            const tsk = tr.querySelector(".task-cell");
+                            return (
+                                (!cat || cat.textContent.trim() === category) &&
+                                tsk && tsk.textContent.trim() === task
+                            );
+                        });
+
+                        if (row) {
+                            const cells = row.querySelectorAll(".clickable-cell");
+                            const index = (month - 1) * weeksPerMonth + (week - 1);
+                            if (cells[index]) cells[index].classList.add("active-cell");
+                        }
+                    });
+                })
+                .catch(err => console.error("❌ WBS 불러오기 실패:", err));
+        }
 
 
-    renderWeeks();
-    loadWbsFromServer();
-</script>
+        renderWeeks();
+        loadWbsFromServer();
+    </script>
 
 
 
 
 
 
-</body>
-</html>
+    </body>
+    </html>

@@ -18,7 +18,7 @@
             <div class="header">
                 <button class="back-btn">&lt;</button>
                 <!-- 프로젝트 제목을 동적으로 출력 -->
-                <h2 th:text="${project.title}">프로젝트 제목</h2>
+                <h2 id="project-name" th:text="${project.title != null ? project.title : '제목 없음'}">프로젝트 제목</h2>
                 <button class="close-btn">&times;</button>
             </div>
 
