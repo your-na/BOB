@@ -430,10 +430,6 @@ public class ProjectController {
         return "todo_add";
     }
 
-    @GetMapping("/todocrud")
-    public String showCrudPage() {
-        return "todo_crud";
-    }
 
     @GetMapping("/todohome")
     public String showHomePage() {

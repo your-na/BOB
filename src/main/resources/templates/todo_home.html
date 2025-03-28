@@ -78,7 +78,12 @@
     <div class="sidebar">
         <button class="sidebar-btn active">홈</button>
         <button class="sidebar-btn">할 일</button>
-        <button class="sidebar-btn">CRUD</button>
+
+        <!-- ✅ 여기가 수정된 CRUD 버튼 -->
+        <a th:href="@{'/todocrud/' + ${project.id}}">
+            <button class="sidebar-btn">CRUD</button>
+        </a>
+
         <button class="sidebar-btn">+</button>
     </div>
 </div>
