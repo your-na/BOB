@@ -6,15 +6,18 @@ import com.example.bob.Entity.ProjectEntity;
 import com.example.bob.Entity.UserProjectEntity;
 import com.example.bob.Service.ProjectService;
 import com.example.bob.security.UserDetailsImpl;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity; // ✅ 추가
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Map; // ✅ 추가
 
 @Controller
 public class SpaceController {
@@ -90,10 +93,30 @@ public class SpaceController {
         return "todo_home"; // todo_home.html로 프로젝트 정보를 넘김
     }
 
+    // ✅ 공지사항 조회 (팀원, 팀장 모두 가능)
+    @ResponseBody
+    @GetMapping("/api/project/{id}/notice")
+    public ResponseEntity<String> getNotice(@PathVariable Long id) {
+        String notice = projectService.getNotice(id);
+        return ResponseEntity.ok(notice);
+    }
+
+    // ✅ 공지사항 수정 (팀장만 가능)
+    @ResponseBody
+    @PatchMapping("/api/project/{id}/notice")
+    public ResponseEntity<?> updateNotice(@PathVariable Long id,
+                                          @RequestBody Map<String, String> request,
+                                          @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        String content = request.get("content");
+        projectService.updateNotice(id, content, userDetails.getUserEntity());
+        return ResponseEntity.ok().build();
+    }
 
     // 할 일 팝업 (task_popup.html)
     @GetMapping("/popup")
     public String openTaskPopup(Model model) {
         return "task_popup"; // task_popup.html 템플릿 렌더링
     }
+
+
 }

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.time.temporal.ChronoUnit;
 
-
 @Entity
 @Getter
 @Setter
@@ -83,34 +82,28 @@ public class ProjectEntity {
     @Builder.Default
     private List<ProjectHistoryEntity> projectHistoryEntities = new ArrayList<>();
 
+    // ✅ 📌 추가된 공지사항 필드
+    @Column(columnDefinition = "TEXT")
+    private String notice;
 
     // ✅ 주최자가 제출을 하면 수락된 상태의 팀원들만 `"완료"`로 변경
     public void completeProject() {
-        // 주최자가 파일을 제출한 경우만 프로젝트 상태 변경
         if (userProjects != null) {
             for (UserProjectEntity userProject : userProjects) {
-                // 주최자가 파일을 제출한 경우만 프로젝트 상태 변경
                 if (userProject.getUser().getUserNick().equals(this.createdBy) && userProject.getSubmittedFileName() != null) {
-                    this.status = "완료"; // 프로젝트 상태 변경
-
-                    // 수락된 모든 팀원들의 상태를 "완료"로 변경
+                    this.status = "완료";
                     for (UserProjectEntity member : userProjects) {
-                        // "진행중" 또는 "모집중" 상태인 팀원들만 "완료"로 변경
                         if ((member.getStatus().equals("진행중") || member.getStatus().equals("모집중")) && !member.getStatus().equals("신청중")) {
-                            member.setStatus("완료"); // 상태를 "완료"로 변경
+                            member.setStatus("완료");
                         }
                     }
-                    break; // 주최자가 완료로 변경되면 바로 상태 변경을 완료
+                    break;
                 }
             }
         }
     }
 
-
-
-    // ✅ 주최자의 상태에 따라 프로젝트 상태 업데이트
     public void updateStatus() {
-        // 주최자의 상태에 따라 프로젝트 상태 업데이트
         UserProjectEntity ownerProject = userProjects.stream()
                 .filter(userProject -> userProject.getUser().getUserNick().equals(this.createdBy))
                 .findFirst()
@@ -133,12 +126,10 @@ public class ProjectEntity {
             this.dDay = 0;
         }
     }
+
     @PrePersist
     @PreUpdate
     public void prePersistAndUpdate() {
         calculateDDay();  // ✅ D-Day 수동 계산 호출
     }
-
 }
-
-

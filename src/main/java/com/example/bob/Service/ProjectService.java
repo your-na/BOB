@@ -535,6 +535,39 @@ public class ProjectService {
 
 
     }
+
+    /**
+     * ✅ 프로젝트 공지사항 조회 (읽기 전용)
+     */
+    @Transactional(readOnly = true)
+    public String getNotice(Long projectId) {
+        // 프로젝트 ID로 프로젝트 조회
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트를 찾을 수 없습니다."));
+        // 공지사항 내용 반환
+        return project.getNotice();
+    }
+
+    /**
+     * ✅ 프로젝트 공지사항 수정 (팀장만 가능)
+     */
+    @Transactional
+    public void updateNotice(Long projectId, String content, UserEntity user) {
+        // 프로젝트 ID로 프로젝트 조회
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트를 찾을 수 없습니다."));
+
+        // 공지사항은 팀장(프로젝트 생성자)만 수정 가능
+        if (!project.getCreatedBy().equals(user.getUserNick())) {
+            throw new SecurityException("공지사항 수정 권한이 없습니다.");
+        }
+
+        // 공지사항 내용 수정
+        project.setNotice(content);
+        // DB에 저장
+        projectRepository.save(project);
+    }
+
 }
 
 

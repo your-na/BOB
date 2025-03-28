@@ -14,6 +14,10 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
+
+// ✅ 아래 import 추가
+import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -96,5 +100,11 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return combinedUserDetailsService;
+    }
+
+    // ✅ 추가된 부분: Spring Security Dialect 등록
+    @Bean
+    public SpringSecurityDialect springSecurityDialect() {
+        return new SpringSecurityDialect();
     }
 }
