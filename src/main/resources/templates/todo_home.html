@@ -77,8 +77,7 @@
     <!-- 사이드바 -->
     <div class="sidebar">
         <button class="sidebar-btn active">홈</button>
-        <button class="sidebar-btn">할 일</button>
-
+        <button class="sidebar-btn" onclick="openTodoPopup()">할 일</button>
         <!-- ✅ 여기가 수정된 CRUD 버튼 -->
         <a th:href="@{'/todocrud/' + ${project.id}}">
             <button class="sidebar-btn">CRUD</button>
@@ -128,6 +127,7 @@
             console.error("❌ 저장 실패:", error);
         });
     }
+
 </script>
 
 </body>

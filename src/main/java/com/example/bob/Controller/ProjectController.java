@@ -425,7 +425,7 @@ public class ProjectController {
     }
 
 
-    @GetMapping("/todoadd")
+        @GetMapping("/todoadd")
     public String showAddPage() {
         return "todo_add";
     }
@@ -435,6 +435,13 @@ public class ProjectController {
     public String showHomePage() {
         return "todo_home";
     }
+
+    @GetMapping("/todoplan")
+    public String showTodoPlanPage() {
+        return "todo_plan"; // templates/todo_plan.html로 이동
+    }
+
+
 
 }
 
