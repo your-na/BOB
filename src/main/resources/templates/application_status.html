@@ -41,11 +41,13 @@
         <button class="status-button pending">⏳ 지원 후 대기중</button>
     </div>
 
-    <!-- 프로젝트 지원 -->
-    <div class="application-card project">
-        <h3>[프로젝트] 개발자 모집 지원</h3>
-        <p class="date">📅 제출일 2025.02.10</p>
-        <button class="status-button pending">⏳ 지원 후 대기중</button>
+    <!-- ✅ 프로젝트 지원 (신청중인 항목만 동적으로 렌더링) -->
+    <div th:each="project : ${projectApplications}" class="application-card project">
+        <h3>[프로젝트] [[${project.project.title}]]</h3>
+        <p class="date">📅 제출일 [[${#temporals.format(project.joinDate, 'yyyy.MM.dd')}]]</p>
+        <button class="status-button pending">
+            ⏳ [[${project.status == '신청중' ? '지원 후 대기중' : project.status}]]
+        </button>
     </div>
 </div>
 

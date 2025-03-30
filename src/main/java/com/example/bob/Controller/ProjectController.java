@@ -436,7 +436,5 @@ public class ProjectController {
         return "todo_home";
     }
 
-    @GetMapping("/appstatus")
-    public String showstatusform() {return "application_status";}
 }
 

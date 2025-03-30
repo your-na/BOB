@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface UserProjectRepository extends JpaRepository<UserProjectEntity, Long> {
 
-    // ✅ 사용자가 승인된 프로젝트만 조회하는 메서드
+    // ✅ 사용자가 신청중인 프로젝트만 조회하는 메서드
     List<UserProjectEntity> findByUserAndStatus(UserEntity user, String status);
 
     // ✅ 사용자가 특정 프로젝트에 이미 신청했는지 확인
@@ -23,7 +23,7 @@ public interface UserProjectRepository extends JpaRepository<UserProjectEntity, 
     // ✅ 특정 사용자와 특정 프로젝트의 신청 정보 가져오기
     Optional<UserProjectEntity> findByUserAndProject(UserEntity user, ProjectEntity project);
 
-    // ✅ 특정 사용자와 프로젝트에 대한 정보 가져오기 (🔹 `userId`와 `projectId`를 올바르게 참조)
+    // ✅ 특정 사용자와 프로젝트에 대한 정보 가져오기 (🔹 userId와 projectId를 올바르게 참조)
     Optional<UserProjectEntity> findByUser_UserIdAndProject_Id(Long userId, Long projectId);
 
     // ✅ 파일을 제출한 프로젝트만 조회 (🔹 특정 사용자가 파일을 제출한 프로젝트만 가져오기)
@@ -33,6 +33,7 @@ public interface UserProjectRepository extends JpaRepository<UserProjectEntity, 
     List<UserProjectEntity> findByUser(UserEntity user);
 
     List<UserProjectEntity> findByUserAndStatusIn(UserEntity user, List<String> statuses);
+
 
     // ✅ 프로젝트와 관련된 팀 신청 삭제
     @Modifying
