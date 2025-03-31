@@ -64,3 +64,34 @@ document.addEventListener("DOMContentLoaded", function() {
 
     renderCalendar();
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    const addTaskBtn = document.querySelector(".add-task-btn");
+    const taskModal = document.querySelector(".task-modal");
+    const cancelBtn = document.querySelector(".cancel-task-btn");
+    const submitBtn = document.querySelector(".submit-task-btn");
+    const taskInput = document.querySelector(".task-input");
+
+    addTaskBtn.addEventListener("click", () => {
+        taskModal.classList.remove("hidden");
+    });
+
+    cancelBtn.addEventListener("click", () => {
+        taskModal.classList.add("hidden");
+    });
+
+    submitBtn.addEventListener("click", () => {
+        const taskText = taskInput.value;
+        if (taskText.trim() === "") {
+            alert("할 일을 입력해주세요!");
+            return;
+        }
+
+        // 여기에 실제 할 일 추가 로직 넣으면 됨 (백엔드 연동 예정)
+        console.log("할 일 생성됨:", taskText);
+
+        taskModal.classList.add("hidden");
+        taskInput.value = "";
+    });
+});
+

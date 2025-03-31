@@ -212,3 +212,80 @@ body {
 .sidebar-btn:hover {
     background: #f0f0f0;
 }
+
+.task-modal {
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    width: 420px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    z-index: 9999;
+    padding: 20px;
+}
+
+.task-modal.hidden {
+    display: none;
+}
+
+.task-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.task-input {
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.start-date, .end-date {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    align-items: center;
+}
+.date-picker {
+    font-size: 14px;
+}
+
+.form-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.form-group label {
+    font-weight: bold;
+}
+
+.space-select, .member-select {
+    width: 60%;
+    padding: 6px;
+    border-radius: 5px;
+}
+
+.task-btns {
+    display: flex;
+    justify-content: space-between;
+}
+
+.submit-task-btn {
+    background-color: #00b800;
+    color: white;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 6px;
+}
+
+.cancel-task-btn {
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 6px;
+}
