@@ -35,17 +35,14 @@ public class ContestController {
     // 사용자 공모전 페이지
     @GetMapping("/contest")
     public String contestList(Model model) {
-        List<ContestDTO> contests = contestService.getApprovedContests();
-
-        model.addAttribute("contests", contests);
+        model.addAttribute("contests", contestService.getAllContests());
         return "contest"; // contest.html
     }
 
     // 관리자 페이지 - 공모전 목록 + 승인 대기
     @GetMapping("/ad_contest")
     public String adminContestList(Model model) {
-        model.addAttribute("pending", contestService.getPendingContests());
-        model.addAttribute("all", contestService.getAllContests());
+        model.addAttribute("contests", contestService.getAllContests());
         return "ad_contest";
     }
 
@@ -92,6 +89,8 @@ public class ContestController {
                 e.printStackTrace();
             }
         }
+        System.out.println("💡 제목: " + dto.getTitle());
+        System.out.println("💡 시상 내역: " + dto.getAwardDetails());
 
         ContestEntity contest = ContestEntity.builder()
                 .title(dto.getTitle())
@@ -113,7 +112,7 @@ public class ContestController {
                 .build();
 
         contestService.save(contest);
-        return "redirect:/contest";
+        return "redirect:/ad_contest";
     }
 
     // 공모전 승인
@@ -126,5 +125,12 @@ public class ContestController {
     @GetMapping("/uploads/contestImages/{fileName}")
     public ResponseEntity<Resource> serveContestImage(@PathVariable String fileName) {
         return contestService.getContestImage(fileName);
+    }
+
+    // 공모전 삭제 요청 처리
+    @PostMapping("/admin/contest/delete")
+    public String deleteContest(@RequestParam List<Long> idsToDelete) {
+        idsToDelete.forEach(contestService::deleteById);
+        return "redirect:/ad_contest";
     }
 }

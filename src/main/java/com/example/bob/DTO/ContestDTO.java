@@ -29,7 +29,6 @@ public class ContestDTO {
     private String awardDetails;
     private String applicationMethod;
     private String description;
-    private String imageUrl;
     private String status;
 
     private long remainingDays; // D-day 계산용
@@ -55,7 +54,6 @@ public class ContestDTO {
                 .awardDetails(awardDetails)
                 .applicationMethod(applicationMethod)
                 .description(description)
-                .imageUrl(imageUrl)
                 .status(status)
                 .creatorType(creatorType)
                 .isApproved(isApproved)
@@ -67,7 +65,10 @@ public class ContestDTO {
 
     public static ContestDTO fromEntity(ContestEntity entity)
     {
-        long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), entity.getStartDate());
+        long daysLeft = 0;
+        if (entity.getStartDate() != null) {
+            daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), entity.getStartDate()) + 1;
+        }
 
         return ContestDTO.builder()
                 .id(entity.getId())
@@ -82,7 +83,6 @@ public class ContestDTO {
                 .awardDetails(entity.getAwardDetails())
                 .applicationMethod(entity.getApplicationMethod())
                 .description(entity.getDescription())
-                .imageUrl(entity.getImageUrl())
                 .creatorType(entity.getCreatorType())
                 .isOnlyBOB(entity.isOnlyBOB())
                 .isApproved(entity.isApproved())

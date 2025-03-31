@@ -1,13 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title><!DOCTYPE html>
-        <html lang="ko">
-        <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>BOB 메인 페이지</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOB 메인 페이지</title>
     <link rel="stylesheet" href="/css/ad_contest.css">
 </head>
 <body>
@@ -60,6 +56,7 @@
         </div>
 
         <!-- 필터링 창 -->
+        <form method="get" action="/ad_contest">
         <div class="filter-box" id="filter-box">
             <div class="filter-tabs">
                 <button class="filter-tab active" data-target="filter-who">주최</button>
@@ -139,7 +136,10 @@
                 </div>
             </div>
         </div>
+        </form>
 
+        <form id="deleteForm" method="post" action="/admin/contest/delete" th:object="${contests}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
         <table class="contest-table">
             <thead>
             <tr>
@@ -148,26 +148,32 @@
                 <th>남은 기간</th>
                 <th>진행 일정</th>
                 <th>현황</th>
+                <th><input type="checkbox" id="select-all"></th>
             </tr>
             </thead>
             <tbody id="contest-body">
             <!-- Thymeleaf 반복문으로 프로젝트 데이터 출력 -->
             <tr th:each="contest : ${contests}">
                 <td th:text="${contest.title}">공모전 제목</td>
-                <td th:text="${contest.host}">주최 기관</td>
+                <td th:text="${contest.organizer}">주최 기관</td>
                 <td th:text="'D-' + ${contest.remainingDays}">D-5456</td>
                 <td th:text="${contest.startDate} + ' ~ ' + ${contest.endDate}">2024.01.01 ~ 2024.06.30</td>
                 <td th:text="${contest.status}">진행 중</td>
                 <td>
-                    <input type="checkbox" class="contest-checkbox">
+                    <input type="checkbox" class="contest-checkbox" name="idsToDelete" th:value="${contest.id}">
                 </td> <!-- 체크박스 추가 -->
             </tr>
             </tbody>
         </table>
+        </form>
     </section>
 </div>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        initializeSearchAndFilter();
+    });
+
     function initializeSearchAndFilter() {
         console.log("📌 검색 & 필터 기능 다시 활성화");
 
@@ -224,6 +230,11 @@
                     selectedFilters.appendChild(selected);
                 }
             });
+        });
+
+        document.getElementById("select-all").addEventListener("change", function () {
+            const checked = this.checked;
+            document.querySelectorAll(".contest-checkbox").forEach(cb => cb.checked = checked);
         });
 
         // ✅ 필터 전체 삭제 버튼 기능 추가

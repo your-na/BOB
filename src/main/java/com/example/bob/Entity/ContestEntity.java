@@ -44,15 +44,12 @@ public class ContestEntity {
     private String status;              // 상태값 (예: 모집중, 종료 등)
 
     // 작성자
-    @Column(nullable = false)
     private String creatorType; // "ADMIN" 또는 "COMPANY"
 
     // 승인 여부
-    @Column(nullable = false)
     private boolean isApproved = false;
 
     // only BOB표시
-    @Column(nullable = false)
     private boolean isOnlyBOB = false;
 
     private LocalDateTime createdAt;
@@ -82,7 +79,6 @@ public class ContestEntity {
                 .awardDetails(this.awardDetails)
                 .applicationMethod(this.applicationMethod)
                 .description(this.description)
-                .imageUrl(this.imageUrl)
                 .status(this.status)
                 .creatorType(this.creatorType)
                 .isApproved(this.isApproved)
