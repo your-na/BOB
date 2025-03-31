@@ -112,10 +112,19 @@ public class SpaceController {
         return ResponseEntity.ok().build();
     }
 
-    // 할 일 팝업 (task_popup.html)
+    // ✅ 할 일 팝업
     @GetMapping("/popup")
     public String openTaskPopup(Model model) {
-        return "task_popup"; // task_popup.html 템플릿 렌더링
+        return "task_popup";  // task_popup.html (thymeleaf templates 기준)
     }
+
+
+    @GetMapping("/todo_plan")
+    public String todoPlanPage() {
+        return "todo_plan"; // 확장자 .html은 생략
+    }
+
+
+
 
 }
