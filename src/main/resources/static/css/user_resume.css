@@ -1,0 +1,165 @@
+/* user_resume.css */
+
+/* 전체 레이아웃 컨테이너 */
+.resume-container {
+    display: flex;
+    max-width: 1200px;
+    margin: 40px auto;
+    gap: 30px;
+    padding: 0 20px;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 왼쪽 콘텐츠 */
+.left-content {
+    flex: 3;
+}
+
+/* 오른쪽 콘텐츠 */
+.right-content {
+    flex: 1;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 2px 2px 5px #ddd;
+}
+
+/* 이력서 상단 제목 */
+.resume-title {
+    border: 2px solid green;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.resume-title h2 {
+    margin: 0;
+}
+
+.resume-title small {
+    color: #999;
+}
+
+/* 각 입력 섹션 */
+.section-box {
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-left: 5px solid green;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+.section-box h3 {
+    margin-top: 0;
+    color: green;
+}
+
+.red {
+    color: red;
+    font-size: 14px;
+}
+
+/* 내 정보 - 사용자 프로필 */
+.user-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.user-info img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-detail p {
+    margin: 5px 0;
+}
+
+/* 학력사항 */
+.form-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.form-group input,
+.form-group select {
+    padding: 8px;
+    font-size: 14px;
+}
+
+.form-group button {
+    padding: 8px 12px;
+    background: #008000;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* 희망직무 */
+label {
+    display: block;
+    margin: 5px 0;
+}
+
+/* 텍스트 입력 및 업로드 영역 */
+textarea {
+    width: 100%;
+    height: 80px;
+    padding: 10px;
+    font-size: 14px;
+    resize: vertical;
+    margin-top: 10px;
+}
+
+.upload-box {
+    border: 1px dashed #ccc;
+    text-align: center;
+    padding: 20px;
+    color: #999;
+    margin-top: 10px;
+    border-radius: 10px;
+}
+
+/* 오른쪽 탭 메뉴 */
+.tab-menu h3 {
+    margin-bottom: 10px;
+}
+
+.tab-menu ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-menu li {
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #eee;
+}
+
+.tab-menu .active {
+    background-color: green;
+    color: white;
+}
+
+/* 수상 리스트 */
+.award-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.award-item {
+    border: 1px solid #000;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: left;
+}

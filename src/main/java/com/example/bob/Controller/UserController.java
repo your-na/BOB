@@ -193,4 +193,7 @@ public class UserController {
 
     @GetMapping("/newcontest")
     public String newcontestform() {return "newcontest";}
+
+    @GetMapping("/user_resume")
+    public String user_resumeform() {return "user_resume";}
 }
