@@ -43,6 +43,25 @@ public class    TodoService {
         return todoRepository.save(todo);
     }
 
+    // '개인' 할 일 저장을 위한 별도 메서드
+    public TodoEntity savePersonalTodo(TodoRequestDto dto, UserEntity user) {
+        // 개인 할 일의 경우에는 `workspace`가 "개인"으로 설정되고, assignee는 항상 "나" (List로 처리)
+        TodoEntity todo = TodoEntity.builder()
+                .title(dto.getTitle())
+                .startDate(dto.getStartDate())
+                .endDate(dto.getEndDate())
+                .assignee(user.getUserNick())
+                .workspace("개인")  // workspace는 "개인"
+                .completed(false)
+                .type("개인")  // type도 "개인"으로 설정
+                .build();
+
+        return todoRepository.save(todo);  // 할 일 저장
+    }
+
+
+
+
     // 팝업용 할 일 조회
     public List<TodoEntity> getTodosForPopup(String userNick) {
         return todoRepository.findTodosForPopup(userNick);

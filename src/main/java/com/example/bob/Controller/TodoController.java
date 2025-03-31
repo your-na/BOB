@@ -39,6 +39,11 @@ public class TodoController {
                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
         UserEntity user = userDetails.getUserEntity();
 
+        // workspace가 "개인"인 경우에는 프로젝트를 찾지 않고 바로 개인 할일을 등록하도록 처리
+        if ("개인".equals(dto.getWorkspace())) {
+            return todoService.savePersonalTodo(dto, user);
+        }
+
         // 주최자인지 판단하는 메서드는 ProjectService에 구현한다고 가정
         boolean isHost = projectService.isUserHost(dto.getWorkspace(), user.getUserNick());
 
