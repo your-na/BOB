@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>공고 상세보기 페이지</title>
+    <link rel="stylesheet" href="/css/jobindex.css" />
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<div class="job-page-wrapper">
+
+    <!-- 왼쪽: 내 이력서 목록 -->
+    <div class="resume-section">
+        <div class="resume-header">
+            <h2>내 이력서</h2>
+            <p>이력서를 마우스로 눌러 잡고 원하는 영역으로 움직일 수 있습니다.</p>
+        </div>
+        <div class="resume-list">
+            <div class="resume-card">
+                <h3>이력서 제목</h3>
+                <p>HTML/CSS</p>
+                <p><span class="job-career"><img src="/images/job_career.png"></span> BOBA에서 연결된 교육 외 1개</p>
+            </div>
+            <div class="resume-card">
+                <h3>백엔드 이력서</h3>
+                <p>Spring / JPA</p>
+                <p><span class="job-career"><img src="/images/job_career.png"></span> BOBA에서 연결된 교육 외 2개</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 기존 HTML 중 job-detail-section 내부 수정 -->
+    <div class="job-detail-section">
+
+        <div class="job-header">
+            <h2>[dskjhdkchs] 개발자 채용</h2>
+            <span class="d-day-badge">D-38</span>
+        </div>
+
+        <div class="job-info-block company-info">
+            <h3>회사 정보</h3>
+            <div class="contact-box">
+                <p class="job-desc">
+                    저희 회사는 뛰어난 인재와 기술을 바탕으로 최고의 제품과 서비스를 창출하여 인류 사회에 공헌하는 것을 궁극적인 목표로 삼고 있습니다.
+                    글로벌 <strong>No.1 IT기업</strong>으로 끊임없는 혁신을 통해 전 세계인이 더욱 행복하고 건강한 삶을 누리는 데 도움이 될 기술을 발전시켜 나갈 것입니다.
+                </p>
+                <div class="contact-bottom">
+                    <div class="contact-info">
+                        <p><img src="/images/email.png"> dskjhdkchs@mail.com</p>
+                        <p><img src="/images/phone.png"> 010 1111 1111</p>
+                    </div>
+                    <div class="arrow">➤</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="job-info-block">
+            <h3>지원자격 및 근무 조건</h3>
+            <ul class="condition-list">
+                <li><strong>경력:</strong> 신입 또는 2년 이하 경력자</li>
+                <li><strong>학력:</strong> 고졸 이상</li>
+                <li><strong>고용형태:</strong> 정규직</li>
+                <li><strong>급여:</strong> 면접 후 결정</li>
+                <li><strong>시간:</strong> 09:00~17:00 (주5일)</li>
+                <li><strong>우대:</strong> 인근 거주자, 관련직무 경험자 우대</li>
+            </ul>
+        </div>
+
+        <div class="job-info-block">
+            <h3>제출서류</h3>
+            <p>졸업증명서(필수) / 성적증명서(선택) / 경력증명서(선택) 각 1 부 외 기타 자격증</p>
+            <p class="notice-red">* 필수 제출 안내 확인</p>
+        </div>
+
+        <div class="job-info-block">
+            <h3>이력서 첨부</h3>
+            <div class="resume-upload-box">
+                <span>📁 파일 업로드</span>
+            </div>
+        </div>
+
+        <div class="job-info-block qa-block">
+            <h3>문의 사항 및 답변</h3>
+            <button class="qa-btn">문의하기</button>
+
+            <div class="qa-item secret">
+                <p>비밀 댓글입니다.</p>
+                <p class="qa-time">2025.01.14 오후 13:22</p>
+                <div class="qa-reply">ㄴ 비밀 답변입니다.</div>
+            </div>
+
+            <div class="qa-item">
+                <p>자격증이 필요할까요?</p>
+                <p class="qa-time">2025.01.14 오후 13:22</p>
+                <div class="qa-reply">ㄴ 자격증은 필수사항은 아니지만 제출하시면 가산점 있으실 것 같습니다.</div>
+            </div>
+        </div>
+
+        <div class="submit-btn-area">
+            <button class="apply-btn">지원하기</button>
+        </div>
+
+    </div>
+
+
+</div>
+
+</body>
+</html>
