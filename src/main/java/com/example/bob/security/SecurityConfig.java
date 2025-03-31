@@ -46,7 +46,7 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/sign").anonymous()  // 로그인 페이지는 익명 접근 허용
                         .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject").authenticated()  // 인증된 사용자만 접근 가능
                         .requestMatchers("/signup", "/co_signup", "/check-nickname", "/check-username").permitAll()  // 회원가입 페이지는 익명 접근 허용
-                        .requestMatchers("/admin/**", "/sidebar").hasAuthority("ADMIN")
+                        .requestMatchers("/admin/**", "/sidebar", "/ad_contest").hasAuthority("ADMIN")
                         .requestMatchers("/contest/create", "/contest/submit").hasAnyAuthority("ADMIN", "COMPANY")
                         .anyRequest().authenticated()  // 나머지 요청은 인증된 사용자만 접근 가능
                 )

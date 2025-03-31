@@ -34,6 +34,7 @@ public class ContestService {
     // 공모전 저장
     public ContestEntity save(ContestEntity contest) {
         ContestEntity saved = contestRepository.save(contest);
+        System.out.println("✅ 저장 시도: " + contest.getTitle());
         saveHistory(saved);
         return saved;
     }
@@ -55,7 +56,9 @@ public class ContestService {
 
     // 전체 공모전 리스트 (관리자)
     public List<ContestDTO> getAllContests() {
-        return contestRepository.findAll().stream()
+        List<ContestEntity> list = contestRepository.findAll();
+        System.out.println("📌 전체 공모전 수: " + list.size());
+        return list.stream()
                 .map(ContestDTO::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -106,6 +109,20 @@ public class ContestService {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    // 공모전 삭제
+    public void deleteById(Long id) {
+        contestRepository.deleteById(id);
+    }
+
+    // 필터
+    public List<ContestDTO> filterContests(String organizer, String region) {
+        return contestRepository.findAll().stream()
+                .filter(c -> (organizer == null || c.getOrganizer().contains(organizer)))
+                .filter(c -> (region == null || c.getRegion().contains(region)))
+                .map(ContestDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 
 
