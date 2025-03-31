@@ -52,6 +52,9 @@ public class ContestEntity {
     // only BOB표시
     private boolean isOnlyBOB = false;
 
+    @Column(nullable = false)
+    private boolean isDeleted = false;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

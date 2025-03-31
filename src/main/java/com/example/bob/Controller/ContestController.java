@@ -139,11 +139,7 @@ public class ContestController {
         ContestEntity contest = contestService.getById(id);
         model.addAttribute("contest", ContestDTO.fromEntity(contest));
 
-        // 관련된 팀원 모집글 등도 같이 추가 가능
-//        List<RecruitDTO> recruitList = recruitService.findByContestId(id);
-//        model.addAttribute("recruitList", recruitList);
-
-        return "postcontest"; // templates/postcontest.html
+        return "postcontest";
     }
 
 }
