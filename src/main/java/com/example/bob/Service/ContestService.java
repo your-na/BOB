@@ -56,7 +56,7 @@ public class ContestService {
 
     // 전체 공모전 리스트 (관리자)
     public List<ContestDTO> getAllContests() {
-        List<ContestEntity> list = contestRepository.findAll();
+        List<ContestEntity> list = contestRepository.findAllByOrderByCreatedAtDesc();
         System.out.println("📌 전체 공모전 수: " + list.size());
         return list.stream()
                 .map(ContestDTO::fromEntity)

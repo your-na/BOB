@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,12 +10,12 @@
 <body>
 
 <!-- header -->
-<div th:insert="~{header :: header}"></div>
+<div th:replace="~{header :: header}"></div>
 
 <!-- 공모전 상세 정보 -->
 <section class="contest-detail">
     <div class="contest-header">
-        <h2>2025 통계 청소년 IT 학술대회</h2>
+        <h2 th:text="${contest.title}">2025 통계 청소년 IT 학술대회</h2> <!-- 공모전명-->
         <div class="status-badge" id="status-badge">모집중</div>
         <button class="bookmark-btn" id="bookmark-btn">⭐</button>
     </div>
@@ -26,15 +26,20 @@
 
         <!-- 공모전 정보 테이블 -->
         <table class="contest-table">
-            <tr><th>주최/주관</th><td>한국정보기술융합회</td></tr>
-            <tr><th>대표 분야</th><td>논문</td></tr>
-            <tr><th>참가 대상</th><td>청소년, 어린이</td></tr>
-            <tr><th>대회 지역</th><td>대전지역</td></tr>
-            <tr><th>접수 기간</th><td>2024.11.14 ~ 2025.03.12</td></tr>
-            <tr><th>심사 기관</th><td>서울 소재 대학교</td></tr>
-            <tr><th>시상 내역</th><td>장학금(대학진학 혜택)</td></tr>
-            <tr><th>웹사이트</th><td><a href="http://korea.org/research/conference/2025x" target="_blank">공식 홈페이지</a></td></tr>
-            <tr><th>참가비용</th><td>110,000원</td></tr>
+            <tr><th>주최/주관</th><td th:text="${contest.organizer}">한국정보기술융합회</td></tr>
+            <tr><th>대표 분야</th><td th:text="${contest.category}">논문</td></tr>
+            <tr><th>참가 대상</th><td th:text="${contest.target}">청소년, 어린이</td></tr>
+            <tr><th>대회 지역</th><td th:text="${contest.region}">대전지역</td></tr>
+            <tr>
+                <th>진행 기간</th>
+                <td th:text="${contest.startDate} + ' ~ ' + ${contest.endDate}">2024.11.14 ~ 2025.03.12</td>
+            </tr>
+            <tr><th>심사 기관</th><td th:text="${contest.judge}">서울 소재 대학교</td></tr>
+            <tr><th>시상 내역</th><td th:text="${contest.awardDetails}">장학금(대학진학 혜택)</td></tr>
+            <tr>
+                <th>웹사이트</th>
+                <td><a th:href="${contest.applicationMethod}" target="_blank">공식 홈페이지</a></td>
+            </tr>
         </table>
     </div>
 
@@ -63,10 +68,11 @@
     </section>
 
     <!-- 버튼 영역 -->
-    <div class="button-box">
+    <div class="button-box" sec:authorize="!hasRole('ADMIN')">
         <button class="apply-btn" id="openModalBtn">공모전 참가하기</button>
         <button class="recruit-btn">팀원 모집글 작성하기</button>
     </div>
+
 
     <!-- 팀원 모집글 리스트 -->
     <section class="recruit-list">
@@ -242,6 +248,23 @@
     function removeMember(id) {
         selectedList = selectedList.filter(u => u.id !== id);
         renderSelectedMembers();
+    }
+
+    // 상태 뱃지 변경
+    const statusBadge = document.getElementById("status-badge");
+    const start = new Date([[${contest.startDate}]]);
+    const end = new Date([[${contest.:endDate}]]);
+    const today = new Date();
+
+    if (today < start) {
+        statusBadge.textContent = "모집전";
+        statusBadge.style.backgroundColor = "#aaaaaa"; // 회색
+    } else if (today >= start && today <= end) {
+        statusBadge.textContent = "진행중";
+        statusBadge.style.backgroundColor = "#0078ff"; // 파란색
+    } else {
+        statusBadge.textContent = "진행완료";
+        statusBadge.style.backgroundColor = "#ff4040"; // 빨간색
     }
 
 </script>

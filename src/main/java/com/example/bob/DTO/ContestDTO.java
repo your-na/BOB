@@ -66,8 +66,8 @@ public class ContestDTO {
     public static ContestDTO fromEntity(ContestEntity entity)
     {
         long daysLeft = 0;
-        if (entity.getStartDate() != null) {
-            daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), entity.getStartDate()) + 1;
+        if (entity.getEndDate() != null) {
+            daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), entity.getEndDate()) + 1;
         }
 
         return ContestDTO.builder()

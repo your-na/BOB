@@ -162,8 +162,6 @@ public class UserController {
     public String conhistoryform() {return "contest_history";}
 
     //관리자 공모전 임의 주소
-    @GetMapping("/adcontest")
-    public String adcontestform() {return "ad_contest";}
 
     @GetMapping("/adnewcon")
     public String adnewform() {return "ad_newcontest";}
