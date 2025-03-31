@@ -2,11 +2,9 @@ package com.example.bob.Repository;
 
 import com.example.bob.Entity.ProjectEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.transaction.annotation.Transactional;
+import java.util.Optional;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
@@ -17,5 +15,9 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     // ✅ "완료" 상태가 아닌 프로젝트만 조회
     @Query("SELECT p FROM ProjectEntity p WHERE p.status <> '완료'")
     List<ProjectEntity> findAllActiveProjects();
+
+    Optional<ProjectEntity> findByTitle(String title);
+
+
 
 }

@@ -13,6 +13,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import java.util.List;
+
+
 
 
 // ✅ 아래 import 추가
@@ -37,15 +43,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> {})
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())  // CSRF 활성화 및 쿠키 저장
-                        .ignoringRequestMatchers("/login", "/signup", "/co_signup","/profile/update", "/logout", "/teamrequest", "/teamrequest/accept", "/teamrequest/reject", "/file/project/submit")  // CSRF 예외 처리
+                        .ignoringRequestMatchers("/login", "/signup", "/co_signup","/profile/update", "/logout", "/teamrequest", "/teamrequest/accept", "/teamrequest/reject", "/file/project/submit", "/api/todos/**")  // CSRF 예외 처리
                 )
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/","/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**", "/project", "/contest").permitAll()  // 모든 사용자 접근 허용
                         .requestMatchers("/login", "/sign").anonymous()  // 로그인 페이지는 익명 접근 허용
-                        .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject").authenticated()  // 인증된 사용자만 접근 가능
-                        .requestMatchers("/signup", "/co_signup", "/check-nickname", "/check-username").permitAll()  // 회원가입 페이지는 익명 접근 허용
+                        .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject", "/api/todos").authenticated()// 인증된 사용자만 접근 가능
+                        .requestMatchers("/signup", "/co_signup", "/check-nickname", "/check-username",  "/api/my-projects").permitAll()  // 회원가입 페이지는 익명 접근 허용
                         .requestMatchers("/admin/**", "/sidebar").hasAuthority("ADMIN")
                         .requestMatchers("/contest/create", "/contest/submit").hasAnyAuthority("ADMIN", "COMPANY")
                         .anyRequest().authenticated()  // 나머지 요청은 인증된 사용자만 접근 가능
@@ -107,4 +114,18 @@ public class SecurityConfig {
     public SpringSecurityDialect springSecurityDialect() {
         return new SpringSecurityDialect();
     }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:8888")); // 프론트 주소!
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true); // 세션 쿠키 허용 시 필요
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config); // 모든 요청에 적용
+        return source;
+    }
+
 }
