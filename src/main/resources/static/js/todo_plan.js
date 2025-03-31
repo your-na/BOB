@@ -212,7 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// ✅ 프로젝트 목록 불러오기
+// ✅ 프로젝트 목록 불러오기 (완료된 프로젝트 제외)
 function loadMyProjects() {
     const spaceSelect = document.querySelector(".space-select");
 
@@ -222,9 +222,12 @@ function loadMyProjects() {
     })
         .then((res) => res.json())
         .then((projects) => {
+            // "완료" 상태인 프로젝트를 제외
+            const filteredProjects = projects.filter(project => project.status !== "완료");
+
             spaceSelect.innerHTML = "";
 
-            projects.forEach((project) => {
+            filteredProjects.forEach((project) => {
                 const option = document.createElement("option");
                 option.value = project.title;
                 option.textContent = project.title;
@@ -239,10 +242,11 @@ function loadMyProjects() {
             spaceSelect.dispatchEvent(new Event("change"));
         })
         .catch((err) => {
-            console.error("프로젝트 목록 불러오기 실패:", err);
+            console.error("프로젝트를 불러오는 중 오류가 발생했습니다.", err);
             alert("프로젝트를 불러오는 중 오류가 발생했습니다.");
         });
 }
+
 
 // ✅ 담당자 목록 동적으로 변경
 document.addEventListener("DOMContentLoaded", () => {
