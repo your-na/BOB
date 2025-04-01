@@ -114,4 +114,10 @@ public class    TodoService {
             return "프로젝트"; // 기본값: 프로젝트
         }
     }
+
+    // 로그인한 유저의 닉네임이 포함된 할 일만 조회
+    public List<TodoEntity> findByDateAndUserNick(String date, String userNick) {
+        return todoRepository.findByStartDateAndAssigneeContaining(date, userNick);
+    }
+
 }

@@ -365,9 +365,17 @@ public class ProjectService {
         project.updateStatus();
         projectRepository.save(project);
 
+        // ✅ 알림 삭제 (receiver는 hostUser 자체로 넘겨야 함)
+        notificationRepository.deleteBySenderAndReceiverAndProjectTitle(
+                applicant.getUserNick(),   // sender 닉네임
+                hostUser,                  // receiver (UserEntity 타입)
+                project.getTitle()         // 프로젝트 제목
+        );
+
         // 주최자가 "완료" 상태로 변경 시, 팀원들도 완료로 업데이트해야 함 (다음 단계에서)
         // 완료 상태는 파일 제출 후에만 변경될 수 있도록 로직 분리
     }
+
 
 
 
@@ -385,10 +393,19 @@ public class ProjectService {
         UserProjectEntity userProject = userProjectRepository.findByUserAndProject(applicant, project)
                 .orElseThrow(() -> new IllegalArgumentException("❌ 신청 내역이 없습니다."));
 
-        // 상태를 "거절됨"으로 변경 (혹은 삭제)
+        // 상태를 "거절됨"으로 변경
         userProject.setStatus("거절됨");
         userProjectRepository.save(userProject);
+
+        // ✅ 알림 삭제 (receiver는 hostUser 자체로 넘겨야 함)
+        notificationRepository.deleteBySenderAndReceiverAndProjectTitle(
+                applicant.getUserNick(),   // sender 닉네임
+                hostUser,                  // receiver (UserEntity)
+                project.getTitle()         // 프로젝트 제목
+        );
     }
+
+
 
     @Transactional
     public void completeProjectInService(Long projectId) {

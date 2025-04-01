@@ -9,7 +9,7 @@
 <body>
 
 <div class="popup-container">
-    <form>
+    <form style="display: flex; flex-direction: column; height: 100%;">
         <div class="popup-header">
             <h2>내 할 일</h2>
             <select id="task-filter">
@@ -20,8 +20,8 @@
             <button class="close-btn" onclick="window.close()">✖</button>
         </div>
 
-        <!-- ✅ 실제 할 일이 동적으로 채워질 곳 -->
-        <ul id="task-list" class="popup-todo-list">
+        <!-- ✅ 여기에 스크롤 생기게 함 -->
+        <ul id="task-list" class="popup-todo-list" style="flex-grow: 1; overflow-y: auto; max-height: 100%; margin-top: 20px;">
             <!-- JS로 <li class="task-item">들이 들어옴 -->
         </ul>
     </form>

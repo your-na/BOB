@@ -5,16 +5,22 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-
 import java.util.List;
 
 public interface TodoRepository extends JpaRepository<TodoEntity, Long> {
-    List<TodoEntity> findByStartDate(String startDate); // ✅ 이것만 있으면 됨!
 
-    // ✅ 팝업에 띄울 할 일 (주최자만 공동 할 일 보이게)
-    @Query("SELECT t FROM TodoEntity t WHERE " +
-            "t.assignee = :userNick OR " +
-            "(t.workspace = '개인' AND t.assignee = :userNick) OR " +
-            "(t.assignee = '공동' AND :userNick = (SELECT p.createdBy FROM ProjectEntity p WHERE p.title = t.workspace))")
+    // ✅ 특정 날짜의 모든 할 일 조회 (todo_plan 용)
+    List<TodoEntity> findByStartDate(String startDate);
+
+    // ✅ popup 페이지에 띄울 할 일
+    // 내 닉네임이 assignee에 포함된 모든 할 일을 가져옴 (공동 포함)
+    @Query(value = "SELECT * FROM todo_entity WHERE FIND_IN_SET(:userNick, assignee)", nativeQuery = true)
     List<TodoEntity> findTodosForPopup(@Param("userNick") String userNick);
+
+    // ✅ 날짜 + 로그인 유저 닉네임 기반 필터링 (todo_plan 용)
+    @Query(value = "SELECT * FROM todo_entity " +
+            "WHERE start_date = :startDate AND FIND_IN_SET(:userNick, assignee)", nativeQuery = true)
+    List<TodoEntity> findByStartDateAndAssigneeContaining(
+            @Param("startDate") String startDate,
+            @Param("userNick") String userNick);
 }

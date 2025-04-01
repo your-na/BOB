@@ -52,9 +52,12 @@ public class TodoController {
 
 
     @GetMapping
-    public List<TodoEntity> getTodos(@RequestParam String date) {
-        return todoService.findByDate(date); // startDate 기준으로 조회
+    public List<TodoEntity> getTodos(@RequestParam String date,
+                                     @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        String userNick = userDetails.getUserEntity().getUserNick(); // 로그인한 유저의 닉네임
+        return todoService.findByDateAndUserNick(date, userNick);   // 닉네임 기반으로 필터링
     }
+
 
     @PatchMapping("/{id}/complete")
     public ResponseEntity<Void> updateTodoCompletion(
