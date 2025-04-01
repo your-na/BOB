@@ -44,14 +44,20 @@ public class ProjectController {
     private final ProjectRepository projectRepository;
     private final UserProjectRepository userProjectRepository;
 
-    // 프로젝트 목록 페이지로 이동
+    // 프로젝트 목록 페이지에서 HTML을 반환하는 엔드포인트
     @GetMapping("/project")
     public String projectList(Model model) {
-        List<ProjectDTO> activeProjects = projectService.getAllProjectsDTO();  // ✅ 완료 제외된 프로젝트만 가져옴
-        model.addAttribute("projects", activeProjects);
-        return "project"; // ✅ 프로젝트 목록 페이지 반환
+        List<ProjectDTO> activeProjects = projectService.getAllProjectsDTO();  // 완료된 프로젝트 제외
+        model.addAttribute("projects", activeProjects);  // Thymeleaf 템플릿으로 데이터 전달
+        return "project";  // "project.html" 템플릿 반환
     }
 
+    // 메인 페이지에서 JSON 응답을 받는 엔드포인트
+    @GetMapping("/project/api")
+    public ResponseEntity<List<ProjectDTO>> getProjects() {
+        List<ProjectDTO> activeProjects = projectService.getAllProjectsDTO();  // 완료된 프로젝트 제외
+        return ResponseEntity.ok(activeProjects);  // JSON 형식으로 반환
+    }
 
     // 내가 만든 프로젝트와 내가 참가한 프로젝트 페이지
     @GetMapping("/myproject")
