@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>이력서 상세보기</title>
+  <link rel="stylesheet" href="/css/resume_detail.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<div class="resume-detail-container">
+
+  <!-- 수정/삭제 버튼 -->
+  <div class="resume-buttons">
+    <button class="edit-btn">수정하기</button>
+    <button class="delete-btn">삭제하기</button>
+  </div>
+
+  <!-- 프로필 정보 -->
+  <div class="profile-row">
+    <div class="photo-wrapper">
+      <img src="/images/haerin.jpg" alt="프로필 사진">
+    </div>
+    <div class="profile-info">
+      <div class="name-skill">
+        <strong>진유서</strong> <span class="skill">HTML/CSS</span>
+      </div>
+      <div class="info-table">
+        <div><strong>성별</strong> 여</div>
+        <div><strong>생년월일</strong> 2004-10-20 (만 20세)</div>
+        <div><strong>전화번호</strong> 010-1020-1020</div>
+        <div><strong>이메일</strong> jeanzforfree@gmail.com</div>
+        <div><strong>주소</strong> 경기도 고양시</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 본문 영역 -->
+  <div class="info-section"><strong>학력사항</strong>
+    <span>2004 03 ~ 2008 02 00대학교 00과 졸업<br>2008 03 ~ 2010 02 00대학교 00과 졸업</span>
+  </div>
+
+  <div class="info-section"><strong>경력사항</strong>
+    <span>수상<br>2024.10.20 <strong>ANUY</strong> 공모전 수상</span>
+  </div>
+
+  <div class="info-section"><strong>포트폴리오</strong>
+    <span>(포트폴리오)</span>
+  </div>
+
+  <div class="info-section"><strong>구직</strong>
+    <span>2001 08 ~ 현재 (주)000테크 부장<br>1년 2개월 편의점 알바</span>
+  </div>
+
+  <div class="info-section"><strong>자격증</strong>
+    <span>컴활 1급<br>엑셀</span>
+  </div>
+
+  <div class="info-section"><strong>자기소개</strong>
+    <textarea readonly>준비된 인재 진유서</textarea>
+  </div>
+
+</div>
+</body>
+</html>

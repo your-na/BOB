@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>이력서 목록</title>
+    <link rel="stylesheet" href="/css/resume_list.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<div class="resume-list-container">
+    <div class="resume-list-header">
+        <h2>내 이력서 목록</h2>
+        <div class="resume-list-controls">
+            <!-- 검색창 + 아이콘 -->
+            <div class="search-wrapper">
+                <input type="text" placeholder="검색어를 입력해주세요">
+                <span class="search-icon">🔍</span>
+            </div>
+            <!-- 이력서 작성 버튼 -->
+            <button class="write-btn">이력서 작성</button>
+        </div>
+    </div>
+
+    <!-- 이력서 카드 리스트 -->
+    <div class="resume-card-list">
+        <div class="resume-card">
+            <span class="title">이력서 제목</span>
+            <div class="right-info">
+                <span class="date">2025년 03월 31일</span>
+                <button class="detail-btn">상세보기</button>
+            </div>
+        </div>
+
+        <!-- 카드 반복 -->
+        <div class="resume-card">
+            <span class="title">이력서 제목</span>
+            <div class="right-info">
+                <span class="date">2025년 03월 31일</span>
+                <button class="detail-btn">상세보기</button>
+            </div>
+        </div>
+
+        <div class="resume-card">
+            <span class="title">이력서 제목</span>
+            <div class="right-info">
+                <span class="date">2025년 03월 31일</span>
+                <button class="detail-btn">상세보기</button>
+            </div>
+        </div>
+
+        <div class="resume-card">
+            <span class="title">이력서 제목</span>
+            <div class="right-info">
+                <span class="date">2025년 03월 31일</span>
+                <button class="detail-btn">상세보기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

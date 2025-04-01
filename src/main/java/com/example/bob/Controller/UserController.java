@@ -196,4 +196,13 @@ public class UserController {
 
     @GetMapping("/user_resume")
     public String user_resumeform() {return "user_resume";}
+
+    @GetMapping("/user_resume2")
+    public String user_resume2form() {return "user_resume2";}
+
+    @GetMapping("/resume_list")
+    public String resume_listform() {return "resume_list";}
+
+    @GetMapping("/resume_detail")
+    public String resume_detailform() {return "resume_detail";}
 }

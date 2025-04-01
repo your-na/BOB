@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>이력서 작성</title>
-  <link rel="stylesheet" href="/css/user_resume.css">
+  <link rel="stylesheet" href="/css/user_resume2.css">
   <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 <body>
@@ -116,6 +116,7 @@
     </section>
   </div>
 
+  <!-- 오른쪽: 경력 없음일 때 전용 -->
   <div class="right-content">
     <div class="tab-header">
       <h3>나의 경력 및 포트폴리오</h3>
@@ -128,16 +129,24 @@
         <li>자격증</li>
       </ul>
     </div>
-    <div class="award-list">
-      <div class="award-item">ANUY 공모전 수상<br><small>2024.10.20</small></div>
-      <div class="award-item">ANUY 공모전 수상<br><small>2024.10.20</small></div>
-      <div class="award-item">ANUY 공모전 수상<br><small>2024.10.20</small></div>
-      <div class="award-item">ANUY 공모전 수상<br><small>2024.10.20</small></div>
-      <div class="award-item">ANUY 공모전 수상<br><small>2024.10.20</small></div>
+    <div class="empty-state">
+      <p>경력 및 포트폴리오가 없습니다.</p>
+      <button id="openModal">내 경력내역 보기 &gt;</button>
     </div>
   </div>
-</div>
 
-<script src="/js/user_resume.js"></script>
+  <!-- 모달 팝업 -->
+  <div class="modal-backdrop" id="modal">
+    <div class="modal-content">
+      <p>추가를 위해 페이지를 이동하시겠습니까?</p>
+      <p class="modal-sub">마이페이지 &gt; 경력내역으로 직접 이동 가능합니다.</p>
+      <div class="modal-buttons">
+        <button>네</button>
+        <button id="closeModal">아니오</button>
+      </div>
+    </div>
+  </div>
+
+<script src="/js/user_resume2.js"></script>
 </body>
 </html>

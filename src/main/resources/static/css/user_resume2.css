@@ -15,7 +15,7 @@
     flex: 3;
 }
 
-/* 전체 오른쪽 고정 영역 */
+/* 오른쪽 고정 영역 */
 .right-content {
     position: sticky;
     top: 100px;
@@ -28,7 +28,7 @@
     overflow: hidden;
 }
 
-/* 초록 헤더 */
+/* 헤더 */
 .tab-header {
     background-color: #A6F4A6;
     padding: 16px 20px 12px 20px;
@@ -38,11 +38,10 @@
 .tab-header h3 {
     margin: 0;
     font-size: 18px;
-    font-weight: 800; /* 더 두껍게! */
+    font-weight: 800;
     color: #1C4C1C;
 }
 
-/* 탭 영역 (배경 흰색) */
 .tab-menu {
     background-color: #fff;
     padding: 10px 20px 0 20px;
@@ -187,7 +186,6 @@ textarea {
     color: #333;
     padding-bottom: 4px;
     border-bottom: 2px solid transparent;
-    transition: all 0.2s;
 }
 
 .tab-menu li.active {
@@ -196,10 +194,23 @@ textarea {
     border-bottom: 2px solid #0ED700;
 }
 
-.tab-menu li.active {
+/* 비어있을 때 안내 */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.empty-state p {
+    margin-bottom: 10px;
+    color: #444;
+}
+
+.empty-state button {
+    background: none;
+    border: none;
+    color: #333;
     font-weight: bold;
-    color: #0ED700;
-    border-bottom: 2px solid #0ED700;
+    cursor: pointer;
 }
 
 /* 수상 리스트 */
@@ -265,3 +276,52 @@ textarea {
     margin: 2px 0 10px 0;
 }
 
+/* 모달 */
+.modal-backdrop {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.3);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.modal-backdrop.active {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border: 1px solid #000;
+    border-radius: 8px;
+    text-align: center;
+    width: 300px;
+}
+
+.modal-content p {
+    margin-bottom: 10px;
+}
+
+.modal-sub {
+    color: red;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-around;
+}
+
+.modal-buttons button {
+    border: 1px solid #000;
+    padding: 6px 14px;
+    background: white;
+    cursor: pointer;
+    border-radius: 6px;
+    min-width: 80px;    /* ✅ 최소 너비 고정 */
+    text-align: center;
+}
