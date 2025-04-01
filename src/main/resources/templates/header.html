@@ -125,15 +125,15 @@
             const notificationBadge = document.getElementById("notification-badge");
             const clearAllButton = document.getElementById("clear-all");
 
-            // ✅ 알림 목록 불러오기
+            // 알림 목록 불러오기
             fetchNotifications();
 
-            // 🔔 알림 목록 렌더링
+            // 알림 목록 렌더링
             function renderNotifications(notifications) {
                 notificationList.innerHTML = ""; // 기존 목록 초기화
 
                 if (!Array.isArray(notifications)) {
-                    console.error("❌ 알림 목록 데이터가 배열이 아닙니다:", notifications);
+                    console.error("알림 목록 데이터가 배열이 아닙니다:", notifications);
                     notificationList.innerHTML = "<li class='notification-item'>알림 목록을 불러올 수 없습니다.</li>";
                     return;
                 }
@@ -145,52 +145,37 @@
                 }
 
                 notifications.forEach(notification => {
-                    console.log("📌 알림 데이터:", notification); // ✅ 알림 데이터 확인
-
-                    if (!notification.id) {
-                        console.error("❌ 알림 ID가 없습니다!", notification);
-                        return;
-                    }
-
                     let item = document.createElement("li");
                     item.classList.add("notification-item");
                     item.textContent = notification.message;
 
-                    // ✅ 알림 ID 및 프로젝트 ID를 data 속성에 저장
+                    // 알림 ID 및 프로젝트 ID를 data 속성에 저장
                     item.setAttribute("data-id", notification.id);
                     item.setAttribute("data-project-id", notification.projectId || "");
                     item.setAttribute("data-user-id", notification.userId || "");
 
-                    // ✅ 알림 클릭 시 읽음 상태로 업데이트하고 페이지 이동
+                    // 알림 클릭 시 읽음 상태로 업데이트하고 페이지 이동
                     item.onclick = function () {
                         const notificationId = this.getAttribute("data-id");
                         const projectId = this.getAttribute("data-project-id");
                         const userId = this.getAttribute("data-user-id");
 
-                        console.log("🔍 클릭한 알림 ID:", notificationId);
-                        console.log("🔍 클릭한 프로젝트 ID:", projectId);
-                        console.log("🔍 클릭한 사용자 ID:", userId);
-
                         if (!notificationId || notificationId === "undefined") {
-                            console.error("❌ 알림 ID가 유효하지 않습니다!");
+                            console.error("알림 ID가 유효하지 않습니다!");
                             return;
                         }
 
                         markAsRead(notificationId); // 알림 읽음 처리
 
-                        // ✅ 프로젝트 ID가 있으면 팀 신청 수락/거절 페이지로 이동
+                        // 프로젝트 ID가 있으면 팀 신청 수락/거절 페이지로 이동
                         if (projectId && projectId !== "undefined") {
-                            console.log("✅ 이동할 프로젝트 ID:", projectId);
-                            window.location.href = `/teamrequest?projectId=${projectId}&userId=${userId}`;  // /teamrequest로 수정
+                            window.location.href = `/teamrequest?projectId=${projectId}&userId=${userId}`;
                         } else if (notification.link && notification.link !== "undefined") {
-                            console.log("✅ 이동할 링크:", notification.link);
                             window.location.href = notification.link;
                         } else {
-                            console.error("🚨 알림 링크가 설정되지 않았습니다.");
+                            console.error("알림 링크가 설정되지 않았습니다.");
                         }
-
                     };
-
 
                     notificationList.appendChild(item);
                 });
@@ -199,13 +184,12 @@
                 notificationBadge.textContent = notifications.length; // 알림 개수 표시
             }
 
-            // ✅ 알림 수 및 목록을 가져오는 함수
+            // 알림 수 및 목록을 가져오는 함수
             function fetchNotifications() {
-                // 📌 알림 수 가져오기
+                // 알림 수 가져오기
                 fetch("/api/notifications/count")
                     .then(response => response.json())
                     .then(data => {
-                        console.log("📢 알림 수:", data); // ✅ 알림 수 확인
                         const notificationCount = data.notificationCount;
 
                         if (notificationCount > 0) {
@@ -216,73 +200,86 @@
                         }
                     })
                     .catch(error => {
-                        console.error("❌ 알림 수 가져오기 실패", error);
+                        console.error("알림 수 가져오기 실패", error);
                     });
 
-                // 📌 알림 목록 가져오기
+                // 알림 목록 가져오기
                 fetch("/api/notifications/list?page=0&size=10") // 페이지네이션을 위한 쿼리 파라미터 추가
                     .then(response => response.json())
                     .then(notifications => {
-                        console.log("📢 알림 목록:", notifications); // ✅ 알림 목록 확인
                         renderNotifications(notifications); // 알림 목록 렌더링
                     })
                     .catch(error => {
-                        console.error("❌ 알림 목록 가져오기 실패", error);
+                        console.error("알림 목록 가져오기 실패", error);
                     });
             }
 
-            // ✅ 알림을 읽음 상태로 처리하는 함수
+            // 알림을 읽음 상태로 처리하는 함수
             function markAsRead(notificationId) {
-                console.log("📢 읽음 처리 요청: ID =", notificationId);
-
                 fetch(`/api/notifications/mark-as-read/${notificationId}`, {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": getCsrfToken() // ✅ CSRF 토큰 추가
+                        "X-CSRF-TOKEN": getCsrfToken() // CSRF 토큰 추가
                     }
                 })
                     .then(response => {
                         if (!response.ok) {
                             throw new Error(`서버 오류: ${response.status}`);
                         }
-                        return response.json(); // ✅ JSON 응답을 반환하도록 변경
+                        return response.json();
                     })
                     .then(data => {
-                        console.log("✅ 알림 상태 업데이트 성공:", data);
                         fetchNotifications(); // 알림 리스트 다시 렌더링
                     })
-                    .catch(error => console.error("❌ 알림 상태 업데이트 실패", error));
+                    .catch(error => console.error("알림 상태 업데이트 실패", error));
             }
 
-            // ✅ CSRF 토큰을 가져오는 함수
+            // CSRF 토큰을 가져오는 함수
             function getCsrfToken() {
                 const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute("content");
-                if (!csrfToken) {
-                    console.error("❌ CSRF 토큰을 찾을 수 없습니다!");
-                    return ""; // CSRF 토큰이 없을 경우 빈 문자열 반환
-                }
-                return csrfToken;
+                return csrfToken ? csrfToken : ''; // CSRF 토큰이 없을 경우 빈 문자열 반환
             }
 
-            // 🔥 알림 아이콘 클릭 시 알림창 표시/숨김
+            // 알림 아이콘 클릭 시 알림창 표시/숨김
             notificationIcon.addEventListener("click", function () {
                 notificationBox.style.display = (notificationBox.style.display === "none" || notificationBox.style.display === "") ? "flex" : "none";
             });
 
-            // ❌ 알림창 닫기 버튼
+            // 알림창 닫기 버튼
             closeNotification.addEventListener("click", function () {
                 notificationBox.style.display = "none";
             });
 
-            // 🗑 "모두 삭제" 버튼
+            // "모두 삭제" 버튼
             clearAllButton.addEventListener("click", function () {
-                notificationList.innerHTML = "<li class='notification-item'>알림이 없습니다.</li>"; // ✅ UI 업데이트
-                notificationBadge.style.display = "none"; // ✅ 배지 숨기기
+                fetch("/api/notifications/delete-all", {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": getCsrfToken() // CSRF 토큰 추가
+                    },
+                    credentials: "include"  // 쿠키와 세션을 포함하여 요청
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            // 응답이 성공적이지 않으면 오류 메시지를 처리
+                            return response.text().then(errorMessage => {
+                                throw new Error(`알림 삭제 실패: ${errorMessage}`);
+                            });
+                        }
+                        return response.text(); // 성공적으로 삭제되면 서버 응답을 반환
+                    })
+                    .then(data => {
+                        alert("모든 알림이 삭제되었습니다.");
+                        notificationList.innerHTML = "<li class='notification-item'>알림이 없습니다.</li>"; // UI 업데이트
+                        notificationBadge.style.display = "none"; // 배지 숨기기
+                    })
+                
             });
+
         });
     </script>
-
 </header>
 </div>
 x

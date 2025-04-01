@@ -74,20 +74,16 @@
         <!-- 필터 버튼 -->
         <div class="filter-container">
             <button class="filter-btn active">공모전</button>
-            <button class="filter-btn">프로젝트</button>
+            <button class="filter-btn" id="project-btn">프로젝트</button>
             <button class="filter-btn">자유</button>
         </div>
-        <ul>
-            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
-            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
-            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
-            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
-            <li><a href="#">그 외엔 가장 최근 게시물이 맨 위로 오게...</a></li>
-        </ul>
+
+        <!-- 프로젝트 목록 -->
+        <div id="project-list" class="project-list">
+            <!-- 프로젝트 목록이 이곳에 표시됩니다. -->
+        </div>
     </div>
 </section>
-
-
 
 <!-- 플로팅 캘린더 버튼 -->
 <button class="floating-calendar" onclick="toggleTaskPlanButtons()"><img src="/images/schedule.png" alt=""></button>
@@ -126,8 +122,7 @@
         window.open('/plan', 'planPopup', 'width=400,height=500,resizable=no,scrollbars=no');
     }
 
-
-    //배너 수정할거양 흥.
+    // 배너 수정할거양 흥.
     document.addEventListener('DOMContentLoaded', () => {
         const prevBtn = document.querySelector('.prev-btn');
         const nextBtn = document.querySelector('.next-btn');
@@ -170,7 +165,7 @@
         setInterval(nextSlide, 3000); // Change slide every 3 seconds
     });
 
-    //active 버튼 스크립트~
+    // active 버튼 스크립트~
     const buttons = document.querySelectorAll('.filter-btn');
 
     buttons.forEach(button => {
@@ -179,8 +174,37 @@
             buttons.forEach(btn => btn.classList.remove('active'));
             // 클릭한 버튼에 active 클래스 추가
             button.classList.add('active');
+
+            // 필터된 버튼에 맞게 프로젝트 목록을 표시하는 로직 추가
+            if (button.textContent === '프로젝트') {
+                loadProjects(); // 프로젝트 목록을 동적으로 로드
+            }
         });
     });
+
+    // 프로젝트 목록을 동적으로 로드하는 함수
+    // 프로젝트 목록을 동적으로 로드하는 함수
+    function loadProjects() {
+        fetch('/project/api')  // 백엔드에서 JSON 형식의 프로젝트 목록을 가져오는 API
+            .then(response => response.json())
+            .then(projects => {
+                console.log(projects);  // 받아온 데이터 확인
+                const projectListDiv = document.getElementById('project-list');
+                projectListDiv.innerHTML = '';  // 기존 목록 초기화
+
+                projects.forEach(project => {
+                    const projectElement = document.createElement('div');
+                    projectElement.classList.add('project-item');
+                    projectElement.innerHTML = `
+                    <a href="/postproject/${project.id}" class="project-title">${project.title}</a>
+                `;
+                    projectListDiv.appendChild(projectElement);
+                });
+            })
+            .catch(error => console.log('Error loading projects:', error)); // 오류 시 로그
+    }
+
+
 </script>
 </body>
 </html>

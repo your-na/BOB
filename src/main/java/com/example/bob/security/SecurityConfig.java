@@ -44,14 +44,14 @@ public class SecurityConfig {
                         .ignoringRequestMatchers(
                                 "/login", "/signup", "/co_signup", "/profile/update", "/logout",
                                 "/teamrequest", "/teamrequest/accept", "/teamrequest/reject",
-                                "/file/project/submit", "/api/todos/**"
+                                "/file/project/submit", "/api/todos/**", "/api/notifications/delete-all"
                         )
                 )
                 .headers(headers -> headers
                         .frameOptions(frameOptions -> frameOptions.sameOrigin()) // ✅ iframe 허용 설정
                 )
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/", "/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**", "/project", "/contest").permitAll()
+                        .requestMatchers("/", "/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**", "/project", "/project/api","/contest").permitAll()
                         .requestMatchers("/login", "/sign").anonymous()
                         .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject", "/api/todos").authenticated()
                         .requestMatchers("/signup", "/co_signup", "/check-nickname", "/check-username", "/api/my-projects").permitAll()
