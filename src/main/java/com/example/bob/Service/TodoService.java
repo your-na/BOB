@@ -50,7 +50,7 @@ public class    TodoService {
                 .title(dto.getTitle())
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
-                .assignee(user.getUserNick())   
+                .assignee(user.getUserNick())
                 .workspace("개인")  // workspace는 "개인"
                 .completed(false)
                 .type("개인")  // type도 "개인"으로 설정
@@ -114,4 +114,10 @@ public class    TodoService {
             return "프로젝트"; // 기본값: 프로젝트
         }
     }
+
+    // 로그인한 유저의 닉네임이 포함된 할 일만 조회
+    public List<TodoEntity> findByDateAndUserNick(String date, String userNick) {
+        return todoRepository.findByStartDateAndAssigneeContaining(date, userNick);
+    }
+
 }
