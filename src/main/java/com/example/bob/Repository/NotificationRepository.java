@@ -16,19 +16,34 @@ import java.util.List;
 public interface NotificationRepository extends JpaRepository<NotificationEntity, Long> {
 
     // 일반 사용자
-    int countByUserAndIsRead(UserEntity userEntity, boolean isRead); // 읽지 않은 알림의 개수를 카운트
-    List<NotificationEntity> findByUser(UserEntity userEntity); // 사용자에 해당하는 모든 알림을 찾기
-    List<NotificationEntity> findByUserAndIsRead(UserEntity userEntity, boolean isRead); // 사용자가 읽지 않은 알림 목록을 가져오기
-    Page<NotificationEntity> findByUser(UserEntity userEntity, Pageable pageable); // 사용자가 받는 알림을 Pageable로 가져오기
+    int countByUserAndIsRead(UserEntity userEntity, boolean isRead);
+
+    List<NotificationEntity> findByUser(UserEntity userEntity);
+
+    List<NotificationEntity> findByUserAndIsRead(UserEntity userEntity, boolean isRead);
+
+    Page<NotificationEntity> findByUser(UserEntity userEntity, Pageable pageable);
 
     // 기업 사용자
-    int countByCompanyAndIsRead(CompanyEntity companyEntity, boolean isRead); // 기업이 읽지 않은 알림 개수 카운트
-    List<NotificationEntity> findByCompany(CompanyEntity companyEntity); // 모든 알림 찾기
-    List<NotificationEntity> findByCompanyAndIsRead(CompanyEntity companyEntity, boolean isRead); // 기업 사용자가 읽지 않은 알림 목록을 가져오기
-    Page<NotificationEntity> findByCompany(CompanyEntity companyEntity, Pageable pageable); // 기업 사용자가 받는 알림을 가져오기
+    int countByCompanyAndIsRead(CompanyEntity companyEntity, boolean isRead);
+
+    List<NotificationEntity> findByCompany(CompanyEntity companyEntity);
+
+    List<NotificationEntity> findByCompanyAndIsRead(CompanyEntity companyEntity, boolean isRead);
+
+    Page<NotificationEntity> findByCompany(CompanyEntity companyEntity, Pageable pageable);
 
     // 프로젝트 관련된 알림 삭제
     @Modifying
     @Query("DELETE FROM NotificationEntity n WHERE n.project = :project")
     void deleteByProject(@Param("project") ProjectEntity project);
+
+    // ✅ 수락/거절 시 알림 1건 삭제
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM NotificationEntity n WHERE n.sender.userNick = :sender " +
+            "AND n.user = :receiver " +
+            "AND n.project.title = :projectTitle")
+    void deleteBySenderAndReceiverAndProjectTitle(@Param("sender") String sender,
+                                                  @Param("receiver") UserEntity receiver,
+                                                  @Param("projectTitle") String projectTitle);
 }
