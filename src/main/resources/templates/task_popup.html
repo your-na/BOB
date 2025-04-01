@@ -9,41 +9,26 @@
 <body>
 
 <div class="popup-container">
-    <form>
-    <div class="popup-header">
-        <h2>내 할 일</h2>
-        <select id="task-filter">
-            <option value="전체">전체</option>
-            <option value="개인">개인</option>
-            <option value="프로젝트">프로젝트</option>
-        </select>
-        <button class="close-btn" onclick="window.close()">✖</button>
-    </div>
+    <form style="display: flex; flex-direction: column; height: 100%;">
+        <div class="popup-header">
+            <h2>내 할 일</h2>
+            <select id="task-filter">
+                <option value="전체">전체</option>
+                <option value="개인">개인</option>
+                <option value="프로젝트">프로젝트</option>
+            </select>
+            <button class="close-btn" onclick="window.close()">✖</button>
+        </div>
 
-    <ul id="task-list">
-        <li class="task-item" data-category="개인">
-            <input type="checkbox">
-            <span class="tag personal">개인</span>
-            <span class="task-text">[프론트] 회원가입 HTML 제작</span>
-            <span class="due-date">D-10</span>
-        </li>
-        <li class="task-item" data-category="프로젝트">
-            <input type="checkbox">
-            <span class="tag project">프로젝트</span>
-            <span class="task-text">[프론트] 로그인 HTML 제작</span>
-            <span class="due-date">D-15</span>
-        </li>
-        <li class="task-item" data-category="개인">
-            <input type="checkbox">
-            <span class="tag personal">개인</span>
-            <span class="task-text">메인페이지 구현하기 위해 JS 공부하기</span>
-            <span class="due-date">D-18</span>
-        </li>
-    </ul>
+        <!-- ✅ 여기에 스크롤 생기게 함 -->
+        <ul id="task-list" class="popup-todo-list" style="flex-grow: 1; overflow-y: auto; max-height: 100%; margin-top: 20px;">
+            <!-- JS로 <li class="task-item">들이 들어옴 -->
+        </ul>
     </form>
 </div>
 
-<script src="task_popup.js"></script>
+<!-- ✅ JS는 백엔드 연동 포함한 전체 JS 코드 불러와야 함 -->
+<script src="/js/task_popup.js"></script>
 
 </body>
 </html>

@@ -18,6 +18,11 @@ import com.example.bob.Entity.NotificationEntity;
 import com.example.bob.Repository.NotificationRepository;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 
 import java.time.LocalDate;
@@ -360,9 +365,17 @@ public class ProjectService {
         project.updateStatus();
         projectRepository.save(project);
 
+        // ✅ 알림 삭제 (receiver는 hostUser 자체로 넘겨야 함)
+        notificationRepository.deleteBySenderAndReceiverAndProjectTitle(
+                applicant.getUserNick(),   // sender 닉네임
+                hostUser,                  // receiver (UserEntity 타입)
+                project.getTitle()         // 프로젝트 제목
+        );
+
         // 주최자가 "완료" 상태로 변경 시, 팀원들도 완료로 업데이트해야 함 (다음 단계에서)
         // 완료 상태는 파일 제출 후에만 변경될 수 있도록 로직 분리
     }
+
 
 
 
@@ -380,10 +393,19 @@ public class ProjectService {
         UserProjectEntity userProject = userProjectRepository.findByUserAndProject(applicant, project)
                 .orElseThrow(() -> new IllegalArgumentException("❌ 신청 내역이 없습니다."));
 
-        // 상태를 "거절됨"으로 변경 (혹은 삭제)
+        // 상태를 "거절됨"으로 변경
         userProject.setStatus("거절됨");
         userProjectRepository.save(userProject);
+
+        // ✅ 알림 삭제 (receiver는 hostUser 자체로 넘겨야 함)
+        notificationRepository.deleteBySenderAndReceiverAndProjectTitle(
+                applicant.getUserNick(),   // sender 닉네임
+                hostUser,                  // receiver (UserEntity)
+                project.getTitle()         // 프로젝트 제목
+        );
     }
+
+
 
     @Transactional
     public void completeProjectInService(Long projectId) {
@@ -567,6 +589,56 @@ public class ProjectService {
         // DB에 저장
         projectRepository.save(project);
     }
+
+    public Map<String, Object> getProjectMembersInfo(String title, UserEntity currentUser) {
+        Map<String, Object> response = new HashMap<>();
+
+        // 프로젝트 가져오기
+        ProjectEntity project = projectRepository.findByTitle(title)
+                .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트가 없습니다: " + title));
+
+        // 주최자
+        String creator = project.getCreatedBy();
+        response.put("creator", creator);
+
+        // 현재 로그인한 사용자 닉네임
+        response.put("currentUser", currentUser.getUserNick());
+
+        // 팀원 닉네임 리스트 가져오기
+        List<String> members = userProjectRepository.findByProject(project).stream()
+                .map(up -> up.getUser().getUserNick())
+                .collect(Collectors.toList());
+        response.put("members", members);
+
+        return response;
+    }
+    // 🔹 ProjectService.java 가장 아래에 추가하면 돼!
+    public List<String> getProjectMemberNicknames(String projectTitle) {
+        ProjectEntity project = projectRepository.findByTitle(projectTitle)
+                .orElseThrow(() -> new IllegalArgumentException("❌ 프로젝트를 찾을 수 없습니다: " + projectTitle));
+
+        List<String> memberNicks = userProjectRepository.findByProject(project).stream()
+                .map(up -> up.getUser().getUserNick())
+                .collect(Collectors.toList());
+
+        // 주최자가 목록에 없으면 추가
+        if (!memberNicks.contains(project.getCreatedBy())) {
+            memberNicks.add(project.getCreatedBy());
+        }
+
+        return memberNicks;
+    }
+
+    // 🔹 이것도 ProjectService.java에 추가
+    public boolean isUserHost(String projectTitle, String userNick) {
+        ProjectEntity project = projectRepository.findByTitle(projectTitle)
+                .orElseThrow(() -> new IllegalArgumentException("❌ 프로젝트를 찾을 수 없습니다: " + projectTitle));
+        return project.getCreatedBy().equals(userNick);
+    }
+
+
+
+
 
 }
 

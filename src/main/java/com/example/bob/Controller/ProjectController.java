@@ -17,7 +17,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import com.example.bob.Repository.UserRepository;
 import com.example.bob.Repository.ProjectRepository;
-import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.LinkedHashSet;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.stream.Collectors;
+
+
+
 
 
 import java.time.LocalDate;
@@ -59,6 +68,36 @@ public class ProjectController {
 
         return "myproject";  // "myproject.html"로 리턴
     }
+
+    // ✅ ProjectController.java 안에 추가해줘!
+    @GetMapping("/api/my-projects")
+    @ResponseBody
+    public List<ProjectDTO> getMyProjects(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        UserEntity user = userDetails.getUserEntity();
+
+        // 내가 만든 프로젝트 목록
+        List<ProjectDTO> createdProjects = projectService.getCreatedProjects(user);
+
+        // 내가 참가한 프로젝트 목록 (단, 내가 만든 건 제외됨)
+        List<ProjectDTO> joinedProjects = projectService.getJoinedProjects(user);
+
+            // ✅ 중복 제거 + 순서 유지
+            Set<ProjectDTO> allProjects = new LinkedHashSet<>();
+            allProjects.addAll(createdProjects);
+            allProjects.addAll(joinedProjects);
+
+            return new ArrayList<>(allProjects);
+    }
+
+    @GetMapping("/api/project-members")
+    @ResponseBody
+    public Map<String, Object> getProjectMembers(
+            @RequestParam String title,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return projectService.getProjectMembersInfo(title, userDetails.getUserEntity());
+    }
+
+
 
     // 프로젝트 상세 보기
     @GetMapping("/postproject/{id}")

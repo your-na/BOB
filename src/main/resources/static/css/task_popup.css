@@ -34,7 +34,12 @@ body {
 #task-list {
     list-style: none;
     padding: 0;
+
+    max-height: 480px;  /* ✅ 내용이 많아질 경우를 대비한 최대 높이 */
+    overflow-y: auto;   /* ✅ 세로 스크롤 생김 */
+    margin-top: 20px;
 }
+
 
 .task-item {
     display: flex;

@@ -151,12 +151,15 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <td>길어라면 프로젝트 알아서 배우자지</td>
-                <td>한국IT산업협회</td>
-                <td>D-5456</td>
-                <td>2024.01.01 ~ 2024.06.30</td>
-                <td>진행 중</td>
+            <!-- Thymeleaf 반복문으로 프로젝트 데이터 출력 -->
+            <tr th:each="contest : ${contests}">
+                <td>
+                    <a th:href="@{'/contest/' + ${contest.id}}" th:text="${contest.title}">공모전 제목</a>
+                </td>
+                <td th:text="${contest.organizer}">주최 기관</td>
+                <td th:text="'D-' + ${contest.remainingDays}">D-5456</td>
+                <td th:text="${contest.startDate} + ' ~ ' + ${contest.endDate}">2024.01.01 ~ 2024.06.30</td>
+                <td th:text="${contest.status}">진행 중</td>
             </tr>
             </tbody>
         </table>

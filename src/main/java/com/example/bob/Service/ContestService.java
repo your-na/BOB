@@ -56,16 +56,14 @@ public class ContestService {
 
     // 전체 공모전 리스트 (관리자)
     public List<ContestDTO> getAllContests() {
-        List<ContestEntity> list = contestRepository.findAll();
-        System.out.println("📌 전체 공모전 수: " + list.size());
-        return list.stream()
+        return contestRepository.findByIsDeletedFalse().stream()
                 .map(ContestDTO::fromEntity)
                 .collect(Collectors.toList());
     }
 
     // 사용자에게 보여줄 승인된 공모전 리스트
     public List<ContestDTO> getApprovedContests() {
-        return contestRepository.findByIsApprovedTrue().stream()
+        return contestRepository.findByIsApprovedTrueAndIsDeletedFalse().stream()
                 .map(ContestDTO::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -113,7 +111,13 @@ public class ContestService {
 
     // 공모전 삭제
     public void deleteById(Long id) {
-        contestRepository.deleteById(id);
+        ContestEntity contest = contestRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 공모전 없음"));
+        contest.setDeleted(true);
+        contestRepository.save(contest);
+
+        // 삭제도 이력에 남김
+        saveHistory(contest);
     }
 
     // 필터

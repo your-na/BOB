@@ -82,7 +82,7 @@ public class UserService implements UserDetailsService {
         if (userDTO.getAccountCreatedAt() == null) {
             userDTO.setAccountCreatedAt(LocalDateTime.now());
         }
-        userDTO.setRole("User");
+        userDTO.setRole("USER");
 
         UserEntity userEntity = UserEntity.toUserEntity(userDTO);
         userRepository.save(userEntity);

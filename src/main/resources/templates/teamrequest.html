@@ -44,13 +44,11 @@
 
 <script>
   function getCsrfToken() {
-    // ✅ 1. `meta` 태그에서 CSRF 토큰 가져오기 (Spring Security 기본 방식)
     let metaToken = document.querySelector("meta[name='_csrf']");
     if (metaToken) {
       return metaToken.getAttribute("content");
     }
 
-    // ✅ 2. 쿠키에서 `XSRF-TOKEN` 가져오기
     let csrfMatch = document.cookie.match(new RegExp('(^| )XSRF-TOKEN=([^;]+)'));
     return csrfMatch ? csrfMatch[2] : '';
   }
@@ -58,7 +56,6 @@
   window.addEventListener("load", function() {
     const requestContainer = document.querySelector(".request-container");
 
-    // ✅ 프로젝트 ID와 유저 ID 가져오기
     const projectId = requestContainer.getAttribute("data-project-id");
     let userId = requestContainer.getAttribute("data-user-id");
 
@@ -76,11 +73,9 @@
       return;
     }
 
-    // ✅ CSRF 토큰 가져오기
     const csrfToken = getCsrfToken();
     console.log("✅ [DEBUG] CSRF Token:", csrfToken);
 
-    // ✅ 수락 버튼 이벤트
     const acceptButton = document.querySelector(".accept-btn");
     if (acceptButton) {
       acceptButton.addEventListener("click", function() {
@@ -88,7 +83,7 @@
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-CSRF-TOKEN": csrfToken  // ✅ CSRF 토큰을 헤더에 추가
+            "X-CSRF-TOKEN": csrfToken
           },
           credentials: "include",
           body: JSON.stringify({
@@ -106,7 +101,7 @@
                 })
                 .then(data => {
                   alert("✅ 팀원 신청이 승인되었습니다!");
-                  location.reload();
+                  window.location.href = "/main"; // ✅ 메인페이지로 이동
                 })
                 .catch(error => {
                   alert("❌ 요청 실패: " + error.message);
@@ -114,7 +109,6 @@
       });
     }
 
-    // ✅ 거절 버튼 이벤트
     const rejectButton = document.querySelector(".reject-btn");
     if (rejectButton) {
       rejectButton.addEventListener("click", function() {
@@ -122,7 +116,7 @@
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-XSRF-TOKEN": getCsrfToken()  // ✅ CSRF 토큰 추가
+            "X-XSRF-TOKEN": getCsrfToken()
           },
           credentials: "include",
           body: JSON.stringify({
@@ -140,7 +134,7 @@
                 })
                 .then(data => {
                   alert("🚫 " + data);
-                  location.reload();
+                  window.location.href = "/main"; // ✅ 메인페이지로 이동
                 })
                 .catch(error => {
                   alert("❌ 요청 실패: " + error.message);

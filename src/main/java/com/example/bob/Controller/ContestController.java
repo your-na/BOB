@@ -32,6 +32,18 @@ public class ContestController {
 
     private final ContestService contestService;
 
+    // 로그인한 사용자에 따라 전체 공모전을 누를시 넘어가는 페이지가 다름
+    @GetMapping("/contest-redirect")
+    public String redirectByUserType(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails instanceof CompanyDetailsImpl) {
+            return "redirect:/comhome"; // 기업은 comhome으로
+        } else if (userDetails instanceof UserDetailsImpl) {
+            return "redirect:/contest"; // 일반 사용자는 contest로
+        } else {
+            return "redirect:/login"; // 비로그인 상태
+        }
+    }
+
     // 사용자 공모전 페이지
     @GetMapping("/contest")
     public String contestList(Model model) {
@@ -129,8 +141,20 @@ public class ContestController {
 
     // 공모전 삭제 요청 처리
     @PostMapping("/admin/contest/delete")
-    public String deleteContest(@RequestParam List<Long> idsToDelete) {
-        idsToDelete.forEach(contestService::deleteById);
+    public String deleteContest(@RequestParam(name = "idsToDelete", required = false) List<Long> idsToDelete) {
+        if (idsToDelete != null) {
+            idsToDelete.forEach(contestService::deleteById);
+        }
         return "redirect:/ad_contest";
     }
+
+
+    @GetMapping("/contest/{id}")
+    public String showContestDetail(@PathVariable Long id, Model model) {
+        ContestEntity contest = contestService.getById(id);
+        model.addAttribute("contest", ContestDTO.fromEntity(contest));
+
+        return "postcontest";
+    }
+
 }

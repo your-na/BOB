@@ -18,7 +18,7 @@
     <section class="contest-list">
         <div class="ohoh">
             <h2>공모전</h2>
-            <button class="deletebtn" id="delete-selected">삭제</button>
+            <button class="deletebtn" id="delete-selected" type="submit" form="deleteForm">삭제</button>
         </div>
         <hr>
         <div class="filter-wrapper">
@@ -154,7 +154,9 @@
             <tbody id="contest-body">
             <!-- Thymeleaf 반복문으로 프로젝트 데이터 출력 -->
             <tr th:each="contest : ${contests}">
-                <td th:text="${contest.title}">공모전 제목</td>
+                <td>
+                    <a th:href="@{'/contest/' + ${contest.id}}" th:text="${contest.title}">공모전 제목</a>
+                </td>
                 <td th:text="${contest.organizer}">주최 기관</td>
                 <td th:text="'D-' + ${contest.remainingDays}">D-5456</td>
                 <td th:text="${contest.startDate} + ' ~ ' + ${contest.endDate}">2024.01.01 ~ 2024.06.30</td>
@@ -248,15 +250,16 @@
         var deleteButton = document.getElementById("delete-selected");
         if (deleteButton) {
             deleteButton.addEventListener("click", function () {
-                var checkboxes = document.querySelectorAll(".contest-checkbox:checked");
+                const checkboxes = document.querySelectorAll(".contest-checkbox:checked");
                 if (checkboxes.length === 0) {
                     alert("삭제할 항목을 선택해주세요.");
                     return;
                 }
 
-                checkboxes.forEach(function (checkbox) {
-                    checkbox.closest("tr").remove();
-                });
+                const confirmed = confirm("정말로 선택한 공모전을 삭제하시겠습니까?");
+                if (confirmed) {
+                    document.getElementById("deleteForm").submit(); // ✅ 폼 제출
+                }
             });
         }
     }

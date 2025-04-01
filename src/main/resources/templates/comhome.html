@@ -8,7 +8,7 @@
 </head>
 <body>
 <!-- header -->
-<div th:insert="~{header :: header}"></div>
+<div th:insert="~{header2 :: header}"></div>
 
 <!-- 메인 배너 -->
 <section class="main-banner">
@@ -21,7 +21,7 @@
     <div class="left-section">
         <h3 class="hot-title">지금 핫한 공모전!!</h3>
         <img src="/images/hot.png" alt="핫한 공모전" class="hot-image">
-        <button class="apply-btn">공모전 주최 신청</button>
+        <button class="apply-btn"><a href="/comhost" class="gkdms">공모전 주최 신청</a></button>
     </div>
 
     <!-- 오른쪽 메인: 검색, 필터, only BOB 버튼, 테이블 -->

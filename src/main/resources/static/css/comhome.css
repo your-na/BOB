@@ -311,7 +311,11 @@
     color: #999;
 }
 
+.gkdms {
+    text-decoration: none;
+    color: white;
+}
 /* ✅ 버튼 구조 변경 */
-<form action="/onlyBOB" method="get">
-<button type="submit" class="BOB">only BOB</button>
-</form>
+/*<form action="/onlyBOB" method="get">*/
+/*<button type="submit" class="BOB">only BOB</button>*/
+/*</form>*/
