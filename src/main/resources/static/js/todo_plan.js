@@ -249,6 +249,7 @@ function loadMyProjects() {
 
 
 // ✅ 담당자 목록 동적으로 변경
+// ✅ 담당자 목록 동적으로 변경
 document.addEventListener("DOMContentLoaded", () => {
     const spaceSelect = document.querySelector(".space-select");
     const memberSelect = document.querySelector(".member-select");
@@ -279,11 +280,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.log("🙋 현재 로그인 유저:", currentUser);
                 console.log("👥 팀원 목록:", members);
 
-                memberSelect.innerHTML = `
-                    <option value="공동">공동</option>
-                    <option value="나">나</option>
-                `;
+                // ✅ 기존 옵션 초기화
+                memberSelect.innerHTML = "";
 
+                // ✅ 주최자일 때만 '공동' 옵션 추가
+                if (creator === currentUser) {
+                    memberSelect.innerHTML += `<option value="공동">공동</option>`;
+                }
+
+                // ✅ '나'는 항상 추가
+                memberSelect.innerHTML += `<option value="나">나</option>`;
+
+                // ✅ 주최자일 경우 팀원 추가
                 if (creator === currentUser) {
                     members.forEach((member) => {
                         if (member !== currentUser) {

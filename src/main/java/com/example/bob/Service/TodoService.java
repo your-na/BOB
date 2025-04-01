@@ -50,7 +50,7 @@ public class    TodoService {
                 .title(dto.getTitle())
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
-                .assignee(user.getUserNick())
+                .assignee(user.getUserNick())   
                 .workspace("개인")  // workspace는 "개인"
                 .completed(false)
                 .type("개인")  // type도 "개인"으로 설정
