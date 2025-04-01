@@ -129,10 +129,13 @@ public class ContestController {
 
     // 공모전 삭제 요청 처리
     @PostMapping("/admin/contest/delete")
-    public String deleteContest(@RequestParam List<Long> idsToDelete) {
-        idsToDelete.forEach(contestService::deleteById);
+    public String deleteContest(@RequestParam(name = "idsToDelete", required = false) List<Long> idsToDelete) {
+        if (idsToDelete != null) {
+            idsToDelete.forEach(contestService::deleteById);
+        }
         return "redirect:/ad_contest";
     }
+
 
     @GetMapping("/contest/{id}")
     public String showContestDetail(@PathVariable Long id, Model model) {

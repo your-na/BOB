@@ -250,15 +250,16 @@
         var deleteButton = document.getElementById("delete-selected");
         if (deleteButton) {
             deleteButton.addEventListener("click", function () {
-                var checkboxes = document.querySelectorAll(".contest-checkbox:checked");
+                const checkboxes = document.querySelectorAll(".contest-checkbox:checked");
                 if (checkboxes.length === 0) {
                     alert("삭제할 항목을 선택해주세요.");
                     return;
                 }
 
-                checkboxes.forEach(function (checkbox) {
-                    checkbox.closest("tr").remove();
-                });
+                const confirmed = confirm("정말로 선택한 공모전을 삭제하시겠습니까?");
+                if (confirmed) {
+                    document.getElementById("deleteForm").submit(); // ✅ 폼 제출
+                }
             });
         }
     }

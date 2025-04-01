@@ -47,6 +47,9 @@ public class SecurityConfig {
                                 "/file/project/submit", "/api/todos/**"
                         )
                 )
+                .headers(headers -> headers
+                        .frameOptions(frameOptions -> frameOptions.sameOrigin()) // ✅ iframe 허용 설정
+                )
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/", "/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**", "/project", "/contest").permitAll()
                         .requestMatchers("/login", "/sign").anonymous()
