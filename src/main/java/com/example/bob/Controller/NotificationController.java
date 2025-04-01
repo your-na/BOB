@@ -73,4 +73,18 @@ public class NotificationController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("알림을 찾을 수 없습니다.");
         }
     }
+    @DeleteMapping("/delete-all")
+    public ResponseEntity<String> deleteAllUserNotifications(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (!(userDetails instanceof UserDetailsImpl)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("일반 사용자만 가능합니다.");
+        }
+
+        UserEntity userEntity = ((UserDetailsImpl) userDetails).getUserEntity();
+
+        // 알림 삭제 서비스 호출
+        notificationService.deleteAllNotificationsForUser(userEntity);
+
+        return ResponseEntity.ok("🔔 모든 알림이 삭제되었습니다.");
+    }
+
 }

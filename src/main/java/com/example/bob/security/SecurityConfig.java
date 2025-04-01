@@ -44,7 +44,7 @@ public class SecurityConfig {
                         .ignoringRequestMatchers(
                                 "/login", "/signup", "/co_signup", "/profile/update", "/logout",
                                 "/teamrequest", "/teamrequest/accept", "/teamrequest/reject",
-                                "/file/project/submit", "/api/todos/**"
+                                "/file/project/submit", "/api/todos/**", "/api/notifications/delete-all"
                         )
                 )
                 .headers(headers -> headers

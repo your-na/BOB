@@ -46,4 +46,9 @@ public interface NotificationRepository extends JpaRepository<NotificationEntity
     void deleteBySenderAndReceiverAndProjectTitle(@Param("sender") String sender,
                                                   @Param("receiver") UserEntity receiver,
                                                   @Param("projectTitle") String projectTitle);
+
+    // ✅ 사용자 알림 전체 삭제
+    @Modifying
+    @Query("DELETE FROM NotificationEntity n WHERE n.user = :user")
+    void deleteByUser(@Param("user") UserEntity user);
 }
