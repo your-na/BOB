@@ -18,6 +18,10 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
 
     Optional<ProjectEntity> findByTitle(String title);
 
-
-
+    // "완료" 상태를 제외하고 최신 프로젝트 ID 기준으로 내림차순 정렬
+    @Query("SELECT p FROM ProjectEntity p WHERE p.status != '완료' ORDER BY p.id DESC")
+    List<ProjectEntity> findAllActiveProjectsSortedById();
 }
+
+
+

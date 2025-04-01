@@ -55,10 +55,12 @@ public class ProjectService {
      * ✅ 모든 프로젝트를 DTO로 변환하여 반환
      */
     public List<ProjectDTO> getAllProjectsDTO() {
-        return projectRepository.findAllActiveProjects().stream()  // "완료" 상태 제외
+        // 최신 프로젝트가 먼저 나올 수 있도록 id 기준으로 내림차순 정렬
+        return projectRepository.findAllActiveProjectsSortedById().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
 
     /**
      * ✅ 특정 프로젝트 가져오기

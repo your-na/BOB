@@ -183,6 +183,7 @@
     });
 
     // 프로젝트 목록을 동적으로 로드하는 함수
+    // 프로젝트 목록을 동적으로 로드하는 함수
     function loadProjects() {
         fetch('/project/api')  // 백엔드에서 JSON 형식의 프로젝트 목록을 가져오는 API
             .then(response => response.json())
@@ -195,15 +196,14 @@
                     const projectElement = document.createElement('div');
                     projectElement.classList.add('project-item');
                     projectElement.innerHTML = `
-                    <a href="/postproject/${project.id}">${project.title}</a>
-                    <p>${project.createdBy}</p>
-                    <p>${project.status}</p>
+                    <a href="/postproject/${project.id}" class="project-title">${project.title}</a>
                 `;
                     projectListDiv.appendChild(projectElement);
                 });
             })
             .catch(error => console.log('Error loading projects:', error)); // 오류 시 로그
     }
+
 
 </script>
 </body>
