@@ -183,9 +183,6 @@ public class UserController {
     @GetMapping("/header2")
     public String header2form() {return "header2";}
 
-    @GetMapping("/comhome")
-    public String comhomeform() {return "comhome";}
-
     @GetMapping("/comhost")
     public String comhostform() {return "comhost";}
 
