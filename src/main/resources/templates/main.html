@@ -14,9 +14,9 @@
 <!-- 메인 배너 -->
 <section class="carousel">
     <div class="carousel-content">
-        <div class="carousel-item active"><img src="/images/banner1.png" alt=""></div>
-        <div class="carousel-item active"><img src="/images/banner.png" alt=""></div>
-        <div class="carousel-item active"><img src="/images/banner1.png" alt=""></div>
+        <div class="carousel-item"><img src="/images/banner001.png" alt="배너1"></div>
+        <div class="carousel-item"><img src="/images/banner002.png" alt="배너2"></div>
+        <div class="carousel-item"><img src="/images/banner003.png" alt="배너3"></div>
     </div>
     <div class="carousel-controls">
         <button class="prev-btn">◀</button>
@@ -29,6 +29,7 @@
     </div>
 </section>
 
+
 <!-- 콘텐츠 섹션 -->
 <section class="content-container">
     <!-- 최신 공모전 -->
@@ -40,9 +41,9 @@
         <div class="card popular-competitions">
             <div class="poster-grid">
                 <img src="/images/banner.png" alt="인기 공모전 포스터 넣">
-                <img src="/images/poster10.png" alt="인기 공모전 포스터 어">
-                <img src="/images/poster11.png" alt="인기 공모전 포스터 야">
-                <img src="/images/poster12.png" alt="인기 공모전 포스터 함">
+                <img src="/images/banner1.png" alt="인기 공모전 포스터 어">
+                <img src="/images/banner1.png" alt="인기 공모전 포스터 야">
+                <img src="/images/banner.png" alt="인기 공모전 포스터 함">
             </div>
         </div>
     </div>
@@ -190,16 +191,23 @@
             .then(projects => {
                 console.log(projects);  // 받아온 데이터 확인
                 const projectListDiv = document.getElementById('project-list');
-                projectListDiv.innerHTML = '';  // 기존 목록 초기화
+                projectListDiv.innerHTML = ''; // 초기화
+
+                const ul = document.createElement('ul'); // 🟢 ul 생성
 
                 projects.forEach(project => {
-                    const projectElement = document.createElement('div');
-                    projectElement.classList.add('project-item');
-                    projectElement.innerHTML = `
-                    <a href="/postproject/${project.id}" class="project-title">${project.title}</a>
-                `;
-                    projectListDiv.appendChild(projectElement);
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = `/postproject/${project.id}`;
+                    a.classList.add('project-title');
+                    a.textContent = project.title;
+
+                    li.appendChild(a);
+                    ul.appendChild(li); // 🟢 li를 ul에 추가
                 });
+
+                projectListDiv.appendChild(ul); // 🟢 ul을 project-list에 넣기
+
             })
             .catch(error => console.log('Error loading projects:', error)); // 오류 시 로그
     }
