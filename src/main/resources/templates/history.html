@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>참여 내역 통합</title>
+    <link rel="stylesheet" href="/css/history.css"> <!-- 통합 CSS -->
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+
+<!-- ✅ Header -->
+<div th:insert="~{header :: header}"></div>
+
+<!-- ✅ 탭 메뉴 -->
+<nav class="tab-menu">
+    <ul>
+        <li class="tab-item active" data-target="job-history">구직 내역</li>
+        <li class="tab-item" data-target="project-history">프로젝트 참여 내역</li>
+        <li class="tab-item" data-target="contest-history">공모전 참여 내역</li>
+        <li class="tab-item" data-target="career-history">이력 내역</li>
+    </ul>
+</nav>
+
+<!-- ✅ 공통 검색창 -->
+<div class="searchcontainer">
+    <form id="searchform">
+        <input type="text" name="sw" id="search_sw" class="searchbar" placeholder="검색어 입력" th:value="${sw}">
+        <span class="searchicon"><img src="/images/search.png" alt=""></span>
+    </form>
+    <button class="external-btn">외부문서 불러오기</button>
+</div>
+
+<!-- ✅ 구직 내역 (비워둠) -->
+<div class="history-section" id="job-history" style="display: block;">
+    <p>구직 내역 구현 예정...</p>
+</div>
+
+<!-- ✅ 프로젝트 참여 내역 -->
+<div class="history-section" id="project-history" style="display: none;">
+    <table class="history-table">
+        <thead>
+        <tr>
+            <th>No.</th>
+            <th>상태</th>
+            <th colspan="2">진행 기간</th>
+            <th>프로젝트</th> <!-- 프로젝트 제목이 표시되는 컬럼 -->
+            <th>제출파일</th>
+            <th>관리</th>
+        </tr>
+        <tr>
+            <th></th>
+            <th></th>
+            <th>시작일자</th>
+            <th>종료일자</th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="userProject, iterStat : ${completedProjects}">
+            <td th:text="${iterStat.count}">1</td>  <!-- 제출된 순서 (No) -->
+            <td th:text="${userProject.status}">완료</td>  <!-- 상태 -->
+            <td th:text="${userProject.project.startDate}">2025-03-17</td>  <!-- 프로젝트 시작 날짜 -->
+            <td th:text="${userProject.submissionDate}">2025-03-17</td>  <!-- 제출 날짜 -->
+            <td th:text="${userProject.project.title}">프로젝트 제목</td>  <!-- 프로젝트 제목 -->
+            <td>
+                <a th:if="${userProject.submittedFileName}"
+                   th:href="@{'/download/' + ${userProject.submittedFileName}}"
+                   th:text="${userProject.submittedFileName}"
+                   target="_blank">파일보기</a>
+                <span th:unless="${userProject.submittedFileName}">미제출</span>
+            </td>
+            <td>
+                <button class="delete-btn">삭제</button>
+            </td>
+        </tr>
+
+        <!-- ✅ 추가될 빈 행 (처음에는 숨겨놓음) -->
+        <tr class="new-entry-row" style="display: none;">
+            <td>-</td>
+            <td>
+                <select class="status-select">
+                    <option value="참여중">참여중</option>
+                    <option value="참여완료">참여완료</option>
+                </select>
+            </td>
+            <td><input type="date" class="start-date"></td>
+            <td><input type="date" class="end-date"></td>
+            <td><input type="text" class="project-name" placeholder="프로젝트 제목"></td>
+            <td>
+                <input type="file" class="file-upload">
+                <a href="#" class="file-view" style="display: none;">파일보기</a>
+            </td>
+            <td>
+                <button class="delete-btn">삭제</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <button class="add-project-btn">+ 프로젝트 내역 추가 하기</button>
+</div>
+
+<!-- ✅ 공모전 참여 내역 -->
+<div class="history-section" id="contest-history" style="display: none;">
+    <table class="history-table">
+        <thead>
+        <tr>
+            <th>No.</th>
+            <th>상태</th>
+            <th colspan="2">진행 기간</th>
+            <th>공모전</th>
+            <th>제출파일</th>
+            <th>관리</th>
+        </tr>
+        <tr>
+            <th></th>
+            <th></th>
+            <th>시작일자</th>
+            <th>종료일자</th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="contest, iterStat : ${submittedContests}">
+            <td th:text="${iterStat.count}">1</td>
+            <td th:text="${contest.status}">참여완료</td>
+            <td th:text="${contest.startDate}"></td>
+            <td th:text="${contest.endDate}"></td>
+            <td th:text="${contest.title}"></td>
+            <td>
+                <a th:if="${contest.submittedFileName}"
+                   th:href="@{'/download/' + ${contest.submittedFileName}}"
+                   th:text="${contest.submittedFileName}"
+                   target="_blank" class="file-view">파일보기</a>
+                <span th:unless="${contest.submittedFileName}">미제출</span>
+            </td>
+            <td>
+                <button class="delete-btn">삭제</button>
+            </td>
+        </tr>
+
+        <!-- ✅ 추가될 빈 행 (처음에는 숨겨놓음) -->
+        <tr class="new-entry-row" style="display: none;">
+            <td>-</td>
+            <td>
+                <select class="status-select">
+                    <option value="참여중">참여중</option>
+                    <option value="참여완료">참여완료</option>
+                </select>
+            </td>
+            <td><input type="date" class="start-date"></td>
+            <td><input type="date" class="end-date"></td>
+            <td><input type="text" class="contest-name" placeholder="공모전 제목"></td>
+            <td>
+                <input type="file" class="file-upload">
+                <a href="#" class="file-view" style="display: none;">파일보기</a>
+            </td>
+            <td>
+                <button class="delete-btn">삭제</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <button class="add-project-btn">+ 공모전 내역 추가 하기</button>
+</div>
+
+<!-- ✅ 이력 내역 (비워둠) -->
+<div class="history-section" id="career-history" style="display: none;">
+    <p>이력 내역 구현 예정...</p>
+</div>
+
+<script src="/js/history.js"></script>
+</body>
+</html>

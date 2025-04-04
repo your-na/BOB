@@ -23,9 +23,8 @@
                         <div class="dropdown-section">
                             <ul>
                                 <li><a href="contest">전체 공모전</a></li>
-                                <li><a href="#">공모전 팀 모집</a></li>
-                                <li><a href="#">공모전 활동</a></li>
-                                <li><a href="#">찜한 공모전</a></li>
+                                <li><a th:href="@{/contestact}">공모전 활동</a></li>
+                                <li><a th:href="@{/likedcontest}">찜한 공모전</a></li>
                             </ul>
                         </div>
                     </div>
@@ -84,7 +83,7 @@
                             <!-- 로그인 상태일 때 -->
                             <li th:if="${user != null}"><a href="/profile">내 정보 / 평점</a></li>
                             <li th:if="${user != null}"><a href="#" class="notification-icon" id="notification-icon">알림</a><span class="notification-badge" id="notification-badge"></span></li>
-                            <li th:if="${user != null}"><a href="#">경력 내역</a></li>
+                            <li th:if="${user != null}"><a th:href="@{/history}">경력 내역</a></li>
                             <li th:if="${user != null}"><a th:href="@{/appstatus}">지원 현황</a></li>
                             <li th:if="${user != null}">
                                 <form id="logoutForm" th:action="@{/logout}" method="post">

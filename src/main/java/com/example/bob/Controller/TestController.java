@@ -17,4 +17,8 @@ public class TestController {
     //구직 공고 상세
     @GetMapping("/jobindex")
     public String jobinform() {return "jobindex";}
+
+    //경력내역 통합
+    @GetMapping("/history")
+    public String historyform() {return "history";}
 }
