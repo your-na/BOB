@@ -74,7 +74,6 @@ public class ProjectService {
     /**
      * ✅ 프로젝트 저장 후 반환
      */
-    // 프로젝트 저장 후 반환
     @Transactional
     public ProjectEntity saveProject(ProjectEntity project, String customRecruitmentCount) {
         logger.info("🚀 프로젝트 저장 전 모집 종료일: {}", project.getRecruitmentEndDate());
@@ -89,20 +88,25 @@ public class ProjectService {
             project.setUserProjects(new ArrayList<>());
         }
 
-        // 주최자의 상태에 따라 프로젝트 상태를 설정
-        UserProjectEntity ownerProject = project.getUserProjects().stream()
-                .filter(userProject -> userProject.getUser().getUserNick().equals(project.getCreatedBy()))
-                .findFirst()
-                .orElse(null);
+        // ✅ 주최자도 참여자 목록에 추가
+        UserEntity creator = userRepository.findByUserNick(project.getCreatedBy())
+                .orElseThrow(() -> new IllegalArgumentException("❌ 주최자 정보를 찾을 수 없습니다."));
 
-        // 주최자의 상태를 확인하여 프로젝트 상태를 변경
-        if (ownerProject != null) {
-            String ownerStatus = ownerProject.getStatus();
-            if ("진행중".equals(ownerStatus)) {
-                project.setStatus("진행중");
-            } else if ("완료".equals(ownerStatus)) {
-                project.setStatus("완료");
-            }
+        UserProjectEntity hostUserProject = UserProjectEntity.builder()
+                .user(creator)
+                .project(project)
+                .status("진행중") // 기본 상태, 필요시 "완료"도 가능
+                .visible(true)    // 삭제된 상태 아님
+                .build();
+
+        project.getUserProjects().add(hostUserProject);
+
+        // 주최자의 상태에 따라 프로젝트 상태를 설정
+        String ownerStatus = hostUserProject.getStatus();
+        if ("진행중".equals(ownerStatus)) {
+            project.setStatus("진행중");
+        } else if ("완료".equals(ownerStatus)) {
+            project.setStatus("완료");
         }
 
         project.updateStatus();  // 상태 최종 업데이트
@@ -283,12 +287,18 @@ public class ProjectService {
      * ✅ 사용자가 만든 프로젝트 목록을 반환
      */
     public List<ProjectDTO> getCreatedProjects(UserEntity user) {
-        // UserEntity를 사용하여 사용자가 만든 프로젝트 목록을 조회
+        // 사용자가 만든 프로젝트 전체 조회
         List<ProjectEntity> createdProjects = projectRepository.findByCreatedBy(user.getUserNick());
+
+        // 🔍 UserProjectEntity에서 visible=true인 것만 필터링
         return createdProjects.stream()
+                .filter(project -> userProjectRepository.findByUserAndProject(user, project)
+                        .map(UserProjectEntity::isVisible)  // visible이 true인 경우만 통과
+                        .orElse(false))  // 없으면 false
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
 
     /**
      * ✅ 사용자가 참가한 프로젝트 목록을 반환
@@ -298,6 +308,7 @@ public class ProjectService {
         List<UserProjectEntity> userProjects = userProjectRepository.findByUserAndStatusIn(user, List.of("진행중", "완료", "모집중"));
 
         return userProjects.stream()
+                .filter(UserProjectEntity::isVisible) // ✅ visible=true만 필터링
                 .map(userProject -> userProject.getProject())
                 .filter(project -> !project.getCreatedBy().equals(user.getUserNick())) // 주최자는 제외
                 .map(this::convertToDTO)

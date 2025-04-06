@@ -34,6 +34,9 @@ public interface UserProjectRepository extends JpaRepository<UserProjectEntity, 
 
     List<UserProjectEntity> findByUserAndStatusIn(UserEntity user, List<String> statuses);
 
+    List<UserProjectEntity> findByUser_UserIdAndStatusAndSubmittedFileNameIsNotNullAndVisibleTrue(Long userId, String status);
+
+
 
     // ✅ 프로젝트와 관련된 팀 신청 삭제
     @Modifying

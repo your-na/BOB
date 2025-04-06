@@ -459,17 +459,18 @@ public class ProjectController {
     public String showHistoryPage(@AuthenticationPrincipal UserDetailsImpl userDetails, Model model) {
         Long userId = userDetails.getUserEntity().getUserId(); // 로그인한 유저 ID
 
-        // ✅ 완료된 프로젝트 가져오기
+        // ✅ 제출된 파일이 있고, 완료 상태이고, visible=true인 내역만 가져오기
         List<UserProjectEntity> completedUserProjects =
-                userProjectRepository.findByUser_UserIdAndStatus(userId, "완료");
+                userProjectRepository.findByUser_UserIdAndStatusAndSubmittedFileNameIsNotNullAndVisibleTrue(userId, "완료");
 
         model.addAttribute("completedProjects", completedUserProjects); // ✅ history.html에서 사용됨
 
-        // ✅ 여기에 공모전 등 다른 내역도 추가 가능
+        // ✅ 공모전 등 추가하려면 여기에 추가
         // model.addAttribute("submittedContests", ...);
 
-        return "history"; // ✅ history.html 렌더링
+        return "history";
     }
+
 
     // ✅ 프로젝트 기록 삭제 API
     @DeleteMapping("/project-history/{id}")

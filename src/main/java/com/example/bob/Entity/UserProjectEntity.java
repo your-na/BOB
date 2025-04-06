@@ -36,14 +36,8 @@ public class UserProjectEntity {
 
     private Long teamMemberId; // 🔥 팀원 아이디 추가
 
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean visible = true; // ✅ 기본값 true (삭제되지 않은 상태)
 
-    // 역할 (주최/참여)
-    public String getRole() {
-        return project.getCreatedBy().equals(user.getUserNick()) ? "주최" : "참여";
-    }
-
-    // 팀원 아이디를 가져오는 메서드
-    public Long getTeamMemberId() {
-        return this.user != null ? this.user.getUserId() : null; // user가 존재하면 teamMemberId를 가져옴
-    }
 }
