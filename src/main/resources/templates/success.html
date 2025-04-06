@@ -49,7 +49,10 @@
 
     <div class="buttons">
         <button class="btn green">제출한 신청서 보기</button>
-        <button class="btn gray">해당 글로 돌아가기</button>
+        <!-- 게시글 상세보기로 이동 -->
+        <a th:href="@{'/postproject/' + ${project.id}}" style="text-decoration: none;">
+            <button class="btn gray">해당 글로 돌아가기</button>
+        </a>
     </div>
 </div>
 </body>
