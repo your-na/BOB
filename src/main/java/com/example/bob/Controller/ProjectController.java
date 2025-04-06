@@ -455,22 +455,25 @@ public class ProjectController {
         return "teamrequest"; // ✅ teamrequest.html 페이지 렌더링
     }
 
-    @GetMapping("/projecthistory")
-    public String showProjectHistory(@AuthenticationPrincipal UserDetailsImpl userDetails, Model model) {
-        Long userId = userDetails.getUserEntity().getUserId();  // 로그인한 유저의 ID
+    @GetMapping("/history")
+    public String showHistoryPage(@AuthenticationPrincipal UserDetailsImpl userDetails, Model model) {
+        Long userId = userDetails.getUserEntity().getUserId(); // 로그인한 유저 ID
 
-        // 완료된 프로젝트 가져오기
-        List<UserProjectEntity> completedUserProjects = userProjectRepository.findByUser_UserIdAndStatus(userId, "완료");
+        // ✅ 완료된 프로젝트 가져오기
+        List<UserProjectEntity> completedUserProjects =
+                userProjectRepository.findByUser_UserIdAndStatus(userId, "완료");
 
+        model.addAttribute("completedProjects", completedUserProjects); // ✅ history.html에서 사용됨
 
-        // DTO로 변환된 프로젝트 리스트를 모델에 담아줍니다.
-        model.addAttribute("completedProjects", completedUserProjects);
+        // ✅ 여기에 공모전 등 다른 내역도 추가 가능
+        // model.addAttribute("submittedContests", ...);
 
-        return "projecthistory";  // projecthistory.html로 전달
+        return "history"; // ✅ history.html 렌더링
     }
 
 
-        @GetMapping("/todoadd")
+
+    @GetMapping("/todoadd")
     public String showAddPage() {
         return "todo_add";
     }
