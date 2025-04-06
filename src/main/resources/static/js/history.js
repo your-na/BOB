@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            if (confirm("정말 삭제하시겠습니까?")) {
+            if (confirm("⚠정말 삭제하시겠습니까?\n 삭제하면 마이프로젝트에서도 사라지며, 복구할 수 없습니다.")) {
                 fetch(`/project-history/${id}`, {
                     method: "DELETE",
                     headers: {
