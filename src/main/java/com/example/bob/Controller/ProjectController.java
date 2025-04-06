@@ -471,6 +471,18 @@ public class ProjectController {
         return "history"; // ✅ history.html 렌더링
     }
 
+    // ✅ 프로젝트 기록 삭제 API
+    @DeleteMapping("/project-history/{id}")
+    @ResponseBody
+    public ResponseEntity<String> deleteProjectHistory(@PathVariable Long id) {
+        try {
+            userProjectRepository.deleteById(id);
+            return ResponseEntity.ok("삭제 성공");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("삭제 실패: " + e.getMessage());
+        }
+    }
+
 
 
     @GetMapping("/todoadd")

@@ -50,15 +50,51 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // ✅ 삭제 버튼
+    // ✅ 삭제 버튼 (백엔드 연동 포함 + CSRF 토큰 처리)
     document.addEventListener("click", function (event) {
         if (event.target.classList.contains("delete-btn")) {
             const row = event.target.closest("tr");
-            if (row) {
-                row.remove();
+            const id = event.target.getAttribute("data-id");
+
+            if (!id) {
+                alert("❌ 삭제할 항목의 ID가 없습니다.");
+                return;
+            }
+
+            if (confirm("정말 삭제하시겠습니까?")) {
+                fetch(`/project-history/${id}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        [getCsrfHeader()]: getCsrfToken()  // ✅ 동적 헤더 키 사용
+                    }
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            alert("✅ 삭제 완료!");
+                            if (row) row.remove();
+                        } else {
+                            alert("❌ 삭제 실패!");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("삭제 중 오류 발생:", error);
+                        alert("❌ 서버 오류가 발생했습니다.");
+                    });
             }
         }
     });
+
+    // ✅ CSRF 토큰 가져오기 함수
+    function getCsrfToken() {
+        const csrfMeta = document.querySelector('meta[name="_csrf"]');
+        return csrfMeta ? csrfMeta.getAttribute("content") : "";
+    }
+
+    function getCsrfHeader() {
+        const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+        return csrfHeaderMeta ? csrfHeaderMeta.getAttribute("content") : "X-CSRF-TOKEN";
+    }
 
     // ✅ 파일 업로드 시 파일보기 링크 활성화
     document.addEventListener("change", function (event) {
