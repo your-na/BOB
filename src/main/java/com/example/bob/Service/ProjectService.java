@@ -264,9 +264,12 @@ public class ProjectService {
      * ✅ 프로젝트를 DTO로 변환하는 메서드
      */
     public ProjectDTO convertToDTO(ProjectEntity projectEntity) {
-        // ✅ 모집중/진행중/완료 상태인 인원만 세기
         List<String> validStatuses = List.of("모집중", "진행중", "완료");
-        int currentParticipants = userProjectRepository.countByProjectAndStatusIn(projectEntity, validStatuses);
+
+        // ✅ 주최자 제외하고 인원 계산
+        int currentParticipants = userProjectRepository.findByProjectAndStatusIn(projectEntity, validStatuses).stream()
+                .filter(up -> !up.getUser().getUserNick().equals(projectEntity.getCreatedBy()))
+                .toList().size(); // Java 16+ 또는 .collect(Collectors.toList()).size();
 
         return new ProjectDTO(
                 projectEntity.getId(),
@@ -276,8 +279,8 @@ public class ProjectService {
                 projectEntity.getGoal(),
                 projectEntity.getStartDate(),
                 projectEntity.getEndDate(),
-                projectEntity.getRecruitmentCount(), // 총 모집 인원
-                currentParticipants,                 // 모집된 사람 수
+                projectEntity.getRecruitmentCount(), // 총 인원
+                currentParticipants,                 // 제외된 인원 수
                 projectEntity.getViews(),
                 projectEntity.getLikes(),
                 projectEntity.getStatus(),
@@ -286,6 +289,7 @@ public class ProjectService {
                 projectEntity.getRecruitmentEndDate()
         );
     }
+
 
 
     /**

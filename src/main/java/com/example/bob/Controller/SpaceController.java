@@ -63,11 +63,11 @@ public class SpaceController {
 
             // ✅ 모집중 또는 진행중인 사람만 추가
             if ("모집중".equals(status) || "진행중".equals(status)) {
-                teamMembers.add(userProject.getUser().getUserNick()); // 팀원 추가
-
-                // 주최자인지 확인
-                if (userProject.getUser().getUserNick().equals(createdBy)) {
-                    owner = userProject.getUser(); // 주최자 정보 저장
+                // ✅ 주최자가 아니면 teamMembers에 추가
+                if (!userProject.getUser().getUserNick().equals(createdBy)) {
+                    teamMembers.add(userProject.getUser().getUserNick());
+                } else {
+                    owner = userProject.getUser(); // 주최자는 따로 저장
                 }
             }
         }

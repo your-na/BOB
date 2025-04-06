@@ -36,8 +36,9 @@ public interface UserProjectRepository extends JpaRepository<UserProjectEntity, 
 
     List<UserProjectEntity> findByUser_UserIdAndStatusAndSubmittedFileNameIsNotNullAndVisibleTrue(Long userId, String status);
 
-    // ✅ 모집 상태가 '완료', '진행중', '모집중'인 사람만 세는 메서드
-    int countByProjectAndStatusIn(ProjectEntity project, List<String> statuses);
+    // ✅ 특정 프로젝트 + 상태 조건으로 유저 프로젝트 조회
+    List<UserProjectEntity> findByProjectAndStatusIn(ProjectEntity project, List<String> statusList);
+
 
 
 
