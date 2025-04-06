@@ -103,8 +103,6 @@ public class ProjectController {
         return projectService.getProjectMembersInfo(title, userDetails.getUserEntity());
     }
 
-
-
     // 프로젝트 상세 보기
     @GetMapping("/postproject/{id}")
     public String showProjectDetail(@PathVariable Long id,
@@ -115,13 +113,27 @@ public class ProjectController {
 
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
 
+        // ✅ 로그인한 사용자 정보
+        UserEntity user = userDetails.getUserEntity();
+
+        // ✅ 좋아요 눌렀는지 여부 확인
+        boolean isLiked = project.getLikedUsers().contains(user.getUserId());
+
+        // ✅ 좋아요 수 가져오기
+        int likesCount = project.getLikes();
+
         model.addAttribute("today", today);
         model.addAttribute("goal", project.getGoal());
         model.addAttribute("project", project);
         model.addAttribute("isOwner", project.getCreatedBy().equals(userDetails.getUserNick())); // 로그인한 사용자가 작성자인지 체크
 
+        // ✅ 좋아요 상태와 수 모델에 추가
+        model.addAttribute("isLiked", isLiked);
+        model.addAttribute("likesCount", likesCount);
+
         return "postproject";
     }
+
 
     // 프로젝트 삭제 API
     @DeleteMapping("/postproject/{id}")
@@ -138,17 +150,23 @@ public class ProjectController {
         }
     }
 
-    // 좋아요 토글 API
-    @PostMapping("/postproject/{id}/like")
+    // 좋아요
+    @PostMapping("/project/{id}/like")
     @ResponseBody
-    public ResponseEntity<?> likeProject(@PathVariable Long id, @RequestParam Long userId) {
-        try {
-            ProjectEntity updatedProject = projectService.toggleLike(id, userId);
-            return ResponseEntity.ok(updatedProject.getLikes());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("좋아요 요청 실패");
-        }
+    public Map<String, Object> toggleLike(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        UserEntity user = userDetails.getUserEntity();
+
+        ProjectEntity project = projectService.toggleLike(id, user.getUserId()); // 좋아요 처리
+
+        boolean liked = project.getLikedUsers().contains(user.getUserId());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("liked", liked); // 현재 좋아요 상태
+        response.put("likes", project.getLikes()); // 좋아요 수
+
+        return response;
     }
+
 
     // 조회수 증가 API
     @PostMapping("/postproject/{id}/incrementViews")

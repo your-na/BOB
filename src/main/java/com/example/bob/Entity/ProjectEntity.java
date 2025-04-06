@@ -67,9 +67,12 @@ public class ProjectEntity {
     @Column(name = "d_day")
     private Integer dDay;  // ✅ int → Integer 변경 (null 값 허용)
 
-    @ElementCollection
+    // ✅ 좋아요 누른 유저 ID들을 저장하는 리스트 (DB에 저장되도록 설정)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "project_liked_users", joinColumns = @JoinColumn(name = "project_id"))
+    @Column(name = "user_id")
     @Builder.Default
-    private List<Long> likedUsers = new ArrayList<>(); // 좋아요 누른 유저들
+    private List<Long> likedUsers = new ArrayList<>();
 
     @Column(nullable = false)
     private int currentParticipants; // 실제 참여 인원
