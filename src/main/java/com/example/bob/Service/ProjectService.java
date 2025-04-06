@@ -264,6 +264,10 @@ public class ProjectService {
      * ✅ 프로젝트를 DTO로 변환하는 메서드
      */
     public ProjectDTO convertToDTO(ProjectEntity projectEntity) {
+        // ✅ 모집중/진행중/완료 상태인 인원만 세기
+        List<String> validStatuses = List.of("모집중", "진행중", "완료");
+        int currentParticipants = userProjectRepository.countByProjectAndStatusIn(projectEntity, validStatuses);
+
         return new ProjectDTO(
                 projectEntity.getId(),
                 projectEntity.getTitle(),
@@ -272,16 +276,17 @@ public class ProjectService {
                 projectEntity.getGoal(),
                 projectEntity.getStartDate(),
                 projectEntity.getEndDate(),
-                projectEntity.getRecruitmentCount(),
-                projectEntity.getCurrentParticipants(),
+                projectEntity.getRecruitmentCount(), // 총 모집 인원
+                currentParticipants,                 // 모집된 사람 수
                 projectEntity.getViews(),
                 projectEntity.getLikes(),
-                projectEntity.getStatus(),  // 한글 상태 반영
+                projectEntity.getStatus(),
                 projectEntity.getRecruitmentPeriod(),
                 projectEntity.getRecruitmentStartDate(),
                 projectEntity.getRecruitmentEndDate()
         );
     }
+
 
     /**
      * ✅ 사용자가 만든 프로젝트 목록을 반환
