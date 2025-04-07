@@ -612,28 +612,34 @@ public class ProjectService {
         projectRepository.save(project);
     }
 
+    /**
+     * ✅ 프로젝트 팀원 정보 반환 (신청자 제외)
+     */
     public Map<String, Object> getProjectMembersInfo(String title, UserEntity currentUser) {
         Map<String, Object> response = new HashMap<>();
 
-        // 프로젝트 가져오기
+        // ✅ 프로젝트 조회
         ProjectEntity project = projectRepository.findByTitle(title)
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트가 없습니다: " + title));
 
-        // 주최자
-        String creator = project.getCreatedBy();
-        response.put("creator", creator);
+        response.put("creator", project.getCreatedBy());                      // 주최자
+        response.put("currentUser", currentUser.getUserNick());              // 현재 로그인 사용자
 
-        // 현재 로그인한 사용자 닉네임
-        response.put("currentUser", currentUser.getUserNick());
-
-        // 팀원 닉네임 리스트 가져오기
+        // ✅ '모집중', '진행중', '완료' 상태의 팀원 닉네임만 반환
         List<String> members = userProjectRepository.findByProject(project).stream()
+                .filter(up -> {
+                    String status = up.getStatus();
+                    return status.equals("모집중") || status.equals("진행중") || status.equals("완료");
+                })
                 .map(up -> up.getUser().getUserNick())
                 .collect(Collectors.toList());
-        response.put("members", members);
 
+        response.put("members", members);
         return response;
     }
+
+
+
     // 🔹 ProjectService.java 가장 아래에 추가하면 돼!
     public List<String> getProjectMemberNicknames(String projectTitle) {
         ProjectEntity project = projectRepository.findByTitle(projectTitle)
