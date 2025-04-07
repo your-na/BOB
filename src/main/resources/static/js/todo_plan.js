@@ -14,6 +14,21 @@ document.addEventListener("DOMContentLoaded", function () {
     const todoList = document.querySelector(".todo-list");
     const taskTitle = document.querySelector(".task-date-title");
 
+    // ✅ 사이드바 버튼 동작 추가
+    const sidebarButtons = document.querySelectorAll('.sidebar-btn');
+    const projectId = 217; // 실제 사용 시 동적으로 처리 가능
+
+    sidebarButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const text = btn.textContent.trim();
+            if (text === "홈") {
+                window.location.href = `http://localhost:8888/todohome/${projectId}`;
+            } else if (text === "CRUD") {
+                window.location.href = `http://localhost:8888/todocrud/${projectId}`;
+            }
+        });
+    });
+
     let selectedDate = null;
     let month = 11;
     let year = 2024;
@@ -179,8 +194,8 @@ document.addEventListener("DOMContentLoaded", () => {
             title: title,
             startDate: date,
             endDate: endDate,
-            assignee: document.querySelector(".member-select").value,   // ✅ 담당자
-            workspace: document.querySelector(".space-select").value    // ✅ 스페이스
+            assignee: document.querySelector(".member-select").value,
+            workspace: document.querySelector(".space-select").value
         };
 
         fetch("http://localhost:8888/api/todos", {
@@ -212,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// ✅ 프로젝트 목록 불러오기 (완료된 프로젝트 제외)
+// ✅ 프로젝트 목록 불러오기
 function loadMyProjects() {
     const spaceSelect = document.querySelector(".space-select");
 
@@ -222,7 +237,6 @@ function loadMyProjects() {
     })
         .then((res) => res.json())
         .then((projects) => {
-            // "완료" 상태인 프로젝트를 제외
             const filteredProjects = projects.filter(project => project.status !== "완료");
 
             spaceSelect.innerHTML = "";
@@ -247,9 +261,7 @@ function loadMyProjects() {
         });
 }
 
-
-// ✅ 담당자 목록 동적으로 변경
-// ✅ 담당자 목록 동적으로 변경
+// ✅ 담당자 목록 동적 로딩
 document.addEventListener("DOMContentLoaded", () => {
     const spaceSelect = document.querySelector(".space-select");
     const memberSelect = document.querySelector(".member-select");
@@ -270,28 +282,18 @@ document.addEventListener("DOMContentLoaded", () => {
         })
             .then((res) => res.json())
             .then((data) => {
-                console.log("📦 서버로부터 받은 data:", data);
-
                 const creator = data.creator;
                 const currentUser = data.currentUser;
                 const members = data.members;
 
-                console.log("👑 주최자:", creator);
-                console.log("🙋 현재 로그인 유저:", currentUser);
-                console.log("👥 팀원 목록:", members);
-
-                // ✅ 기존 옵션 초기화
                 memberSelect.innerHTML = "";
 
-                // ✅ 주최자일 때만 '공동' 옵션 추가
                 if (creator === currentUser) {
                     memberSelect.innerHTML += `<option value="공동">공동</option>`;
                 }
 
-                // ✅ '나'는 항상 추가
                 memberSelect.innerHTML += `<option value="나">나</option>`;
 
-                // ✅ 주최자일 경우 팀원 추가
                 if (creator === currentUser) {
                     members.forEach((member) => {
                         if (member !== currentUser) {

@@ -88,48 +88,70 @@
     </div>
 </div>
 
-<!-- ✅ 공지사항 자동 저장 스크립트 -->
+<!-- ✅ 공지사항 자동 저장 및 버튼 이동 스크립트 -->
 <script th:inline="javascript">
     /*<![CDATA[*/
     let projectId = /*[[${project.id}]]*/ 0;
     /*]]>*/
 </script>
+
 <script>
-    const textarea = document.getElementById("notice");
-    let timer = null;
+    document.addEventListener("DOMContentLoaded", function () {
+        // ✅ 페이지 이동: 왼쪽 < 버튼 → plan 페이지
+        const backBtn = document.querySelector(".back-btn");
+        if (backBtn) {
+            backBtn.addEventListener("click", function () {
+                window.location.href = "http://localhost:8888/plan";
+            });
+        }
 
-    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+        // ✅ 페이지 이동: 오른쪽 X 버튼 → main 페이지
+        const closeBtn = document.querySelector(".close-btn");
+        if (closeBtn) {
+            closeBtn.addEventListener("click", function () {
+                window.location.href = "http://localhost:8888/main";
+            });
+        }
 
-    // 내용이 바뀌면 2초 뒤 저장
-    textarea?.addEventListener("input", function () {
-        if (textarea.readOnly) return;
-        if (timer) clearTimeout(timer);
-        timer = setTimeout(saveNotice, 2000);
-    });
+        // ✅ 공지사항 자동 저장 처리
+        const textarea = document.getElementById("notice");
+        let timer = null;
 
-    // 포커스가 벗어나면 저장
-    textarea?.addEventListener("blur", function () {
-        if (textarea.readOnly) return;
-        saveNotice();
-    });
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
 
-    function saveNotice() {
-        fetch(`/api/project/${projectId}/notice`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                [csrfHeader]: csrfToken // ✅ CSRF 토큰 포함
-            },
-            body: JSON.stringify({ content: textarea.value })
-        }).then(() => {
-            console.log("✅ 공지사항 저장됨");
-        }).catch((error) => {
-            console.error("❌ 저장 실패:", error);
+        // 내용이 바뀌면 2초 후 저장
+        textarea?.addEventListener("input", function () {
+            if (textarea.readOnly) return;
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(saveNotice, 2000);
         });
-    }
 
+        // 포커스 벗어날 때 저장
+        textarea?.addEventListener("blur", function () {
+            if (textarea.readOnly) return;
+            saveNotice();
+        });
+
+        function saveNotice() {
+            if (!textarea || textarea.readOnly) return;
+
+            fetch(`/api/project/${projectId}/notice`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify({ content: textarea.value })
+            }).then(() => {
+                console.log("✅ 공지사항 저장됨");
+            }).catch((error) => {
+                console.error("❌ 저장 실패:", error);
+            });
+        }
+    });
 </script>
+
 
 </body>
 </html>
