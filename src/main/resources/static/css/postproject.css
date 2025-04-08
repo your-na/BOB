@@ -182,3 +182,8 @@
     color: white;
     cursor: not-allowed;  /* 클릭 방지 */
 }
+
+.action-button {
+    text-decoration: none;
+    color: grey;
+}

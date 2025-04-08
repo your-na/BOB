@@ -44,7 +44,7 @@
     <tbody>
     <tr th:each="project : ${createdProjects}">
       <td>
-        <a th:href="@{/postproject/{id}(id=${project.id})}" th:text="${project.title}">프로젝트명</a>
+        <a th:href="@{/postproject/{id}(id=${project.id})}" th:text="${project.title}" class="protitle">프로젝트명</a>
       </td>
       <td th:text="${project.createdBy}">생성자</td>
       <td th:text="'D-' + ${project.recruitmentPeriod}">D-3</td>

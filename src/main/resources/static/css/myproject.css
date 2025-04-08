@@ -295,3 +295,12 @@
     background: #008f00;
 }
 
+td {
+    white-space: nowrap;
+}
+
+.protitle {
+    text-decoration: none;
+    font-weight: bold;
+    color: black;
+}

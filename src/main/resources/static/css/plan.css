@@ -35,3 +35,9 @@ body {
 .star-icon:hover {
     color: gold;
 }
+
+.protitle {
+    text-decoration: none;
+    color: #353535;
+    cursor: pointer;
+}
