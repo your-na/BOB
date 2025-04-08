@@ -15,7 +15,7 @@
     flex: 3;
 }
 
-/* 오른쪽 고정 영역 */
+/* 전체 오른쪽 고정 영역 */
 .right-content {
     position: sticky;
     top: 100px;
@@ -28,7 +28,7 @@
     overflow: hidden;
 }
 
-/* 헤더 */
+/* 초록 헤더 */
 .tab-header {
     background-color: #A6F4A6;
     padding: 16px 20px 12px 20px;
@@ -38,10 +38,11 @@
 .tab-header h3 {
     margin: 0;
     font-size: 18px;
-    font-weight: 800;
+    font-weight: 800; /* 더 두껍게! */
     color: #1C4C1C;
 }
 
+/* 탭 영역 (배경 흰색) */
 .tab-menu {
     background-color: #fff;
     padding: 10px 20px 0 20px;
@@ -116,12 +117,12 @@
     margin: 5px 0;
 }
 
-/* 학력사항 */
 .form-group {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     align-items: center;
+    position: relative;
 }
 
 .form-group input,
@@ -186,31 +187,13 @@ textarea {
     color: #333;
     padding-bottom: 4px;
     border-bottom: 2px solid transparent;
+    transition: all 0.2s;
 }
 
 .tab-menu li.active {
     font-weight: bold;
     color: #0ED700;
     border-bottom: 2px solid #0ED700;
-}
-
-/* 비어있을 때 안내 */
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
-}
-
-.empty-state p {
-    margin-bottom: 10px;
-    color: #444;
-}
-
-.empty-state button {
-    background: none;
-    border: none;
-    color: #333;
-    font-weight: bold;
-    cursor: pointer;
 }
 
 /* 수상 리스트 */
@@ -276,52 +259,164 @@ textarea {
     margin: 2px 0 10px 0;
 }
 
-/* 모달 */
-.modal-backdrop {
+.edu-btn {
+    background-color: #ffffff;
+    color: black;
+    font-weight: bold;
+    font-size: 12px;
+    padding: 4px 8px;
+    border: 1px solid #6a6a6a;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.edu-btn .plus {
+    color: #19CB13;
+    font-size: 20px;
+}
+
+.edu-btn:hover{
+    transform: translateY(-1px);
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.education-item {
+    margin-bottom: 10px;
+}
+
+/* 삭제 버튼 스타일 */
+.form-group .del-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #000000;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.form-group .del-btn:hover {
+    transform: translateY(-1px);
+}
+
+.arrow-toggle {
+    margin-left: auto;            /* 오른쪽 끝으로 보내기 */
+    font-size: 20px;
+    font-weight: bold;
+    color: #1C4C1C;
+    cursor: pointer;
+}
+
+.sub-wrapper {
+    text-align: right;
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+
+.sub-btn {
+    background-color: #19CB13;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+    transition: all 0.2s ease-in-out;
+    margin-left: 380px;
+}
+
+.sub-btn:hover {
+    background-color: #0ea30e;
+}
+
+.char-count {
+    text-align: right;
+    font-size: 13px;
+    margin-top: 4px;
+    color: #666;
+}
+.char-count.warning {
+    color: red;
+    font-weight: bold;
+}
+
+/* 모달 전체 배경 */
+.modal {
+    display: none; /* 처음엔 숨김 */
     position: fixed;
     top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.3);
-    display: none;
-    align-items: center;
+    width: 100vw; height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
     justify-content: center;
+    align-items: center;
     z-index: 999;
 }
 
-.modal-backdrop.active {
-    display: flex;
-}
-
+/* 모달 내부 */
 .modal-content {
     background: white;
     padding: 30px;
     border: 1px solid #000;
     border-radius: 8px;
     text-align: center;
-    width: 300px;
+    width: 400px;
 }
 
-.modal-content p {
+.modal-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
     margin-bottom: 10px;
 }
 
-.modal-sub {
+.modal-desc {
+    font-size: 14px;
     color: red;
-    font-size: 13px;
     margin-bottom: 20px;
 }
 
-.modal-buttons {
+.modal-btns {
     display: flex;
     justify-content: space-around;
 }
 
-.modal-buttons button {
-    border: 1px solid #000;
-    padding: 6px 14px;
-    background: white;
-    cursor: pointer;
+.modal-btns button {
+    padding: 8px 20px;
+    border: 1px solid #666;
     border-radius: 6px;
-    min-width: 80px;    /* ✅ 최소 너비 고정 */
+    background: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* ✅ 데이터 없을 때 안내 스타일 */
+.empty-content {
+    padding: 50px 20px;
     text-align: center;
+    color: #333;
+    border-top: 1px solid #ccc;
+}
+
+.no-data-text {
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+.view-link {
+    font-size: 14px;
+    font-weight: bold;
+    color: #0c0c0c;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.view-link:hover {
+    color: #19CB13;
 }
