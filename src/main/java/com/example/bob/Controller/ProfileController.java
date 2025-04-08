@@ -43,24 +43,28 @@ public class ProfileController {
 
     @GetMapping("/main")
     public String mainPage(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
-        if (userDetails == null){
+        if (userDetails == null) {
             model.addAttribute("user", null);
             model.addAttribute("profileLink", "/login");
-            return "main";
+            return "main"; // 비로그인 사용자는 main.html
         }
 
-        if (userDetails.getUserType().equals("user")) {
-            UserEntity user = ((UserDetailsImpl) userDetails).getUserEntity();
-            model.addAttribute("user", user);
-            model.addAttribute("profileLink", "/profile");
-        } else if (userDetails.getUserType().equals("company")) {
+        // 기업 사용자라면 main2.html로 분기
+        if (userDetails.getUserType().equals("company")) {
             CompanyEntity company = ((CompanyDetailsImpl) userDetails).getCompanyEntity();
             model.addAttribute("user", company);
-            model.addAttribute("profileLink", "/company/profile"); // 기업 전용 프로필 페이지 (추후 링크 수정)
+            model.addAttribute("profileLink", "/company/profile");
+            return "main2"; // ✅ 여기서 main2.html로 반환
         }
+
+        // 일반 사용자
+        UserEntity user = ((UserDetailsImpl) userDetails).getUserEntity();
+        model.addAttribute("user", user);
+        model.addAttribute("profileLink", "/profile");
 
         return "main";
     }
+
 
 
     @GetMapping("/profile")
