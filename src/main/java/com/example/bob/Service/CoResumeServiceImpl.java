@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 @Service
 public class CoResumeServiceImpl implements CoResumeService {
@@ -56,4 +57,12 @@ public class CoResumeServiceImpl implements CoResumeService {
         // ✅ DB에 저장
         coResumeRepository.save(resume);
     }
+
+    // ✅ 목록 조회용 메서드
+    @Override
+    public List<CoResumeEntity> getAllResumes() {
+        return coResumeRepository.findAll();
+    }
+
+
 }

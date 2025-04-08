@@ -5,6 +5,11 @@ import com.example.bob.Service.CoResumeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.bob.Entity.CoResumeEntity;
+import com.example.bob.DTO.CoResumeListResponseDTO;
+import java.util.List;
+
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,4 +35,21 @@ public class CoResumeController {
 
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping
+    public ResponseEntity<List<CoResumeListResponseDTO>> getAllResumes() {
+        List<CoResumeEntity> resumeEntities = coResumeService.getAllResumes();
+
+        // Entity → DTO 변환
+        List<CoResumeListResponseDTO> result = resumeEntities.stream()
+                .map(resume -> new CoResumeListResponseDTO(
+                        resume.getId(),
+                        resume.getTitle(),
+                        resume.getCreatedAt()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(result);
+    }
+
 }
