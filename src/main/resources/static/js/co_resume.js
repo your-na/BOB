@@ -134,7 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-
     // ✅ 목차 클릭 → 스크롤
     document.querySelectorAll(".outline-list a").forEach(link => {
         link.addEventListener("click", e => {
@@ -163,33 +162,78 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // ✅ 팝업 옵션 클릭 → 섹션 추가
     document.querySelectorAll(".popup-option").forEach(option => {
         option.addEventListener("click", () => {
             const type = option.textContent.trim();
-
-            // ✅ 현재 존재하는 섹션 수 기준으로 정확히 계산
             const sectionIndex = document.querySelectorAll(".resume-section").length + 1;
 
             const newSection = document.createElement("section");
             newSection.className = "resume-section";
             newSection.id = `section${sectionIndex}`;
 
-            // ✅ 너의 타입에 맞게 content 조립
-            let content = `
-            <div class="section-header">
-                <span class="section-title-text">${sectionIndex}. 제목 입력</span>
-                <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
-                <button class="delete-btn">✕</button>
-            </div>
-            <input type="text" id="ohcomment" placeholder="설명 입력">
-            <textarea placeholder="구직자 답변 입력란"></textarea>
-        `;
+            let content = "";
+            switch (type) {
+                case "선택형":
+                    content = `
+                    <div class="section-header">
+                        <span class="section-title-text">${sectionIndex}. 제목 입력</span>
+                        <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                        <label>선택 방식</label>
+                        <select><option>선택형</option></select>
+                        <button class="delete-btn">✕</button>
+                    </div>
+                    <input type="text" id="ohcomment" placeholder="설명 입력">
+                    <div class="tag-mode">
+                        <button class="mode-btn selected-tag">복수선택 ⭕</button>
+                        <button class="mode-btn">복수선택 ❌</button>
+                    </div>
+                    <div class="tag-list job-tags"></div>
+                    <input class="tag-input" type="text" placeholder="항목 입력 후 엔터">
+                    `;
+                    break;
+
+                case "서술형":
+                    content = `
+                    <div class="section-header">
+                        <span class="section-title-text">${sectionIndex}. 제목 입력</span>
+                        <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                        <button class="delete-btn">✕</button>
+                    </div>
+                    <input type="text" id="ohcomment" placeholder="설명 입력">
+                    <textarea placeholder="구직자 답변 입력란"></textarea>
+                    `;
+                    break;
+
+                case "사진 첨부":
+                    content = `
+                    <div class="section-header">
+                        <span class="section-title-text">${sectionIndex}. 제목 입력</span>
+                        <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                        <button class="delete-btn">✕</button>
+                    </div>
+                    <input type="text" id="ohcomment" placeholder="설명 입력">
+                    <textarea placeholder="구직자 사진 입력란"></textarea>
+                    `;
+                    break;
+
+                case "파일 첨부":
+                    content = `
+                    <div class="section-header">
+                        <span class="section-title-text">${sectionIndex}. 제목 입력</span>
+                        <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                        <button class="delete-btn">✕</button>
+                    </div>
+                    <input type="text" id="ohcomment" placeholder="설명 입력">
+                    <textarea placeholder="구직자 파일 첨부란"></textarea>
+                    `;
+                    break;
+            }
 
             newSection.innerHTML = content;
             document.querySelector(".add-section").before(newSection);
             popup.style.display = "none";
 
-            // ✅ 목차에 정확한 번호로 추가
             const outlineList = document.querySelector(".outline-list");
             const tocItem = document.createElement("li");
             const tocLink = document.createElement("a");
@@ -198,14 +242,12 @@ document.addEventListener("DOMContentLoaded", () => {
             tocItem.appendChild(tocLink);
             outlineList.appendChild(tocItem);
 
-            // ✅ 제목 실시간 반영
             const titleInput = newSection.querySelector(".section-title-input");
             titleInput?.addEventListener("input", () => {
                 tocLink.textContent = `${sectionIndex}. ${titleInput.value || "제목 입력"}`;
             });
         });
     });
-
 
     // ✅ 선택형 섹션 내 태그 추가 처리
     document.addEventListener("keydown", (e) => {
@@ -237,7 +279,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const header = titleSpan.closest(".section-header");
             const input = header.querySelector(".section-title-input");
 
-            // 현재 제목 텍스트만 숫자 빼고 추출
             const number = titleSpan.textContent.split(".")[0];
             const currentTitle = titleSpan.textContent.replace(`${number}. `, "");
 
@@ -261,29 +302,14 @@ document.addEventListener("DOMContentLoaded", () => {
             span.textContent = `${number}. ${newTitle}`;
             input.style.display = "none";
             span.style.display = "inline-block";
-        }
-    });
 
-// 엔터로 제목 수정 마무리할 때도 목차 동기화 추가
-    document.addEventListener("keydown", function (e) {
-        if (e.target.classList.contains("section-title-input") && e.key === "Enter") {
-            const input = e.target;
-            const header = input.closest(".section-header");
-            const span = header.querySelector(".section-title-text");
-            const number = span.textContent.split(".")[0];
-            const newTitle = input.value.trim() || "제목 없음";
-
-            span.textContent = `${number}. ${newTitle}`;
-            input.style.display = "none";
-            span.style.display = "inline-block";
-
-            // 👉 여기 추가
             const section = input.closest(".resume-section");
             const sectionId = section.id;
             const tocLink = document.querySelector(`.outline-list a[href="#${sectionId}"]`);
             if (tocLink) tocLink.textContent = `${number}. ${newTitle}`;
         }
     });
+
     function reorderSectionsAndToc() {
         const allSections = document.querySelectorAll(".resume-section");
         const allTocLinks = document.querySelectorAll(".outline-list a");
@@ -301,7 +327,6 @@ document.addEventListener("DOMContentLoaded", () => {
             span.textContent = `${newNumber}. ${currentTitle}`;
             if (input) input.value = currentTitle;
 
-            // ✅ 목차도 인덱스로 동기화
             const tocLink = allTocLinks[idx];
             if (tocLink) {
                 tocLink.textContent = `${newNumber}. ${currentTitle}`;
@@ -309,5 +334,4 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-
 });
