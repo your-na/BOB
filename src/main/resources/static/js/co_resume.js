@@ -4,9 +4,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const jobTagContainer = document.querySelector(".job-tags");
     const multiOnBtn = document.getElementById("multi-on");
     const multiOffBtn = document.getElementById("multi-off");
-    let multiSelect = true;
+    const addBtn = document.getElementById("add-section");
+    const popup = document.getElementById("section-popup");
 
-    // 섹션 클릭 시 강조
+    let multiSelect = true;
+    let sectionCount = document.querySelectorAll(".resume-section").length;
+
+    // ✅ 섹션 클릭 시 강조
     sections.forEach(section => {
         section.addEventListener("click", () => {
             sections.forEach(s => s.classList.remove("selected"));
@@ -14,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // 태그 클릭 처리
+    // ✅ 태그 클릭 처리
     document.querySelectorAll(".tag-list").forEach(container => {
         const isSingleMode = container.dataset.single === "true";
 
@@ -24,7 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const isDirect = tag.classList.contains("direct-input-tag");
 
-            // 단일선택: 항상 하나만 선택되게
             if (isSingleMode || (!isSingleMode && !multiSelect)) {
                 container.querySelectorAll(".tag").forEach(t => t.classList.remove("selected-tag"));
                 container.querySelectorAll("input.custom-input").forEach(i => i.remove());
@@ -32,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             tag.classList.toggle("selected-tag");
 
-            // 직접입력 처리
             if (isDirect) {
                 const exists = tag.nextElementSibling;
                 if (tag.classList.contains("selected-tag") && !(exists && exists.classList.contains("custom-input"))) {
@@ -53,7 +55,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
             } else {
-                // 직접입력 태그는 해제 및 input 제거
                 container.querySelectorAll(".direct-input-tag").forEach(dtag => {
                     dtag.classList.remove("selected-tag");
                     const input = dtag.nextElementSibling;
@@ -64,7 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        // ✕ 버튼으로 삭제
         container.addEventListener("click", e => {
             if (e.target.classList.contains("tag-remove")) {
                 const tag = e.target.closest(".tag");
@@ -73,14 +73,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // 복수선택 토글
-    multiOnBtn.addEventListener("click", () => {
+    // ✅ 복수선택 토글
+    multiOnBtn?.addEventListener("click", () => {
         multiSelect = true;
         multiOnBtn.classList.add("selected-tag");
         multiOffBtn.classList.remove("selected-tag");
     });
 
-    multiOffBtn.addEventListener("click", () => {
+    multiOffBtn?.addEventListener("click", () => {
         multiSelect = false;
         multiOnBtn.classList.remove("selected-tag");
         multiOffBtn.classList.add("selected-tag");
@@ -91,8 +91,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // 희망직무 입력
-    jobInput.addEventListener("keydown", e => {
+    // ✅ 희망직무 입력
+    jobInput?.addEventListener("keydown", e => {
         if (e.key === "Enter" && jobInput.value.trim()) {
             e.preventDefault();
             const text = jobInput.value.trim();
@@ -104,15 +104,25 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // 삭제 버튼
-    document.querySelectorAll(".delete-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-            const section = btn.closest(".resume-section");
-            if (section && section.id !== "section1") section.remove();
-        });
+    // ✅ 저장 버튼
+    document.querySelector(".save-btn")?.addEventListener("click", () => {
+        const title = document.getElementById("resumeTitle")?.value;
+        if (!title?.trim()) {
+            alert("제목을 입력해주세요!");
+        } else {
+            alert("저장되었습니다.");
+        }
     });
 
-    // 목차 클릭 → 섹션 스크롤
+    // ✅ 삭제 버튼
+    document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("delete-btn")) {
+            const section = e.target.closest(".resume-section");
+            if (section && section.id !== "section1") section.remove();
+        }
+    });
+
+    // ✅ 목차 클릭 → 스크롤
     document.querySelectorAll(".outline-list a").forEach(link => {
         link.addEventListener("click", e => {
             e.preventDefault();
@@ -124,13 +134,151 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // 저장 버튼
-    document.querySelector(".save-btn")?.addEventListener("click", () => {
-        const title = document.getElementById("resumeTitle")?.value;
-        if (!title?.trim()) {
-            alert("제목을 입력해주세요!");
-        } else {
-            alert("저장되었습니다.");
+    // ✅ ➕ 버튼 클릭 시 팝업 위치 설정
+    addBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const rect = addBtn.getBoundingClientRect();
+        popup.style.top = `${rect.bottom + window.scrollY + 5}px`;
+        popup.style.left = `${rect.left + window.scrollX}px`;
+        popup.style.display = popup.style.display === "block" ? "none" : "block";
+    });
+
+    // ✅ 팝업 바깥 클릭 시 닫기
+    document.addEventListener("click", function (e) {
+        if (!popup.contains(e.target) && e.target !== addBtn) {
+            popup.style.display = "none";
+        }
+    });
+
+    // ✅ 팝업 옵션 클릭 → 섹션 추가
+    document.querySelectorAll(".popup-option").forEach(option => {
+        option.addEventListener("click", () => {
+            const type = option.textContent.trim();
+            sectionCount++;
+
+            const newSection = document.createElement("section");
+            newSection.className = "resume-section";
+            newSection.id = `section${sectionCount}`;
+
+            let content = "";
+
+            switch (type) {
+                case "선택형":
+                    content = `
+                    <div class="section-header">
+                        <span class="section-title-text">${sectionCount}. 제목 입력</span>
+                        <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                        <label>선택 방식</label>
+                        <select><option>선택형</option></select>
+                        <button class="delete-btn">✕</button>
+                    </div>
+                    <input type="text" id="ohcomment" placeholder="설명 입력">
+                    <div class="tag-mode">
+                        <button class="mode-btn selected-tag">복수선택 ⭕</button>
+                        <button class="mode-btn">복수선택 ❌</button>
+                    </div>
+                    <div class="tag-list job-tags"></div>
+                    <input class="tag-input" type="text" placeholder="항목 입력 후 엔터">
+                    `;
+                    break;
+
+                case "서술형":
+                    content = `
+                    <div class="section-header">
+                        <span class="section-title-text">${sectionCount}. 제목 입력</span>
+                        <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                        <button class="delete-btn">✕</button>
+                    </div>
+                    <input type="text" id="ohcomment" placeholder="설명 입력">
+                    <textarea placeholder="구직자 답변 입력란"></textarea>
+                    `;
+                    break;
+
+                case "사진 첨부":
+                    content = `
+                    <div class="section-header">
+                        <span class="section-title-text">${sectionCount}. 제목 입력</span>
+                        <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                        <button class="delete-btn">✕</button>
+                    </div>
+                    <input type="text" id="ohcomment" placeholder="설명 입력">
+                    <textarea placeholder="구직자 사진 입력란"></textarea>
+                    `;
+                    break;
+
+                case "파일 첨부":
+                    content = `
+                    <div class="section-header">
+                        <span class="section-title-text">${sectionCount}. 제목 입력</span>
+                        <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                        <button class="delete-btn">✕</button>
+                    </div>
+                    <input type="text" id="ohcomment" placeholder="설명 입력">
+                    <textarea placeholder="구직자 파일 첨부란"></textarea>
+                    `;
+                    break;
+            }
+
+            newSection.innerHTML = content;
+            document.querySelector(".add-section").before(newSection);
+            popup.style.display = "none";
+        });
+    });
+
+    // ✅ 선택형 섹션 내 태그 추가 처리
+    document.addEventListener("keydown", (e) => {
+        if (e.target.classList.contains("tag-input") && e.key === "Enter") {
+            e.preventDefault();
+            const value = e.target.value.trim();
+            if (!value) return;
+
+            const tagList = e.target.previousElementSibling;
+            const tag = document.createElement("span");
+            tag.className = "tag";
+            tag.innerHTML = `<span class="tag-label">${value}</span><span class="tag-remove">✕</span>`;
+            tagList.appendChild(tag);
+            e.target.value = "";
+        }
+    });
+
+    // ✅ 태그 삭제
+    document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("tag-remove")) {
+            const tag = e.target.closest(".tag");
+            if (tag) tag.remove();
+        }
+    });
+
+    document.addEventListener("click", function (e) {
+        const titleSpan = e.target.closest(".section-title-text");
+        if (titleSpan) {
+            const header = titleSpan.closest(".section-header");
+            const input = header.querySelector(".section-title-input");
+
+            // 현재 제목 텍스트만 숫자 빼고 추출
+            const number = titleSpan.textContent.split(".")[0];
+            const currentTitle = titleSpan.textContent.replace(`${number}. `, "");
+
+            input.value = currentTitle;
+            titleSpan.style.display = "none";
+            input.style.display = "inline-block";
+            input.focus();
+        }
+    });
+
+    document.addEventListener("keydown", function (e) {
+        if (e.target.classList.contains("section-title-input") && e.key === "Enter") {
+            e.preventDefault();
+            const input = e.target;
+            const header = input.closest(".section-header");
+            const span = header.querySelector(".section-title-text");
+
+            const number = span.textContent.split(".")[0];
+            const newTitle = input.value.trim() || "제목 없음";
+
+            span.textContent = `${number}. ${newTitle}`;
+            input.style.display = "none";
+            span.style.display = "inline-block";
         }
     });
 });
