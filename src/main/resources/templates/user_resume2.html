@@ -10,6 +10,29 @@
 <!-- header -->
 <div th:insert="~{header :: header}"></div>
 
+<!-- 모달 -->
+<div id="submitModal" class="modal">
+  <div class="modal-content">
+    <p class="modal-title"><strong>제출하시겠습니까?</strong></p>
+    <p class="modal-desc">제출 후 구직-신청한 구직 내역에서 확인하실 수 있습니다.</p>
+    <div class="modal-btns">
+      <button class="modal-confirm">네</button>
+      <button class="modal-cancel">아니오</button>
+    </div>
+  </div>
+</div>
+<!-- ✅ 이동 모달 -->
+<div id="redirectModal" class="modal">
+  <div class="modal-content">
+    <p class="modal-title">추가를 위해 페이지를 이동하시겠습니까?</p>
+    <p class="modal-desc">마이페이지 &gt; 경력내역으로 직접 이동 가능합니다.</p>
+    <div class="modal-btns">
+      <button class="modal-confirm" onclick="location.href='/projecthistory'">네</button>
+      <button class="modal-cancel">아니오</button>
+    </div>
+  </div>
+</div>
+
 <div class="resume-container">
   <div class="left-content">
     <div class="resume-title">
@@ -28,6 +51,7 @@
             <span class="red">* 내 정보에서 불러온 정보입니다.</span>
           </h3>
         </div>
+        <div class="arrow-toggle">❯</div>
       </div>
       <div class="user-info">
         <img src="/images/haerin.jpg" alt="프로필 사진">
@@ -52,15 +76,28 @@
           <p class="section-desc">구직자 설명입력 칸 입니다.</p>
         </div>
       </div>
-      <div class="form-group">
-        <input type="text" placeholder="학교명">
-        <select><option>학과</option></select>
-        <select><option>상태</option></select>
-        <select><option>2020</option></select>
-        <span>~</span>
-        <select><option>2023</option></select>
-        <button>추가하기</button>
+      <div id="education-list">
+        <div class="form-group education-item">
+          <input type="text" placeholder="학교명">
+          <input type="text" placeholder="학과명">
+          <select class="edu-status">
+            <option disabled selected>상태</option>
+            <option value="재학">재학</option>
+            <option value="졸업">졸업</option>
+          </select>
+          <select class="start-year"></select>
+          <select class="start-month"></select>
+          <span class="tilde">~</span>
+          <select class="end-year"></select>
+          <select class="end-month"></select>
+
+          <button type="button" class="del-btn">✖</button>
+        </div>
       </div>
+
+      <button class="edu-btn" id="add-education-btn">
+        <span class="plus">＋</span> 추가하기
+      </button>
     </section>
 
     <!-- 3. 희망직무 -->
@@ -112,41 +149,43 @@
           <p class="section-desc">구직자 설명입력 칸 입니다.</p>
         </div>
       </div>
-      <textarea placeholder="입력해주세요."></textarea>
+      <textarea id="selfIntro" placeholder="입력해주세요."></textarea>
+      <div id="charCount" class="char-count">0 / 500</div>
     </section>
+
+    <div class="submit-wrapper">
+      <button type="submit" class="sub-btn">제출하기</button>
+    </div>
+
   </div>
 
-  <!-- 오른쪽: 경력 없음일 때 전용 -->
   <div class="right-content">
     <div class="tab-header">
       <h3>나의 경력 및 포트폴리오</h3>
     </div>
     <div class="tab-menu">
-      <ul>
-        <li class="active">수상</li>
-        <li>포트폴리오</li>
-        <li>구직</li>
-        <li>자격증</li>
+      <ul id="tab-list">
+        <li class="tab active" data-tab="award">수상</li>
+        <li class="tab" data-tab="portfolio">포트폴리오</li>
+        <li class="tab" data-tab="job">구직</li>
+        <li class="tab" data-tab="cert">자격증</li>
       </ul>
     </div>
-    <div class="empty-state">
-      <p>경력 및 포트폴리오가 없습니다.</p>
-      <button id="openModal">내 경력내역 보기 &gt;</button>
-    </div>
-  </div>
 
-  <!-- 모달 팝업 -->
-  <div class="modal-backdrop" id="modal">
-    <div class="modal-content">
-      <p>추가를 위해 페이지를 이동하시겠습니까?</p>
-      <p class="modal-sub">마이페이지 &gt; 경력내역으로 직접 이동 가능합니다.</p>
-      <div class="modal-buttons">
-        <button>네</button>
-        <button id="closeModal">아니오</button>
-      </div>
-    </div>
-  </div>
+    <!-- 각 탭별 콘텐츠 자리 (아직 데이터가 없어서 비어있을 수 있음) -->
+    <div class="tab-content" data-content="award" style="display: none;"></div>
+    <div class="tab-content" data-content="portfolio" style="display: none;"></div>
+    <div class="tab-content" data-content="job" style="display: none;"></div>
+    <div class="tab-content" data-content="cert" style="display: none;"></div>
 
+    <!-- ✅ 데이터 없을 경우 안내 메시지 -->
+    <div class="empty-content" data-content="empty" style="display: none;">
+      <p class="no-data-text">경력 및 포트폴리오가 없습니다.</p>
+      <p class="view-link">내 경력내역 보기 &gt;</p>
+    </div>
+
+  </div>
+</div>
 <script src="/js/user_resume2.js"></script>
 </body>
 </html>
