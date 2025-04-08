@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>공고 상세보기</title>
+  <link rel="stylesheet" href="/css/co_jobdetail.css" />
+  <link rel="stylesheet" th:href="@{/css/header2.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header2 :: header}"></div>
+
+<div class="job-wrapper">
+  <div class="job-card">
+    <div class="job-header">
+      <h2>[dskjhdkchs] 개발자 채용</h2>
+      <span class="badge">D-38</span>
+    </div>
+
+    <div class="job-info-block company-info">
+      <h3>회사 정보</h3>
+      <div class="contact-box">
+        <p class="job-desc">
+          저희 회사는 뛰어난 인재와 기술을 바탕으로 최고의 제품과 서비스를 창출하여 인류 사회에 공헌하는 것을 궁극적인 목표로 삼고 있습니다.
+          글로벌 <strong>No.1 IT기업</strong>으로 끊임없는 혁신을 통해 전 세계인이 더욱 행복하고 건강한 삶을 누리는 데 도움이 될 기술을 발전시켜 나갈 것입니다.
+        </p>
+        <div class="contact-bottom">
+          <div class="contact-info">
+            <p><img src="/images/email.png"> dskjhdkchs@mail.com</p>
+            <p><img src="/images/phone.png"> 010 1111 1111</p>
+          </div>
+          <div class="arrow">➤</div>
+        </div>
+      </div>
+    </div>
+
+    <section class="condition-info">
+      <h3>지원자격 및 근무 조건</h3>
+      <ul>
+        <li><strong>경력:</strong> 신입 또는 2년 이하 경력자</li>
+        <li><strong>학력:</strong> 고졸 이상</li>
+        <li><strong>고용형태:</strong> 정규직</li>
+        <li><strong>급여:</strong> 면접 후 결정</li>
+        <li><strong>시간:</strong> 09:00~17:00 (주5일)</li>
+        <li><strong>우대:</strong> 인근 거주자, 관련직무 경험자 우대</li>
+      </ul>
+
+<!--      추후 타임리프할 때 아래걸로 하면 돼영-->
+<!--      <ul class="condition-list">-->
+<!--        <li><strong>경력:</strong> <span th:text="${job.career}">경력 내용</span></li>-->
+<!--        <li><strong>학력:</strong> <span th:text="${job.education}">학력 내용</span></li>-->
+<!--        <li><strong>고용형태:</strong> <span th:text="${job.employmentTypes}">정규직</span></li>-->
+<!--        <li><strong>급여:</strong> <span th:text="${job.salary}">면접 후 결정</span></li>-->
+<!--        <li><strong>시간:</strong> <span th:text="${job.time}">09:00~17:00</span></li>-->
+<!--        <li><strong>우대:</strong> <span th:text="${job.preference}">관련직무 우대</span></li>-->
+<!--      </ul>-->
+    </section>
+
+    <section class="documents">
+      <h3>제출서류</h3>
+      <p>졸업증명서(필수) / 성적증명서(선택) / 경력증명서(선택) 등 기타 자격증</p>
+      <p class="notice">* 필수 제출 안내 확인</p>
+    </section>
+
+    <section class="resume-template">
+      <h3>이력서 양식</h3>
+      <div class="resume-item" onclick="openResumeModal('백엔드 모집용 이력서')">
+        📄 백엔드 모집용 이력서
+      </div>
+    </section>
+
+    <section class="qa-section">
+      <h3>문의 사항 및 답변</h3>
+
+      <div class="qa-item">
+        <p>비밀 문의입니다.</p>
+        <p class="time">2025.01.14 13:22</p>
+        <div class="reply">ㄴ 비밀 답변입니다.</div>
+      </div>
+
+      <div class="qa-item">
+        <p>자격증이 필요한가요?</p>
+        <p class="time">2025.01.14 13:22</p>
+        <div class="reply">ㄴ 있으면 가산점이 있지만 필수는 아닙니다.</div>
+      </div>
+    </section>
+
+    <div class="btn-area">
+      <button class="edit">수정</button>
+      <button class="delete">삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- 이력서 모달 -->
+<div class="modal" id="resumeModal">
+  <div class="modal-content">
+    <span class="close" onclick="closeResumeModal()">&times;</span>
+    <h3 id="modal-title">이력서 제목</h3>
+    <p>이곳에 이력서의 상세 내용이 들어갑니다. (DB에서 불러올 수 있음)</p>
+  </div>
+</div>
+
+<script src="/js/co_jobdetail.js"></script>
+</body>
+</html>

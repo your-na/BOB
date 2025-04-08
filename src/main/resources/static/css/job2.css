@@ -1,0 +1,190 @@
+/* 전체 컨테이너 */
+.container {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1000px;
+    margin: 40px auto;
+    gap: 20px;
+}
+
+/* =================== */
+/* 오른쪽 채용 정보 섹션 */
+/* =================== */
+.jobs-section {
+    width: 100%;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
+}
+
+.jobs-section h2 {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.job-count {
+    font-size: 14px;
+    color: gray;
+}
+
+/* 필터 스타일 */
+.filters {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.filters select {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* 채용 공고 리스트 */
+.job-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.job-card {
+    background: #f8f8f8;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.job-card h3 {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.job-card p {
+    font-size: 14px;
+    color: #555;
+}
+
+.urgent {
+    color: red;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.job-phone {
+    display: inline-block; /* 인라인 요소로 설정하여 크기 조절 가능하게 함 */
+    width: 16px; /* 아이콘 크기 지정 */
+    height: 16px;
+    vertical-align: middle; /* 텍스트와 정렬 */
+    margin-top: -2px;
+}
+
+.job-phone img {
+    width: 100%; /* 부모 크기 100% 적용 */
+    height: 100%;
+    object-fit: contain; /* 이미지 비율 유지하며 크기 조정 */
+}
+
+.job-place {
+    display: inline-block; /* 인라인 요소로 설정하여 크기 조절 가능하게 함 */
+    width: 16px; /* 아이콘 크기 지정 */
+    height: 16px;
+    vertical-align: middle; /* 텍스트와 정렬 */
+    margin-top: -2px;
+}
+
+.job-place img {
+    width: 100%; /* 부모 크기 100% 적용 */
+    height: 100%;
+    object-fit: contain; /* 이미지 비율 유지하며 크기 조정 */
+}
+
+.job-career {
+    display: inline-block; /* 인라인 요소로 설정하여 크기 조절 가능하게 함 */
+    width: 16px; /* 아이콘 크기 지정 */
+    height: 16px;
+    vertical-align: middle; /* 텍스트와 정렬 */
+    margin-top: -2px;
+}
+
+.job-career img {
+    width: 100%; /* 부모 크기 100% 적용 */
+    height: 100%;
+    object-fit: contain; /* 이미지 비율 유지하며 크기 조정 */
+}
+
+.searchicon {
+    display: inline-block;
+    margin-left: 10px;
+    font-size: 10px;
+    text-decoration: none;
+    width: 35px;
+    height: 35px;
+}
+
+.searchicon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 🔍 검색 아이콘 & 검색창을 감싸는 컨테이너 */
+.search-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin-top: 10px;
+}
+
+/* 🔍 검색창 스타일 (기본적으로 숨김) */
+.search-box {
+    position: absolute;
+    left: 50px; /* 아이콘 바로 옆에 위치하도록 설정 */
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    padding: 5px;
+    width: 200px;
+    display: none; /* 기본적으로 숨김 */
+}
+
+/* 🔍 검색창 내부 스타일 */
+.search-box input {
+    width: 100%;
+    padding: 5px;
+    border: none;
+    outline: none;
+}
+
+/* ❌ 닫기 버튼 */
+#search-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    margin-left: 5px;
+    color: #888;
+}
+
+.job-create-btn {
+    background-color: #2ecc71; /* 연초록 */
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    margin-left: 10px;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+
+.job-create-btn:hover {
+    background-color: #27ae60; /* 진한 초록으로 호버 효과 */
+}

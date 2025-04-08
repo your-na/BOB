@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>구인글 작성</title>
+    <link rel="stylesheet" href="/css/co_jobwrite.css">
+    <link rel="stylesheet" th:href="@{/css/header2.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header2 :: header}"></div>
+
+<h2>구인글 작성</h2>
+
+<!-- 모집 기간 -->
+<div class="date-range">
+    모집 기간:
+    <input type="date" id="startDate"> ~ <input type="date" id="endDate">
+</div>
+
+<!-- 제목 -->
+<input type="text" class="title-input" placeholder="제목을 입력해주세요.">
+
+<div class="main-container">
+    <!-- 왼쪽 입력 영역 -->
+    <div class="form-container">
+        <form id="jobForm">
+            <label>회사 소개글:
+                <textarea name="companyIntro" required></textarea>
+            </label>
+
+            <label>E-mail:
+                <input type="email" name="email" required>
+            </label>
+
+            <label>전화번호:
+                <input type="text" name="phone" required>
+            </label>
+
+            <label>회사 링크:
+                <input type="url" name="companyLink">
+            </label>
+
+            <label>경력:
+                <input type="text" name="career">
+            </label>
+
+            <label>학력:
+                <input type="text" name="education">
+            </label>
+
+            <label>우대:
+                <input type="text" name="preference">
+            </label>
+
+            <label>고용형태:<br>
+                <input type="checkbox" name="employmentType" value="인턴">인턴
+                <input type="checkbox" name="employmentType" value="계약직">계약직
+                <input type="checkbox" name="employmentType" value="정규직">정규직
+                <input type="checkbox" name="employmentType" value="프리랜서">프리랜서
+                <input type="checkbox" name="employmentType" value="기타">기타:
+                <input type="text" name="employmentEtc" class="extra-employment">
+            </label>
+
+            <label>급여:
+                <input type="text" name="salary">
+            </label>
+
+            <label>날짜 및 시간:
+                <input type="text" name="time">
+            </label>
+
+            <label>이력서 양식: <button type="button" id="addResumeBtn">추가하기</button></label>
+
+            <!-- 드롭된 이력서 목록 -->
+            <div id="added-resume-list" class="added-resume-list">
+                <h4>📄 추가된 이력서</h4>
+                <ul id="resume-output"></ul>
+            </div>
+
+            <div class="btns">
+                <button class="submit-btn">작성</button>
+                <button class="cancel-btn">취소</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 이력서 선택 사이드 패널 -->
+    <div class="resume-panel">
+        <div class="resume-header">
+            <span class="resume-title">저장된 이력서</span>
+            <span class="add-resume-text">+ 이력서 추가</span>
+        </div>
+        <div class="resume-tabs">
+            <div class="resume-tab" draggable="true">백엔드 모집용 이력서</div>
+            <div class="resume-tab" draggable="true">프론트 모집용 이력서</div>
+            <div class="resume-tab" draggable="true">인턴 모집용 이력서</div>
+        </div>
+        <p class="resume-hint">※ 등록하길 원하시는 이력서 양식을 추가하기에 드래그 해서 추가가 가능합니다.</p>
+    </div>
+    <!-- 이력서 모달 -->
+    <div id="resume-modal" class="modal hidden">
+        <div class="modal-content">
+            <span id="modal-close">&times;</span>
+            <h3 id="modal-title">이력서 제목</h3>
+            <p id="modal-body">이력서 내용이 여기에 표시됩니다.</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/co_jobwrite.js"></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/css/job2.css">
+    <link rel="stylesheet" th:href="@{/css/header2.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header2 :: header}"></div>
+
+<div class="container">
+    <!-- 오른쪽 채용 정보 섹션 -->
+    <div class="jobs-section">
+        <h2>채용정보 <span class="job-count">총 115건</span></h2>
+
+        <div class="job-head">
+            <form>
+                <!-- 검색 아이콘 -->
+
+                <div class="search-container">
+                    <div class="searchicon" id="searchicon">
+                        <img src="/images/search-icon.png" alt="">
+                    </div>
+                    <!-- 검색창 (처음엔 숨김) -->
+                    <div class="search-box" id="search-box">
+                        <input type="text" placeholder="프로젝트 검색..." id="search-input">
+                        <button type="button" id="search-close">&times;</button>
+                    </div>
+                </div>
+            </form>
+            <div class="filters">
+                <select>
+                    <option>기업 형태 전체</option>
+                </select>
+                <select>
+                    <option>관련도순</option>
+                </select>
+
+                <a href="/cojobwrite" class="job-create-btn">구인글 작성</a>
+            </div>
+        </div>
+        <!-- 채용 공고 리스트 -->
+        <div class="job-list">
+            <div class="job-card">
+                <span class="urgent">채용 마감 임박</span>
+                <h3>[dskjhkchks] 개발자 채용</h3>
+                <p><span class="job-phone"><img src="/images/job_phone.png"></span> 02-271-xxxx | 경력 1년 이상</p>
+                <p><span class="job-place"><img src="/images/job_place.png"></span> 경제나무딩딩(주)</p>
+            </div>
+            <div class="job-card">
+                <span class="urgent">채용 마감 임박</span>
+                <h3>[dskjhkchks] 개발자 채용</h3>
+                <p><span class="job-phone"><img src="/images/job_phone.png"></span> 02-271-xxxx | 경력 1년 이상</p>
+                <p><span class="job-place"><img src="/images/job_place.png"></span> 경제나무딩딩(주)</p>
+            </div>
+            <div class="job-card">
+                <span class="urgent">채용 마감 임박</span>
+                <h3>[dskjhkchks] 개발자 채용</h3>
+                <p><span class="job-phone"><img src="/images/job_phone.png"></span> 02-271-xxxx | 경력 1년 이상</p>
+                <p><span class="job-place"><img src="/images/job_place.png"></span> 경제나무딩딩(주)</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var searchIcon = document.getElementById("searchicon");
+        var searchBox = document.getElementById("search-box");
+        var searchClose = document.getElementById("search-close");
+
+        // 검색 아이콘 클릭 시 검색창 표시/숨김
+        searchIcon.addEventListener("click", function () {
+            if (searchBox.style.display === "none" || searchBox.style.display === "") {
+                searchBox.style.display = "flex"; // 검색창 보이기
+            } else {
+                searchBox.style.display = "none"; // 검색창 숨기기
+            }
+        });
+
+        // 닫기 버튼 클릭 시 검색창 숨기기
+        searchClose.addEventListener("click", function () {
+            searchBox.style.display = "none";
+        });
+    });
+
+</script>
+</body>
+</html>

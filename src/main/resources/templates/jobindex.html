@@ -56,7 +56,6 @@
                     <div class="arrow">➤</div>
                 </div>
             </div>
-
         </div>
 
         <div class="job-info-block">
@@ -69,6 +68,16 @@
                 <li><strong>시간:</strong> 09:00~17:00 (주5일)</li>
                 <li><strong>우대:</strong> 인근 거주자, 관련직무 경험자 우대</li>
             </ul>
+
+            <!--      추후 타임리프할 때 아래걸로 하면 돼영-->
+            <!--      <ul class="condition-list">-->
+            <!--        <li><strong>경력:</strong> <span th:text="${job.career}">경력 내용</span></li>-->
+            <!--        <li><strong>학력:</strong> <span th:text="${job.education}">학력 내용</span></li>-->
+            <!--        <li><strong>고용형태:</strong> <span th:text="${job.employmentTypes}">정규직</span></li>-->
+            <!--        <li><strong>급여:</strong> <span th:text="${job.salary}">면접 후 결정</span></li>-->
+            <!--        <li><strong>시간:</strong> <span th:text="${job.time}">09:00~17:00</span></li>-->
+            <!--        <li><strong>우대:</strong> <span th:text="${job.preference}">관련직무 우대</span></li>-->
+            <!--      </ul>-->
         </div>
 
         <div class="job-info-block">
@@ -78,11 +87,23 @@
         </div>
 
         <div class="job-info-block">
-            <h3>이력서 첨부</h3>
-            <div class="resume-upload-box">
-                <span>📁 파일 업로드</span>
+            <h3>이력서 양식</h3>
+            <div class="resume-upload-box" onclick="openResumeModal()">
+                <span>📝 기업이 등록한 이력서 양식 보기</span>
             </div>
         </div>
+
+        <!-- ✅ 모달 창 -->
+        <div id="resumeModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <p>이력서 작성 하시겠습니까?</p>
+                <div class="modal-buttons">
+                    <button onclick="confirmResume()">예</button>
+                    <button onclick="closeResumeModal()">아니오</button>
+                </div>
+            </div>
+        </div>
+
 
         <div class="job-info-block qa-block">
             <h3>문의 사항 및 답변</h3>
@@ -109,6 +130,33 @@
 
 
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modal = document.getElementById("resumeModal");
+        const resumeBox = document.querySelector(".resume-upload-box"); // ✅ 클래스 이름 맞춤
+
+        if (resumeBox) {
+            resumeBox.addEventListener("click", function () {
+                modal.style.display = "flex";
+            });
+        }
+
+        const closeBtn = document.querySelector(".modal-buttons button:last-child");
+        if (closeBtn) {
+            closeBtn.addEventListener("click", function () {
+                modal.style.display = "none";
+            });
+        }
+
+        const yesBtn = document.querySelector(".modal-buttons button:first-child");
+        if (yesBtn) {
+            yesBtn.addEventListener("click", function () {
+                window.location.href = "/resume/write"; // 예: 이력서 작성 페이지 이동
+            });
+        }
+    });
+</script>
 
 </body>
 </html>
