@@ -3,6 +3,9 @@ package com.example.bob.Entity;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.data.annotation.CreatedDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 기업이 생성한 이력서 양식 엔티티 (전체 이력서 단위)
@@ -15,6 +18,10 @@ public class CoResumeEntity {
     private Long id;  // 이력서 ID (자동 생성)
 
     private String title;  // 이력서 제목 (예: 개발자 채용 양식)
+
+    // 작성일 필드를 String으로 변경
+    private String createdAt;  // 작성일 (yyyy-MM-dd 형식)
+
 
     // 이력서 항목들과의 1:N 관계
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -37,4 +44,7 @@ public class CoResumeEntity {
 
     public List<CoResumeSectionEntity> getSections() { return sections; }
     public void setSections(List<CoResumeSectionEntity> sections) { this.sections = sections; }
+
+    public String getCreatedAt() { return createdAt; }
+    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
 }
