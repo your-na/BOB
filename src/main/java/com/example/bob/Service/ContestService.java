@@ -34,7 +34,6 @@ public class ContestService {
     // 공모전 저장
     public ContestEntity save(ContestEntity contest) {
         ContestEntity saved = contestRepository.save(contest);
-        System.out.println("✅ 저장 시도: " + contest.getTitle());
         saveHistory(saved);
         return saved;
     }
@@ -46,6 +45,13 @@ public class ContestService {
         contest.setApproved(true);
         contestRepository.save(contest);
         saveHistory(contest);
+    }
+
+    public void reject(Long id) {
+        ContestEntity c = contestRepository.findById(id).orElseThrow();
+        c.setApproved(false);
+        contestRepository.save(c);
+        saveHistory(c);
     }
 
     // 공모전 히스토리 저장

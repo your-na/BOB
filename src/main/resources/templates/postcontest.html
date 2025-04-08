@@ -19,12 +19,12 @@
     <div class="contest-header">
         <h2 th:text="${contest.title}">2025 통계 청소년 IT 학술대회</h2> <!-- 공모전명-->
         <div class="status-badge" id="status-badge">모집중</div>
-        <button class="bookmark-btn" id="bookmark-btn">⭐</button>
+        <button class="bookmark-btn" id="bookmark-btn" sec:authorize="!hasRole('ADMIN')">⭐</button>
     </div>
 
     <div class="contest-content">
         <!-- 공모전 대표 이미지 -->
-        <img src="/images/contest-banner.png" alt="공모전 배너" class="contest-banner" />
+        <img th:src="@{${contest.imageUrl}}" alt="공모전 배너" class="contest-banner" />
 
         <!-- 공모전 정보 테이블 -->
         <table class="contest-table">
@@ -47,26 +47,7 @@
 
     <!-- 공모전 상세 내용 -->
     <section class="contest-details">
-        <h3>상세내용</h3>
-        <p>2025 통계 청소년 IT 학술대회</p>
-        <h4>📌 참가 자격</h4>
-        <p>고등학교 3학년 또는 그 이하 청소년 (2007년생 ~ 2010년생)</p>
-        <h4>📌 특전</h4>
-        <ul>
-            <li>IT 스타트업/데이터센터 드림 교육캠프 혜택</li>
-            <li>논문 1:1 교육 지원 제공</li>
-        </ul>
-        <h4>📌 접수 기간</h4>
-        <p>2024.11.14 ~ 2025.01.12</p>
-        <h4>📌 시상 내역</h4>
-        <ul>
-            <li>대상 (1명) - 200만원</li>
-            <li>금상 (2명) - 100만원</li>
-            <li>은상 (3명) - 50만원</li>
-            <li>장려상 (5명) - 30만원</li>
-        </ul>
-        <h4>📌 문의</h4>
-        <p>이메일: contact@eduKIBA.org</p>
+        <div th:text="${contest.description}" id="contest-description">상세페이지</div>
     </section>
 
     <!-- 버튼 영역 -->
@@ -128,7 +109,7 @@
     </div>
 </div>
 
-<script>
+<script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function () {
         // 북마크 토글
         document.getElementById("bookmark-btn").addEventListener("click", function () {
@@ -137,14 +118,18 @@
 
         // 상태 뱃지 변경
         const statusBadge = document.getElementById("status-badge");
-        const registrationEndDate = new Date("2025-01-12");
+
+        const startDate = new Date([[${contest.startDate}]]);
+        const endDate = new Date([[${contest.endDate}]]);
         const today = new Date();
-        if (today > registrationEndDate) {
+
+
+        if (today > endDate) {
             statusBadge.textContent = "진행완료";
             statusBadge.style.backgroundColor = "#ff4040";
         } else {
             statusBadge.textContent = "진행중";
-            statusBadge.style.backgroundColor = "#0078ff";
+            statusBadge.style.backgroundColor = "#02b902";
         }
 
         // 참여하기 버튼
@@ -255,7 +240,7 @@
     // 상태 뱃지 변경
     const statusBadge = document.getElementById("status-badge");
     const start = new Date([[${contest.startDate}]]);
-    const end = new Date([[${contest.:endDate}]]);
+    const end = new Date([[${contest.endDate}]]);
     const today = new Date();
 
     if (today < start) {

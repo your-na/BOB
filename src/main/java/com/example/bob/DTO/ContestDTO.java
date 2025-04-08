@@ -20,6 +20,7 @@ public class ContestDTO {
     private String category;
     private String target;
     private String region;
+    private String imageUrl;
 
     private LocalDate startDate;
     private LocalDate endDate;
@@ -31,6 +32,7 @@ public class ContestDTO {
     private String description;
     private String status;
 
+
     private long remainingDays; // D-day 계산용
 
     private String creatorType; // "ADMIN", "COMPANY"
@@ -40,6 +42,14 @@ public class ContestDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    public void setIsApproved(boolean isApproved) {
+        this.isApproved = isApproved;
+    }
+
+    public void setIsOnlyBOB(boolean isOnlyBOB) {
+        this.isOnlyBOB = isOnlyBOB;
+    }
+
     public ContestEntity toEntity() {
         return ContestEntity.builder()
                 .id(id)
@@ -48,6 +58,7 @@ public class ContestDTO {
                 .category(category)
                 .target(target)
                 .region(region)
+                .imageUrl(imageUrl)
                 .startDate(startDate)
                 .endDate(endDate)
                 .judge(judge)
@@ -77,6 +88,7 @@ public class ContestDTO {
                 .category(entity.getCategory())
                 .target(entity.getTarget())
                 .region(entity.getRegion())
+                .imageUrl(entity.getImageUrl())
                 .startDate(entity.getStartDate())
                 .endDate(entity.getEndDate())
                 .judge(entity.getJudge())
