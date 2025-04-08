@@ -118,9 +118,22 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("click", (e) => {
         if (e.target.classList.contains("delete-btn")) {
             const section = e.target.closest(".resume-section");
-            if (section && section.id !== "section1") section.remove();
+            if (section && section.id !== "section1") {
+                const sectionId = section.id;
+                section.remove();
+
+                // 목차에서도 해당 항목 제거
+                const tocLink = document.querySelector(`.outline-list a[href="#${sectionId}"]`);
+                if (tocLink) {
+                    tocLink.closest("li").remove();
+                }
+
+                // ✅ 번호 및 제목 동기화
+                reorderSectionsAndToc();
+            }
         }
     });
+
 
     // ✅ 목차 클릭 → 스크롤
     document.querySelectorAll(".outline-list a").forEach(link => {
@@ -281,4 +294,66 @@ document.addEventListener("DOMContentLoaded", () => {
             span.style.display = "inline-block";
         }
     });
+    // 목차 항목도 추가
+    const outlineList = document.querySelector(".outline-list");
+
+    const tocItem = document.createElement("li");
+    const tocLink = document.createElement("a");
+    tocLink.href = `#section${sectionCount}`;
+    tocLink.textContent = `${sectionCount}. 제목 입력`;
+    tocItem.appendChild(tocLink);
+    outlineList.appendChild(tocItem);
+
+// 동기화 위해 제목 input에 이벤트 연결
+    newSection.querySelector(".section-title-input")?.addEventListener("input", function (e) {
+        tocLink.textContent = `${sectionCount}. ${e.target.value || "제목 입력"}`;
+    });
+
+// 엔터로 제목 수정 마무리할 때도 목차 동기화 추가
+    document.addEventListener("keydown", function (e) {
+        if (e.target.classList.contains("section-title-input") && e.key === "Enter") {
+            const input = e.target;
+            const header = input.closest(".section-header");
+            const span = header.querySelector(".section-title-text");
+            const number = span.textContent.split(".")[0];
+            const newTitle = input.value.trim() || "제목 없음";
+
+            span.textContent = `${number}. ${newTitle}`;
+            input.style.display = "none";
+            span.style.display = "inline-block";
+
+            // 👉 여기 추가
+            const section = input.closest(".resume-section");
+            const sectionId = section.id;
+            const tocLink = document.querySelector(`.outline-list a[href="#${sectionId}"]`);
+            if (tocLink) tocLink.textContent = `${number}. ${newTitle}`;
+        }
+    });
+    function reorderSectionsAndToc() {
+        const allSections = document.querySelectorAll(".resume-section");
+        const allTocLinks = document.querySelectorAll(".outline-list a");
+
+        allSections.forEach((section, idx) => {
+            const newNumber = idx + 1;
+            section.id = `section${newNumber}`;
+
+            const header = section.querySelector(".section-header");
+            const span = header.querySelector(".section-title-text");
+            const input = header.querySelector(".section-title-input");
+
+            const currentTitle = input?.value || span?.textContent.replace(/^\d+\.\s*/, "") || "제목 입력";
+
+            span.textContent = `${newNumber}. ${currentTitle}`;
+            if (input) input.value = currentTitle;
+
+            // ✅ 목차도 인덱스로 동기화
+            const tocLink = allTocLinks[idx];
+            if (tocLink) {
+                tocLink.textContent = `${newNumber}. ${currentTitle}`;
+                tocLink.setAttribute("href", `#section${newNumber}`);
+            }
+        });
+    }
+
+
 });
