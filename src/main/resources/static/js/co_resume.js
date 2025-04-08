@@ -106,13 +106,65 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ✅ 저장 버튼
     document.querySelector(".save-btn")?.addEventListener("click", () => {
-        const title = document.getElementById("resumeTitle")?.value;
-        if (!title?.trim()) {
+        const title = document.getElementById("resumeTitle")?.value.trim();
+        if (!title) {
             alert("제목을 입력해주세요!");
-        } else {
-            alert("저장되었습니다.");
+            return;
         }
+
+        const sections = [];
+        document.querySelectorAll(".resume-section").forEach(section => {
+            const headerText = section.querySelector(".section-header span")?.textContent.trim();
+            const sectionTitle = headerText?.split(". ")[1] || "제목 없음";
+            const type = sectionTitle.includes("자기소개") || section.querySelector("textarea") ? "서술형" : "선택형";
+
+            const comment = section.querySelector("#ohcomment")?.value || "";
+
+            if (type === "선택형") {
+                const tagElements = section.querySelectorAll(".tag-list .tag-label");
+                const tags = Array.from(tagElements).map(el => el.textContent.trim());
+                sections.push({ type, title: sectionTitle, comment, tags });
+            } else if (type === "서술형") {
+                const content = section.querySelector("textarea")?.value || "";
+                sections.push({ type, title: sectionTitle, comment, content });
+            }
+        });
+
+        const resumeData = {
+            title,
+            sections
+        };
+        // ✅ CSRF 토큰 가져오기
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+
+        console.log("CSRF TOKEN:", csrfToken);
+        console.log("CSRF HEADER:", csrfHeader);
+
+
+        // ✅ fetch로 백엔드에 POST 요청 보내기
+        fetch("/api/resumes", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                [csrfHeader]: csrfToken // ex: "X-CSRF-TOKEN": "abcd..."
+            },
+            body: JSON.stringify(resumeData)
+        })
+            .then(response => {
+                if (!response.ok) throw new Error("저장 실패");
+                return response.json();
+            })
+            .then(data => {
+                alert("저장 완료!");
+                // 저장 후 페이지 이동 등 원하는 작업
+            })
+            .catch(error => {
+                alert("저장 중 오류가 발생했습니다.");
+                console.error(error);
+            });
     });
+
 
     // ✅ 삭제 버튼
     document.addEventListener("click", (e) => {

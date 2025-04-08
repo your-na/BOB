@@ -5,7 +5,12 @@
     <title>이력서 저장 목록</title>
     <link rel="stylesheet" href="/css/co_resumelist.css">
     <link rel="stylesheet" th:href="@{/css/header2.css}">
+
+    <!-- ✅ CSRF 토큰 메타 태그 추가 -->
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
 </head>
+
 <body>
 <!-- 헤더 -->
 <div th:insert="~{header2 :: header}"></div>
@@ -32,28 +37,72 @@
 
     <!-- 이력서 리스트 -->
     <div class="resume-list">
-        <!-- 이 영역은 반복 렌더링됨 -->
-        <div class="resume-card">
-            <input type="checkbox">
-            <div class="resume-info">
-                <div class="resume-title">백엔드 모집용 이력서</div>
-                <div class="resume-date">작성일: 2024-06-20</div>
-            </div>
-            <button class="delete-btn">🗑️</button>
-        </div>
-
-        <!-- 반복 렌더링되는 resume-card 백엔드 연동 시 이걸로... -->
-        <div class="resume-card" th:each="resume : ${resumeList}">
-            <input type="checkbox">
-            <div class="resume-info">
-                <div class="resume-title" th:text="${resume.title}">이력서 제목</div>
-                <div class="resume-date" th:text="'작성일: ' + ${resume.createdAt}">작성일</div>
-            </div>
-            <button class="delete-btn" th:onclick="'deleteResume(' + ${resume.id} + ')'">🗑️</button>
-        </div>
-
-        <!-- 여기에 백엔드에서 반복 렌더링 -->
+        <!-- JS에서 여기에 카드가 동적으로 들어갈 예정 -->
     </div>
+
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        fetch("/api/resumes")
+            .then(response => response.json())
+            .then(data => {
+                const listContainer = document.querySelector(".resume-list");
+                listContainer.innerHTML = "";
+
+                if (data.length === 0) {
+                    listContainer.innerHTML = "<p>등록된 이력서 양식이 없습니다.</p>";
+                    return;
+                }
+
+                data.forEach(resume => {
+                    const card = document.createElement("div");
+                    card.className = "resume-card";
+
+                    card.innerHTML = `
+                        <input type="checkbox">
+                        <div class="resume-info">
+                            <div class="resume-title">${resume.title}</div>
+                            <div class="resume-date">작성일: ${resume.createdAt}</div>
+                        </div>
+                        <button class="delete-btn" onclick="deleteResume(${resume.id})">🗑️</button>
+                    `;
+
+                    listContainer.appendChild(card);
+                });
+            })
+            .catch(error => {
+                console.error("이력서 목록 불러오기 실패:", error);
+            });
+    });
+
+    // ✅ 삭제 함수: <meta>에서 CSRF 토큰 읽어서 전송
+    function deleteResume(id) {
+        const csrf = getCsrfInfo();
+        if (confirm("정말 삭제하시겠습니까?")) {
+            fetch(`/api/resumes/${id}`, {
+                method: "DELETE",
+                headers: {
+                    [csrf.header]: csrf.token
+                }
+            })
+                .then(() => {
+                    alert("삭제 완료!");
+                    location.reload();
+                })
+                .catch(() => {
+                    alert("삭제 실패");
+                });
+        }
+    }
+
+    // ✅ <meta> 태그에서 CSRF 정보 가져오기
+    function getCsrfInfo() {
+        const token = document.querySelector('meta[name="_csrf"]')?.getAttribute("content");
+        const header = document.querySelector('meta[name="_csrf_header"]')?.getAttribute("content") || "X-XSRF-TOKEN";
+        return { token, header };
+    }
+</script>
+
+
 </body>
 </html>

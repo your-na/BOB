@@ -5,6 +5,11 @@
   <title>이력서 양식</title>
   <link rel="stylesheet" href="/css/co_resume.css">
   <link rel="stylesheet" th:href="@{/css/header2.css}">
+
+  <!-- ✅ CSRF 토큰 정보 (Spring Security 연동용) -->
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
   <script defer src="/js/co_resume.js"></script>
 </head>
 <body>
