@@ -163,80 +163,49 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // ✅ 팝업 옵션 클릭 → 섹션 추가
     document.querySelectorAll(".popup-option").forEach(option => {
         option.addEventListener("click", () => {
             const type = option.textContent.trim();
-            sectionCount++;
+
+            // ✅ 현재 존재하는 섹션 수 기준으로 정확히 계산
+            const sectionIndex = document.querySelectorAll(".resume-section").length + 1;
 
             const newSection = document.createElement("section");
             newSection.className = "resume-section";
-            newSection.id = `section${sectionCount}`;
+            newSection.id = `section${sectionIndex}`;
 
-            let content = "";
-
-            switch (type) {
-                case "선택형":
-                    content = `
-                    <div class="section-header">
-                        <span class="section-title-text">${sectionCount}. 제목 입력</span>
-                        <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
-                        <label>선택 방식</label>
-                        <select><option>선택형</option></select>
-                        <button class="delete-btn">✕</button>
-                    </div>
-                    <input type="text" id="ohcomment" placeholder="설명 입력">
-                    <div class="tag-mode">
-                        <button class="mode-btn selected-tag">복수선택 ⭕</button>
-                        <button class="mode-btn">복수선택 ❌</button>
-                    </div>
-                    <div class="tag-list job-tags"></div>
-                    <input class="tag-input" type="text" placeholder="항목 입력 후 엔터">
-                    `;
-                    break;
-
-                case "서술형":
-                    content = `
-                    <div class="section-header">
-                        <span class="section-title-text">${sectionCount}. 제목 입력</span>
-                        <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
-                        <button class="delete-btn">✕</button>
-                    </div>
-                    <input type="text" id="ohcomment" placeholder="설명 입력">
-                    <textarea placeholder="구직자 답변 입력란"></textarea>
-                    `;
-                    break;
-
-                case "사진 첨부":
-                    content = `
-                    <div class="section-header">
-                        <span class="section-title-text">${sectionCount}. 제목 입력</span>
-                        <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
-                        <button class="delete-btn">✕</button>
-                    </div>
-                    <input type="text" id="ohcomment" placeholder="설명 입력">
-                    <textarea placeholder="구직자 사진 입력란"></textarea>
-                    `;
-                    break;
-
-                case "파일 첨부":
-                    content = `
-                    <div class="section-header">
-                        <span class="section-title-text">${sectionCount}. 제목 입력</span>
-                        <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
-                        <button class="delete-btn">✕</button>
-                    </div>
-                    <input type="text" id="ohcomment" placeholder="설명 입력">
-                    <textarea placeholder="구직자 파일 첨부란"></textarea>
-                    `;
-                    break;
-            }
+            // ✅ 너의 타입에 맞게 content 조립
+            let content = `
+            <div class="section-header">
+                <span class="section-title-text">${sectionIndex}. 제목 입력</span>
+                <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                <button class="delete-btn">✕</button>
+            </div>
+            <input type="text" id="ohcomment" placeholder="설명 입력">
+            <textarea placeholder="구직자 답변 입력란"></textarea>
+        `;
 
             newSection.innerHTML = content;
             document.querySelector(".add-section").before(newSection);
             popup.style.display = "none";
+
+            // ✅ 목차에 정확한 번호로 추가
+            const outlineList = document.querySelector(".outline-list");
+            const tocItem = document.createElement("li");
+            const tocLink = document.createElement("a");
+            tocLink.href = `#section${sectionIndex}`;
+            tocLink.textContent = `${sectionIndex}. 제목 입력`;
+            tocItem.appendChild(tocLink);
+            outlineList.appendChild(tocItem);
+
+            // ✅ 제목 실시간 반영
+            const titleInput = newSection.querySelector(".section-title-input");
+            titleInput?.addEventListener("input", () => {
+                tocLink.textContent = `${sectionIndex}. ${titleInput.value || "제목 입력"}`;
+            });
         });
     });
+
 
     // ✅ 선택형 섹션 내 태그 추가 처리
     document.addEventListener("keydown", (e) => {
@@ -340,6 +309,5 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-
 
 });
