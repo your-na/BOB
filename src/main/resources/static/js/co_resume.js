@@ -294,20 +294,6 @@ document.addEventListener("DOMContentLoaded", () => {
             span.style.display = "inline-block";
         }
     });
-    // 목차 항목도 추가
-    const outlineList = document.querySelector(".outline-list");
-
-    const tocItem = document.createElement("li");
-    const tocLink = document.createElement("a");
-    tocLink.href = `#section${sectionCount}`;
-    tocLink.textContent = `${sectionCount}. 제목 입력`;
-    tocItem.appendChild(tocLink);
-    outlineList.appendChild(tocItem);
-
-// 동기화 위해 제목 input에 이벤트 연결
-    newSection.querySelector(".section-title-input")?.addEventListener("input", function (e) {
-        tocLink.textContent = `${sectionCount}. ${e.target.value || "제목 입력"}`;
-    });
 
 // 엔터로 제목 수정 마무리할 때도 목차 동기화 추가
     document.addEventListener("keydown", function (e) {
