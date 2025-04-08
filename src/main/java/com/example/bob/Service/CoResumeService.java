@@ -9,4 +9,8 @@ public interface CoResumeService {
 
     // ✅ 목록 조회 메서드 추가
     List<CoResumeEntity> getAllResumes();
+
+    // ✅ 삭제 메서드 추가
+    void deleteResume(Long id);
+
 }

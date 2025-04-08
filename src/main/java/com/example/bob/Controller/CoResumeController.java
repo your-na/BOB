@@ -52,4 +52,16 @@ public class CoResumeController {
         return ResponseEntity.ok(result);
     }
 
+    //이력서 양식 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> deleteResume(@PathVariable Long id) {
+        coResumeService.deleteResume(id);
+
+        Map<String, String> result = new HashMap<>();
+        result.put("message", "이력서 삭제 성공");
+
+        return ResponseEntity.ok(result);
+    }
+
+
 }

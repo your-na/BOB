@@ -64,5 +64,12 @@ public class CoResumeServiceImpl implements CoResumeService {
         return coResumeRepository.findAll();
     }
 
+    // ✅ 삭제 메서드
+    @Override
+    public void deleteResume(Long id) {
+        coResumeRepository.deleteById(id);
+    }
+
+
 
 }

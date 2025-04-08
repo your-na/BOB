@@ -5,7 +5,12 @@
     <title>이력서 저장 목록</title>
     <link rel="stylesheet" href="/css/co_resumelist.css">
     <link rel="stylesheet" th:href="@{/css/header2.css}">
+
+    <!-- ✅ CSRF 토큰 메타 태그 추가 -->
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
 </head>
+
 <body>
 <!-- 헤더 -->
 <div th:insert="~{header2 :: header}"></div>
@@ -42,7 +47,7 @@
             .then(response => response.json())
             .then(data => {
                 const listContainer = document.querySelector(".resume-list");
-                listContainer.innerHTML = ""; // 기존 내용 비우기
+                listContainer.innerHTML = "";
 
                 if (data.length === 0) {
                     listContainer.innerHTML = "<p>등록된 이력서 양식이 없습니다.</p>";
@@ -54,13 +59,13 @@
                     card.className = "resume-card";
 
                     card.innerHTML = `
-                    <input type="checkbox">
-                    <div class="resume-info">
-                        <div class="resume-title">${resume.title}</div>
-                        <div class="resume-date">작성일: ${resume.createdAt}</div>
-                    </div>
-                    <button class="delete-btn" onclick="deleteResume(${resume.id})">🗑️</button>
-                `;
+                        <input type="checkbox">
+                        <div class="resume-info">
+                            <div class="resume-title">${resume.title}</div>
+                            <div class="resume-date">작성일: ${resume.createdAt}</div>
+                        </div>
+                        <button class="delete-btn" onclick="deleteResume(${resume.id})">🗑️</button>
+                    `;
 
                     listContainer.appendChild(card);
                 });
@@ -70,21 +75,34 @@
             });
     });
 
-    // 🗑 삭제 버튼 클릭 시 호출되는 함수 (선택)
+    // ✅ 삭제 함수: <meta>에서 CSRF 토큰 읽어서 전송
     function deleteResume(id) {
+        const csrf = getCsrfInfo();
         if (confirm("정말 삭제하시겠습니까?")) {
             fetch(`/api/resumes/${id}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    [csrf.header]: csrf.token
+                }
             })
                 .then(() => {
                     alert("삭제 완료!");
-                    location.reload(); // 새로고침
+                    location.reload();
                 })
                 .catch(() => {
                     alert("삭제 실패");
                 });
         }
     }
+
+    // ✅ <meta> 태그에서 CSRF 정보 가져오기
+    function getCsrfInfo() {
+        const token = document.querySelector('meta[name="_csrf"]')?.getAttribute("content");
+        const header = document.querySelector('meta[name="_csrf_header"]')?.getAttribute("content") || "X-XSRF-TOKEN";
+        return { token, header };
+    }
 </script>
+
+
 </body>
 </html>
