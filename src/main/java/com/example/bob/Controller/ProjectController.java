@@ -502,6 +502,10 @@ public class ProjectController {
         }
     }
 
+    @GetMapping("/projecthistory")
+    public String showProjectHistoryPage() {
+        return "projecthistory"; // templates/projecthistory.html 파일을 반환
+    }
 
 
     @GetMapping("/todoadd")
