@@ -17,7 +17,7 @@ public class CompanyDetailsImpl implements CustomUserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_COMPANY"));
+        return Collections.singletonList(new SimpleGrantedAuthority("COMPANY"));
     }
 
     @Override

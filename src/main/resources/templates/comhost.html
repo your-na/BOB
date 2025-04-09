@@ -11,6 +11,7 @@
 <!-- header -->
 <div th:insert="~{header :: header}"></div>
 
+<form th:action="@{/comhost}" method="post" enctype="multipart/form-data" th:object="${contestDTO}">
 <div class="form-container">
     <div class="image-upload">
         <div class="image-upload">
@@ -18,43 +19,43 @@
                 <span>포스터 이미지</span>
                 <img id="preview-image" src="#" alt="미리보기" style="display:none; max-height:100%; max-width:100%;">
             </div>
-            <input type="file" id="image-input" accept="image/*">
+            <input type="file" id="image-input" accept="image/*" name="imageUrl">
             <p class="warning" id="image-warning">해당 공모전 포스터 이미지를 업로드 해주세요.</p>
         </div>
 
-        <form>
+
         <label>공모전명</label>
-        <input type="text" placeholder="공모명을 입력해주세요.">
+        <input type="text" th:field="*{title}" placeholder="공모명을 입력해주세요.">
 
         <label>대표분야</label>
-        <select>
+        <select th:field="*{category}">
             <option disabled selected>프론트 / 웹, 앱 디자인</option>
             <option>IT / 소프트웨어</option>
             <option>기타</option>
         </select>
 
         <label>참가대상</label>
-        <input type="text" placeholder="참가 대상을 입력해주세요.">
+        <input type="text" th:field="*{target}" placeholder="참가 대상을 입력해주세요.">
 
         <label>대회지역</label>
-        <input type="text" placeholder="대회 지역을 입력해주세요.">
+        <input type="text" th:field="*{region}" placeholder="대회 지역을 입력해주세요.">
 
         <label>진행 일정</label>
         <div class="date-row">
-            <input type="date"> ~ <input type="date">
+            <input type="date" th:field="*{startDate}"> ~ <input type="date" <input type="date" th:field="*{endDate}">>
         </div>
 
         <label>심사기관</label>
-        <input type="text" placeholder="심사 기간을 입력해주세요.">
+        <input type="text" th:field="*{judge}" placeholder="심사 기간을 입력해주세요.">
 
         <label>시상내역</label>
-        <input type="text" placeholder="시상 내용을 입력해주세요.">
+        <input type="text" th:field="*{awardDetails}" placeholder="시상 내용을 입력해주세요.">
 
         <label>주최 신청 날짜</label>
         <input type="date">
 
         <label>공모전 설명</label>
-        <textarea placeholder="공모전 설명을 적어주세요."></textarea>
+        <textarea th:field="*{description}" placeholder="공모전 설명을 적어주세요."></textarea>
 
         <div class="button-group">
             <button type="submit" class="submit">신청</button>

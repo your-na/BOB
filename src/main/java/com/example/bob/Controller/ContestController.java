@@ -53,6 +53,13 @@ public class ContestController {
         return "ad_contest";
     }
 
+    // 기업 공모전 목록
+    @GetMapping("/comhome")
+    public String coContestList(Model model){
+        model.addAttribute("contests", contestService.getAllContests());
+        return "comhome";
+    }
+
     // ✅ 승인 대기 공모전 목록
     @GetMapping("/ad_contest_list")
     public String pendingList(Model model) {
@@ -70,6 +77,14 @@ public class ContestController {
     // ✅ 공모전 상세 보기 (사용자용)
     @GetMapping("/contest/{id}")
     public String showContestDetail(@PathVariable Long id, Model model) {
+        ContestEntity contest = contestService.getById(id);
+        model.addAttribute("contest", ContestDTO.fromEntity(contest));
+        return "postcontest";
+    }
+
+    // 공모전 상세 보기 (기업용)
+    @GetMapping("/comhome/{id}")
+    public String showCoContestDetail(@PathVariable Long id, Model model) {
         ContestEntity contest = contestService.getById(id);
         model.addAttribute("contest", ContestDTO.fromEntity(contest));
         return "postcontest";
