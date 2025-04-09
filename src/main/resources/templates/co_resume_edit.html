@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>이력서 수정</title>
+    <link rel="stylesheet" href="/css/co_resume.css">
+    <link rel="stylesheet" th:href="@{/css/header2.css}">
+
+    <!-- ✅ CSRF 토큰 정보 (Spring Security 연동용) -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+</head>
+<body>
+
+<!-- 헤더 -->
+<div th:insert="~{header2 :: header}"></div>
+
+<div class="resume-wrapper">
+    <!-- 왼쪽 작성 영역 -->
+    <div class="resume-container">
+        <h1>이력서 수정</h1>
+        <div class="resume-title">
+            <label for="resumeTitle">이력서 제목</label>
+            <input type="text" id="resumeTitle" placeholder="제목을 입력해주세요.">
+            <p class="warn">* 기본으로 주어지는 항목들 이외 항목도 추가 가능합니다.</p>
+        </div>
+
+        <!-- 각 섹션 반복 -->
+        <div class="resume-sections-container">
+            <!-- 섹션들은 JS로 동적으로 추가됩니다 -->
+        </div>
+
+        <div class="add-section">
+            <button id="add-section">➕ 섹션 추가</button>
+        </div>
+
+        <div class="section-popup" id="section-popup" style="display: none; position: absolute; z-index: 1000;">
+            <div class="popup-option">선택형</div>
+            <div class="popup-option">서술형</div>
+            <div class="popup-option">사진 첨부</div>
+            <div class="popup-option">파일 첨부</div>
+        </div>
+    </div>
+
+    <!-- 오른쪽 사이드 (목차 & 템플릿) -->
+    <div class="resume-side sticky">
+        <div class="outline-box">
+            <p class="outline-title">📋 목차</p>
+            <ul class="outline-list">
+                <!-- 섹션 목차는 JS로 동적으로 생성됩니다 -->
+            </ul>
+            <button class="add-outline">항목 추가</button>
+            <button class="save-btn">저장</button>
+        </div>
+
+        <div class="template-box">
+            <p>🧩 템플릿</p>
+            <div class="template-grid">
+                <div class="template-card">미리보기</div>
+                <div class="template-card">미리보기</div>
+                <div class="template-card">미리보기</div>
+                <div class="template-card">미리보기</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // URL 경로에서 이력서 id 추출
+        const pathSegments = window.location.pathname.split('/');
+        const resumeId = pathSegments[pathSegments.length - 1];  // 마지막 부분이 ID
+
+        console.log("추출된 이력서 ID:", resumeId);  // ID가 제대로 추출되었는지 확인
+
+        if (resumeId) {
+            fetch(`/api/coresumes/${resumeId}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("불러온 이력서 데이터:", data);  // 데이터를 제대로 불러왔는지 확인
+
+                    // 기존 데이터 채우기
+                    document.querySelector("#resumeTitle").value = data.title;
+
+                    const sectionContainer = document.querySelector(".resume-sections-container");
+                    const outlineList = document.querySelector(".outline-list");
+
+                    // 섹션 데이터를 확인하는 로그
+                    console.log("이력서 섹션 데이터:", data.sections);
+
+                    data.sections.forEach((section, index) => {
+                        const sectionElement = document.createElement("section");
+                        sectionElement.className = "resume-section";
+                        sectionElement.id = `section${index + 1}`;
+
+                        sectionElement.innerHTML = `
+                            <div class="section-header">
+                                <span>${section.title}</span>
+                                <button class="delete-btn">✕</button>
+                            </div>
+                            <input type="text" value="${section.comment}" placeholder="설명 입력">
+                            <div class="section-content">
+                                ${section.type === "서술형" ? `<textarea placeholder="내용을 입력하세요">${section.content}</textarea>` : ""}
+                            </div>
+                            <div class="section-content">
+                                ${section.type === "선택형" ? `<div class="tag-list">${section.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>` : ""}
+                            </div>
+                        `;
+                        sectionContainer.appendChild(sectionElement);
+
+                        const outlineItem = document.createElement("li");
+                        outlineItem.innerHTML = `<a href="#section${index + 1}">${section.title}</a>`;
+                        outlineList.appendChild(outlineItem);
+                    });
+
+                    // 삭제 버튼 기능
+                    document.querySelectorAll(".delete-btn").forEach((button, index) => {
+                        button.addEventListener("click", () => {
+                            const sectionToDelete = button.closest(".resume-section");
+                            sectionToDelete.remove();
+                            outlineList.removeChild(outlineList.children[index]);
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error("이력서 데이터를 불러오는 데 실패했습니다.", error);
+                });
+        }
+    });
+
+    // 저장 버튼 클릭 시 수정된 내용을 서버로 전송
+    document.querySelector(".save-btn").addEventListener("click", () => {
+        const resumeTitle = document.querySelector("#resumeTitle").value;
+        const sections = Array.from(document.querySelectorAll(".resume-section")).map(section => {
+            return {
+                title: section.querySelector(".section-header span").textContent,
+                comment: section.querySelector("input[type='text']").value,
+                type: section.querySelector(".section-content textarea") ? "서술형" : "선택형",
+                content: section.querySelector(".section-content textarea") ? section.querySelector(".section-content textarea").value : "",
+                tags: Array.from(section.querySelectorAll(".tag")).map(tag => tag.textContent)
+            };
+        });
+
+        const updatedResume = {
+            title: resumeTitle,
+            sections: sections
+        };
+
+        fetch(`/api/coresumes/${resumeId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "X-XSRF-TOKEN": document.querySelector('meta[name="_csrf"]').getAttribute("content")
+            },
+            body: JSON.stringify(updatedResume)
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert("이력서 수정 완료!");
+                window.location.href = "/coresumelist";  // 수정 완료 후 목록 페이지로 이동
+            })
+            .catch(error => {
+                console.error("이력서 수정 실패:", error);
+                alert("수정 실패");
+            });
+    });
+</script>
+
+
+</body>
+</html>

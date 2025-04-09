@@ -43,29 +43,33 @@
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-        fetch("/api/resumes")
+        fetch("/api/coresumes")
             .then(response => response.json())
             .then(data => {
                 const listContainer = document.querySelector(".resume-list");
                 listContainer.innerHTML = "";
 
-                if (data.length === 0) {
+                // 응답 데이터가 배열이라면 바로 사용
+                const resumes = Array.isArray(data) ? data : [];
+
+                if (resumes.length === 0) {
                     listContainer.innerHTML = "<p>등록된 이력서 양식이 없습니다.</p>";
                     return;
                 }
 
-                data.forEach(resume => {
+                resumes.forEach(resume => {
                     const card = document.createElement("div");
                     card.className = "resume-card";
+                    card.dataset.id = resume.id; // 각 카드에 data-id 추가
 
                     card.innerHTML = `
-                        <input type="checkbox">
-                        <div class="resume-info">
-                            <div class="resume-title">${resume.title}</div>
-                            <div class="resume-date">작성일: ${resume.createdAt}</div>
-                        </div>
-                        <button class="delete-btn" onclick="deleteResume(${resume.id})">🗑️</button>
-                    `;
+                    <input type="checkbox" class="resume-checkbox">
+                    <div class="resume-info">
+                        <div class="resume-title">${resume.title}</div>
+                        <div class="resume-date">작성일: ${resume.createdAt}</div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteResume(${resume.id})">🗑️</button>
+                `;
 
                     listContainer.appendChild(card);
                 });
@@ -79,7 +83,7 @@
     function deleteResume(id) {
         const csrf = getCsrfInfo();
         if (confirm("정말 삭제하시겠습니까?")) {
-            fetch(`/api/resumes/${id}`, {
+            fetch(`/api/coresumes/${id}`, {
                 method: "DELETE",
                 headers: {
                     [csrf.header]: csrf.token
@@ -95,6 +99,18 @@
         }
     }
 
+    // 수정하기 버튼 클릭 시 체크된 항목 수정 페이지로 리디렉션
+    document.querySelector(".edit-btn")?.addEventListener("click", () => {
+        const selectedItems = document.querySelectorAll("input[type='checkbox']:checked");
+        if (selectedItems.length === 1) {  // 하나의 항목만 선택되었을 때
+            const resumeId = selectedItems[0].closest(".resume-card").dataset.id; // 선택된 항목의 ID를 가져옴
+            window.location.href = `/coresumes/edit/${resumeId}`;  // 수정 페이지로 리디렉션 (동적 URL)
+        } else {
+            alert("수정할 항목을 선택해주세요.");
+        }
+    });
+
+
     // ✅ <meta> 태그에서 CSRF 정보 가져오기
     function getCsrfInfo() {
         const token = document.querySelector('meta[name="_csrf"]')?.getAttribute("content");
@@ -102,7 +118,6 @@
         return { token, header };
     }
 </script>
-
 
 </body>
 </html>

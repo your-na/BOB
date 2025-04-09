@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         // ✅ fetch로 백엔드에 POST 요청 보내기
-        fetch("/api/resumes", {
+        fetch("/api/coresumes", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
