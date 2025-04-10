@@ -166,6 +166,9 @@ public class UserController {
     @GetMapping("/adnewcon")
     public String adnewform() {return "ad_newcontest";}
 
+    @GetMapping("adconrequest")
+    public String adconrequestform() {return "ad_contest_request";}
+
     @GetMapping("adconlist")
     public String conlistform() {return "ad_contest_list";}
 

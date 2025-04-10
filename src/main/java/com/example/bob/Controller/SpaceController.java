@@ -124,6 +124,11 @@ public class SpaceController {
         return "todo_plan"; // 확장자 .html은 생략
     }
 
+    @GetMapping("/comcontest")
+    public String comcontestForm() {
+        return "comcontest";
+    }
+
 
 
 

@@ -1,0 +1,233 @@
+.com-contest-wrapper {
+    padding-top: 80px; /* 전체적으로 아래로 내림 */
+    text-align: center;
+}
+
+.form-title {
+    font-size: 28px;
+    margin-bottom: 30px;
+    color: #222;
+    font-weight: bold;
+}
+
+.com-contest-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    font-family: 'Noto Sans KR', sans-serif;
+    text-align: left;
+}
+
+.poster-upload {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.poster-box {
+    width: 300px;
+    height: 350px;
+    border: 1px solid #00c400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.poster-text {
+    color: #00c400;
+    font-weight: bold;
+}
+
+.poster-warning {
+    color: #e60000;
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+.contest-form label {
+    display: block;
+    margin-bottom: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.contest-form input[type="text"],
+.contest-form input[type="date"],
+.contest-form select {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+.contest-form input:focus,
+.contest-form select:focus {
+    outline: none;
+    border-color: #00c400;
+}
+
+.poster-input {
+    margin-top: 15px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.clickable-box {
+    cursor: pointer;
+    width: 300px;
+    height: 350px;
+    border: 1px solid #00c400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.clickable-box:hover {
+    background-color: #f5fff5;
+}
+
+#customFieldInput {
+    display: none;
+    margin-top: 10px;
+    margin-bottom: 18px; /* 다른 입력칸과 같은 여백 추가 */
+}
+
+.date-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.date-input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.date-tilde {
+    font-size: 18px;
+    color: #333;
+}
+
+.submission-date {
+    font-size: 16px;
+    margin-top: -20px;
+    margin-bottom: 10px;
+    color: #999b;
+    text-align: center;
+}
+.description-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 15px;
+    font-size: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    resize: none; /* 수동 리사이즈 막기 */
+    overflow-y: hidden; /* 스크롤 안 보이게 */
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.submit-btn {
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+    margin-top: 30px;
+    background-color: #00c400;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+    background-color: #00a800;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+/* 모달입니다람쥐 */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal-box {
+    background: #f9f9f9;
+    padding: 30px;
+    border: 1.5px solid #333;
+    border-radius: 4px;
+    width: 380px;
+    text-align: center;
+    box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.modal-desc {
+    color: #e60000;
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.modal-buttons button {
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px 24px;
+    background-color: white;
+    color: #333;
+    border: 1px solid #333;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.modal-buttons button:hover {
+    background-color: #f0f0f0;
+}
