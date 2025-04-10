@@ -37,6 +37,12 @@ public class CoResumeServiceImpl implements CoResumeService {
         CoResumeEntity resume = new CoResumeEntity();
         resume.setTitle(requestDTO.getTitle());
 
+        // 희망직무 태그 저장
+        List<String> jobTags = requestDTO.getJobTags();
+        if (jobTags != null && !jobTags.isEmpty()) {
+            resume.setJobTags(jobTags);  // 희망직무 태그를 이력서에 추가
+        }
+
         // 섹션들 추가
         if (requestDTO.getSections() != null) {
             for (CoResumeSectionRequestDTO sectionDTO : requestDTO.getSections()) {
@@ -45,7 +51,7 @@ public class CoResumeServiceImpl implements CoResumeService {
                 sectionEntity.setTitle(sectionDTO.getTitle());
                 sectionEntity.setComment(sectionDTO.getComment());
                 sectionEntity.setContent(sectionDTO.getContent());
-                sectionEntity.setTags(sectionDTO.getTags());
+                sectionEntity.setTags(sectionDTO.getTags());  // 태그 저장
                 sectionEntity.setMultiSelect(sectionDTO.isMultiSelect()); // 복수선택 여부
                 sectionEntity.setDirectInputValue(sectionDTO.getDirectInputValue()); // 직접입력 값
 
@@ -62,9 +68,6 @@ public class CoResumeServiceImpl implements CoResumeService {
         coResumeRepository.save(resume);
         logger.info("이력서 저장 완료 - 제목: {}", requestDTO.getTitle());  // 저장 완료 로그
     }
-
-
-
 
     // ✅ 이력서 조회 (수정용)
     @Override
@@ -90,10 +93,12 @@ public class CoResumeServiceImpl implements CoResumeService {
                     ))
                     .collect(Collectors.toList());
 
+            // 반환할 이력서 정보에 희망직무 태그도 포함
             return new CoResumeRequestDTO(
                     resumeEntity.getTitle(),
                     sectionDTOList,
-                    resumeEntity.getCreatedAt()
+                    resumeEntity.getCreatedAt(),
+                    resumeEntity.getJobTags()  // 희망직무 태그를 반환
             );
         } else {
             logger.error("이력서를 찾을 수 없습니다 - ID: {}", id);
@@ -109,6 +114,12 @@ public class CoResumeServiceImpl implements CoResumeService {
 
         resumeEntity.setTitle(updatedResume.getTitle());
         resumeEntity.setCreatedAt(updatedResume.getCreatedAt());
+
+        // 희망직무 태그 업데이트
+        List<String> jobTags = updatedResume.getJobTags();
+        if (jobTags != null && !jobTags.isEmpty()) {
+            resumeEntity.setJobTags(jobTags);  // 희망직무 태그 업데이트
+        }
 
         List<CoResumeSectionEntity> updatedSections = updatedResume.getSections().stream()
                 .map(sectionDTO -> {

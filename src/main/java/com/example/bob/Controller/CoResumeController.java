@@ -42,6 +42,9 @@ public class CoResumeController {
             });
         });
 
+        // 희망직무 태그들 로그 추가 (디버그용)
+        logger.debug("희망직무 태그들: {}", requestDTO.getJobTags());
+
         // 이력서 저장
         coResumeService.saveResume(requestDTO);
 

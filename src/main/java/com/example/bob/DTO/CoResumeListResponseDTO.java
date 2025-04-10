@@ -15,5 +15,6 @@ public class CoResumeListResponseDTO {
     private String title;      // 이력서 제목
     private String createdAt;  // 작성일 (yyyy-MM-dd)
 
+
     // Lombok이 @Getter, @AllArgsConstructor로 기본적으로 처리
 }
