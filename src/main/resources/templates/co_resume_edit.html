@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>이력서 수정</title>
-    <link rel="stylesheet" href="/css/co_resume.css">
+    <link rel="stylesheet" href="/css/co_resume_edit.css">
     <link rel="stylesheet" th:href="@{/css/header2.css}">
 
     <!-- ✅ CSRF 토큰 정보 (Spring Security 연동용) -->
@@ -25,9 +25,9 @@
             <p class="warn">* 기본으로 주어지는 항목들 이외 항목도 추가 가능합니다.</p>
         </div>
 
-        <!-- 각 섹션 반복 -->
+        <!-- 각 섹션 반복 (일반회원 정보 외 다른 섹션은 동적으로 불러옴) -->
         <div class="resume-sections-container">
-            <!-- 섹션들은 JS로 동적으로 추가됩니다 -->
+            <!-- 다른 섹션들은 JS로 동적으로 추가됩니다 -->
         </div>
 
         <div class="add-section">
@@ -67,74 +67,112 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // URL 경로에서 이력서 id 추출
         const pathSegments = window.location.pathname.split('/');
-        const resumeId = pathSegments[pathSegments.length - 1];  // 마지막 부분이 ID
+        const resumeId = pathSegments[pathSegments.length - 1];
 
-        console.log("추출된 이력서 ID:", resumeId);  // ID가 제대로 추출되었는지 확인
+        console.log("추출된 이력서 ID:", resumeId);
+
+        // 전체 조건 항목을 미리 정의하거나 서버에서 받아오는 로직을 추가
+        const allConditions = {
+            "경력사항": [
+                "1년 이내", "3개월 이내", "6개월 이내", "직접입력"
+            ],
+            "포트폴리오": [
+                "1개 이하", "3개 이상", "5개 이상", "직접입력"
+            ],
+            "자기소개": [
+                "50자 이상", "200자 이상", "500자 이상", "직접입력"
+            ]
+            // 다른 섹션에 맞는 조건을 추가할 수 있음
+        };
 
         if (resumeId) {
             fetch(`/api/coresumes/${resumeId}`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log("불러온 이력서 데이터:", data);  // 데이터를 제대로 불러왔는지 확인
+                    console.log("불러온 이력서 데이터:", data);
 
-                    // 기존 데이터 채우기
                     document.querySelector("#resumeTitle").value = data.title;
 
                     const sectionContainer = document.querySelector(".resume-sections-container");
                     const outlineList = document.querySelector(".outline-list");
 
-                    // 섹션 데이터를 확인하는 로그
-                    console.log("이력서 섹션 데이터:", data.sections);
-
                     data.sections.forEach((section, index) => {
-                        const sectionElement = document.createElement("section");
-                        sectionElement.className = "resume-section";
-                        sectionElement.id = `section${index + 1}`;
+                        console.log(`섹션 ${index + 1} 데이터:`, section);
 
-                        // 복수선택 버튼을 추가하는 조건
-                        let multiSelectButton = '';
-                        if (section.type === "선택형" && section.title === "희망직무") {
-                            // "희망직무"일 경우 복수선택 버튼 추가
-                            multiSelectButton = `
-                            <div class="tag-mode">
-                                <button class="mode-btn selected-tag">복수선택 ⭕</button>
-                                <button class="mode-btn">복수선택 ❌</button>
-                            </div>
-                        `;
-                        } else if (section.type === "선택형") {
-                            // 새로 추가된 선택형 섹션에는 복수선택 버튼 추가
-                            multiSelectButton = `
-                            <div class="tag-mode">
-                                <button class="mode-btn selected-tag">복수선택 ⭕</button>
-                                <button class="mode-btn">복수선택 ❌</button>
-                            </div>
-                        `;
-                        }
+                        // 일반회원 정보는 고정형으로 처리
+                        if (section.title === "일반회원 정보") {
+                            const sectionElement = document.createElement("section");
+                            sectionElement.className = "resume-section selected";
+                            sectionElement.id = `section${index + 1}`;
 
-                        // 일반회원 정보, 학력사항 등에는 복수선택 버튼을 추가하지 않음
-                        sectionElement.innerHTML = `
-                        <div class="section-header">
-                            <span>${section.title}</span>
-                            <button class="delete-btn">✕</button>
-                        </div>
-                        <input type="text" value="${section.comment}" placeholder="설명 입력">
-                        <div class="section-content">
-                            ${section.type === "서술형" ? `<textarea placeholder="내용을 입력하세요">${section.content}</textarea>` : ""}
-                        </div>
-                        <div class="section-content">
-                            ${section.type === "선택형" ? `<div class="tag-list">${section.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>` : ""}
-                        </div>
-                        ${multiSelectButton}
+                            sectionElement.innerHTML = `
+                        <div class="section-header"><span>${section.title}</span></div>
+                        <p class="section-note">사이트 등록 정보를 기반으로 보여집니다.</p>
                     `;
 
-                        sectionContainer.appendChild(sectionElement);
+                            sectionContainer.appendChild(sectionElement);
+                        } else {
+                            const sectionElement = document.createElement("section");
+                            sectionElement.className = "resume-section";
+                            sectionElement.id = `section${index + 1}`;
+
+                            let multiSelectButton = '';
+                            if (section.type === "선택형") {
+                                multiSelectButton = `
+                        <div class="tag-mode">
+                            <button class="mode-btn ${section.multiSelect === 1 ? "selected-tag" : ""}">복수선택 ⭕</button>
+                            <button class="mode-btn ${section.multiSelect === 2 ? "selected-tag" : ""}">복수선택 ❌</button>
+                        </div>
+                        `;
+                            }
+
+                            // 선택형 섹션의 조건 항목을 해당 섹션에 맞는 조건만 불러오도록 수정
+                            const sectionConditions = allConditions[section.title] || []; // 해당 섹션의 조건만 필터링
+
+                            const conditionList = sectionConditions.map(condition => {
+                                const isSelected = section.conditions.includes(condition);  // 선택된 항목 확인
+                                return `
+                            <span class="condition ${isSelected ? 'active' : ''}" data-condition="${condition}">
+                                ${condition}
+                            </span>
+                        `;
+                            }).join('');
+
+                            sectionElement.innerHTML = `
+                    <div class="section-header">
+                        <span>${section.title}</span>
+                        <button class="delete-btn">✕</button>
+                    </div>
+                    <input type="text" value="${section.comment}" placeholder="설명 입력">
+                    <div class="section-content">
+                        ${section.type === "서술형" ? `<textarea placeholder="내용을 입력하세요">${section.content}</textarea>` : ""}
+                    </div>
+                    <div class="section-content">
+                        ${section.type === "서술형" && section.conditions ? `<div class="conditions-list">${conditionList}</div>` : ""}
+                    </div>
+                    <div class="section-content">
+                        ${section.type === "선택형" ? `
+                        <div class="tag-list">
+                            ${section.tags && section.tags.length > 0 ? section.tags.map(tag => {
+                                const isSelected = section.selectedTags && section.selectedTags.includes(tag);
+                                return `<span class="tag ${isSelected ? 'active' : ''}">${tag}</span>`;
+                            }).join('') : '선택지가 없습니다.'}
+                        </div>` : ""}
+                    </div>
+                    ${multiSelectButton}
+                    `;
+
+                            sectionContainer.appendChild(sectionElement);
+                        }
 
                         const outlineItem = document.createElement("li");
                         outlineItem.innerHTML = `<a href="#section${index + 1}">${section.title}</a>`;
                         outlineList.appendChild(outlineItem);
                     });
+
+                    // 조건 항목 클릭 시 선택/비선택 토글
+                    addConditionClickListener();
 
                     // 삭제 버튼 기능
                     document.querySelectorAll(".delete-btn").forEach((button, index) => {
@@ -149,47 +187,62 @@
                     console.error("이력서 데이터를 불러오는 데 실패했습니다.", error);
                 });
         }
-    });
 
-
-    // 저장 버튼 클릭 시 수정된 내용을 서버로 전송
-    document.querySelector(".save-btn").addEventListener("click", () => {
-        const resumeTitle = document.querySelector("#resumeTitle").value;
-        const sections = Array.from(document.querySelectorAll(".resume-section")).map(section => {
-            return {
-                title: section.querySelector(".section-header span").textContent,
-                comment: section.querySelector("input[type='text']").value,
-                type: section.querySelector(".section-content textarea") ? "서술형" : "선택형",
-                content: section.querySelector(".section-content textarea") ? section.querySelector(".section-content textarea").value : "",
-                tags: Array.from(section.querySelectorAll(".tag")).map(tag => tag.textContent)
-            };
-        });
-
-        const updatedResume = {
-            title: resumeTitle,
-            sections: sections
-        };
-
-        fetch(`/api/coresumes/${resumeId}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "X-XSRF-TOKEN": document.querySelector('meta[name="_csrf"]').getAttribute("content")
-            },
-            body: JSON.stringify(updatedResume)
-        })
-            .then(response => response.json())
-            .then(data => {
-                alert("이력서 수정 완료!");
-                window.location.href = "/coresumelist";  // 수정 완료 후 목록 페이지로 이동
-            })
-            .catch(error => {
-                console.error("이력서 수정 실패:", error);
-                alert("수정 실패");
+        // 조건 항목 클릭 시 활성화/비활성화 처리
+        function addConditionClickListener() {
+            document.querySelectorAll(".conditions-list .condition").forEach(condition => {
+                condition.addEventListener("click", (e) => {
+                    e.target.classList.toggle("active");
+                });
             });
+        }
+
+        // 저장 버튼 클릭 시 수정된 내용을 서버로 전송
+        document.querySelector(".save-btn").addEventListener("click", () => {
+            const resumeTitle = document.querySelector("#resumeTitle").value;
+            const sections = Array.from(document.querySelectorAll(".resume-section")).map(section => {
+                const selectedConditions = Array.from(section.querySelectorAll(".conditions-list .active"))
+                    .map(condition => condition.dataset.condition);
+
+                return {
+                    title: section.querySelector(".section-header span").textContent,
+                    comment: section.querySelector("input[type='text']").value,
+                    type: section.querySelector(".section-content textarea") ? "서술형" : "선택형",
+                    content: section.querySelector(".section-content textarea") ? section.querySelector(".section-content textarea").value : "",
+                    tags: Array.from(section.querySelectorAll(".tag")).map(tag => tag.textContent),
+                    multiSelect: section.querySelector(".mode-btn.selected-tag") !== null,  // 복수선택 여부
+                    conditions: selectedConditions // 선택된 조건 항목들
+                };
+            });
+
+            const updatedResume = {
+                title: resumeTitle,
+                sections: sections
+            };
+
+            fetch(`/api/coresumes/${resumeId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-XSRF-TOKEN": document.querySelector('meta[name="_csrf"]').getAttribute("content")
+                },
+                body: JSON.stringify(updatedResume)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert("이력서 수정 완료!");
+                    window.location.href = "/coresumelist";  // 수정 완료 후 목록 페이지로 이동
+                })
+                .catch(error => {
+                    console.error("이력서 수정 실패:", error);
+                    alert("수정 실패");
+                });
+        });
     });
+
 
 </script>
+
 
 </body>
 </html>

@@ -1,0 +1,285 @@
+.resume-wrapper {
+    display: flex;
+    gap: 40px;
+    padding: 40px;
+    margin-top: 5%;
+}
+
+.resume-container {
+    flex: 2;
+}
+
+.resume-side {
+    flex: 1;
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+.resume-title input {
+    width: 97%;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.warn {
+    color: red;
+    font-size: 12px;
+}
+
+.resume-section {
+    border: 1.5px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    background: #fff;
+    transition: border 0.2s;
+}
+
+.resume-section input{
+    width: 70%;
+    height: 30px;
+    border-radius: 20px;
+    border: 1px solid grey;
+    margin-bottom: 3%;
+    padding-left: 13px;
+}
+
+.resume-section select {
+    border: 1px solid grey;
+    width: 20%;
+    height: 30px;
+    border-radius: 20px;
+    padding-left: 16px;
+}
+.resume-section.selected {
+    border-color: #00b800;
+}
+
+.section-header {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+.delete-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #aaa;
+}
+
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+.tag {
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: #f1f1f1;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.05);
+}
+.tag.selected-tag {
+    background: #00b800;
+    color: #fff;
+}
+
+textarea {
+    resize: none;
+    width: 95%;
+    height: 100px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 6px;
+    pointer-events: none;   /* 클릭, 입력 등 모든 인터랙션 차단 */
+    background-color: #f5f5f5; /* 비활성화 느낌 배경색 */
+    color: #888;             /* 비활성화 느낌 텍스트 색상 */
+}
+
+.tag-mode {
+    margin-bottom: 10px;
+}
+.mode-btn {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    cursor: pointer;
+}
+.mode-btn.selected-tag {
+    background: #00b800;
+    color: #fff;
+}
+
+.outline-box {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background: #fdfdfd;
+}
+.outline-title {
+    color: #00b800;
+    font-weight: bold;
+}
+.outline-list {
+    list-style: none;
+    padding-left: 0;
+}
+.outline-list li {
+    margin-bottom: 8px;
+}
+.outline-list a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+}
+
+.add-outline, .save-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px;
+    background: #00b800;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.template-box {
+    border: 1px solid #ccc;
+    padding: 15px;
+    background: #fdfdfd;
+    border-radius: 8px;
+}
+
+.template-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+.template-card {
+    height: 80px;
+    background: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.custom-input {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    height: 32px;
+}
+
+.add-section {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#add-section {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background-color: #f9f9f9;
+    color: #00b800;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+}
+
+#add-section:hover {
+    transform: scale(1.1);
+}
+
+.tag-remove {
+    margin-left: 10px;
+}
+
+.section-popup {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    z-index: 1000;
+    width: 130px;
+    font-size: 14px;
+}
+
+.section-popup .popup-option {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+.section-popup .popup-option:last-child {
+    border-bottom: none;
+}
+
+.section-popup .popup-option:hover {
+    background-color: #f0f0f0;
+}
+
+.section-title-input {
+    font-weight: bold;
+    font-size: 16px;
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    display: none;
+}
+
+.section-title-text {
+    font-weight: bold;
+    font-size: 16px;
+    cursor: text;
+}
+
+#ohcomment {
+    border: none;
+}
+
+#ohcomment:focus {
+    border: none;
+}
+/* 조건 항목 버튼 스타일 */
+.conditions-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.condition {
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: #f1f1f1;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.05);
+}
+
+.condition.selected {
+    background: #00b800;
+    color: #fff;
+}
+
+/* 버튼 선택 시 스타일 */
+.condition.active {
+    background-color: #00b800; /* 초록색 배경 */
+    color: #fff; /* 흰색 글씨 */
+}
+
