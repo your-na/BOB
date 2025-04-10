@@ -82,3 +82,10 @@ body {
     color: #00c800;
     font-weight: bold;
 }
+
+.error-message {
+    color: red;
+    font-size: 13px;
+    margin-bottom: 10px;
+    text-align: center;
+}

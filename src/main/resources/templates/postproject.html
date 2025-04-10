@@ -75,9 +75,16 @@
 <!-- 프로젝트 신청 페이지로 이동하는 버튼 -->
 <form action="/projectapplication" method="get">
     <input type="hidden" name="projectId" th:value="${project.id}">
-    <button type="submit" class="apply-btn">팀 신청하기</button>
+    <button type="submit"
+            class="apply-btn"
+            th:disabled="${isOwner}"
+            th:style="${isOwner} ? 'background: grey; cursor: not-allowed;' : ''">
+        팀 신청하기
+    </button>
+    <p th:if="${isOwner}" style="color: red; font-size: 13px; margin-top: 5px;">
+        본인이 작성한 프로젝트에는 신청할 수 없습니다.
+    </p>
 </form>
-
 <hr>
 
 <!-- 좋아요 & 스크랩 -->

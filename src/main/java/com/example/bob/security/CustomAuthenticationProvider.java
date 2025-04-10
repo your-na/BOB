@@ -35,6 +35,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         } catch (UsernameNotFoundException e) {
             // 일반 사용자 없으면 기업 사용자로 시도
             user = companyDetailsService.loadUserByUsername(username);
+            throw new UsernameNotFoundException("존재하지 않는 아이디입니다.");
         }
 
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
