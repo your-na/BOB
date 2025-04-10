@@ -9,7 +9,6 @@
     <!-- ✅ CSRF 토큰 정보 (Spring Security 연동용) -->
     <meta name="_csrf" th:content="${_csrf.token}" />
     <meta name="_csrf_header" th:content="${_csrf.headerName}" />
-
 </head>
 <body>
 
@@ -94,19 +93,42 @@
                         sectionElement.className = "resume-section";
                         sectionElement.id = `section${index + 1}`;
 
-                        sectionElement.innerHTML = `
-                            <div class="section-header">
-                                <span>${section.title}</span>
-                                <button class="delete-btn">✕</button>
-                            </div>
-                            <input type="text" value="${section.comment}" placeholder="설명 입력">
-                            <div class="section-content">
-                                ${section.type === "서술형" ? `<textarea placeholder="내용을 입력하세요">${section.content}</textarea>` : ""}
-                            </div>
-                            <div class="section-content">
-                                ${section.type === "선택형" ? `<div class="tag-list">${section.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>` : ""}
+                        // 복수선택 버튼을 추가하는 조건
+                        let multiSelectButton = '';
+                        if (section.type === "선택형" && section.title === "희망직무") {
+                            // "희망직무"일 경우 복수선택 버튼 추가
+                            multiSelectButton = `
+                            <div class="tag-mode">
+                                <button class="mode-btn selected-tag">복수선택 ⭕</button>
+                                <button class="mode-btn">복수선택 ❌</button>
                             </div>
                         `;
+                        } else if (section.type === "선택형") {
+                            // 새로 추가된 선택형 섹션에는 복수선택 버튼 추가
+                            multiSelectButton = `
+                            <div class="tag-mode">
+                                <button class="mode-btn selected-tag">복수선택 ⭕</button>
+                                <button class="mode-btn">복수선택 ❌</button>
+                            </div>
+                        `;
+                        }
+
+                        // 일반회원 정보, 학력사항 등에는 복수선택 버튼을 추가하지 않음
+                        sectionElement.innerHTML = `
+                        <div class="section-header">
+                            <span>${section.title}</span>
+                            <button class="delete-btn">✕</button>
+                        </div>
+                        <input type="text" value="${section.comment}" placeholder="설명 입력">
+                        <div class="section-content">
+                            ${section.type === "서술형" ? `<textarea placeholder="내용을 입력하세요">${section.content}</textarea>` : ""}
+                        </div>
+                        <div class="section-content">
+                            ${section.type === "선택형" ? `<div class="tag-list">${section.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>` : ""}
+                        </div>
+                        ${multiSelectButton}
+                    `;
+
                         sectionContainer.appendChild(sectionElement);
 
                         const outlineItem = document.createElement("li");
@@ -128,6 +150,7 @@
                 });
         }
     });
+
 
     // 저장 버튼 클릭 시 수정된 내용을 서버로 전송
     document.querySelector(".save-btn").addEventListener("click", () => {
@@ -165,8 +188,8 @@
                 alert("수정 실패");
             });
     });
-</script>
 
+</script>
 
 </body>
 </html>

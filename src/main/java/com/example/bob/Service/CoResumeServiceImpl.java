@@ -12,27 +12,28 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @Service
 public class CoResumeServiceImpl implements CoResumeService {
 
     private final CoResumeRepository coResumeRepository;
-    private final CoResumeSectionRepository coResumeSectionRepository; // 이 부분 추가
-    private static final Logger logger = LoggerFactory.getLogger(CoResumeEditController.class);  // 로그 출력을 위한 로거 설정
+    private final CoResumeSectionRepository coResumeSectionRepository;
+    private static final Logger logger = LoggerFactory.getLogger(CoResumeEditController.class);
 
-    // 생성자에 coResumeSectionRepository 추가
     @Autowired
     public CoResumeServiceImpl(CoResumeRepository coResumeRepository, CoResumeSectionRepository coResumeSectionRepository) {
         this.coResumeRepository = coResumeRepository;
         this.coResumeSectionRepository = coResumeSectionRepository;
     }
 
+    // ✅ 이력서 저장
+    @Override
     public void saveResume(CoResumeRequestDTO requestDTO) {
+        logger.info("이력서 저장 요청 - 제목: {}", requestDTO.getTitle());  // 이력서 제목 로그
+
         CoResumeEntity resume = new CoResumeEntity();
         resume.setTitle(requestDTO.getTitle());
 
@@ -45,40 +46,36 @@ public class CoResumeServiceImpl implements CoResumeService {
                 sectionEntity.setComment(sectionDTO.getComment());
                 sectionEntity.setContent(sectionDTO.getContent());
                 sectionEntity.setTags(sectionDTO.getTags());
+                sectionEntity.setMultiSelect(sectionDTO.isMultiSelect()); // 복수선택 여부
+                sectionEntity.setDirectInputValue(sectionDTO.getDirectInputValue()); // 직접입력 값
+
+                // 조건 항목들을 저장하는 부분
+                sectionEntity.setConditions(sectionDTO.getConditions()); // 조건 항목들 저장
+                logger.info("조건 항목 저장됨: {}", sectionDTO.getConditions()); // 조건 항목 로그
 
                 // 연관 관계 설정
-                resume.addSection(sectionEntity); // 이걸 통해 resume_id가 자동으로 설정됨
+                resume.addSection(sectionEntity);
             }
         }
 
-        coResumeRepository.save(resume);  // 이력서 저장
+        // 이력서 저장
+        coResumeRepository.save(resume);
+        logger.info("이력서 저장 완료 - 제목: {}", requestDTO.getTitle());  // 저장 완료 로그
     }
 
 
 
-        // ✅ 목록 조회용 메서드
-        @Override
-        public List<CoResumeEntity> getAllResumes() {
-            return coResumeRepository.findAll();
-        }
 
-    // ✅ 삭제 메서드
-    @Override
-    public void deleteResume(Long id) {
-        coResumeRepository.deleteById(id);
-    }
-
-    // ✅ 이력서 조회: 수정 페이지에서 사용할 데이터 반환
+    // ✅ 이력서 조회 (수정용)
     @Override
     public CoResumeRequestDTO getResumeById(Long id) {
-        logger.info("이력서 데이터 불러오기 요청 - ID: {}", id);  // 요청 로그 추가
+        logger.info("이력서 데이터 불러오기 요청 - ID: {}", id);
 
         Optional<CoResumeEntity> resumeEntityOpt = coResumeRepository.findById(id);
         if (resumeEntityOpt.isPresent()) {
             CoResumeEntity resumeEntity = resumeEntityOpt.get();
 
-            logger.info("이력서 데이터 불러오기 성공 - ID: {}", id);  // 성공 로그 추가
-            logger.info("불러온 섹션 데이터: {}", resumeEntity.getSections());  // 섹션 데이터 확인
+            logger.info("이력서 데이터 불러오기 성공 - ID: {}", id);
 
             List<CoResumeSectionRequestDTO> sectionDTOList = resumeEntity.getSections().stream()
                     .map(sectionEntity -> new CoResumeSectionRequestDTO(
@@ -86,11 +83,12 @@ public class CoResumeServiceImpl implements CoResumeService {
                             sectionEntity.getTitle(),
                             sectionEntity.getComment(),
                             sectionEntity.getContent(),
-                            sectionEntity.getTags() != null ? sectionEntity.getTags() : new ArrayList<String>()
+                            sectionEntity.getTags(),
+                            sectionEntity.isMultiSelect(),
+                            sectionEntity.getConditions(),
+                            sectionEntity.getDirectInputValue()
                     ))
                     .collect(Collectors.toList());
-
-            logger.info("변환된 이력서 데이터: {}", sectionDTOList);  // 변환된 섹션 데이터 확인
 
             return new CoResumeRequestDTO(
                     resumeEntity.getTitle(),
@@ -98,26 +96,20 @@ public class CoResumeServiceImpl implements CoResumeService {
                     resumeEntity.getCreatedAt()
             );
         } else {
-            logger.error("이력서를 찾을 수 없습니다 - ID: {}", id);  // 에러 로그 추가
+            logger.error("이력서를 찾을 수 없습니다 - ID: {}", id);
             throw new RuntimeException("이력서를 찾을 수 없습니다.");
         }
     }
 
-
-
-
-    // ✅ 이력서 데이터를 업데이트하는 메서드
+    // ✅ 이력서 업데이트
     @Override
     public void updateResume(Long id, CoResumeRequestDTO updatedResume) {
-        // 이력서 엔티티를 DB에서 찾기
         CoResumeEntity resumeEntity = coResumeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("이력서가 존재하지 않습니다."));
 
-        // 제목 및 수정일 업데이트
         resumeEntity.setTitle(updatedResume.getTitle());
-        resumeEntity.setCreatedAt(updatedResume.getCreatedAt());  // 날짜 처리도 함께
+        resumeEntity.setCreatedAt(updatedResume.getCreatedAt());
 
-        // 섹션 업데이트
         List<CoResumeSectionEntity> updatedSections = updatedResume.getSections().stream()
                 .map(sectionDTO -> {
                     CoResumeSectionEntity sectionEntity = new CoResumeSectionEntity();
@@ -125,20 +117,30 @@ public class CoResumeServiceImpl implements CoResumeService {
                     sectionEntity.setType(sectionDTO.getType());
                     sectionEntity.setComment(sectionDTO.getComment());
                     sectionEntity.setContent(sectionDTO.getContent());
-                    sectionEntity.setTags(sectionDTO.getTags()); // 선택형 태그 목록 설정
-
-                    // 연관된 이력서 설정
-                    sectionEntity.setResume(resumeEntity);
-
+                    sectionEntity.setTags(sectionDTO.getTags());
+                    sectionEntity.setMultiSelect(sectionDTO.isMultiSelect()); // 복수선택 여부
+                    sectionEntity.setConditions(sectionDTO.getConditions()); // 조건 항목들
+                    sectionEntity.setDirectInputValue(sectionDTO.getDirectInputValue()); // 직접입력 값
+                    sectionEntity.setResume(resumeEntity); // 연관된 이력서 설정
                     return sectionEntity;
                 })
                 .collect(Collectors.toList());
 
-        // 기존 섹션 삭제 후 새로운 섹션 저장
         coResumeSectionRepository.deleteAll(resumeEntity.getSections());
         resumeEntity.setSections(updatedSections);
 
         coResumeRepository.save(resumeEntity);
     }
 
+    // ✅ 목록 조회
+    @Override
+    public List<CoResumeEntity> getAllResumes() {
+        return coResumeRepository.findAll();
+    }
+
+    // ✅ 삭제
+    @Override
+    public void deleteResume(Long id) {
+        coResumeRepository.deleteById(id);
+    }
 }

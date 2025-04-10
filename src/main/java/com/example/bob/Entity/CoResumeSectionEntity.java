@@ -23,7 +23,17 @@ public class CoResumeSectionEntity {
      * 예: ["백엔드", "프론트엔드", "AI"]
      */
     @ElementCollection
-    private List<String> tags;
+    private List<String> tags;  // 선택형 태그 목록
+
+    /**
+     * 선택된 조건 항목들 (예: "50자 이상", "200자 이상")
+     */
+    @ElementCollection
+    private List<String> conditions;  // 조건 항목들 (예: "50자 이상", "200자 이상")
+
+    private boolean multiSelect; // 복수선택 여부
+
+    private String directInputValue; // 직접 입력 값 (사용자가 입력한 값)
 
     /**
      * 이 섹션이 소속된 이력서 양식 (N:1)
@@ -50,6 +60,16 @@ public class CoResumeSectionEntity {
     public List<String> getTags() { return tags; }
     public void setTags(List<String> tags) { this.tags = tags; }
 
+    public List<String> getConditions() { return conditions; }
+    public void setConditions(List<String> conditions) { this.conditions = conditions; }
+
+    public boolean isMultiSelect() { return multiSelect; }
+    public void setMultiSelect(boolean multiSelect) { this.multiSelect = multiSelect; }
+
+    public String getDirectInputValue() { return directInputValue; }
+    public void setDirectInputValue(String directInputValue) { this.directInputValue = directInputValue; }
+
     public CoResumeEntity getResume() { return resume; }
     public void setResume(CoResumeEntity resume) { this.resume = resume; }
 }
+
