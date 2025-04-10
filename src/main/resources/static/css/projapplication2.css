@@ -1,0 +1,102 @@
+.container {
+    position: relative;
+    width: 60%;
+    height: 1000px;
+    margin: 50px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border: 2px solid #b3b3b3;
+}
+h2 {
+    margin-top: 110px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+.profile-container {
+    display: flex;
+    align-items: center;
+}
+.profile-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: #ddd;
+    display: inline-block;
+    margin-left: 30px;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+.info {
+    text-align: left;
+    margin-left: 35px;
+}
+.info2 {
+    text-align: left;
+    margin-left: 35px;
+}
+.project-header h3 {
+    text-align: left;
+    margin-left: 30px; /* 지원정보 확인과 같은 왼쪽 여백 적용 */
+}
+.highlight {
+    color: green;
+    font-weight: bold;
+}
+.message-box {
+    width: 850px;
+    height: 200px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    margin-left: 25px;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+    width: fit-content;
+}
+.profile-header h3 {
+    margin: 0;
+    font-weight: bold;
+    white-space: nowrap;
+    margin-left: 30px;
+}
+
+.info p {
+    margin: 5px 0;
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px; /* 간격 조정 */
+}
+.info p strong {
+    font-weight: bold;
+    min-width: 80px; /* 라벨의 최소 너비 줄이기 */
+}
+.info p span {
+    color: gray;
+}
+.info2 p {
+    margin: 5px 0;
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px; /* 간격 조정 */
+}
+.info2 p strong {
+    font-weight: bold;
+    min-width: 80px; /* 라벨의 최소 너비 줄이기 */
+}
+.info2 p span {
+    color: #19CB13;
+}
+.info2 span {
+    color: gray;
+}
+.message h3 {
+    text-align: left;
+    margin-left: 30px;
+}

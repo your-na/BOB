@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>프로젝트 목록</title>
+    <link rel="stylesheet" href="/css/projapplication2.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!---header--->
+<div th:insert="~{header :: header}"></div>
+
+<h2>프로젝트 참가신청서</h2>
+<div class="container">
+    <div class="profile-img"></div>
+    <div class="profile-header">
+        <h3><strong>지원정보 확인</strong></h3>
+    </div>
+    <br>
+    <div class="info">
+        <p><strong>이름</strong> <span th:text="${user.userName}">임채민</span><span th:text="(${user.sex})"> (여, 22세)</span></p>
+        <p><strong>휴대폰</strong> <span th:text="${user.userPhone}">010-1234-5678</span></p>
+        <p><strong>이메일</strong> <span th:text="${user.userEmail}">abc@defg.com</span></p>
+        <p><strong>주언어</strong> <span th:text="${user.mainLanguage}">C언어</span></p>
+        <p><strong>평균 평점</strong> <span>5.0</span></p>
+    </div>
+    <br>
+    <br>
+    <div class="project-header">
+        <h3><strong>지원프로젝트 확인</strong></h3>
+    </div>
+    <div class="info2">
+        <p><strong>프로젝트명</strong> <span th:text="${project.title}">공모전A 함께할 팀원 모집합니다!</span></p>
+        <p><strong>프로젝트 내용</strong></p>
+        <span th:text="${project.description}">저는 프론트 쪽이고, 제 경력은 프로필 보기로 확인해 주세요. 저는 경력보단 참여 잘 할 자신 있으신 분을 위주로 뽑을 예정입니다^_^</span>
+    </div>
+    <br>
+    <br>
+    <div class="message">
+        <h3><strong>전달 메시지</strong></h3>
+        <textarea name="message" class="message-box" placeholder="전달 메시지"></textarea>
+    </div>
+    <br>
+    <br>
+</div>
+</body>
+</html>
