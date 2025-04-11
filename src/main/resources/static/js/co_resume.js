@@ -7,8 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const addBtn = document.getElementById("add-section");
     const popup = document.getElementById("section-popup");
 
-    let multiSelect = true;
-
     // ➕ 버튼 클릭 시 팝업 위치 설정
     addBtn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -26,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-// ✅ 팝업 바깥 클릭 시 닫기
+    // ✅ 팝업 바깥 클릭 시 닫기
     document.addEventListener("click", function (e) {
         if (!popup.contains(e.target) && e.target !== addBtn) {
             popup.style.display = "none";
@@ -34,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-// ✅ 팝업 옵션 클릭 → 섹션 추가
+    // ✅ 팝업 옵션 클릭 → 섹션 추가
     document.querySelectorAll(".popup-option").forEach(option => {
         option.addEventListener("click", () => {
             const type = option.textContent.trim();  // 클릭된 옵션 가져오기
@@ -45,6 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
             newSection.id = `section${sectionIndex}`;
 
             let content = "";
+            let multiSelect = "false";  // 기본적으로 복수선택은 비활성화
+
             switch (type) {
                 case "선택형":
                     content = `
@@ -63,6 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <div class="tag-list job-tags"></div>
                         <input class="tag-input" type="text" placeholder="항목 입력 후 엔터">
                     `;
+                    multiSelect = "true"; // "선택형" 섹션에만 복수선택을 활성화
                     break;
                 case "서술형":
                     content = `
@@ -117,51 +118,49 @@ document.addEventListener("DOMContentLoaded", () => {
             titleInput?.addEventListener("input", () => {
                 tocLink.textContent = `${sectionIndex}. ${titleInput.value || "제목 입력"}`;
             });
+
+            // 새로 추가된 섹션에 대해 복수선택 활성화 여부 설정
+            if (multiSelect === "true") {
+                newSection.setAttribute("data-multi-select", "true");
+                console.log(`선택형 섹션에 data-multi-select="true" 설정됨`);
+            }
         });
     });
 
-// ✅ 선택형 섹션 내 태그 추가 처리
-    document.addEventListener("keydown", (e) => {
-        if (e.target.classList.contains("tag-input") && e.key === "Enter") {
-            e.preventDefault();
-            const value = e.target.value.trim();
-            if (!value) return;
-
-            const tagList = e.target.previousElementSibling;
-            const tag = document.createElement("span");
-            tag.className = "tag";
-            tag.innerHTML = `<span class="tag-label">${value}</span><span class="tag-remove">✕</span>`;
-            tagList.appendChild(tag);
-            e.target.value = "";
-        }
-    });
-    // ✅ 섹션 클릭 시 강조
-    sections.forEach(section => {
-        section.addEventListener("click", () => {
-            sections.forEach(s => s.classList.remove("selected"));
-            section.classList.add("selected");
-        });
-    });
-
-    // ✅ 복수선택 토글
+    // ✅ 복수선택 활성화 버튼 클릭 시
     multiOnBtn?.addEventListener("click", () => {
-        multiSelect = true;
+        multiSelect = true;  // 복수선택 활성화
         multiOnBtn.classList.add("selected-tag");
         multiOffBtn.classList.remove("selected-tag");
-        console.log("복수선택 활성화됨");
+
+        // 희망직무 섹션에 대해서만 data-multi-select 값을 true로 설정
+        const hopeJobSection = document.getElementById("section3");  // 희망직무 섹션
+        if (hopeJobSection) {
+            hopeJobSection.setAttribute("data-multi-select", "true");
+            console.log("희망직무 섹션 복수선택 활성화됨");
+        }
     });
 
+// ✅ 복수선택 비활성화 버튼 클릭 시
     multiOffBtn?.addEventListener("click", () => {
-        multiSelect = false;
+        multiSelect = false;  // 복수선택 비활성화
         multiOnBtn.classList.remove("selected-tag");
         multiOffBtn.classList.add("selected-tag");
-        console.log("복수선택 비활성화됨");
 
+        // 희망직무 섹션에 대해서만 data-multi-select 값을 false로 설정
+        const hopeJobSection = document.getElementById("section3");  // 희망직무 섹션
+        if (hopeJobSection) {
+            hopeJobSection.setAttribute("data-multi-select", "false");
+            console.log("희망직무 섹션 복수선택 비활성화됨");
+        }
+
+        // 선택된 태그 중 첫 번째만 남기고 나머지 비활성화
         const selected = jobTagContainer.querySelectorAll(".selected-tag");
         if (selected.length > 1) {
             selected.forEach((tag, i) => i > 0 && tag.classList.remove("selected-tag"));
         }
     });
+
 
     // ✅ 희망직무 입력
     jobInput?.addEventListener("keydown", e => {
@@ -190,7 +189,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-
     // ✅ 저장 버튼 클릭 시 데이터 준비
     document.querySelector(".save-btn")?.addEventListener("click", () => {
         const title = document.getElementById("resumeTitle")?.value.trim();
@@ -205,61 +203,40 @@ document.addEventListener("DOMContentLoaded", () => {
             const sectionTitle = headerText?.split(". ")[1] || "제목 없음";
             const type = sectionTitle.includes("자기소개") || section.querySelector("textarea") ? "서술형" : "선택형";
             const comment = section.querySelector("#ohcomment")?.value || "";
+            const multiSelect = section.getAttribute("data-multi-select") === "true";  // 복수선택 여부
 
-            console.log(`섹션 제목: ${sectionTitle}, 유형: ${type}`);
-
-            // 조건 항목들 추출 (서술형 섹션에도 조건이 들어가야 함)
             const selectedConditions = [];
             section.querySelectorAll(".tag-list .selected-tag").forEach(tag => {
                 selectedConditions.push(tag.textContent.trim());
             });
 
-            console.log("선택된 조건 항목들:", selectedConditions);
+            const selectedTags = Array.from(section.querySelectorAll(".tag-list .selected-tag"))
+                .map(tag => tag.textContent.trim());
 
-            if (type === "선택형") {
-                // 선택형 섹션에서 선택된 태그들 추출
-                const selectedTags = Array.from(section.querySelectorAll(".tag-list .selected-tag"))
-                    .map(tag => tag.textContent.trim());
-
-                console.log(`선택형 섹션 선택된 항목들: ${selectedTags}`);
-
-                sectionsData.push({
-                    type,
-                    title: sectionTitle,
-                    comment,
-                    selectedTags,  // 선택된 태그들
-                    conditions: selectedConditions // 선택된 조건들
-                });
-            } else if (type === "서술형") {
-                const content = section.querySelector("textarea")?.value || "";
-                sectionsData.push({
-                    type,
-                    title: sectionTitle,
-                    comment,
-                    content,
-                    conditions: selectedConditions // 서술형 섹션에도 조건 항목 추가
-                });
-            }
+            sectionsData.push({
+                type,
+                title: sectionTitle,
+                comment,
+                selectedTags,
+                conditions: selectedConditions,
+                multiSelect // 복수선택 여부
+            });
         });
 
-        // 희망직무 입력된 태그들을 저장에 추가
         const jobTags = [];
         jobTagContainer.querySelectorAll(".tag").forEach(tag => {
             jobTags.push(tag.querySelector(".tag-label").textContent.trim());
         });
 
-        console.log("희망직무 태그들:", jobTags);
-
         const resumeData = {
             title,
             sections: sectionsData,
-            jobTags // 희망직무 태그들 포함
+            jobTags
         };
 
         const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
 
-        // 서버로 데이터 전송
         fetch("/api/coresumes", {
             method: "POST",
             headers: {
@@ -271,7 +248,6 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(response => response.json())
             .then(data => {
                 alert("저장 완료!");
-                // 페이지 이동 등 추가 작업
             })
             .catch(error => {
                 alert("저장 중 오류가 발생했습니다.");
@@ -280,7 +256,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
-
 
 // ✅ 삭제 버튼
 document.addEventListener("click", (e) => {
@@ -313,8 +288,6 @@ document.querySelectorAll(".outline-list a").forEach(link => {
         }
     });
 });
-
-
 
 // ✅ 태그 삭제
 document.addEventListener("click", (e) => {
@@ -387,4 +360,3 @@ function reorderSectionsAndToc() {
         }
     });
 }
-

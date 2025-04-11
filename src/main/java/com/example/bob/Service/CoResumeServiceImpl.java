@@ -29,10 +29,9 @@ public class CoResumeServiceImpl implements CoResumeService {
         this.coResumeSectionRepository = coResumeSectionRepository;
     }
 
-    // ✅ 이력서 저장
     @Override
     public void saveResume(CoResumeRequestDTO requestDTO) {
-        logger.info("이력서 저장 요청 - 제목: {}", requestDTO.getTitle());  // 이력서 제목 로그
+        logger.info("이력서 저장 요청 - 제목: {}", requestDTO.getTitle());
 
         CoResumeEntity resume = new CoResumeEntity();
         resume.setTitle(requestDTO.getTitle());
@@ -46,13 +45,19 @@ public class CoResumeServiceImpl implements CoResumeService {
         // 섹션들 추가
         if (requestDTO.getSections() != null) {
             for (CoResumeSectionRequestDTO sectionDTO : requestDTO.getSections()) {
+                // 로그 추가: multiSelect 값 확인
+                logger.debug("복수선택 여부: {}", sectionDTO.isMultiSelect());
+
                 CoResumeSectionEntity sectionEntity = new CoResumeSectionEntity();
                 sectionEntity.setType(sectionDTO.getType());
                 sectionEntity.setTitle(sectionDTO.getTitle());
                 sectionEntity.setComment(sectionDTO.getComment());
                 sectionEntity.setContent(sectionDTO.getContent());
                 sectionEntity.setTags(sectionDTO.getTags());  // 태그 저장
-                sectionEntity.setMultiSelect(sectionDTO.isMultiSelect()); // 복수선택 여부
+
+                // multiSelect 값은 sectionDTO에서 받아온 값에 따라 설정
+                sectionEntity.setMultiSelect(sectionDTO.isMultiSelect());  // 복수선택 여부
+
                 sectionEntity.setDirectInputValue(sectionDTO.getDirectInputValue()); // 직접입력 값
 
                 // 조건 항목들을 저장하는 부분
@@ -68,6 +73,7 @@ public class CoResumeServiceImpl implements CoResumeService {
         coResumeRepository.save(resume);
         logger.info("이력서 저장 완료 - 제목: {}", requestDTO.getTitle());  // 저장 완료 로그
     }
+
 
     // ✅ 이력서 조회 (수정용)
     @Override
@@ -87,7 +93,7 @@ public class CoResumeServiceImpl implements CoResumeService {
                             sectionEntity.getComment(),
                             sectionEntity.getContent(),
                             sectionEntity.getTags(),
-                            sectionEntity.isMultiSelect(),
+                            sectionEntity.isMultiSelect(),  // multiSelect 값 전달
                             sectionEntity.getConditions(),
                             sectionEntity.getDirectInputValue()
                     ))
@@ -123,6 +129,9 @@ public class CoResumeServiceImpl implements CoResumeService {
 
         List<CoResumeSectionEntity> updatedSections = updatedResume.getSections().stream()
                 .map(sectionDTO -> {
+                    // 로그 추가: multiSelect 값 확인
+                    logger.debug("복수선택 여부: {}", sectionDTO.isMultiSelect());
+
                     CoResumeSectionEntity sectionEntity = new CoResumeSectionEntity();
                     sectionEntity.setTitle(sectionDTO.getTitle());
                     sectionEntity.setType(sectionDTO.getType());
@@ -136,6 +145,9 @@ public class CoResumeServiceImpl implements CoResumeService {
                     return sectionEntity;
                 })
                 .collect(Collectors.toList());
+
+
+
 
         coResumeSectionRepository.deleteAll(resumeEntity.getSections());
         resumeEntity.setSections(updatedSections);
