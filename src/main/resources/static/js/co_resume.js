@@ -17,10 +17,59 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.addEventListener("click", (e) => {
-        if (!popup.contains(e.target) && e.target !== addBtn) {
+        const target = e.target;
+
+        // 팝업 바깥 클릭 시 닫기
+        if (!popup.contains(target) && target !== addBtn) {
             popup.style.display = "none";
         }
+
+        // 제목 클릭 → input 전환
+        const titleSpan = target.closest(".section-title-text");
+        if (titleSpan) {
+            const header = titleSpan.closest(".section-header");
+            const input = header.querySelector(".section-title-input");
+            const number = titleSpan.textContent.split(".")[0];
+            const currentTitle = titleSpan.textContent.replace(`${number}. `, "");
+            input.value = currentTitle;
+            titleSpan.style.display = "none";
+            input.style.display = "inline-block";
+            input.focus();
+        }
+
+        // 직접입력 → textarea 활성화
+        if (target.classList.contains("direct-input-tag")) {
+            const section = target.closest(".resume-section");
+            const textarea = section?.querySelector("textarea");
+            if (textarea) {
+                const disabled = textarea.style.pointerEvents === "none" || !textarea.style.pointerEvents;
+                textarea.style.pointerEvents = disabled ? "auto" : "none";
+                textarea.style.backgroundColor = disabled ? "#fff" : "#f5f5f5";
+                textarea.style.color = disabled ? "#000" : "#888";
+            }
+        }
+
+        // 태그 선택
+        const tag = target.closest(".tag");
+        if (tag && !target.classList.contains("tag-remove")) {
+            tag.classList.toggle("selected-tag");
+        }
+
+        // 태그 삭제
+        if (target.classList.contains("tag-remove")) {
+            tag?.remove();
+        }
+
+        // 섹션 삭제
+        if (target.classList.contains("delete-btn")) {
+            const section = target.closest(".resume-section");
+            const sectionId = section.id;
+            section.remove();
+            const tocLink = document.querySelector(`.outline-list a[href="#${sectionId}"]`);
+            tocLink?.closest("li")?.remove();
+        }
     });
+
 
     document.querySelectorAll(".popup-option").forEach(option => {
         option.addEventListener("click", () => {
@@ -161,17 +210,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // 태그 선택/삭제
-    document.addEventListener("click", (e) => {
-        const tag = e.target.closest(".tag");
-        if (tag && !e.target.classList.contains("tag-remove")) {
-            tag.classList.toggle("selected-tag");
-        }
-        if (e.target.classList.contains("tag-remove")) {
-            tag?.remove();
-        }
-    });
-
     // 저장 버튼
     document.querySelector(".save-btn")?.addEventListener("click", () => {
         const title = document.getElementById("resumeTitle")?.value.trim();
@@ -223,21 +261,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     });
 
-    // 제목 수정
-    document.addEventListener("click", function (e) {
-        const titleSpan = e.target.closest(".section-title-text");
-        if (titleSpan) {
-            const header = titleSpan.closest(".section-header");
-            const input = header.querySelector(".section-title-input");
-            const number = titleSpan.textContent.split(".")[0];
-            const currentTitle = titleSpan.textContent.replace(`${number}. `, "");
-            input.value = currentTitle;
-            titleSpan.style.display = "none";
-            input.style.display = "inline-block";
-            input.focus();
-        }
-    });
-
     document.addEventListener("keydown", function (e) {
         if (e.target.classList.contains("section-title-input") && e.key === "Enter") {
             e.preventDefault();
@@ -253,17 +276,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const section = input.closest(".resume-section");
             const tocLink = document.querySelector(`.outline-list a[href="#${section.id}"]`);
             if (tocLink) tocLink.textContent = `${number}. ${newTitle}`;
-        }
-    });
-
-    // 삭제
-    document.addEventListener("click", (e) => {
-        if (e.target.classList.contains("delete-btn")) {
-            const section = e.target.closest(".resume-section");
-            const sectionId = section.id;
-            section.remove();
-            const tocLink = document.querySelector(`.outline-list a[href="#${sectionId}"]`);
-            tocLink?.closest("li")?.remove();
         }
     });
 });
