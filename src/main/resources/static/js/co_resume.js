@@ -254,22 +254,32 @@ document.addEventListener("DOMContentLoaded", () => {
             const textarea = section.querySelector("textarea");
             const content = textarea ? textarea.value : "";
 
+            const selectedConditions = [];
+            section.querySelectorAll(".tag-list .selected-tag").forEach(tag => {
+                selectedConditions.push(tag.textContent.trim());
+            });
+
             const selectedTags = Array.from(section.querySelectorAll(".tag-list .tag-label"))
                 .map(tag => tag.textContent.trim());
             const multiSelect = section.querySelector(".mode-btn.selected-tag")?.textContent.includes("⭕") || false;
 
-            sectionsData.push({
-                type: section.querySelector("select") ? "선택형" : "서술형",
-                title: sectionTitle,
-                comment,
-                tags: selectedTags,
-                content,
-                multiSelect
+
+
+                sectionsData.push({
+                    type: section.querySelector("select") ? "선택형" : "서술형",
+                    title: sectionTitle,
+                    comment,
+                    tags: selectedTags,
+                    content,
+                    multiSelect,
+                    conditions: selectedConditions
+                });
             });
-        });
 
         const jobTags = Array.from(jobTagContainer.querySelectorAll(".tag .tag-label"))
             .map(tag => tag.textContent.trim());
+
+
 
         const resumeData = { title, sections: sectionsData, jobTags };
 

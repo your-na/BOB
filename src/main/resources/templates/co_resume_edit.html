@@ -354,10 +354,10 @@
                         const sectionConditions = allConditions[section.title] || [];  // 해당 섹션에 맞는 조건 항목을 가져옴
                         const conditionList = sectionConditions.map(condition => {
                             return `
-                                <span class="condition ${section.conditions.includes(condition) ? 'active' : ''}" data-condition="${condition}">
-                                    ${condition}
-                                </span>
-                            `;
+        <span class="condition ${section.conditions.includes(condition) ? 'active' : ''}" data-condition="${condition}">
+            ${condition}
+        </span>
+    `;
                         }).join('');
 
                         sectionElement.innerHTML = `
