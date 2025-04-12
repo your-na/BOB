@@ -37,27 +37,57 @@ document.addEventListener("DOMContentLoaded", () => {
             input.focus();
         }
 
-        // 직접입력 → textarea 활성화
-        if (target.classList.contains("direct-input-tag")) {
-            const section = target.closest(".resume-section");
-            const textarea = section?.querySelector("textarea");
-            if (textarea) {
-                const disabled = textarea.style.pointerEvents === "none" || !textarea.style.pointerEvents;
-                textarea.style.pointerEvents = disabled ? "auto" : "none";
-                textarea.style.backgroundColor = disabled ? "#fff" : "#f5f5f5";
-                textarea.style.color = disabled ? "#000" : "#888";
-            }
-        }
-
         // 태그 선택
         const tag = target.closest(".tag");
         if (tag && !target.classList.contains("tag-remove")) {
+            const container = tag.closest(".tag-list");
+            const isSingle = container?.dataset.single === "true";
+
+            if (isSingle) {
+                container.querySelectorAll(".tag").forEach(t => t.classList.remove("selected-tag"));
+                container.querySelectorAll("input.custom-input").forEach(i => i.remove());
+            }
+
             tag.classList.toggle("selected-tag");
+
+            // ✅ 직접입력 input 처리
+            const isDirect = tag.classList.contains("direct-input-tag");
+            if (isDirect) {
+                const exists = tag.nextElementSibling;
+                if (tag.classList.contains("selected-tag") && !(exists && exists.classList.contains("custom-input"))) {
+                    const input = document.createElement("input");
+                    input.type = "text";
+                    input.placeholder = "직접 입력";
+                    input.className = "custom-input";
+                    input.style.marginLeft = "10px";
+                    input.addEventListener("keydown", (ev) => {
+                        if (ev.key === "Enter") ev.preventDefault();
+                    });
+                    tag.insertAdjacentElement("afterend", input);
+                    input.focus();
+                } else if (!tag.classList.contains("selected-tag")) {
+                    const input = tag.nextElementSibling;
+                    if (input && input.classList.contains("custom-input")) {
+                        input.remove();
+                    }
+                }
+            } else {
+                // ✅ 다른 태그 클릭 시 직접입력 input 제거
+                const allDirect = container?.querySelectorAll(".direct-input-tag") || [];
+                allDirect.forEach(dtag => {
+                    dtag.classList.remove("selected-tag");
+                    const input = dtag.nextElementSibling;
+                    if (input && input.classList.contains("custom-input")) {
+                        input.remove();
+                    }
+                });
+            }
         }
 
         // 태그 삭제
         if (target.classList.contains("tag-remove")) {
-            tag?.remove();
+            const tag = target.closest(".tag");
+            if (tag) tag.remove();
         }
 
         // 섹션 삭제
@@ -69,6 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
             tocLink?.closest("li")?.remove();
         }
     });
+
 
 
     document.querySelectorAll(".popup-option").forEach(option => {
