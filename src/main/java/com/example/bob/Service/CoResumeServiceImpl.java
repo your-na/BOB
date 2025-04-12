@@ -5,13 +5,16 @@ import com.example.bob.DTO.CoResumeRequestDTO;
 import com.example.bob.DTO.CoResumeSectionRequestDTO;
 import com.example.bob.Entity.CoResumeEntity;
 import com.example.bob.Entity.CoResumeSectionEntity;
+import com.example.bob.Entity.CoResumeTagEntity;
 import com.example.bob.Repository.CoResumeRepository;
 import com.example.bob.Repository.CoResumeSectionRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,6 +32,7 @@ public class CoResumeServiceImpl implements CoResumeService {
         this.coResumeSectionRepository = coResumeSectionRepository;
     }
 
+    // ✅ 이력서 저장 (제작)
     @Override
     public void saveResume(CoResumeRequestDTO requestDTO) {
         logger.info("이력서 저장 요청 - 제목: {}", requestDTO.getTitle());
@@ -36,46 +40,55 @@ public class CoResumeServiceImpl implements CoResumeService {
         CoResumeEntity resume = new CoResumeEntity();
         resume.setTitle(requestDTO.getTitle());
 
-        // 희망직무 태그 저장
-        List<String> jobTags = requestDTO.getJobTags();
-        if (jobTags != null && !jobTags.isEmpty()) {
-            resume.setJobTags(jobTags);  // 희망직무 태그를 이력서에 추가
-        }
+        List<CoResumeTagEntity> tagEntities = new ArrayList<>();
 
-        // 섹션들 추가
         if (requestDTO.getSections() != null) {
             for (CoResumeSectionRequestDTO sectionDTO : requestDTO.getSections()) {
-                // 로그 추가: multiSelect 값 확인
-                logger.debug("복수선택 여부: {}", sectionDTO.isMultiSelect());
-
                 CoResumeSectionEntity sectionEntity = new CoResumeSectionEntity();
                 sectionEntity.setType(sectionDTO.getType());
                 sectionEntity.setTitle(sectionDTO.getTitle());
                 sectionEntity.setComment(sectionDTO.getComment());
                 sectionEntity.setContent(sectionDTO.getContent());
-                sectionEntity.setTags(sectionDTO.getTags());  // 태그 저장
+                sectionEntity.setMultiSelect(sectionDTO.isMultiSelect());
+                sectionEntity.setDirectInputValue(sectionDTO.getDirectInputValue());
+                sectionEntity.setConditions(sectionDTO.getConditions());
 
-                // multiSelect 값은 sectionDTO에서 받아온 값에 따라 설정
-                sectionEntity.setMultiSelect(sectionDTO.isMultiSelect());  // 복수선택 여부
+                // ✅ 태그 처리
+                if (sectionDTO.getTags() != null) {
+                    for (String tagValue : sectionDTO.getTags()) {
+                        CoResumeTagEntity tag = new CoResumeTagEntity();
+                        tag.setTag(tagValue);
+                        tag.setResume(resume);                // 이력서 연관
+                        tag.setSection(sectionEntity);        // ✅ 섹션 연관 (이게 핵심!)
+                        tagEntities.add(tag);
+                    }
+                    sectionEntity.setTags(sectionDTO.getTags());
+                } else {
+                    sectionEntity.setTags(new ArrayList<>());
+                }
 
-                sectionEntity.setDirectInputValue(sectionDTO.getDirectInputValue()); // 직접입력 값
-
-                // 조건 항목들을 저장하는 부분
-                sectionEntity.setConditions(sectionDTO.getConditions()); // 조건 항목들 저장
-                logger.info("조건 항목 저장됨: {}", sectionDTO.getConditions()); // 조건 항목 로그
-
-                // 연관 관계 설정
                 resume.addSection(sectionEntity);
             }
         }
 
-        // 이력서 저장
+        // ✅ 희망직무 태그 처리
+        if (requestDTO.getJobTags() != null) {
+            for (String tagValue : requestDTO.getJobTags()) {
+                CoResumeTagEntity tag = new CoResumeTagEntity();
+                tag.setTag(tagValue);
+                tag.setResume(resume); // 희망직무는 resume만 설정
+                tagEntities.add(tag);
+            }
+        }
+
+        resume.setJobTags(tagEntities);
         coResumeRepository.save(resume);
-        logger.info("이력서 저장 완료 - 제목: {}", requestDTO.getTitle());  // 저장 완료 로그
+
+        logger.info("이력서 저장 완료 - 제목: {}", requestDTO.getTitle());
     }
 
 
-    // ✅ 이력서 조회 (수정용)
+    // ✅ 이력서 조회
     @Override
     public CoResumeRequestDTO getResumeById(Long id) {
         logger.info("이력서 데이터 불러오기 요청 - ID: {}", id);
@@ -83,7 +96,6 @@ public class CoResumeServiceImpl implements CoResumeService {
         Optional<CoResumeEntity> resumeEntityOpt = coResumeRepository.findById(id);
         if (resumeEntityOpt.isPresent()) {
             CoResumeEntity resumeEntity = resumeEntityOpt.get();
-
             logger.info("이력서 데이터 불러오기 성공 - ID: {}", id);
 
             List<CoResumeSectionRequestDTO> sectionDTOList = resumeEntity.getSections().stream()
@@ -93,18 +105,22 @@ public class CoResumeServiceImpl implements CoResumeService {
                             sectionEntity.getComment(),
                             sectionEntity.getContent(),
                             sectionEntity.getTags(),
-                            sectionEntity.isMultiSelect(),  // multiSelect 값 전달
+                            sectionEntity.isMultiSelect(),
                             sectionEntity.getConditions(),
                             sectionEntity.getDirectInputValue()
                     ))
                     .collect(Collectors.toList());
 
-            // 반환할 이력서 정보에 희망직무 태그도 포함
+            // jobTags에서 문자열만 추출
+            List<String> jobTagStrings = resumeEntity.getJobTags().stream()
+                    .map(CoResumeTagEntity::getTag)
+                    .collect(Collectors.toList());
+
             return new CoResumeRequestDTO(
                     resumeEntity.getTitle(),
                     sectionDTOList,
                     resumeEntity.getCreatedAt(),
-                    resumeEntity.getJobTags()  // 희망직무 태그를 반환
+                    jobTagStrings
             );
         } else {
             logger.error("이력서를 찾을 수 없습니다 - ID: {}", id);
@@ -112,7 +128,7 @@ public class CoResumeServiceImpl implements CoResumeService {
         }
     }
 
-    // ✅ 이력서 업데이트
+    // ✅ 이력서 수정
     @Override
     public void updateResume(Long id, CoResumeRequestDTO updatedResume) {
         CoResumeEntity resumeEntity = coResumeRepository.findById(id)
@@ -121,47 +137,47 @@ public class CoResumeServiceImpl implements CoResumeService {
         resumeEntity.setTitle(updatedResume.getTitle());
         resumeEntity.setCreatedAt(updatedResume.getCreatedAt());
 
-        // 희망직무 태그 업데이트
-        List<String> jobTags = updatedResume.getJobTags();
-        if (jobTags != null && !jobTags.isEmpty()) {
-            resumeEntity.setJobTags(jobTags);  // 희망직무 태그 업데이트
-        }
-
         List<CoResumeSectionEntity> updatedSections = updatedResume.getSections().stream()
                 .map(sectionDTO -> {
-                    // 로그 추가: multiSelect 값 확인
-                    logger.debug("복수선택 여부: {}", sectionDTO.isMultiSelect());
-
                     CoResumeSectionEntity sectionEntity = new CoResumeSectionEntity();
                     sectionEntity.setTitle(sectionDTO.getTitle());
                     sectionEntity.setType(sectionDTO.getType());
                     sectionEntity.setComment(sectionDTO.getComment());
                     sectionEntity.setContent(sectionDTO.getContent());
                     sectionEntity.setTags(sectionDTO.getTags());
-                    sectionEntity.setMultiSelect(sectionDTO.isMultiSelect()); // 복수선택 여부
-                    sectionEntity.setConditions(sectionDTO.getConditions()); // 조건 항목들
-                    sectionEntity.setDirectInputValue(sectionDTO.getDirectInputValue()); // 직접입력 값
-                    sectionEntity.setResume(resumeEntity); // 연관된 이력서 설정
+                    sectionEntity.setMultiSelect(sectionDTO.isMultiSelect());
+                    sectionEntity.setConditions(sectionDTO.getConditions());
+                    sectionEntity.setDirectInputValue(sectionDTO.getDirectInputValue());
+                    sectionEntity.setResume(resumeEntity);
                     return sectionEntity;
                 })
                 .collect(Collectors.toList());
 
-
-
-
         coResumeSectionRepository.deleteAll(resumeEntity.getSections());
         resumeEntity.setSections(updatedSections);
+
+        // 태그도 모두 새로 갱신
+        List<CoResumeTagEntity> updatedTags = new ArrayList<>();
+        if (updatedResume.getJobTags() != null) {
+            for (String tagValue : updatedResume.getJobTags()) {
+                CoResumeTagEntity tag = new CoResumeTagEntity();
+                tag.setTag(tagValue);
+                tag.setResume(resumeEntity);
+                updatedTags.add(tag);
+            }
+        }
+        resumeEntity.setJobTags(updatedTags);
 
         coResumeRepository.save(resumeEntity);
     }
 
-    // ✅ 목록 조회
+    // ✅ 이력서 전체 목록 조회
     @Override
     public List<CoResumeEntity> getAllResumes() {
         return coResumeRepository.findAll();
     }
 
-    // ✅ 삭제
+    // ✅ 이력서 삭제
     @Override
     public void deleteResume(Long id) {
         coResumeRepository.deleteById(id);

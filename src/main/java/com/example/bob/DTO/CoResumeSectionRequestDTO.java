@@ -15,17 +15,27 @@ public class CoResumeSectionRequestDTO {
     private String title;              // 섹션 제목
     private String comment;            // 설명/가이드
     private String content;            // 서술형일 때 사용
-    private List<String> tags;         // 선택형일 때 사용
+    private List<String> tags;         // ✅ 선택형 보기 태그
     private boolean multiSelect;       // 복수선택 여부
     private List<String> conditions;   // 조건 항목들 (예: 50자 이상, 200자 이상 등)
     private String directInputValue;   // 직접입력 값 (사용자가 입력한 값)
 
-    // 기본 생성자, Lombok을 사용하여 @Getter, @Setter, @AllArgsConstructor 처리됨
+    // ✅ tags가 null일 경우 빈 리스트 반환
+    public List<String> getTags() {
+        if (tags == null) {
+            tags = new ArrayList<>();
+        }
+        return tags;
+    }
 
-    // 추가된 안전장치: conditions 필드가 null일 경우 빈 리스트로 초기화
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    // ✅ conditions가 null일 경우 빈 리스트 반환
     public List<String> getConditions() {
         if (conditions == null) {
-            conditions = new ArrayList<>();  // conditions가 null이면 빈 리스트로 초기화
+            conditions = new ArrayList<>();
         }
         return conditions;
     }

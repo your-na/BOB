@@ -27,9 +27,9 @@ public class CoResumeEntity {
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<CoResumeSectionEntity> sections = new ArrayList<>();
 
-    // 희망직무 태그 (jobTags) 추가
-    @ElementCollection
-    private List<String> jobTags = new ArrayList<>();  // 희망직무 태그들
+    @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CoResumeTagEntity> jobTags = new ArrayList<>();
+
 
     /**
      * 연관관계 편의 메서드
@@ -52,7 +52,12 @@ public class CoResumeEntity {
     public Date getCreatedAt() { return createdAt; }
     public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
 
-    // Getter / Setter for jobTags
-    public List<String> getJobTags() { return jobTags; }
-    public void setJobTags(List<String> jobTags) { this.jobTags = jobTags; }
+    public List<CoResumeTagEntity> getJobTags() {
+        return jobTags;
+    }
+    public void setJobTags(List<CoResumeTagEntity> jobTags) {
+        this.jobTags = jobTags;
+    }
+
+
 }

@@ -32,18 +32,14 @@ public class CoResumeController {
     public ResponseEntity<Map<String, String>> saveResume(@RequestBody CoResumeRequestDTO requestDTO) {
         // 조건 항목 로그 추가
         requestDTO.getSections().forEach(section -> {
-            logger.info("섹션 제목: {}, 조건 항목들: {}", section.getTitle(), section.getConditions());
         });
 
         // 조건 항목들이 잘 전달되는지 확인 (디버그용)
         requestDTO.getSections().forEach(section -> {
             section.getConditions().forEach(condition -> {
-                logger.debug("선택된 조건: {}", condition);
             });
         });
 
-        // 희망직무 태그들 로그 추가 (디버그용)
-        logger.debug("희망직무 태그들: {}", requestDTO.getJobTags());
 
         // 이력서 저장
         coResumeService.saveResume(requestDTO);
