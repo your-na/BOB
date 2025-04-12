@@ -309,10 +309,10 @@
             <button class="delete-btn">✕</button>
         </div>
         <input type="text" id="ohcomment" value="${section.comment || ''}" placeholder="설명 입력">
-        <div class="tag-list">
+        <div class="tag-list conditions-list">
             ${["초등학교", "중학교", "고등학교", "대학교", "대학원", "최종"].map(level => {
-                                const isSelected = section.tags?.includes(level) ? "selected-tag" : "";
-                                return `<span class="tag ${isSelected}">${level}</span>`;
+                                const isSelected = section.conditions?.includes(level) ? "selected-tag active" : "";
+                                return `<span class="tag condition ${isSelected}" data-condition="${level}">${level}</span>`;
                             }).join('')}
         </div>
         <input type="text" placeholder="학교명" value="${section.school || ''}"><br>
@@ -401,19 +401,23 @@
 
         // 조건 항목 클릭 시 활성화/비활성화 처리
         function addConditionClickListener() {
-            document.querySelectorAll(".conditions-list .condition").forEach(condition => {
+            document.querySelectorAll(".condition").forEach(condition => {
                 condition.addEventListener("click", (e) => {
                     e.target.classList.toggle("active");
+                    // 스타일적으로도 추가하고 싶으면 여기에 selected-tag도 같이 토글할 수 있어요
+                    e.target.classList.toggle("selected-tag");
                 });
             });
         }
+
 
         // 저장 버튼 클릭 시 수정된 내용을 서버로 전송
         document.querySelector(".save-btn").addEventListener("click", () => {
             const resumeTitle = document.querySelector("#resumeTitle").value;
             const sections = Array.from(document.querySelectorAll(".resume-section")).map(section => {
-                const selectedConditions = Array.from(section.querySelectorAll(".conditions-list .active"))
+                const selectedConditions = Array.from(section.querySelectorAll(".condition.active"))
                     .map(condition => condition.dataset.condition);
+
 
                 return {
                     title: section.querySelector(".section-header span").textContent,
