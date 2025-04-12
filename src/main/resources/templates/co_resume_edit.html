@@ -213,6 +213,7 @@
             <p class="section-note">사이트 등록 정보를 기반으로 보여집니다.</p>
         `;
                             sectionContainer.appendChild(sectionElement);
+                            addConditionClickListener();  // 🔥 조건 클릭 토글 적용
                             return; // 여기서 끝내고 다음 섹션으로 넘어감
                         }
                         else if (section.title === "희망직무") {
@@ -242,6 +243,8 @@
     `;
 
                             sectionContainer.appendChild(sectionElement);
+                            addConditionClickListener();  // 🔥 조건 클릭 토글 적용
+
 
                             // 입력 및 태그 추가 기능
                             const tagList = sectionElement.querySelector(".job-tags");
@@ -335,6 +338,7 @@
         </div>
     `;
                             sectionContainer.appendChild(sectionElement);
+                            addConditionClickListener();  // 🔥 조건 클릭 토글 적용
                             return; // 다음 섹션으로 넘어가게 종료
                         }
 
@@ -386,6 +390,8 @@
                         `;
 
                         sectionContainer.appendChild(sectionElement);
+                        addConditionClickListener();  // 🔥 조건 클릭 토글 적용
+
                     });
                 })
                 .catch(error => {
