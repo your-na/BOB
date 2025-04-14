@@ -283,3 +283,18 @@ textarea {
     color: #fff; /* 흰색 글씨 */
 }
 
+.condition.selected-tag {
+    background-color: #00b800;
+    color: #fff;
+}
+/* 더 구체적으로 지정 */
+.resume-section .condition.active,
+.resume-section .condition.selected-tag {
+    background-color: #00b800 !important;
+    color: white !important;
+}
+
+
+
+
+

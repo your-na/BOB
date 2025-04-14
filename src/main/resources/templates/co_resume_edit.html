@@ -162,19 +162,25 @@
                 });
 
                 // 조건 항목 추가
-                const sectionConditions = allConditions[type] || [];  // 해당 섹션에 맞는 조건 항목을 가져옴
+                const sectionConditions = allConditions[type] || [];
                 const conditionList = sectionConditions.map(condition => {
                     return `
-                        <span class="condition" data-condition="${condition}">
-                            ${condition}
-                        </span>
-                    `;
+                <span class="condition" data-condition="${condition}">
+                    ${condition}
+                </span>
+            `;
                 }).join('');
+
                 // 조건 항목을 해당 섹션에 삽입
                 newSection.querySelector(".conditions-list").innerHTML = conditionList;
 
-                // 조건 항목 클릭 시 활성화/비활성화 처리
+                // ✅ 이 밑에 추가!
+                document.querySelector(".resume-sections-container").appendChild(newSection);
+
+                // ✅ 조건 항목 이벤트 바인딩
                 addConditionClickListener();
+
+
             });
         });
 
@@ -213,7 +219,6 @@
             <p class="section-note">사이트 등록 정보를 기반으로 보여집니다.</p>
         `;
                             sectionContainer.appendChild(sectionElement);
-                            addConditionClickListener();  // 🔥 조건 클릭 토글 적용
                             return; // 여기서 끝내고 다음 섹션으로 넘어감
                         }
                         else if (section.title === "희망직무") {
@@ -243,7 +248,6 @@
     `;
 
                             sectionContainer.appendChild(sectionElement);
-                            addConditionClickListener();  // 🔥 조건 클릭 토글 적용
 
 
                             // 입력 및 태그 추가 기능
@@ -299,6 +303,31 @@
 
                             return;
                         }
+                        else if (section.title === "포트폴리오") {
+                            sectionElement.innerHTML = `
+        <div class="section-header">
+            <span>${index + 1}. ${section.title}</span>
+            <button class="delete-btn">✕</button>
+        </div>
+        <input type="text" id="ohcomment" value="${section.comment || ''}" placeholder="설명 입력">
+        <div class="tag-list conditions-list">
+            ${["1개 이하", "3개 이상", "5개 이상", "직접입력"].map(condition => {
+                                const isSelected = section.conditions?.includes(condition) ? "selected-tag active" : "";
+                                return `<span class="tag condition ${isSelected}" data-condition="${condition}">${condition}</span>`;
+                            }).join('')}
+        </div>
+        <textarea placeholder="포트폴리오 설명">${section.content || ''}</textarea>
+    `;
+                            sectionContainer.appendChild(sectionElement);
+
+                            // ✅ 렌더링 직후에 조건 클릭 바인딩 (setTimeout으로 해결)
+                            setTimeout(() => {
+                                addConditionClickListener();
+                            }, 0);
+
+                            return;
+                        }
+
 
 
 
@@ -338,7 +367,6 @@
         </div>
     `;
                             sectionContainer.appendChild(sectionElement);
-                            addConditionClickListener();  // 🔥 조건 클릭 토글 적용
                             return; // 다음 섹션으로 넘어가게 종료
                         }
 
@@ -355,14 +383,15 @@
                         }
 
                         // 조건 항목을 모두 추가하는 부분
-                        const sectionConditions = allConditions[section.title] || [];  // 해당 섹션에 맞는 조건 항목을 가져옴
+                        const currentConditions = Array.isArray(section.conditions) ? section.conditions : [];
+                        const sectionConditions = allConditions[section.title] || [];
+
                         const conditionList = sectionConditions.map(condition => {
-                            return `
-        <span class="condition ${section.conditions.includes(condition) ? 'active' : ''}" data-condition="${condition}">
-            ${condition}
-        </span>
-    `;
+                            const isActive = currentConditions.includes(condition) ? "active selected-tag" : "";
+                            return `<span class="condition ${isActive}" data-condition="${condition}">${condition}</span>`;
                         }).join('');
+
+
 
                         sectionElement.innerHTML = `
                             <div class="section-header">
@@ -401,14 +430,26 @@
 
         // 조건 항목 클릭 시 활성화/비활성화 처리
         function addConditionClickListener() {
-            document.querySelectorAll(".condition").forEach(condition => {
+            const conditions = document.querySelectorAll(".condition");
+            console.log("🟡 조건 항목 개수:", conditions.length);
+
+            conditions.forEach(condition => {
+                // 이미 바인딩된 요소는 건너뜀
+                if (condition.dataset.bound === "true") return;
+
+                console.log("🔵 조건 항목 텍스트:", condition.textContent);
+
                 condition.addEventListener("click", (e) => {
                     e.target.classList.toggle("active");
-                    // 스타일적으로도 추가하고 싶으면 여기에 selected-tag도 같이 토글할 수 있어요
                     e.target.classList.toggle("selected-tag");
+                    console.log("🟢 클릭됨:", e.target.textContent, "→ classList:", e.target.classList.value);
                 });
+
+                condition.dataset.bound = "true"; // 중복 바인딩 방지
             });
         }
+
+
 
 
         // 저장 버튼 클릭 시 수정된 내용을 서버로 전송
@@ -456,7 +497,7 @@
 
         // ✅ 희망직무 입력
         jobInput?.addEventListener("keydown", e => {
-            if (e.key === "Enter" && jobInput.value.trim()) {
+            if (e.key === "Enter" &&    jobInput.value.trim()) {
                 e.preventDefault();
                 const text = jobInput.value.trim();
                 const tag = document.createElement("span");
