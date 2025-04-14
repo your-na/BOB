@@ -452,9 +452,18 @@
                                 <button class="delete-btn">✕</button>
                             </div>
                             <input type="text" value="${section.comment}" placeholder="설명 입력">
-                            <div class="section-content">
-                                ${section.type === "서술형" ? `<textarea placeholder="내용을 입력하세요">${section.content}</textarea>` : ""}
-                            </div>
+                           <div class="section-content">
+                           ${
+                                 section.type === "서술형"
+                                ? `<textarea placeholder="내용을 입력하세요">${section.content || ''}</textarea>`
+                                : section.type === "사진 첨부"
+                                    ? `<textarea placeholder="구직자 사진 입력란">${section.content || ''}</textarea>`
+                                    : section.type === "파일 첨부"
+                                        ? `<textarea placeholder="구직자 파일 첨부란">${section.content || ''}</textarea>`
+                                        : ""
+                        }
+</div>
+
                             <div class="section-content">
                                 ${section.type === "서술형" || section.type === "선택형" ? `<div class="conditions-list">${conditionList}</div>` : ""}
                             </div>
@@ -575,11 +584,22 @@
                     jobTags = tags;
                     return null; // sections 배열에서 제거됨
                 }
+                let type = "서술형";
+                const sectionText = section.querySelector("textarea")?.placeholder || "";
+
+                if (sectionText.includes("사진")) {
+                    type = "사진 첨부";
+                } else if (sectionText.includes("파일")) {
+                    type = "파일 첨부";
+                } else if (section.querySelector("select")) {
+                    type = "선택형";
+                }
+
 
                 return {
                     title: sectionTitle,
                     comment: section.querySelector("input[type='text']").value,
-                    type: section.querySelector("select") ? "선택형" : "서술형",
+                    type: type,
                     content: content,
                     tags: tags,
                     multiSelect: multiSelect,

@@ -287,10 +287,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 .map(tag => tag.textContent.trim());
             const multiSelect = section.querySelector(".mode-btn.selected-tag")?.textContent.includes("⭕") || false;
 
+            let type = "서술형";
+            const placeholder = textarea?.getAttribute("placeholder") || "";
+
+            if (placeholder.includes("사진")) {
+                type = "사진 첨부";
+            } else if (placeholder.includes("파일")) {
+                type = "파일 첨부";
+            } else if (section.querySelector("select")) {
+                type = "선택형";
+            }
 
 
-                sectionsData.push({
-                    type: section.querySelector("select") ? "선택형" : "서술형",
+            sectionsData.push({
+                    type,
                     title: sectionTitle,
                     comment,
                     tags: selectedTags,
