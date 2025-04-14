@@ -144,6 +144,28 @@
                         <div class="conditions-list"></div>  <!-- 조건 항목 추가 -->
                     `;
                         break;
+                    case "사진 첨부":
+                        content = `
+                        <div class="section-header">
+                            <span class="section-title-text">${sectionIndex}. 제목 입력</span>
+                            <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                            <button class="delete-btn">✕</button>
+                        </div>
+                        <input type="text" id="ohcomment" placeholder="설명 입력">
+                        <textarea placeholder="구직자 사진 입력란"></textarea>
+                    `;
+                        break;
+                    case "파일 첨부":
+                        content = `
+                        <div class="section-header">
+                            <span class="section-title-text">${sectionIndex}. 제목 입력</span>
+                            <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                            <button class="delete-btn">✕</button>
+                        </div>
+                        <input type="text" id="ohcomment" placeholder="설명 입력">
+                        <textarea placeholder="구직자 파일 첨부란"></textarea>
+                    `;
+                        break;
                 }
 
                 newSection.innerHTML = content;

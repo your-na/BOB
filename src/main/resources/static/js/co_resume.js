@@ -143,6 +143,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     `;
                     break;
                 case "사진 첨부":
+                    content = `
+                        <div class="section-header">
+                            <span class="section-title-text">${sectionIndex}. 제목 입력</span>
+                            <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                            <button class="delete-btn">✕</button>
+                        </div>
+                        <input type="text" id="ohcomment" placeholder="설명 입력">
+                        <textarea placeholder="구직자 사진 입력란"></textarea>
+                    `;
+                    break;
                 case "파일 첨부":
                     content = `
                         <div class="section-header">
@@ -151,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <button class="delete-btn">✕</button>
                         </div>
                         <input type="text" id="ohcomment" placeholder="설명 입력">
-                        <textarea placeholder="해당 내용을 입력하세요"></textarea>
+                        <textarea placeholder="구직자 파일 첨부란"></textarea>
                     `;
                     break;
             }
@@ -248,8 +258,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const sectionsData = [];
         document.querySelectorAll(".resume-section").forEach(section => {
-            const headerText = section.querySelector(".section-header span")?.textContent.trim();
-            const sectionTitle = headerText?.split(". ")[1] || "제목 없음";
+            let sectionTitle = "";
+            const titleSpan = section.querySelector(".section-header span");
+            const titleInput = section.querySelector(".section-title-input");
+
+// ✅ input이 존재하고 값이 있으면 우선 사용 (추가된 섹션)
+            if (titleInput && titleInput.value.trim()) {
+                sectionTitle = titleInput.value.trim();
+            }
+// ✅ input이 없거나 비어 있으면 span에서 추출 (기본 섹션)
+            else if (titleSpan && titleSpan.textContent.trim()) {
+                const raw = titleSpan.textContent.trim();
+                sectionTitle = raw.includes(". ") ? raw.split(". ")[1] : raw;
+            } else {
+                sectionTitle = "제목 없음";
+            }
+
             const comment = section.querySelector("#ohcomment")?.value || "";
             const textarea = section.querySelector("textarea");
             const content = textarea ? textarea.value : "";
@@ -311,6 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const number = span.textContent.split(".")[0];
             const newTitle = input.value.trim() || "제목 없음";
             span.textContent = `${number}. ${newTitle}`;
+            input.value = newTitle; // ✅ span이 바뀌었으면 input도 동기화!
             input.style.display = "none";
             span.style.display = "inline-block";
 
