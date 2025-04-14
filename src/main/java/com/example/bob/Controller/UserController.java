@@ -163,14 +163,8 @@ public class UserController {
 
     //관리자 공모전 임의 주소
 
-    @GetMapping("/adnewcon")
-    public String adnewform() {return "ad_newcontest";}
 
-    @GetMapping("adconrequest")
-    public String adconrequestform() {return "ad_contest_request";}
 
-    @GetMapping("adconlist")
-    public String conlistform() {return "ad_contest_list";}
 
     //관리자^_^
     @GetMapping("/sidebar")

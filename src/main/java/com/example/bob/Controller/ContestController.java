@@ -39,6 +39,9 @@ public class ContestController {
         }
     }
 
+    @GetMapping("/adnewcon")
+    public String adnewform() {return "ad_newcontest";}
+
     // ✅ 사용자용 공모전 목록
     @GetMapping("/contest")
     public String contestList(Model model) {
@@ -55,8 +58,9 @@ public class ContestController {
 
     // 기업 공모전 목록
     @GetMapping("/comhome")
-    public String coContestList(Model model){
-        model.addAttribute("contests", contestService.getAllContests());
+    public String comHomePage(Model model) {
+        List<ContestDTO> contestList = contestService.getApprovedContests(); // 승인된 공모전만
+        model.addAttribute("contestList", contestList);
         return "comhome";
     }
 
@@ -65,13 +69,6 @@ public class ContestController {
     public String pendingList(Model model) {
         model.addAttribute("contests", contestService.getPendingContests());
         return "ad_contest_list";
-    }
-
-    // ✅ 공모전 상세 보기 (관리자 요청 상세)
-    @GetMapping("/ad_contest_request/{id}")
-    public String requestDetail(@PathVariable Long id, Model model) {
-        model.addAttribute("contest", contestService.getById(id));
-        return "ad_contest_request";
     }
 
     // ✅ 공모전 상세 보기 (사용자용)
@@ -90,19 +87,7 @@ public class ContestController {
         return "postcontest";
     }
 
-    // ✅ 공모전 승인
-    @PostMapping("/admin/contest/approve/{id}")
-    public String approve(@PathVariable Long id) {
-        contestService.approve(id);
-        return "redirect:/ad_contest_list";
-    }
 
-    // ✅ 공모전 거절
-    @PostMapping("/admin/contest/reject/{id}")
-    public String reject(@PathVariable Long id) {
-        contestService.reject(id);
-        return "redirect:/ad_contest_list";
-    }
 
     // ✅ 공모전 삭제
     @PostMapping("/admin/contest/delete")

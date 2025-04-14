@@ -35,18 +35,22 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 const textarea = document.getElementById('description');
-
 textarea.addEventListener('input', function () {
-    this.style.height = 'auto';              // 일단 줄였다가
-    this.style.height = `${this.scrollHeight}px`; // 내용에 맞춰 자동 확장
+    this.style.height = 'auto';
+    this.style.height = `${this.scrollHeight}px`;
 });
 
-/* 모달입니다람쥐 */
+// 모달 표시
 document.querySelector('.submit-btn').addEventListener('click', function (e) {
-    e.preventDefault(); // form 전송 막고
+    e.preventDefault();
     document.getElementById('confirmModal').style.display = 'flex';
 });
 
 document.getElementById('confirmNo').addEventListener('click', function () {
     document.getElementById('confirmModal').style.display = 'none';
+});
+
+document.getElementById('confirmYes').addEventListener('click', function () {
+    document.getElementById('confirmModal').style.display = 'none';
+    document.getElementById('realSubmit').click();
 });

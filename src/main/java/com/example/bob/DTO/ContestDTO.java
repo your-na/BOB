@@ -98,6 +98,7 @@ public class ContestDTO {
                 .creatorType(entity.getCreatorType())
                 .isOnlyBOB(entity.isOnlyBOB())
                 .isApproved(entity.isApproved())
+                .createdAt(entity.getCreatedAt())
                 .status(entity.getStatus())
                 .remainingDays(daysLeft)
                 .build();

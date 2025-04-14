@@ -81,8 +81,31 @@ public class ContestService {
                 .collect(Collectors.toList());
     }
 
+    public List<ContestDTO> getAllPendingContests() {
+        return contestRepository.findByIsApprovedFalse()
+                .stream()
+                .map(ContestDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    public void approveContest(Long id) {
+        ContestEntity contest = contestRepository.findById(id).orElseThrow();
+        contest.setApproved(true);
+        contestRepository.save(contest);
+    }
+
+    public void rejectContest(Long id) {
+        contestRepository.deleteById(id);
+    }
+
     public ContestEntity getById(Long id) {
         return contestRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 공모전 없음"));
+    }
+
+    public ContestDTO getContestById(Long id) {
+        return contestRepository.findById(id)
+                .map(ContestDTO::fromEntity)
+                .orElseThrow(() -> new IllegalArgumentException("공모전을 찾을 수 없습니다."));
     }
 
     private final String uploadDir = "uploads/contestImages/";
