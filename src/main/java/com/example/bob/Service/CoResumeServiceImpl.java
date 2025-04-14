@@ -152,73 +152,61 @@ public class CoResumeServiceImpl implements CoResumeService {
         resumeEntity.setTitle(updatedResume.getTitle());
         resumeEntity.setCreatedAt(updatedResume.getCreatedAt());
 
-        // ✅ 요기! 전송된 데이터 로그 찍기
-        System.out.println("✅ [업데이트 요청] 제목: " + updatedResume.getTitle());
-        for (CoResumeSectionRequestDTO section : updatedResume.getSections()) {
-            System.out.println("🟢 섹션 제목: " + section.getTitle());
-            System.out.println("📎 설명: " + section.getComment());
-            System.out.println("🏷️ 태그: " + section.getTags());
-            System.out.println("🧩 조건: " + section.getConditions());
-            System.out.println("🔁 복수선택 여부: " + section.isMultiSelect());
+        // ✅ 섹션 처리
+        resumeEntity.getSections().clear();
+        List<CoResumeSectionRequestDTO> sectionDTOs = updatedResume.getSections();
+        if (sectionDTOs != null && !sectionDTOs.isEmpty()) {
+            List<CoResumeSectionEntity> updatedSections = sectionDTOs.stream()
+                    .map(sectionDTO -> {
+                        CoResumeSectionEntity sectionEntity = new CoResumeSectionEntity();
+                        sectionEntity.setTitle(sectionDTO.getTitle());
+                        sectionEntity.setType(sectionDTO.getType());
+                        sectionEntity.setComment(sectionDTO.getComment());
+                        sectionEntity.setContent(sectionDTO.getContent());
+                        sectionEntity.setTags(sectionDTO.getTags());
+                        sectionEntity.setMultiSelect(sectionDTO.isMultiSelect());
+                        sectionEntity.setConditions(sectionDTO.getConditions());
+                        sectionEntity.setDirectInputValue(sectionDTO.getDirectInputValue());
+                        sectionEntity.setResume(resumeEntity);
+                        return sectionEntity;
+                    })
+                    .collect(Collectors.toList());
+            resumeEntity.getSections().addAll(updatedSections);
 
+            // ✅ 태그도 갱신 (섹션 기반 태그)
+            List<CoResumeTagEntity> updatedTags = new ArrayList<>();
 
-        }
-
-        List<CoResumeSectionEntity> updatedSections = updatedResume.getSections().stream()
-                .map(sectionDTO -> {
-                    CoResumeSectionEntity sectionEntity = new CoResumeSectionEntity();
-                    sectionEntity.setTitle(sectionDTO.getTitle());
-                    sectionEntity.setType(sectionDTO.getType());
-                    sectionEntity.setComment(sectionDTO.getComment());
-                    sectionEntity.setContent(sectionDTO.getContent());
-                    sectionEntity.setTags(sectionDTO.getTags());
-                    sectionEntity.setMultiSelect(sectionDTO.isMultiSelect());
-                    sectionEntity.setConditions(sectionDTO.getConditions());
-                    sectionEntity.setDirectInputValue(sectionDTO.getDirectInputValue());
-                    sectionEntity.setResume(resumeEntity);
-                    return sectionEntity;
-                })
-                .collect(Collectors.toList());
-
-        resumeEntity.getSections().clear(); // ✅ 기존 리스트 clear
-        resumeEntity.getSections().addAll(updatedSections); // ✅ 새로 받은 리스트 추가
-
-
-        // 태그도 모두 새로 갱신
-        List<CoResumeTagEntity> updatedTags = new ArrayList<>();
-
-// 1️⃣ 희망직무 태그 저장 (resume만 연결)
-        if (updatedResume.getJobTags() != null) {
-            for (String tagValue : updatedResume.getJobTags()) {
-                CoResumeTagEntity tag = new CoResumeTagEntity();
-                tag.setTag(tagValue);
-                tag.setResume(resumeEntity);
-                updatedTags.add(tag);
+            // 1️⃣ 희망직무 태그
+            if (updatedResume.getJobTags() != null) {
+                for (String tagValue : updatedResume.getJobTags()) {
+                    CoResumeTagEntity tag = new CoResumeTagEntity();
+                    tag.setTag(tagValue);
+                    tag.setResume(resumeEntity);
+                    updatedTags.add(tag);
+                }
             }
-        }
 
-// 2️⃣ 각 섹션 태그도 저장 (resume + section 연결)
-        for (CoResumeSectionEntity section : updatedSections) {
-            for (String tagValue : section.getTags()) {
-                CoResumeTagEntity tag = new CoResumeTagEntity();
-                tag.setTag(tagValue);
-                tag.setResume(resumeEntity);
-                tag.setSection(section);
-                updatedTags.add(tag);
+            // 2️⃣ 섹션별 태그
+            for (CoResumeSectionEntity section : updatedSections) {
+                for (String tagValue : section.getTags()) {
+                    CoResumeTagEntity tag = new CoResumeTagEntity();
+                    tag.setTag(tagValue);
+                    tag.setResume(resumeEntity);
+                    tag.setSection(section);
+                    updatedTags.add(tag);
+                }
             }
+
+            resumeEntity.getJobTags().clear();
+            resumeEntity.getJobTags().addAll(updatedTags);
+        } else {
+            // 섹션이 아예 없으면 관련 태그도 모두 제거
+            resumeEntity.getJobTags().clear();
         }
-
-        // ✅ 여기 로그 추가!
-        System.out.println("✅ 저장할 jobTags: " + updatedTags.size());
-        System.out.println("✅ 저장할 sections: " + updatedSections.size());
-
-        resumeEntity.getJobTags().clear();  // 기존 태그 리스트 비움
-        resumeEntity.getJobTags().addAll(updatedTags);  // 새로 받은 태그들 추가
-
-
 
         coResumeRepository.save(resumeEntity);
     }
+
 
     // ✅ 이력서 전체 목록 조회
     @Override

@@ -169,6 +169,9 @@
                 }
 
                 newSection.innerHTML = content;
+                newSection.setAttribute("data-title", type === "선택형" ? "추가선택" : "제목 입력");
+                newSection.setAttribute("data-type", type);  // 서술형, 선택형 등
+
                 document.querySelector(".add-section").before(newSection);  // 새 섹션 추가
                 popup.style.display = "none";  // 팝업 닫기
 
@@ -258,6 +261,9 @@
                         const sectionElement = document.createElement("section");
                         sectionElement.className = "resume-section";
                         sectionElement.id = `section${index + 1}`;
+                        sectionElement.setAttribute("data-title", section.title);   // ✅ 추가
+                        sectionElement.setAttribute("data-type", section.type);     // ✅ 추가
+
 
                         // ✅ 일반회원 정보 예외 처리
                         if (section.title === "일반회원 정보") {
@@ -450,7 +456,7 @@
                                 <span>${section.title}</span>
                                 <button class="delete-btn">✕</button>
                             </div>
-                            <input type="text" value="${section.comment}" placeholder="설명 입력">
+                            <input type="text" id="ohcomment" value="${section.comment || ''}" placeholder="설명 입력">
                            <div class="section-content">
                            ${
                                  section.type === "서술형"
@@ -559,45 +565,45 @@
         }
 
 
-
-
         // 저장 버튼 클릭 시 수정된 내용을 서버로 전송
         document.querySelector(".save-btn").addEventListener("click", () => {
             const resumeTitle = document.querySelector("#resumeTitle").value;
 
-            let jobTags = []; // ✨ 추가: 희망직무 태그를 따로 담을 변수
+            let jobTags = [];
 
             const sections = Array.from(document.querySelectorAll(".resume-section")).map(section => {
-                const selectedConditions = Array.from(section.querySelectorAll(".condition.active"))
-                    .map(condition => condition.dataset.condition);
-
-                const titleText = section.querySelector(".section-header span").textContent.trim();
-                const sectionTitle = titleText.includes(".") ? titleText.split(". ")[1] : titleText;
+                const sectionTitle = section.dataset.title || section.querySelector(".section-header span")?.textContent.trim();
+                const type = section.dataset.type || (() => {
+                    const sectionText = section.querySelector("textarea")?.placeholder || "";
+                    if (sectionText.includes("사진")) return "사진 첨부";
+                    if (sectionText.includes("파일")) return "파일 첨부";
+                    if (section.querySelector("select")) return "선택형";
+                    return "서술형";
+                })();
 
                 const content = section.querySelector("textarea")?.value || "";
                 const tags = Array.from(section.querySelectorAll(".tag-label")).map(tag => tag.textContent.trim());
                 const multiSelect = section.querySelector(".mode-btn.selected-tag")?.textContent.includes("⭕") || false;
 
-                // ✨ 희망직무는 jobTags로 따로 저장하고, sections에 포함시키지 않음
-                if (sectionTitle === "희망직무") {
-                    jobTags = tags;
-                    return null; // sections 배열에서 제거됨
-                }
-                let type = "서술형";
-                const sectionText = section.querySelector("textarea")?.placeholder || "";
-
-                if (sectionText.includes("사진")) {
-                    type = "사진 첨부";
-                } else if (sectionText.includes("파일")) {
-                    type = "파일 첨부";
-                } else if (section.querySelector("select")) {
-                    type = "선택형";
-                }
-
                 const commentInput = section.querySelector("#ohcomment");
                 const comment = commentInput ? commentInput.value : "";
 
+                const selectedConditions = Array.from(section.querySelectorAll(".condition.active"))
+                    .map(condition => condition.dataset.condition);
 
+                // 📦 디버깅 로그 출력
+                console.log("📦 section.dataset.title:", section.dataset.title);
+                console.log("📝 실제 제목(span):", section.querySelector(".section-header span")?.textContent);
+                console.log("🧾 type 추론 결과:", type);
+                console.log("🟨 설명(comment):", comment);
+                console.log("🔖 tags:", tags);
+                console.log("📌 conditions:", selectedConditions);
+                console.log("➕ multiSelect:", multiSelect);
+
+                if (sectionTitle === "희망직무") {
+                    jobTags = tags;
+                    return null;
+                }
 
                 return {
                     title: sectionTitle,
@@ -608,15 +614,15 @@
                     multiSelect: multiSelect,
                     conditions: selectedConditions
                 };
-            }).filter(Boolean); // null 제거
+            }).filter(Boolean);
 
-             // 최종 이력서 객체
             const updatedResume = {
                 title: resumeTitle,
                 sections: sections,
-                jobTags: jobTags // ✨ 반드시 추가!
+                jobTags: jobTags
             };
 
+            console.log("🚀 최종 업데이트 데이터:", updatedResume);
 
             fetch(`/api/coresumes/${resumeId}`, {
                 method: "PUT",
@@ -628,14 +634,16 @@
             })
                 .then(response => response.json())
                 .then(data => {
+                    console.log("✅ 이력서 저장 성공", data);
                     alert("이력서 수정 완료!");
-                    window.location.href = "/coresumelist";  // 수정 완료 후 목록 페이지로 이동
+                    window.location.href = "/coresumelist";
                 })
                 .catch(error => {
-                    console.error("이력서 수정 실패:", error);
+                    console.error("❌ 이력서 저장 실패:", error);
                     alert("수정 실패");
                 });
         });
+
 
         // ✅ 희망직무 입력
         jobInput?.addEventListener("keydown", e => {
