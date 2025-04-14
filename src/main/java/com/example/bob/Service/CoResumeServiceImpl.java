@@ -98,24 +98,38 @@ public class CoResumeServiceImpl implements CoResumeService {
             CoResumeEntity resumeEntity = resumeEntityOpt.get();
             logger.info("이력서 데이터 불러오기 성공 - ID: {}", id);
 
+            // 1️⃣ 전체 태그 리스트 (희망직무 + 선택형 섹션 포함)
+            List<CoResumeTagEntity> allTags = resumeEntity.getJobTags();
+
+            // 2️⃣ 섹션 DTO 구성
             List<CoResumeSectionRequestDTO> sectionDTOList = resumeEntity.getSections().stream()
-                    .map(sectionEntity -> new CoResumeSectionRequestDTO(
-                            sectionEntity.getType(),
-                            sectionEntity.getTitle(),
-                            sectionEntity.getComment(),
-                            sectionEntity.getContent(),
-                            sectionEntity.getTags(),
-                            sectionEntity.isMultiSelect(),
-                            sectionEntity.getConditions(),
-                            sectionEntity.getDirectInputValue()
-                    ))
+                    .map(sectionEntity -> {
+                        // 2-1️⃣ 해당 섹션과 연결된 태그만 필터링
+                        List<String> tagsForThisSection = allTags.stream()
+                                .filter(tag -> tag.getSection() != null && tag.getSection().equals(sectionEntity))
+                                .map(CoResumeTagEntity::getTag)
+                                .collect(Collectors.toList());
+
+                        return new CoResumeSectionRequestDTO(
+                                sectionEntity.getType(),
+                                sectionEntity.getTitle(),
+                                sectionEntity.getComment(),
+                                sectionEntity.getContent(),
+                                tagsForThisSection, // ✅ 섹션별 태그 포함
+                                sectionEntity.isMultiSelect(),
+                                sectionEntity.getConditions(),
+                                sectionEntity.getDirectInputValue()
+                        );
+                    })
                     .collect(Collectors.toList());
 
-            // jobTags에서 문자열만 추출
-            List<String> jobTagStrings = resumeEntity.getJobTags().stream()
+            // 3️⃣ 희망직무 태그는 section 없이 저장됨
+            List<String> jobTagStrings = allTags.stream()
+                    .filter(tag -> tag.getSection() == null)
                     .map(CoResumeTagEntity::getTag)
                     .collect(Collectors.toList());
 
+            // 4️⃣ DTO 리턴
             return new CoResumeRequestDTO(
                     resumeEntity.getTitle(),
                     sectionDTOList,
@@ -127,6 +141,7 @@ public class CoResumeServiceImpl implements CoResumeService {
             throw new RuntimeException("이력서를 찾을 수 없습니다.");
         }
     }
+
 
     // ✅ 이력서 수정
     @Override

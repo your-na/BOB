@@ -407,12 +407,15 @@
                             </div>
                             <div class="section-content">
                                 ${section.type === "선택형" ? `
-                                    <div class="tag-list">
-                                        ${section.tags && section.tags.length > 0 ? section.tags.map(tag => {
-                            const isSelected = section.selectedTags && section.selectedTags.includes(tag);
-                            return `<span class="tag ${isSelected ? 'active' : ''}">${tag}</span>`;
+                                  <div class="tag-list">
+  ${section.tags && section.tags.length > 0 ? section.tags.map(tag => {
+                            return `<span class="tag selected-tag">
+        <span class="tag-label">${tag}</span>
+        <span class="tag-remove">✕</span>
+      </span>`;
                         }).join('') : '선택지가 없습니다.'}
-                                    </div>
+</div>
+
                                 ` : ""}
                             </div>
                             ${multiSelectButton}
@@ -455,26 +458,44 @@
         // 저장 버튼 클릭 시 수정된 내용을 서버로 전송
         document.querySelector(".save-btn").addEventListener("click", () => {
             const resumeTitle = document.querySelector("#resumeTitle").value;
+
+            let jobTags = []; // ✨ 추가: 희망직무 태그를 따로 담을 변수
+
             const sections = Array.from(document.querySelectorAll(".resume-section")).map(section => {
                 const selectedConditions = Array.from(section.querySelectorAll(".condition.active"))
                     .map(condition => condition.dataset.condition);
 
+                const titleText = section.querySelector(".section-header span").textContent.trim();
+                const sectionTitle = titleText.includes(".") ? titleText.split(". ")[1] : titleText;
+
+                const content = section.querySelector("textarea")?.value || "";
+                const tags = Array.from(section.querySelectorAll(".tag-label")).map(tag => tag.textContent.trim());
+                const multiSelect = section.querySelector(".mode-btn.selected-tag")?.textContent.includes("⭕") || false;
+
+                // ✨ 희망직무는 jobTags로 따로 저장하고, sections에 포함시키지 않음
+                if (sectionTitle === "희망직무") {
+                    jobTags = tags;
+                    return null; // sections 배열에서 제거됨
+                }
 
                 return {
-                    title: section.querySelector(".section-header span").textContent,
+                    title: sectionTitle,
                     comment: section.querySelector("input[type='text']").value,
-                    type: section.querySelector(".section-content textarea") ? "서술형" : "선택형",
-                    content: section.querySelector(".section-content textarea") ? section.querySelector(".section-content textarea").value : "",
-                    tags: Array.from(section.querySelectorAll(".tag")).map(tag => tag.textContent),
-                    multiSelect: section.querySelector(".mode-btn.selected-tag") !== null,  // 복수선택 여부
-                    conditions: selectedConditions // 선택된 조건 항목들
+                    type: section.querySelector("select") ? "선택형" : "서술형",
+                    content: content,
+                    tags: tags,
+                    multiSelect: multiSelect,
+                    conditions: selectedConditions
                 };
-            });
+            }).filter(Boolean); // null 제거
 
+             // 최종 이력서 객체
             const updatedResume = {
                 title: resumeTitle,
-                sections: sections
+                sections: sections,
+                jobTags: jobTags // ✨ 반드시 추가!
             };
+
 
             fetch(`/api/coresumes/${resumeId}`, {
                 method: "PUT",
