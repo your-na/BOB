@@ -479,8 +479,30 @@
                                 }
                             });
                         }
+                        // ✅ 복수선택 버튼 토글 기능 추가
+                        if (section.type === "선택형") {
+                            const multiOnBtn = sectionElement.querySelector(".mode-btn:nth-child(1)");
+                            const multiOffBtn = sectionElement.querySelector(".mode-btn:nth-child(2)");
+                            let multiSelect = section.multiSelect ?? true;  // 기본값 true
 
+                            multiOnBtn?.addEventListener("click", () => {
+                                multiSelect = true;
+                                multiOnBtn.classList.add("selected-tag");
+                                multiOffBtn.classList.remove("selected-tag");
+                            });
 
+                            multiOffBtn?.addEventListener("click", () => {
+                                multiSelect = false;
+                                multiOnBtn.classList.remove("selected-tag");
+                                multiOffBtn.classList.add("selected-tag");
+
+                                const tagList = sectionElement.querySelector(".job-tags");
+                                const tags = tagList.querySelectorAll(".tag");
+                                tags.forEach((tag, i) => {
+                                    if (i > 0) tag.remove();  // 첫 번째만 남기고 제거
+                                });
+                            });
+                        }
                     });
                 })
         }
