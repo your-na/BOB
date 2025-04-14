@@ -111,23 +111,27 @@
                 switch (type) {
                     case "선택형":
                         content = `
-                        <div class="section-header">
-                            <span class="section-title-text">${sectionIndex}. 제목 입력</span>
-                            <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
-                            <label>선택 방식</label>
-                            <select><option>선택형</option></select>
-                            <button class="delete-btn">✕</button>
-                        </div>
-                        <input type="text" id="ohcomment" placeholder="설명 입력">
-                        <div class="tag-mode">
-                            <button class="mode-btn selected-tag">복수선택 ⭕</button>
-                            <button class="mode-btn">복수선택 ❌</button>
-                        </div>
-                        <div class="tag-list job-tags"></div>
-                        <input class="tag-input" type="text" placeholder="항목 입력 후 엔터">
-                        <div class="conditions-list"></div>  <!-- 조건 항목 추가 -->
-                    `;
+        <div class="section-header">
+            <span class="section-title-text">${sectionIndex}. 추가선택</span>
+            <label style="margin-left: 20px;">선택 방식</label>
+            <select>
+                <option selected>선택형</option>
+            </select>
+            <button class="delete-btn">✕</button>
+        </div>
+        <input type="text" id="ohcomment" placeholder="설명 입력">
+
+        <div class="tag-mode">
+            <button class="mode-btn selected-tag">복수선택 ⭕</button>
+            <button class="mode-btn">복수선택 ❌</button>
+        </div>
+
+        <div class="tag-list job-tags"></div>
+        <input class="tag-input" type="text" placeholder="항목 입력 후 엔터">
+        <div class="conditions-list"></div>
+         `;
                         break;
+
                     case "서술형":
                         content = `
                         <div class="section-header">
@@ -145,6 +149,29 @@
                 newSection.innerHTML = content;
                 document.querySelector(".add-section").before(newSection);  // 새 섹션 추가
                 popup.style.display = "none";  // 팝업 닫기
+
+                // ✅ tag 입력 기능 바인딩 (선택형 섹션 공통용)
+                const tagInput = newSection.querySelector(".tag-input");
+                const tagList = newSection.querySelector(".job-tags");
+
+                tagInput?.addEventListener("keydown", e => {
+                    if (e.key === "Enter" && tagInput.value.trim()) {
+                        e.preventDefault();
+                        const tagText = tagInput.value.trim();
+                        const tag = document.createElement("span");
+                        tag.className = "tag selected-tag";
+                        tag.innerHTML = `<span class="tag-label">${tagText}</span><span class="tag-remove">✕</span>`;
+                        tagList.appendChild(tag);
+                        tagInput.value = "";
+                    }
+                });
+
+                tagList?.addEventListener("click", e => {
+                    if (e.target.classList.contains("tag-remove")) {
+                        const tag = e.target.closest(".tag");
+                        tag?.remove();
+                    }
+                });
 
                 // 목차에 추가
                 const outlineList = document.querySelector(".outline-list");
@@ -245,6 +272,7 @@
                 </span>
             `).join('')}
         </div>
+        <input class="tag-input" type="text" placeholder="항목 입력 후 엔터">
     `;
 
                             sectionContainer.appendChild(sectionElement);
@@ -264,7 +292,7 @@
                                     // if (!multiSelect) {
                                     //     tagList.innerHTML = '';
                                     // }
-                                    
+
 
                                     const tag = document.createElement("span");
                                     tag.className = "tag selected-tag";
@@ -408,30 +436,53 @@
                             <div class="section-content">
                                 ${section.type === "서술형" || section.type === "선택형" ? `<div class="conditions-list">${conditionList}</div>` : ""}
                             </div>
-                            <div class="section-content">
-                                ${section.type === "선택형" ? `
-                                  <div class="tag-list">
-  ${section.tags && section.tags.length > 0 ? section.tags.map(tag => {
-                            return `<span class="tag selected-tag">
-        <span class="tag-label">${tag}</span>
-        <span class="tag-remove">✕</span>
-      </span>`;
-                        }).join('') : '선택지가 없습니다.'}
+                           <div class="section-content">
+    ${section.type === "선택형" ? `
+        <div class="tag-list job-tags">
+            ${section.tags && section.tags.length > 0 ? section.tags.map(tag => `
+                <span class="tag selected-tag">
+                    <span class="tag-label">${tag}</span>
+                    <span class="tag-remove">✕</span>
+                </span>`).join('') : ''}
+        </div>
+        <input class="tag-input" type="text" placeholder="항목 입력 후 엔터">  <!-- ✅ 요 줄 추가 -->
+    ` : ""}
 </div>
 
-                                ` : ""}
-                            </div>
                             ${multiSelectButton}
                         `;
 
                         sectionContainer.appendChild(sectionElement);
                         addConditionClickListener();  // 🔥 조건 클릭 토글 적용
 
+                        // ✅ 선택형 태그 입력 기능 바인딩
+                        if (section.type === "선택형") {
+                            const tagInput = sectionElement.querySelector(".tag-input");
+                            const tagList = sectionElement.querySelector(".job-tags");
+
+                            tagInput?.addEventListener("keydown", e => {
+                                if (e.key === "Enter" && tagInput.value.trim()) {
+                                    e.preventDefault();
+                                    const tagText = tagInput.value.trim();
+                                    const tag = document.createElement("span");
+                                    tag.className = "tag selected-tag";
+                                    tag.innerHTML = `<span class="tag-label">${tagText}</span><span class="tag-remove">✕</span>`;
+                                    tagList.appendChild(tag);
+                                    tagInput.value = "";
+                                }
+                            });
+
+                            tagList?.addEventListener("click", e => {
+                                if (e.target.classList.contains("tag-remove")) {
+                                    const tag = e.target.closest(".tag");
+                                    tag?.remove();
+                                }
+                            });
+                        }
+
+
                     });
                 })
-                .catch(error => {
-                    console.error("이력서 데이터를 불러오는 데 실패했습니다.", error);
-                });
         }
 
         // 조건 항목 클릭 시 활성화/비활성화 처리
