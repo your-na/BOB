@@ -594,10 +594,14 @@
                     type = "선택형";
                 }
 
+                const commentInput = section.querySelector("#ohcomment");
+                const comment = commentInput ? commentInput.value : "";
+
+
 
                 return {
                     title: sectionTitle,
-                    comment: section.querySelector("input[type='text']").value,
+                    comment: comment,
                     type: type,
                     content: content,
                     tags: tags,
