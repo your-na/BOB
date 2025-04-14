@@ -260,9 +260,11 @@
                                     e.preventDefault();
                                     const tagText = input.value.trim();
 
-                                    if (!multiSelect) {
-                                        tagList.innerHTML = '';
-                                    }
+                                    // 🔥 수정 전 (모든 기존 태그 삭제)
+                                    // if (!multiSelect) {
+                                    //     tagList.innerHTML = '';
+                                    // }
+                                    
 
                                     const tag = document.createElement("span");
                                     tag.className = "tag selected-tag";
@@ -271,6 +273,7 @@
                                     input.value = "";
                                 }
                             });
+
 
                             // 복수선택 토글
                             const multiOnBtn = sectionElement.querySelector("#multi-on");
