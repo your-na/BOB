@@ -89,24 +89,42 @@
     document.addEventListener("DOMContentLoaded", function () {
         const approveBtn = document.getElementById("approve-btn");
         const rejectBtn = document.getElementById("reject-btn");
+        const contestId = /*[[${contest.id}]]*/ 0; // 타임리프에서 공모전 ID 주입
 
-        // 승인 버튼 클릭 시
+        // 승인
         approveBtn.addEventListener("click", function () {
             if (confirm("이 공모전을 승인하시겠습니까?")) {
-                alert("공모전이 승인되었습니다.");
-                // ✅ 서버에 승인 요청을 보낼 수 있음
+                fetch("/admin/contest/approve", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams({ id: contestId })
+                }).then(() => {
+                    alert("공모전이 승인되었습니다.");
+                    window.location.href = "/adconlist"; // 목록으로 이동
+                });
             }
         });
 
-        // 거절 버튼 클릭 시
+        // 거절
         rejectBtn.addEventListener("click", function () {
             if (confirm("이 공모전을 거절하시겠습니까?")) {
-                alert("공모전이 거절되었습니다.");
-                // ✅ 서버에 거절 요청을 보낼 수 있음
+                fetch("/admin/contest/reject", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams({ id: contestId })
+                }).then(() => {
+                    alert("공모전이 거절되었습니다.");
+                    window.location.href = "/adconlist"; // 목록으로 이동
+                });
             }
         });
     });
 </script>
+
 
 </body>
 </html>

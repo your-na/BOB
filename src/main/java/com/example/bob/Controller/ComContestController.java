@@ -77,12 +77,12 @@ public class ComContestController {
     @PostMapping("/admin/contest/approve")
     public String approveContest(@RequestParam Long id) {
         contestService.approveContest(id);
-        return "redirect:/admin/contest/requests";
+        return "redirect:/adconlist";
     }
 
     @PostMapping("/admin/contest/reject")
     public String rejectContest(@RequestParam Long id) {
         contestService.rejectContest(id); // 필요 시 삭제나 상태 변경
-        return "redirect:/admin/contest/requests";
+        return "redirect:/adconlist";
     }
 }

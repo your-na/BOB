@@ -9,6 +9,7 @@ public interface ContestRepository extends JpaRepository<ContestEntity, Long> {
     List<ContestEntity> findByIsApprovedTrue(); // 승인된 공모전만 조회
     List<ContestEntity> findByIsApprovedFalse(); // 미승인 공모전 조회 (관리자용)
 
+    List<ContestEntity> findByIsApprovedFalseAndIsDeletedFalse();
     List<ContestEntity> findAllByOrderByCreatedAtDesc();
 
     List<ContestEntity> findByIsApprovedTrueAndIsDeletedFalse(); // 사용자용 목록
