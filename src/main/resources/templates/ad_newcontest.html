@@ -34,7 +34,15 @@
                 </tr>
                 <tr>
                     <th>대표분야</th>
-                    <td><input type="text" id="contest-field" name="category"></td>
+                    <td>
+                        <select id="fieldSelect" name="category">
+                            <option disabled selected>분야를 선택하세요</option>
+                            <option>프론트 / 웹, 앱 디자인</option>
+                            <option>백 / 웹, 앱 개발</option>
+                            <option value="custom">직접 입력</option>
+                        </select>
+                        <input type="text" id="customFieldInput" name="categoryCustom" placeholder="직접 분야를 입력해주세요." style="display: none; margin-top: 10px;" />
+                    </td>
                 </tr>
                 <tr>
                     <th>참가대상</th>
@@ -61,7 +69,9 @@
                 </tr>
                 <tr>
                     <th>웹사이트</th>
-                    <td><input type="text" id="contest-method" name="applicationMethod"></td>
+                    <td><input type="text" name="applicationMethod"
+                               onblur="prependHttp(this)"
+                               placeholder="웹사이트 링크를 첨부해주세요."></td>
                 </tr>
             </table>
         </div>
@@ -124,6 +134,38 @@
             if (confirm("입력한 내용을 모두 초기화하시겠습니까?")) {
                 document.querySelector("form").reset();
                 posterPreview.src = "/images/placeholder.png";
+            }
+        });
+
+        function prependHttp(input) {
+            if (input.value && !input.value.startsWith("http://") && !input.value.startsWith("https://")) {
+                input.value = "https://" + input.value;
+            }
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const fieldSelect = document.getElementById("fieldSelect");
+        const customInput = document.getElementById("customFieldInput");
+
+        fieldSelect.addEventListener("change", function () {
+            if (fieldSelect.value === "custom") {
+                customInput.style.display = "block"; // ✅ 직접 입력 선택 시 보이게
+            } else {
+                customInput.style.display = "none"; // 다른 항목 선택 시 숨김
+                customInput.value = ""; // 입력된 내용도 초기화
+            }
+        });
+
+        // 아래는 기존 코드 (예: 확인 버튼 클릭 시 hidden input 추가)
+        document.getElementById('confirmYes').addEventListener('click', function () {
+            if (fieldSelect.value === 'custom' && customInput.value.trim() !== '') {
+                const hiddenCategoryInput = document.createElement("input");
+                hiddenCategoryInput.type = "hidden";
+                hiddenCategoryInput.name = "customCategory";
+                hiddenCategoryInput.value = customInput.value.trim();
+
+                document.querySelector(".contest-form").appendChild(hiddenCategoryInput);
             }
         });
     });

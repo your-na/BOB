@@ -71,3 +71,9 @@ document.getElementById('confirmYes').addEventListener('click', function () {
     document.getElementById('realSubmit').click();
 });
 
+function prependHttp(input) {
+    if (input.value && !input.value.startsWith("http://") && !input.value.startsWith("https://")) {
+        input.value = "https://" + input.value;
+    }
+}
+

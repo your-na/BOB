@@ -75,7 +75,9 @@
 
             <label>시상내역 <input type="text" name="awardDetails" placeholder="시상 내역을 입력해주세요."></label>
 
-            <label>웹사이트 <input type="text" name="applicationMethod" placeholder="웹사이트 링크를 첨부해주세요."></label>
+            <input type="text" name="applicationMethod"
+                   onblur="prependHttp(this)"
+                   placeholder="웹사이트 링크를 첨부해주세요.">
 
             <label>공모전 설명</label>
             <textarea id="description" name="description" class="description-textarea" placeholder="공모전 설명을 적어주세요."></textarea>
