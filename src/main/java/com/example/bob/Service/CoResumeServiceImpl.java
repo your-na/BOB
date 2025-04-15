@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.Date;
+
 
 @Service
 public class CoResumeServiceImpl implements CoResumeService {
@@ -39,6 +41,8 @@ public class CoResumeServiceImpl implements CoResumeService {
 
         CoResumeEntity resume = new CoResumeEntity();
         resume.setTitle(requestDTO.getTitle());
+        resume.setCreatedAt(requestDTO.getCreatedAt() != null ? requestDTO.getCreatedAt() : new Date());  // 🔥 추가
+
 
         List<CoResumeTagEntity> tagEntities = new ArrayList<>();
 

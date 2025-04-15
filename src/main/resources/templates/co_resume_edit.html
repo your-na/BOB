@@ -549,6 +549,17 @@
 
         // 조건 항목 클릭 시 활성화/비활성화 처리
         function addConditionClickListener() {
+
+            // ✅ 섹션 삭제 처리 (❌ 버튼)
+            document.addEventListener("click", function(e) {
+                if (e.target.classList.contains("delete-btn")) {
+                    const section = e.target.closest(".resume-section");
+                    const tocLink = document.querySelector(`.outline-list a[href="#${section.id}"]`);
+                    section?.remove();  // 섹션 삭제
+                    tocLink?.parentElement?.remove();  // 목차 항목 삭제
+                }
+            });
+
             const conditions = document.querySelectorAll(".condition");
             console.log("🟡 조건 항목 개수:", conditions.length);
 
@@ -576,7 +587,7 @@
             let jobTags = [];
 
             const sections = Array.from(document.querySelectorAll(".resume-section")).map(section => {
-                const sectionTitle = section.dataset.title || section.querySelector(".section-header span")?.textContent.trim();
+                const sectionTitle = section.dataset.title || section.querySelector(".section-header .section-title-text")?.textContent.replace(/^\d+\.\s*/, "").trim();
                 const type = section.dataset.type || (() => {
                     const sectionText = section.querySelector("textarea")?.placeholder || "";
                     if (sectionText.includes("사진")) return "사진 첨부";
@@ -632,7 +643,8 @@
             const updatedResume = {
                 title: resumeTitle,
                 sections: sections,
-                jobTags: jobTags
+                jobTags: jobTags,
+                createdAt: new Date()
             };
 
             console.log("🚀 최종 업데이트 데이터:", updatedResume);
