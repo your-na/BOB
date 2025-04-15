@@ -45,14 +45,14 @@ public class ContestController {
     // ✅ 사용자용 공모전 목록
     @GetMapping("/contest")
     public String contestList(Model model) {
-        model.addAttribute("contests", contestService.getAllContests());
+        model.addAttribute("contests", contestService.getApprovedContests());
         return "contest";
     }
 
     // ✅ 관리자 공모전 목록
     @GetMapping("/ad_contest")
     public String adminContestList(Model model) {
-        model.addAttribute("contests", contestService.getAllContests());
+        model.addAttribute("contests", contestService.getApprovedContests());
         return "ad_contest";
     }
 
