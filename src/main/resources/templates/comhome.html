@@ -87,7 +87,7 @@
             </thead>
             <tbody>
             <tr th:each="contest : ${contestList}">
-                <td th:text="${contest.title}">공모전 제목</td>
+                <td><a class="aa" th:href="@{'/contest/' + ${contest.id}}" th:text="${contest.title}">공모전 제목</a></td>
                 <td th:text="${contest.organizer}">주최자</td>
                 <td th:text="'D-' + ${contest.remainingDays}">D-day</td>
                 <td>

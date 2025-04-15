@@ -319,3 +319,12 @@
 /*<form action="/onlyBOB" method="get">*/
 /*<button type="submit" class="BOB">only BOB</button>*/
 /*</form>*/
+
+.aa {
+    text-decoration: none;
+    color: #494949;
+}
+
+.aa:hover {
+    font-weight: bold;
+}
