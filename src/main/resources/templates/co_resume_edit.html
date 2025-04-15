@@ -452,14 +452,16 @@
 
 
                         sectionElement.innerHTML = `
-                            <div class="section-header">
-                                <span>${section.title}</span>
-                                <button class="delete-btn">✕</button>
-                            </div>
-                            <input type="text" id="ohcomment" value="${section.comment || ''}" placeholder="설명 입력">
-                           <div class="section-content">
-                           ${
-                                 section.type === "서술형"
+    <div class="section-header">
+        <span class="section-title-text">${index + 1}. ${section.title}</span>
+        <button class="delete-btn">✕</button>
+    </div>
+
+    <input type="text" id="ohcomment" value="${section.comment || ''}" placeholder="설명 입력">
+
+    <div class="section-content">
+        ${
+                            section.type === "서술형"
                                 ? `<textarea placeholder="내용을 입력하세요">${section.content || ''}</textarea>`
                                 : section.type === "사진 첨부"
                                     ? `<textarea placeholder="구직자 사진 입력란">${section.content || ''}</textarea>`
@@ -467,9 +469,11 @@
                                         ? `<textarea placeholder="구직자 파일 첨부란">${section.content || ''}</textarea>`
                                         : ""
                         }
-</div>
+    </div>
 
-                            <div class="section-content">
+
+
+                        <div class="section-content">
                                 ${section.type === "서술형" || section.type === "선택형" ? `<div class="conditions-list">${conditionList}</div>` : ""}
                             </div>
                            <div class="section-content">
