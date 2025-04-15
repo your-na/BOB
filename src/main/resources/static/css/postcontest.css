@@ -1,7 +1,7 @@
 /* 공모전 상세 페이지 */
 .contest-detail {
     width: 80%;
-    margin-top: 100px;
+    margin-top: 2%;
     margin-left: 70px;
     background: white;
     padding: 20px;
@@ -295,4 +295,18 @@ input[type="text"] {
     border: none;
     margin-left: 6px;
     cursor: pointer;
+}
+
+.haeunbabo{
+    text-decoration: none;
+    color: dimgrey;
+}
+
+.haeunbabo:hover {
+    font-weight: bold;
+}
+
+#haeunamuhani{
+    margin-top: 10%;
+    margin-left: 5%;
 }

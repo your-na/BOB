@@ -40,7 +40,8 @@
             <tr><th>시상 내역</th><td th:text="${contest.awardDetails}">장학금(대학진학 혜택)</td></tr>
             <tr>
                 <th>웹사이트</th>
-                <td><a th:href="${contest.applicationMethod}" target="_blank">공식 홈페이지</a></td>
+                <td><a th:href="@{${contest.applicationMethod}}" target="_blank">공식 홈페이지</a>
+                </td>
             </tr>
         </table>
     </div>

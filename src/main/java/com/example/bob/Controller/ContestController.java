@@ -84,7 +84,7 @@ public class ContestController {
     public String showCoContestDetail(@PathVariable Long id, Model model) {
         ContestEntity contest = contestService.getById(id);
         model.addAttribute("contest", ContestDTO.fromEntity(contest));
-        return "postcontest";
+        return "co_postcontest";
     }
 
 
