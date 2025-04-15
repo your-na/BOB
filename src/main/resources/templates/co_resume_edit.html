@@ -602,8 +602,17 @@
 
                 if (sectionTitle === "희망직무") {
                     jobTags = tags;
-                    return null;
+                    return {
+                        title: sectionTitle,
+                        comment: comment,
+                        type: type,
+                        content: content,
+                        tags: tags,
+                        multiSelect: multiSelect,
+                        conditions: selectedConditions
+                    };
                 }
+
 
                 return {
                     title: sectionTitle,
@@ -642,20 +651,6 @@
                     console.error("❌ 이력서 저장 실패:", error);
                     alert("수정 실패");
                 });
-        });
-
-
-        // ✅ 희망직무 입력
-        jobInput?.addEventListener("keydown", e => {
-            if (e.key === "Enter" &&    jobInput.value.trim()) {
-                e.preventDefault();
-                const text = jobInput.value.trim();
-                const tag = document.createElement("span");
-                tag.className = "tag";
-                tag.innerHTML = `<span class="tag-label">${text}</span><span class="tag-remove">✕</span>`;
-                jobTagContainer.appendChild(tag);
-                jobInput.value = "";
-            }
         });
     });
 </script>
