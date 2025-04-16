@@ -41,14 +41,6 @@ public class TestController {
     @GetMapping("/placeholder")
     public String placeform() {return "ad_placeholder";}
 
-    //관리자 기업 공모전 목록
-    @GetMapping("/adcomcont")
-    public String comconform() {return "ad_comcontest";}
-
-    //외부
-    @GetMapping("/adnotcont")
-    public String notconform() {return "ad_notcomcontest";}
-
     //기업 주최한 공모전 목록
     @GetMapping("/comycontest")
     public String myconform() {return "co_mycontest";}

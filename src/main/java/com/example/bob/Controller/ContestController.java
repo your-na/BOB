@@ -169,7 +169,7 @@ public class ContestController {
         return isApproved ? "redirect:/ad_contest" : "redirect:/comhome";
     }
 
-    @GetMapping("/adcomcont")
+    @GetMapping("/adnotcont")
     public String showExternalContests(Model model) {
         List<ContestDTO> adminContests = contestService.getContestsByCreatorType("ADMIN");
         model.addAttribute("contests", adminContests);

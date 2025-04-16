@@ -91,7 +91,7 @@ public class ComContestController {
         return "redirect:/adconlist";
     }
 
-    @GetMapping("/adnotcont")
+    @GetMapping("/adcomcont")
     public String showCompanyContests(Model model) {
         List<ContestDTO> companyContests = contestService.getContestsByCreatorType("COMPANY");
         model.addAttribute("contests", companyContests);
