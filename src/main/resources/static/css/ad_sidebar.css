@@ -80,9 +80,12 @@ body {
 }
 
 /* ✅ 로그아웃 버튼 */
-.logout a {
+.logout button {
     color: #676767;
     font-weight: bold;
+    background: white;
+    border: none;
+    margin-left: 13%;
 }
 
 /* ✅ main-content 스타일 */
