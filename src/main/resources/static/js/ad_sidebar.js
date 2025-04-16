@@ -20,5 +20,5 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // ✅ 첫 번째 기본 페이지 자동 로드
-    iframe.src = "/adcontest"; // 기본: 전체 공모전
+    iframe.src = "/placeholder"; // 기본: 전체 공모전
 });

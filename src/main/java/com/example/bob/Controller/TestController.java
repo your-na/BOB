@@ -36,4 +36,16 @@ public class TestController {
 
     @GetMapping("/copostcon")
     public String coconform() {return "co_postcontest";}
+
+    //관리자 첫화면?
+    @GetMapping("/placeholder")
+    public String placeform() {return "ad_placeholder";}
+
+    //관리자 기업 공모전 목록
+    @GetMapping("/adcomcont")
+    public String comconform() {return "ad_comcontest";}
+
+    //외부
+    @GetMapping("/adnotcont")
+    public String notconform() {return "ad_notcomcontest";}
 }
