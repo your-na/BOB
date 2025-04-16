@@ -1,6 +1,7 @@
 package com.example.bob.DTO;
 
 import com.example.bob.Entity.ContestEntity;
+import jakarta.persistence.Transient;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -20,6 +21,8 @@ public class ContestDTO {
     private String category;
     private String target;
     private String region;
+
+    @Transient
     private String imageUrl;
 
     private LocalDate startDate;
