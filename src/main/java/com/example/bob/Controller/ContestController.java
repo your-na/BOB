@@ -107,7 +107,7 @@ public class ContestController {
     // ✅ 공모전 등록 (기업 or 관리자)
     @PostMapping("/contest/create")
     public String createContest(@ModelAttribute ContestDTO dto,
-                                @RequestParam("imageUrl") MultipartFile imageUrl,
+                                @RequestParam("imageFile") MultipartFile imageFile,
                                 @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         String creatorType = "UNKNOWN";
@@ -127,17 +127,17 @@ public class ContestController {
         }
 
         String status = dto.getStartDate().isAfter(LocalDate.now()) ? "대기중" : "모집중";
-        String imageFile = "/images/sample.png";
+        String imageUrl = "/images/sample.png";
 
-        if (imageUrl != null && !imageUrl.isEmpty()) {
+        if (imageFile != null && !imageFile.isEmpty()) {
             try {
-                String originalName = imageUrl.getOriginalFilename();
+                String originalName = imageFile.getOriginalFilename();
                 String fileName = System.currentTimeMillis() + "_" + originalName;
                 Path folderPath = Paths.get("uploads/contestImages");
                 Files.createDirectories(folderPath);
                 Path savePath = folderPath.resolve(fileName);
-                Files.copy(imageUrl.getInputStream(), savePath);
-                imageFile = "/uploads/contestImages/" + fileName;
+                Files.copy(imageFile.getInputStream(), savePath);
+                imageUrl = "/uploads/contestImages/" + fileName;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -155,7 +155,7 @@ public class ContestController {
                 .awardDetails(dto.getAwardDetails())
                 .applicationMethod(dto.getApplicationMethod())
                 .description(dto.getDescription())
-                .imageUrl(imageFile)
+                .imageUrl(imageUrl)
                 .status(status)
                 .creatorType(creatorType)
                 .isOnlyBOB(isOnlyBOB)
