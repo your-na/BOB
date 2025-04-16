@@ -616,7 +616,11 @@
             let jobTags = [];
 
             const sections = Array.from(document.querySelectorAll(".resume-section")).map(section => {
-                const sectionTitle = section.dataset.title || section.querySelector(".section-header .section-title-text")?.textContent.replace(/^\d+\.\s*/, "").trim();
+                const sectionTitleText = section.querySelector(".section-header .section-title-text");
+                const number = sectionTitleText?.textContent.split(".")[0];
+                const rawTitle = sectionTitleText?.textContent.replace(`${number}. `, "").trim();
+                const sectionTitle = rawTitle || "제목 입력";
+
                 const type = section.dataset.type || (() => {
                     const sectionText = section.querySelector("textarea")?.placeholder || "";
                     if (sectionText.includes("사진")) return "사진 첨부";
