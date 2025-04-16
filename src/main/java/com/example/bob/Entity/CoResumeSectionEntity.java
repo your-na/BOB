@@ -2,37 +2,48 @@ package com.example.bob.Entity;
 
 import jakarta.persistence.*;
 import java.util.List;
+import java.util.ArrayList;
 
-/**
- * 기업이 설정한 이력서 양식 내 개별 항목 섹션 엔티티
- */
 @Entity
 public class CoResumeSectionEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;  // 섹션 ID
+    private Long id;
 
-    private String type;     // 섹션 유형 (예: 선택형, 서술형 등)
-    private String title;    // 섹션 제목 (예: 학력사항, 희망직무 등)
-    private String comment;  // 항목 설명/가이드 (예: 학력은 최근 순으로 입력하세요)
-    private String content;  // 기본값 또는 설명 텍스트 (서술형에 해당)
+    private String type;
+    private String title;
+    private String comment;
+    private String content;
+
+    private boolean multiSelect;
+
+    private String directInputValue;
+
+    @ElementCollection
+    private List<String> conditions;  // 조건들 (예: 50자 이상 등)
 
     /**
-     * 선택형일 경우 사용할 태그 목록
-     * 예: ["백엔드", "프론트엔드", "AI"]
+     * 이 섹션에 속한 선택형 보기 태그들 (예: 백엔드, 프론트엔드)
      */
-    @ElementCollection
+    @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CoResumeTagEntity> sectionTags = new ArrayList<>();
+
+    /**
+     * 태그 문자열 리스트 - 실제 DB에는 저장하지 않지만, DTO 변환용으로 사용
+     */
+    @Transient
     private List<String> tags;
 
     /**
-     * 이 섹션이 소속된 이력서 양식 (N:1)
+     * 이 섹션이 소속된 이력서
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resume_id")
     private CoResumeEntity resume;
 
-    // Getter / Setter
+    // ✅ Getter / Setter
+
     public Long getId() { return id; }
 
     public String getType() { return type; }
@@ -47,9 +58,22 @@ public class CoResumeSectionEntity {
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
 
-    public List<String> getTags() { return tags; }
-    public void setTags(List<String> tags) { this.tags = tags; }
+    public boolean isMultiSelect() { return multiSelect; }
+    public void setMultiSelect(boolean multiSelect) { this.multiSelect = multiSelect; }
+
+    public String getDirectInputValue() { return directInputValue; }
+    public void setDirectInputValue(String directInputValue) { this.directInputValue = directInputValue; }
+
+    public List<String> getConditions() { return conditions; }
+    public void setConditions(List<String> conditions) { this.conditions = conditions; }
+
+    public List<CoResumeTagEntity> getSectionTags() { return sectionTags; }
+    public void setSectionTags(List<CoResumeTagEntity> sectionTags) { this.sectionTags = sectionTags; }
 
     public CoResumeEntity getResume() { return resume; }
     public void setResume(CoResumeEntity resume) { this.resume = resume; }
+
+    // ✅ tags 필드 (Transient)
+    public List<String> getTags() { return tags; }
+    public void setTags(List<String> tags) { this.tags = tags; }
 }

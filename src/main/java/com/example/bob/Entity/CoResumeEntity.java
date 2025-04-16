@@ -2,10 +2,9 @@ package com.example.bob.Entity;
 
 import jakarta.persistence.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.springframework.data.annotation.CreatedDate;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 기업이 생성한 이력서 양식 엔티티 (전체 이력서 단위)
@@ -19,13 +18,18 @@ public class CoResumeEntity {
 
     private String title;  // 이력서 제목 (예: 개발자 채용 양식)
 
-    // 작성일 필드를 String으로 변경
-    private String createdAt;  // 작성일 (yyyy-MM-dd 형식)
+    // 작성일 필드를 Date로 변경
+    @CreatedDate
+    @Temporal(TemporalType.DATE)
+    private Date createdAt;  // 작성일 (yyyy-MM-dd 형식)
 
-
-    // 이력서 항목들과의 1:N 관계
-    @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
+    // 이력서 항목들과의 1:N 관계, EAGER로 설정하여 sections를 즉시 로딩
+    @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<CoResumeSectionEntity> sections = new ArrayList<>();
+
+    @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CoResumeTagEntity> jobTags = new ArrayList<>();
+
 
     /**
      * 연관관계 편의 메서드
@@ -33,7 +37,7 @@ public class CoResumeEntity {
      */
     public void addSection(CoResumeSectionEntity section) {
         sections.add(section);
-        section.setResume(this);
+        section.setResume(this); // 현재 이력서 객체와 섹션을 연결
     }
 
     // Getter / Setter
@@ -45,6 +49,15 @@ public class CoResumeEntity {
     public List<CoResumeSectionEntity> getSections() { return sections; }
     public void setSections(List<CoResumeSectionEntity> sections) { this.sections = sections; }
 
-    public String getCreatedAt() { return createdAt; }
-    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+    public Date getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
+
+    public List<CoResumeTagEntity> getJobTags() {
+        return jobTags;
+    }
+    public void setJobTags(List<CoResumeTagEntity> jobTags) {
+        this.jobTags = jobTags;
+    }
+
+
 }

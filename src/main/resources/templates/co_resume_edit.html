@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>이력서 수정</title>
+    <link rel="stylesheet" href="/css/co_resume_edit.css">
+    <link rel="stylesheet" th:href="@{/css/header2.css}">
+
+    <!-- ✅ CSRF 토큰 정보 (Spring Security 연동용) -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+</head>
+<body>
+
+<!-- 헤더 -->
+<div th:insert="~{header2 :: header}"></div>
+
+<div class="resume-wrapper">
+    <!-- 왼쪽 작성 영역 -->
+    <div class="resume-container">
+        <h1>이력서 수정</h1>
+        <div class="resume-title">
+            <label for="resumeTitle">이력서 제목</label>
+            <input type="text" id="resumeTitle" placeholder="제목을 입력해주세요.">
+            <p class="warn">* 기본으로 주어지는 항목들 이외 항목도 추가 가능합니다.</p>
+        </div>
+
+        <!-- 각 섹션 반복 (일반회원 정보 외 다른 섹션은 동적으로 불러옴) -->
+        <div class="resume-sections-container">
+            <!-- 다른 섹션들은 JS로 동적으로 추가됩니다 -->
+        </div>
+
+        <div class="add-section">
+            <button id="add-section">➕</button>
+        </div>
+
+        <div class="section-popup" id="section-popup" style="display: none; position: absolute; z-index: 1000;">
+            <div class="popup-option">선택형</div>
+            <div class="popup-option">서술형</div>
+            <div class="popup-option">사진 첨부</div>
+            <div class="popup-option">파일 첨부</div>
+        </div>
+    </div>
+
+    <!-- 오른쪽 사이드 (목차 & 템플릿) -->
+    <div class="resume-side sticky">
+        <div class="outline-box">
+            <p class="outline-title">📋 목차</p>
+            <ul class="outline-list">
+                <!-- 섹션 목차는 JS로 동적으로 생성됩니다 -->
+            </ul>
+            <button class="add-outline">항목 추가</button>
+            <button class="save-btn">저장</button>
+        </div>
+
+        <div class="template-box">
+            <p>🧩 템플릿</p>
+            <div class="template-grid">
+                <div class="template-card">미리보기</div>
+                <div class="template-card">미리보기</div>
+                <div class="template-card">미리보기</div>
+                <div class="template-card">미리보기</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const pathSegments = window.location.pathname.split('/');
+        const resumeId = pathSegments[pathSegments.length - 1];
+        const addBtn = document.getElementById("add-section");
+        const popup = document.getElementById("section-popup");
+        // ✅ 제목 클릭 시 input 전환
+        document.addEventListener("click", (e) => {
+            const target = e.target;
+            if (target.classList.contains("section-title-text")) {
+                const header = target.closest(".section-header");
+                const input = header.querySelector(".section-title-input");
+
+                if (!input) return;
+
+                // 기존 span 텍스트에서 숫자 제거 후 input에 세팅
+                const number = target.textContent.split(".")[0];
+                const currentTitle = target.textContent.replace(`${number}. `, "").trim();
+                input.value = currentTitle;
+
+                target.style.display = "none";
+                input.style.display = "inline-block";
+                input.focus();
+
+                // blur 시 span으로 다시 보이기
+                input.addEventListener("blur", () => {
+                    const newTitle = input.value.trim() || "제목 입력";
+                    target.textContent = `${number}. ${newTitle}`;
+                    input.style.display = "none";
+                    target.style.display = "inline-block";
+
+                    const section = input.closest(".resume-section");
+
+                    // ✅ 이 한 줄 추가!
+                    section.dataset.title = newTitle;
+
+                    // 목차도 업데이트
+                    const tocLink = document.querySelector(`.outline-list a[href="#${section.id}"]`);
+                    if (tocLink) tocLink.textContent = `${number}. ${newTitle}`;
+                });
+
+            }
+        });
+
+// ✅ 엔터 눌렀을 때도 span으로 전환
+        document.addEventListener("keydown", (e) => {
+            if (e.target.classList.contains("section-title-input") && e.key === "Enter") {
+                e.preventDefault();
+                e.target.blur();  // blur 이벤트로 넘김
+            }
+        });
+
+
+        // ➕ 버튼 클릭 시 팝업 위치 설정
+        addBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const rect = addBtn.getBoundingClientRect();
+            popup.style.top = `${rect.bottom + window.scrollY + 5}px`;  // 위치 설정
+            popup.style.left = `${rect.left + window.scrollX}px`;  // 위치 설정
+
+            // 팝업 상태 토글
+            if (popup.style.display === "block") {
+                console.log("팝업 닫기");
+                popup.style.display = "none";
+            } else {
+                console.log("팝업 열기");
+                popup.style.display = "block";
+            }
+        });
+
+        // 팝업 바깥 클릭 시 닫기
+        document.addEventListener("click", function (e) {
+            if (!popup.contains(e.target) && e.target !== addBtn) {
+                popup.style.display = "none";
+                console.log("팝업 닫기 (바깥 클릭)");
+            }
+        });
+
+        // 팝업 옵션 클릭 → 섹션 추가
+        document.querySelectorAll(".popup-option").forEach(option => {
+            option.addEventListener("click", () => {
+                const type = option.textContent.trim();  // 클릭된 옵션 가져오기
+                const sectionIndex = document.querySelectorAll(".resume-section").length + 1;  // 섹션 인덱스 설정
+
+                const newSection = document.createElement("section");
+                newSection.className = "resume-section";
+                newSection.id = `section${sectionIndex}`;
+
+                let content = "";
+                switch (type) {
+                    case "선택형":
+                        content = `
+        <div class="section-header">
+            <span class="section-title-text">${sectionIndex}. 추가선택</span>
+            <label style="margin-left: 20px;">선택 방식</label>
+            <select>
+                <option selected>선택형</option>
+            </select>
+            <button class="delete-btn">✕</button> <input type="text" class="section-title-input" value="추가선택" style="display: none;">
+        </div>
+        <input type="text" id="ohcomment" placeholder="설명 입력">
+
+        <div class="tag-mode">
+            <button class="mode-btn selected-tag">복수선택 ⭕</button>
+            <button class="mode-btn">복수선택 ❌</button>
+        </div>
+
+        <div class="tag-list job-tags"></div>
+        <input class="tag-input" type="text" placeholder="항목 입력 후 엔터">
+        <div class="conditions-list"></div>
+         `;
+                        break;
+
+                    case "서술형":
+                        content = `
+                        <div class="section-header">
+                            <span class="section-title-text">${sectionIndex}. 제목 입력</span>
+                            <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                            <button class="delete-btn">✕</button>
+                        </div>
+                        <input type="text" id="ohcomment" placeholder="설명 입력">
+                        <textarea placeholder="구직자 답변 입력란"></textarea>
+                        <div class="conditions-list"></div>  <!-- 조건 항목 추가 -->
+                    `;
+                        break;
+                    case "사진 첨부":
+                        content = `
+                        <div class="section-header">
+                            <span class="section-title-text">${sectionIndex}. 제목 입력</span>
+                            <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                            <button class="delete-btn">✕</button>
+                        </div>
+                        <input type="text" id="ohcomment" placeholder="설명 입력">
+                        <textarea placeholder="구직자 사진 입력란"></textarea>
+                    `;
+                        break;
+                    case "파일 첨부":
+                        content = `
+                        <div class="section-header">
+                            <span class="section-title-text">${sectionIndex}. 제목 입력</span>
+                            <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                            <button class="delete-btn">✕</button>
+                        </div>
+                        <input type="text" id="ohcomment" placeholder="설명 입력">
+                        <textarea placeholder="구직자 파일 첨부란"></textarea>
+                    `;
+                        break;
+                }
+
+                newSection.innerHTML = content;
+                newSection.setAttribute("data-title", type === "선택형" ? "추가선택" : "제목 입력");
+                newSection.setAttribute("data-type", type);  // 서술형, 선택형 등
+
+                document.querySelector(".add-section").before(newSection);  // 새 섹션 추가
+                popup.style.display = "none";  // 팝업 닫기
+
+                // ✅ tag 입력 기능 바인딩 (선택형 섹션 공통용)
+                const tagInput = newSection.querySelector(".tag-input");
+                const tagList = newSection.querySelector(".job-tags");
+
+                tagInput?.addEventListener("keydown", e => {
+                    if (e.key === "Enter" && tagInput.value.trim()) {
+                        e.preventDefault();
+                        const tagText = tagInput.value.trim();
+                        const tag = document.createElement("span");
+                        tag.className = "tag selected-tag";
+                        tag.innerHTML = `<span class="tag-label">${tagText}</span><span class="tag-remove">✕</span>`;
+                        tagList.appendChild(tag);
+                        tagInput.value = "";
+                    }
+                });
+
+                tagList?.addEventListener("click", e => {
+                    if (e.target.classList.contains("tag-remove")) {
+                        const tag = e.target.closest(".tag");
+                        tag?.remove();
+                    }
+                });
+
+                // 목차에 추가
+                const outlineList = document.querySelector(".outline-list");
+                const tocItem = document.createElement("li");
+                const tocLink = document.createElement("a");
+                tocLink.href = `#section${sectionIndex}`;
+                tocLink.textContent = `${sectionIndex}. 제목 입력`;
+                tocItem.appendChild(tocLink);
+                outlineList.appendChild(tocItem);
+
+                // 섹션 제목 수정
+                const titleInput = newSection.querySelector(".section-title-input");
+                titleInput?.addEventListener("input", () => {
+                    tocLink.textContent = `${sectionIndex}. ${titleInput.value || "제목 입력"}`;
+                });
+
+                // 조건 항목 추가
+                const sectionConditions = allConditions[type] || [];
+                const conditionList = sectionConditions.map(condition => {
+                    return `
+                <span class="condition" data-condition="${condition}">
+                    ${condition}
+                </span>
+            `;
+                }).join('');
+
+                // 조건 항목을 해당 섹션에 삽입
+                newSection.querySelector(".conditions-list").innerHTML = conditionList;
+
+                // ✅ 이 밑에 추가!
+                document.querySelector(".resume-sections-container").appendChild(newSection);
+
+                // ✅ 조건 항목 이벤트 바인딩
+                addConditionClickListener();
+
+
+            });
+        });
+
+        // 전체 조건 항목을 미리 정의하거나 서버에서 받아오는 로직을 추가
+        const allConditions = {
+            "경력사항": ["1년 이내", "3개월 이내", "6개월 이내", "직접입력"],
+            "포트폴리오": ["1개 이하", "3개 이상", "5개 이상", "직접입력"],
+            "자기소개": ["50자 이상", "200자 이상", "500자 이상", "직접입력"],
+            "학력사항": ["초등학교", "중학교", "고등학교", "대학교", "대학원", "최종"]
+        };
+
+        if (resumeId) {
+            fetch(`/api/coresumes/${resumeId}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("불러온 이력서 데이터:", data);
+
+                    document.querySelector("#resumeTitle").value = data.title;
+
+                    const sectionContainer = document.querySelector(".resume-sections-container");
+                    const outlineList = document.querySelector(".outline-list");
+
+                    data.sections.forEach((section, index) => {
+                        console.log(`섹션 ${index + 1} 데이터:`, section);
+
+                        const sectionElement = document.createElement("section");
+                        sectionElement.className = "resume-section";
+                        sectionElement.id = `section${index + 1}`;
+                        sectionElement.setAttribute("data-title", section.title);   // ✅ 추가
+                        sectionElement.setAttribute("data-type", section.type);     // ✅ 추가
+
+
+                        // ✅ 일반회원 정보 예외 처리
+                        if (section.title === "일반회원 정보") {
+                            sectionElement.innerHTML = `
+            <div class="section-header">
+                <span>${index + 1}. ${section.title}</span>
+            </div>
+            <p class="section-note">사이트 등록 정보를 기반으로 보여집니다.</p>
+        `;
+                            sectionContainer.appendChild(sectionElement);
+                            return; // 여기서 끝내고 다음 섹션으로 넘어감
+                        }
+                        else if (section.title === "희망직무") {
+                            const isMulti = section.multiSelect;
+
+                            sectionElement.innerHTML = `
+        <div class="section-header">
+            <span>${index + 1}. ${section.title}</span>
+            <button class="delete-btn">✕</button>
+        </div>
+        <input type="text" id="ohcomment" value="${section.comment || ''}" placeholder="설명 입력">
+
+        <div class="tag-mode">
+            <button class="mode-btn ${isMulti ? 'selected-tag' : ''}" id="multi-on">복수선택 ⭕</button>
+            <button class="mode-btn ${!isMulti ? 'selected-tag' : ''}" id="multi-off">복수선택 ❌</button>
+        </div>
+
+        <input type="text" id="job-input" placeholder="직무 입력 후 엔터">
+        <div class="tag-list job-tags">
+            ${(section.tags || []).map(tag => `
+                <span class="tag selected-tag">
+                    <span class="tag-label">${tag}</span>
+                    <span class="tag-remove">✕</span>
+                </span>
+            `).join('')}
+        </div>
+    `;
+
+                            sectionContainer.appendChild(sectionElement);
+
+
+                            // 입력 및 태그 추가 기능
+                            const tagList = sectionElement.querySelector(".job-tags");
+                            const input = sectionElement.querySelector("#job-input");
+                            let multiSelect = isMulti;
+
+                            input.addEventListener("keydown", e => {
+                                if (e.key === "Enter" && input.value.trim()) {
+                                    e.preventDefault();
+                                    const tagText = input.value.trim();
+
+                                    // 🔥 수정 전 (모든 기존 태그 삭제)
+                                    // if (!multiSelect) {
+                                    //     tagList.innerHTML = '';
+                                    // }
+
+
+                                    const tag = document.createElement("span");
+                                    tag.className = "tag selected-tag";
+                                    tag.innerHTML = `<span class="tag-label">${tagText}</span><span class="tag-remove">✕</span>`;
+                                    tagList.appendChild(tag);
+                                    input.value = "";
+                                }
+                            });
+
+
+                            // 복수선택 토글
+                            const multiOnBtn = sectionElement.querySelector("#multi-on");
+                            const multiOffBtn = sectionElement.querySelector("#multi-off");
+
+                            multiOnBtn.addEventListener("click", () => {
+                                multiSelect = true;
+                                multiOnBtn.classList.add("selected-tag");
+                                multiOffBtn.classList.remove("selected-tag");
+                            });
+
+                            multiOffBtn.addEventListener("click", () => {
+                                multiSelect = false;
+                                multiOnBtn.classList.remove("selected-tag");
+                                multiOffBtn.classList.add("selected-tag");
+
+                                tags.forEach(tag => {
+                                    tag.classList.remove("selected-tag");
+                                });
+                            });
+
+                            // 태그 삭제
+                            tagList.addEventListener("click", e => {
+                                if (e.target.classList.contains("tag-remove")) {
+                                    const tag = e.target.closest(".tag");
+                                    tag?.remove();
+                                }
+                            });
+
+                            return;
+                        }
+                        else if (section.title === "포트폴리오") {
+                            sectionElement.innerHTML = `
+        <div class="section-header">
+            <span>${index + 1}. ${section.title}</span>
+            <button class="delete-btn">✕</button>
+        </div>
+        <input type="text" id="ohcomment" value="${section.comment || ''}" placeholder="설명 입력">
+        <div class="tag-list conditions-list">
+            ${["1개 이하", "3개 이상", "5개 이상", "직접입력"].map(condition => {
+                                const isSelected = section.conditions?.includes(condition) ? "selected-tag active" : "";
+                                return `<span class="tag condition ${isSelected}" data-condition="${condition}">${condition}</span>`;
+                            }).join('')}
+        </div>
+        <textarea placeholder="포트폴리오 설명">${section.content || ''}</textarea>
+    `;
+                            sectionContainer.appendChild(sectionElement);
+
+                            // ✅ 렌더링 직후에 조건 클릭 바인딩 (setTimeout으로 해결)
+                            setTimeout(() => {
+                                addConditionClickListener();
+                            }, 0);
+
+                            return;
+                        }
+
+
+
+
+                        if (section.title === "학력사항") {
+                            sectionElement.innerHTML = `
+        <div class="section-header">
+            <span>${index + 1}. ${section.title}</span>
+            <button class="delete-btn">✕</button>
+        </div>
+        <input type="text" id="ohcomment" value="${section.comment || ''}" placeholder="설명 입력">
+        <div class="tag-list conditions-list">
+            ${["초등학교", "중학교", "고등학교", "대학교", "대학원", "최종"].map(level => {
+                                const isSelected = section.conditions?.includes(level) ? "selected-tag active" : "";
+                                return `<span class="tag condition ${isSelected}" data-condition="${level}">${level}</span>`;
+                            }).join('')}
+        </div>
+        <input type="text" placeholder="학교명" value="${section.school || ''}"><br>
+        <input type="text" placeholder="학과" value="${section.major || ''}">
+        <select>
+            <option ${section.status === "재학" ? "selected" : ""}>재학</option>
+            <option ${section.status === "졸업" ? "selected" : ""}>졸업</option>
+        </select>
+        <div class="date-group">
+            <select>
+                ${Array.from({ length: 30 }, (_, i) => {
+                                const year = 2000 + i;
+                                return `<option ${section.startYear == year ? "selected" : ""}>${year}</option>`;
+                            }).join('')}
+            </select>
+            ~
+            <select>
+                ${Array.from({ length: 30 }, (_, i) => {
+                                const year = 2000 + i;
+                                return `<option ${section.endYear == year ? "selected" : ""}>${year}</option>`;
+                            }).join('')}
+            </select>
+        </div>
+    `;
+                            sectionContainer.appendChild(sectionElement);
+                            return; // 다음 섹션으로 넘어가게 종료
+                        }
+
+
+                        // ✅ 나머지 섹션 렌더링 (기존 코드 유지)
+                        let multiSelectButton = '';
+                        if (section.type === "선택형" && section.title !== "학력사항") {
+                            multiSelectButton = `
+            <div class="tag-mode">
+                <button class="mode-btn ${section.multiSelect === true ? "selected-tag" : ""}">복수선택 ⭕</button>
+                <button class="mode-btn ${section.multiSelect === false ? "selected-tag" : ""}">복수선택 ❌</button>
+            </div>
+        `;
+                        }
+
+                        // 조건 항목을 모두 추가하는 부분
+                        const currentConditions = Array.isArray(section.conditions) ? section.conditions : [];
+                        const sectionConditions = allConditions[section.title] || [];
+
+                        const conditionList = sectionConditions.map(condition => {
+                            const isActive = currentConditions.includes(condition) ? "active selected-tag" : "";
+                            return `<span class="condition ${isActive}" data-condition="${condition}">${condition}</span>`;
+                        }).join('');
+
+
+                        const 기본제공타이틀 = ["일반회원 정보", "희망직무", "포트폴리오", "학력사항", "자기소개", "경력사항"];
+                        const isCustomSection = !기본제공타이틀.includes(section.title);
+                        sectionElement.innerHTML = `
+  <div class="section-header">
+      <span class="section-title-text">${index + 1}. ${section.title}</span>
+      ${isCustomSection ? `<input type="text" class="section-title-input" value="${section.title}" style="display: none;">` : ""}
+      <button class="delete-btn">✕</button>
+  </div>
+
+
+    <input type="text" id="ohcomment" value="${section.comment || ''}" placeholder="설명 입력">
+
+    <div class="section-content">
+        ${
+                            section.type === "서술형"
+                                ? `<textarea placeholder="내용을 입력하세요">${section.content || ''}</textarea>`
+                                : section.type === "사진 첨부"
+                                    ? `<textarea placeholder="구직자 사진 입력란">${section.content || ''}</textarea>`
+                                    : section.type === "파일 첨부"
+                                        ? `<textarea placeholder="구직자 파일 첨부란">${section.content || ''}</textarea>`
+                                        : ""
+                        }
+    </div>
+
+
+
+                        <div class="section-content">
+                                ${section.type === "서술형" || section.type === "선택형" ? `<div class="conditions-list">${conditionList}</div>` : ""}
+                            </div>
+                           <div class="section-content">
+    ${section.type === "선택형" ? `
+        <div class="tag-list job-tags">
+            ${section.tags && section.tags.length > 0 ? section.tags.map(tag => `
+                <span class="tag selected-tag">
+                    <span class="tag-label">${tag}</span>
+                    <span class="tag-remove">✕</span>
+                </span>`).join('') : ''}
+        </div>
+        <input class="tag-input" type="text" placeholder="항목 입력 후 엔터">  <!-- ✅ 요 줄 추가 -->
+    ` : ""}
+</div>
+
+                            ${multiSelectButton}
+                        `;
+
+                        sectionContainer.appendChild(sectionElement);
+                        addConditionClickListener();  // 🔥 조건 클릭 토글 적용
+
+                        // ✅ 선택형 태그 입력 기능 바인딩
+                        if (section.type === "선택형") {
+                            const tagInput = sectionElement.querySelector(".tag-input");
+                            const tagList = sectionElement.querySelector(".job-tags");
+
+                            tagInput?.addEventListener("keydown", e => {
+                                if (e.key === "Enter" && tagInput.value.trim()) {
+                                    e.preventDefault();
+                                    const tagText = tagInput.value.trim();
+                                    const tag = document.createElement("span");
+                                    tag.className = "tag selected-tag";
+                                    tag.innerHTML = `<span class="tag-label">${tagText}</span><span class="tag-remove">✕</span>`;
+                                    tagList.appendChild(tag);
+                                    tagInput.value = "";
+                                }
+                            });
+
+                            tagList?.addEventListener("click", e => {
+                                if (e.target.classList.contains("tag-remove")) {
+                                    const tag = e.target.closest(".tag");
+                                    tag?.remove();
+                                }
+                            });
+                        }
+                        // ✅ 복수선택 버튼 토글 기능 추가
+                        if (section.type === "선택형") {
+                            const multiOnBtn = sectionElement.querySelector(".mode-btn:nth-child(1)");
+                            const multiOffBtn = sectionElement.querySelector(".mode-btn:nth-child(2)");
+                            let multiSelect = section.multiSelect ?? true;  // 기본값 true
+
+                            multiOnBtn?.addEventListener("click", () => {
+                                multiSelect = true;
+                                multiOnBtn.classList.add("selected-tag");
+                                multiOffBtn.classList.remove("selected-tag");
+                            });
+
+                            multiOffBtn?.addEventListener("click", () => {
+                                multiSelect = false;
+                                multiOnBtn.classList.remove("selected-tag");
+                                multiOffBtn.classList.add("selected-tag");
+
+                                const tagList = sectionElement.querySelector(".job-tags");
+                                const tags = tagList.querySelectorAll(".tag");
+                                tags.forEach(tag => {
+                                    tag.classList.remove("selected-tag");
+                                });
+                            });
+                        }
+                    });
+                })
+        }
+
+        // 조건 항목 클릭 시 활성화/비활성화 처리
+        function addConditionClickListener() {
+
+            // ✅ 섹션 삭제 처리 (❌ 버튼)
+            document.addEventListener("click", function(e) {
+                if (e.target.classList.contains("delete-btn")) {
+                    const section = e.target.closest(".resume-section");
+                    const tocLink = document.querySelector(`.outline-list a[href="#${section.id}"]`);
+                    section?.remove();  // 섹션 삭제
+                    tocLink?.parentElement?.remove();  // 목차 항목 삭제
+                }
+            });
+
+            const conditions = document.querySelectorAll(".condition");
+            console.log("🟡 조건 항목 개수:", conditions.length);
+
+            conditions.forEach(condition => {
+                // 이미 바인딩된 요소는 건너뜀
+                if (condition.dataset.bound === "true") return;
+
+                console.log("🔵 조건 항목 텍스트:", condition.textContent);
+
+                condition.addEventListener("click", (e) => {
+                    e.target.classList.toggle("active");
+                    e.target.classList.toggle("selected-tag");
+                    console.log("🟢 클릭됨:", e.target.textContent, "→ classList:", e.target.classList.value);
+                });
+
+                condition.dataset.bound = "true"; // 중복 바인딩 방지
+            });
+        }
+
+
+        // 저장 버튼 클릭 시 수정된 내용을 서버로 전송
+        document.querySelector(".save-btn").addEventListener("click", () => {
+            const resumeTitle = document.querySelector("#resumeTitle").value;
+
+            let jobTags = [];
+
+            const sections = Array.from(document.querySelectorAll(".resume-section")).map(section => {
+                const sectionTitle = section.dataset.title || section.querySelector(".section-header .section-title-text")?.textContent.replace(/^\d+\.\s*/, "").trim();
+                const type = section.dataset.type || (() => {
+                    const sectionText = section.querySelector("textarea")?.placeholder || "";
+                    if (sectionText.includes("사진")) return "사진 첨부";
+                    if (sectionText.includes("파일")) return "파일 첨부";
+                    if (section.querySelector("select")) return "선택형";
+                    return "서술형";
+                })();
+
+                const content = section.querySelector("textarea")?.value || "";
+                const tags = Array.from(section.querySelectorAll(".tag-label")).map(tag => tag.textContent.trim());
+                const multiSelect = section.querySelector(".mode-btn.selected-tag")?.textContent.includes("⭕") || false;
+
+                const commentInput = section.querySelector("#ohcomment");
+                const comment = commentInput ? commentInput.value : "";
+
+                const selectedConditions = Array.from(section.querySelectorAll(".condition.active"))
+                    .map(condition => condition.dataset.condition);
+
+                // 📦 디버깅 로그 출력
+                console.log("📦 section.dataset.title:", section.dataset.title);
+                console.log("📝 실제 제목(span):", section.querySelector(".section-header span")?.textContent);
+                console.log("🧾 type 추론 결과:", type);
+                console.log("🟨 설명(comment):", comment);
+                console.log("🔖 tags:", tags);
+                console.log("📌 conditions:", selectedConditions);
+                console.log("➕ multiSelect:", multiSelect);
+
+                if (sectionTitle === "희망직무") {
+                    jobTags = tags;
+                    return {
+                        title: sectionTitle,
+                        comment: comment,
+                        type: type,
+                        content: content,
+                        tags: tags,
+                        multiSelect: multiSelect,
+                        conditions: selectedConditions
+                    };
+                }
+
+
+                return {
+                    title: sectionTitle,
+                    comment: comment,
+                    type: type,
+                    content: content,
+                    tags: tags,
+                    multiSelect: multiSelect,
+                    conditions: selectedConditions
+                };
+            }).filter(Boolean);
+
+            const updatedResume = {
+                title: resumeTitle,
+                sections: sections,
+                jobTags: jobTags,
+                createdAt: new Date()
+            };
+
+            console.log("🚀 최종 업데이트 데이터:", updatedResume);
+
+            fetch(`/api/coresumes/${resumeId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-XSRF-TOKEN": document.querySelector('meta[name="_csrf"]').getAttribute("content")
+                },
+                body: JSON.stringify(updatedResume)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("✅ 이력서 저장 성공", data);
+                    alert("이력서 수정 완료!");
+                    window.location.href = "/coresumelist";
+                })
+                .catch(error => {
+                    console.error("❌ 이력서 저장 실패:", error);
+                    alert("수정 실패");
+                });
+        });
+    });
+</script>
+
+
+
+</body>
+</html>
