@@ -15,4 +15,7 @@ public interface ContestRepository extends JpaRepository<ContestEntity, Long> {
     List<ContestEntity> findByIsApprovedTrueAndIsDeletedFalse(); // 사용자용 목록
     List<ContestEntity> findByIsDeletedFalse(); // 관리자용 전체 목록
 
+    List<ContestEntity> findByCreatorTypeAndIsDeletedFalse(String creatorType);
+
+
 }

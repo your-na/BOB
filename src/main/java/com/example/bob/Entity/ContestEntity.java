@@ -45,6 +45,7 @@ public class ContestEntity {
 
     // 작성자
     private String creatorType; // "ADMIN" 또는 "COMPANY"
+    private Long creatorId; // 기업 회원 ID 저장
 
     // 승인 여부
     private boolean isApproved = false;

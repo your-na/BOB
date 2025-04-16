@@ -154,4 +154,12 @@ public class ContestService {
     }
 
 
+    public List<ContestDTO> getContestsByCreatorType(String creatorType) {
+        return contestRepository.findByCreatorTypeAndIsDeletedFalse(creatorType).stream()
+                .map(ContestDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+
+
 }
