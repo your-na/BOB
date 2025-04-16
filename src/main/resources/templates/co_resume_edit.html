@@ -72,6 +72,7 @@
         const addBtn = document.getElementById("add-section");
         const popup = document.getElementById("section-popup");
 
+
         // ➕ 버튼 클릭 시 팝업 위치 설정
         addBtn.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -345,9 +346,8 @@
                                 multiOnBtn.classList.remove("selected-tag");
                                 multiOffBtn.classList.add("selected-tag");
 
-                                const tags = tagList.querySelectorAll(".tag");
-                                tags.forEach((tag, i) => {
-                                    if (i > 0) tag.remove();
+                                tags.forEach(tag => {
+                                    tag.classList.remove("selected-tag");
                                 });
                             });
 
@@ -451,11 +451,14 @@
 
 
 
+                        const isCustomSection = !["일반회원 정보", "학력사항", "희망직무", "경력사항", "포트폴리오", "자기소개"].includes(section.title);
+
                         sectionElement.innerHTML = `
-    <div class="section-header">
-        <span class="section-title-text">${index + 1}. ${section.title}</span>
-        <button class="delete-btn">✕</button>
-    </div>
+  <div class="section-header">
+    <span class="section-title-text">${index + 1}. ${section.title}</span>
+    ${isCustomSection ? `<input type="text" class="section-title-input" value="${section.title}" style="display: none;">` : ""}
+    <button class="delete-btn">✕</button>
+  </div>
 
     <input type="text" id="ohcomment" value="${section.comment || ''}" placeholder="설명 입력">
 
@@ -494,6 +497,32 @@
 
                         sectionContainer.appendChild(sectionElement);
                         addConditionClickListener();  // 🔥 조건 클릭 토글 적용
+
+                        const sectionTitleText = sectionElement.querySelector(".section-title-text");
+                        const sectionTitleInput = sectionElement.querySelector(".section-title-input");
+
+                        if (sectionTitleText && sectionTitleInput) {
+                            sectionTitleText.addEventListener("click", () => {
+                                const number = sectionTitleText.textContent.split(".")[0];
+                                const currentTitle = sectionTitleText.textContent.replace(`${number}. `, "").trim();
+                                sectionTitleInput.value = currentTitle;
+
+                                sectionTitleText.style.display = "none";
+                                sectionTitleInput.style.display = "inline-block";
+                                sectionTitleInput.focus();
+
+                                sectionTitleInput.addEventListener("blur", () => {
+                                    const newTitle = sectionTitleInput.value.trim() || "제목 입력";
+                                    sectionTitleText.textContent = `${number}. ${newTitle}`;
+                                    sectionTitleInput.style.display = "none";
+                                    sectionTitleText.style.display = "inline-block";
+
+                                    const tocLink = document.querySelector(`.outline-list a[href="#${sectionElement.id}"]`);
+                                    if (tocLink) tocLink.textContent = `${number}. ${newTitle}`;
+                                });
+                            });
+                        }
+
 
                         // ✅ 선택형 태그 입력 기능 바인딩
                         if (section.type === "선택형") {
@@ -538,8 +567,8 @@
 
                                 const tagList = sectionElement.querySelector(".job-tags");
                                 const tags = tagList.querySelectorAll(".tag");
-                                tags.forEach((tag, i) => {
-                                    if (i > 0) tag.remove();  // 첫 번째만 남기고 제거
+                                tags.forEach(tag => {
+                                    tag.classList.remove("selected-tag");
                                 });
                             });
                         }
