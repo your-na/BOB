@@ -48,4 +48,8 @@ public class TestController {
     //외부
     @GetMapping("/adnotcont")
     public String notconform() {return "ad_notcomcontest";}
+
+    //기업 주최한 공모전 목록
+    @GetMapping("/comycontest")
+    public String myconform() {return "co_mycontest";}
 }
