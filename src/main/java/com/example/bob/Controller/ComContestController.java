@@ -3,6 +3,7 @@ package com.example.bob.Controller;
 import com.example.bob.DTO.ContestDTO;
 import com.example.bob.Entity.ContestEntity;
 import com.example.bob.Service.ContestService;
+import com.example.bob.security.CompanyDetailsImpl;
 import com.example.bob.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -49,7 +51,10 @@ public class ComContestController {
         contestDTO.setIsApproved(false);
         contestDTO.setIsOnlyBOB(true);
 
-        // 🟡 상태 계산
+        Long creatorId = ((CompanyDetailsImpl) userDetails).getCompanyEntity().getCompanyId();
+        contestDTO.setCreatorId(creatorId);
+
+        // 🟡 상태 계산 d
         String status = contestDTO.getStartDate().isAfter(LocalDate.now()) ? "대기중" : "모집중";
         contestDTO.setStatus(status);
 
@@ -85,4 +90,13 @@ public class ComContestController {
         contestService.rejectContest(id); // 필요 시 삭제나 상태 변경
         return "redirect:/adconlist";
     }
+
+    @GetMapping("/adnotcont")
+    public String showCompanyContests(Model model) {
+        List<ContestDTO> companyContests = contestService.getContestsByCreatorType("COMPANY");
+        model.addAttribute("contests", companyContests);
+        return "ad_comcontest"; // 기업 공모전 목록 HTML
+    }
+
+
 }

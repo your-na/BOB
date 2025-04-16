@@ -98,6 +98,8 @@ public class ContestController {
         return "redirect:/ad_contest";
     }
 
+
+
     // ✅ 공모전 이미지 서빙
     @GetMapping("/uploads/contestImages/{fileName}")
     public ResponseEntity<Resource> serveContestImage(@PathVariable String fileName) {
@@ -166,4 +168,12 @@ public class ContestController {
 
         return isApproved ? "redirect:/ad_contest" : "redirect:/comhome";
     }
+
+    @GetMapping("/adcomcont")
+    public String showExternalContests(Model model) {
+        List<ContestDTO> adminContests = contestService.getContestsByCreatorType("ADMIN");
+        model.addAttribute("contests", adminContests);
+        return "ad_notcomcontest"; // 외부 공모전 목록 HTML
+    }
+
 }

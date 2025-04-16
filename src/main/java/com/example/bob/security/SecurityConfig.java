@@ -56,7 +56,7 @@ public class SecurityConfig {
                         .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject", "/api/todos", "/api/resumes").authenticated()
                         .requestMatchers("/signup", "/co_signup", "/check-nickname", "/check-username", "/api/my-projects").permitAll()
                         .requestMatchers("/comhome", "/comhome/**", "/comcontest").hasAuthority("COMPANY")
-                        .requestMatchers("/admin/**", "/sidebar", "/ad_contest").hasAuthority("ADMIN")
+                        .requestMatchers("/admin/**", "/sidebar", "/ad_contest", "/adcomcont", "/adcomcont").hasAuthority("ADMIN")
                         .requestMatchers("/contest/create", "/contest/submit").hasAnyAuthority("ADMIN", "COMPANY")
                         .anyRequest().authenticated()
                 )
