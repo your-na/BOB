@@ -133,20 +133,25 @@ public class CoResumeServiceImpl implements CoResumeService {
                     .map(CoResumeTagEntity::getTag)
                     .collect(Collectors.toList());
 
-            // ✅ 4️⃣ 희망직무를 sections 안에도 넣어주기
-            if (!jobTagStrings.isEmpty()) {
+            // ✅ 희망직무 섹션 중복 방지 조건 추가
+            boolean hasJobSection = sectionDTOList.stream()
+                    .anyMatch(section -> "희망직무".equals(section.getTitle()));
+
+// ✅ 중복되지 않은 경우에만 섹션에 추가
+            if (!jobTagStrings.isEmpty() && !hasJobSection) {
                 CoResumeSectionRequestDTO jobSection = new CoResumeSectionRequestDTO(
-                        "선택형",                                 // type
-                        "희망직무",                               // title
-                        "희망하는 직무를 선택해주세요.",            // comment
-                        "",                                      // content 없음
-                        jobTagStrings,                          // tags
-                        true,                                   // multiSelect
-                        new ArrayList<>(),                      // 조건 없음
-                        null                                    // 직접입력값 없음
+                        "선택형",
+                        "희망직무",
+                        "희망하는 직무를 선택해주세요.",
+                        "",
+                        jobTagStrings,
+                        true,
+                        new ArrayList<>(),
+                        null
                 );
-                sectionDTOList.add(jobSection); // 👈 리스트에 추가!
+                sectionDTOList.add(jobSection); // 👈 조건 통과 시만 추가됨!
             }
+
 
             // 5️⃣ DTO 리턴
             return new CoResumeRequestDTO(
