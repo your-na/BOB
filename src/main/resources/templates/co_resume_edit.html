@@ -71,6 +71,51 @@
         const resumeId = pathSegments[pathSegments.length - 1];
         const addBtn = document.getElementById("add-section");
         const popup = document.getElementById("section-popup");
+        // ✅ 제목 클릭 시 input 전환
+        document.addEventListener("click", (e) => {
+            const target = e.target;
+            if (target.classList.contains("section-title-text")) {
+                const header = target.closest(".section-header");
+                const input = header.querySelector(".section-title-input");
+
+                if (!input) return;
+
+                // 기존 span 텍스트에서 숫자 제거 후 input에 세팅
+                const number = target.textContent.split(".")[0];
+                const currentTitle = target.textContent.replace(`${number}. `, "").trim();
+                input.value = currentTitle;
+
+                target.style.display = "none";
+                input.style.display = "inline-block";
+                input.focus();
+
+                // blur 시 span으로 다시 보이기
+                input.addEventListener("blur", () => {
+                    const newTitle = input.value.trim() || "제목 입력";
+                    target.textContent = `${number}. ${newTitle}`;
+                    input.style.display = "none";
+                    target.style.display = "inline-block";
+
+                    const section = input.closest(".resume-section");
+
+                    // ✅ 이 한 줄 추가!
+                    section.dataset.title = newTitle;
+
+                    // 목차도 업데이트
+                    const tocLink = document.querySelector(`.outline-list a[href="#${section.id}"]`);
+                    if (tocLink) tocLink.textContent = `${number}. ${newTitle}`;
+                });
+
+            }
+        });
+
+// ✅ 엔터 눌렀을 때도 span으로 전환
+        document.addEventListener("keydown", (e) => {
+            if (e.target.classList.contains("section-title-input") && e.key === "Enter") {
+                e.preventDefault();
+                e.target.blur();  // blur 이벤트로 넘김
+            }
+        });
 
 
         // ➕ 버튼 클릭 시 팝업 위치 설정
@@ -118,7 +163,7 @@
             <select>
                 <option selected>선택형</option>
             </select>
-            <button class="delete-btn">✕</button>
+            <button class="delete-btn">✕</button> <input type="text" class="section-title-input" value="추가선택" style="display: none;">
         </div>
         <input type="text" id="ohcomment" placeholder="설명 입력">
 
@@ -450,15 +495,15 @@
                         }).join('');
 
 
-
-                        const isCustomSection = !["일반회원 정보", "학력사항", "희망직무", "경력사항", "포트폴리오", "자기소개"].includes(section.title);
-
+                        const 기본제공타이틀 = ["일반회원 정보", "희망직무", "포트폴리오", "학력사항", "자기소개", "경력사항"];
+                        const isCustomSection = !기본제공타이틀.includes(section.title);
                         sectionElement.innerHTML = `
   <div class="section-header">
-    <span class="section-title-text">${index + 1}. ${section.title}</span>
-    ${isCustomSection ? `<input type="text" class="section-title-input" value="${section.title}" style="display: none;">` : ""}
-    <button class="delete-btn">✕</button>
+      <span class="section-title-text">${index + 1}. ${section.title}</span>
+      ${isCustomSection ? `<input type="text" class="section-title-input" value="${section.title}" style="display: none;">` : ""}
+      <button class="delete-btn">✕</button>
   </div>
+
 
     <input type="text" id="ohcomment" value="${section.comment || ''}" placeholder="설명 입력">
 
@@ -497,32 +542,6 @@
 
                         sectionContainer.appendChild(sectionElement);
                         addConditionClickListener();  // 🔥 조건 클릭 토글 적용
-
-                        const sectionTitleText = sectionElement.querySelector(".section-title-text");
-                        const sectionTitleInput = sectionElement.querySelector(".section-title-input");
-
-                        if (sectionTitleText && sectionTitleInput) {
-                            sectionTitleText.addEventListener("click", () => {
-                                const number = sectionTitleText.textContent.split(".")[0];
-                                const currentTitle = sectionTitleText.textContent.replace(`${number}. `, "").trim();
-                                sectionTitleInput.value = currentTitle;
-
-                                sectionTitleText.style.display = "none";
-                                sectionTitleInput.style.display = "inline-block";
-                                sectionTitleInput.focus();
-
-                                sectionTitleInput.addEventListener("blur", () => {
-                                    const newTitle = sectionTitleInput.value.trim() || "제목 입력";
-                                    sectionTitleText.textContent = `${number}. ${newTitle}`;
-                                    sectionTitleInput.style.display = "none";
-                                    sectionTitleText.style.display = "inline-block";
-
-                                    const tocLink = document.querySelector(`.outline-list a[href="#${sectionElement.id}"]`);
-                                    if (tocLink) tocLink.textContent = `${number}. ${newTitle}`;
-                                });
-                            });
-                        }
-
 
                         // ✅ 선택형 태그 입력 기능 바인딩
                         if (section.type === "선택형") {
@@ -616,11 +635,7 @@
             let jobTags = [];
 
             const sections = Array.from(document.querySelectorAll(".resume-section")).map(section => {
-                const sectionTitleText = section.querySelector(".section-header .section-title-text");
-                const number = sectionTitleText?.textContent.split(".")[0];
-                const rawTitle = sectionTitleText?.textContent.replace(`${number}. `, "").trim();
-                const sectionTitle = rawTitle || "제목 입력";
-
+                const sectionTitle = section.dataset.title || section.querySelector(".section-header .section-title-text")?.textContent.replace(/^\d+\.\s*/, "").trim();
                 const type = section.dataset.type || (() => {
                     const sectionText = section.querySelector("textarea")?.placeholder || "";
                     if (sectionText.includes("사진")) return "사진 첨부";
