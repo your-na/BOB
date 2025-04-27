@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>외부 공모전 목록</title>
+    <link rel="stylesheet" href="/css/ad_notcomcontest.css">
+    <script defer src="/js/ad_notcomcontest.js"></script>
+</head>
+<body>
+
+<!-- 공모전 주최 신청 목록 -->
+<section class="contest-list">
+    <h2>외부 공모전 목록</h2>
+
+    <!-- 검색 및 필터 -->
+    <div class="top-bar">
+        <div class="filter-dropdown">
+            <button class="filter-btn">최신순 ▼</button>
+            <ul class="filter-menu">
+                <li data-filter="latest">최신순</li>
+                <li data-filter="oldest">오래된순</li>
+            </ul>
+        </div>
+        <input type="text" id="search-input" placeholder="검색어 입력">
+    </div>
+
+    <!-- 신청 목록 테이블 -->
+    <table class="contest-table">
+        <thead>
+        <tr>
+            <th>공모명</th>
+            <th>주최</th>
+            <th>신청 날짜</th>
+            <th>진행 일정</th>
+            <th>정보</th>
+        </tr>
+        </thead>
+        <tbody id="contest-body">
+        <!-- ✅ 데이터가 있을 경우 출력 -->
+        <tr th:each="contest : ${contests}">
+            <td th:text="${contest.title}"></td>
+            <td th:text="${contest.organizer}"></td>
+            <td th:text="${#temporals.format(contest.createdAt, 'yyyy.MM.dd')}"></td>
+            <td th:text="${#temporals.format(contest.startDate, 'yyyy.MM.dd')} + ' ~ ' + ${#temporals.format(contest.endDate, 'yyyy.MM.dd')}"></td>
+            <td>
+                <a th:href="@{'/admin/contest/request/' + ${contest.id}}">
+                    <button class="detail-btn">상세보기</button>
+            </td>
+        </tr>
+
+        <!-- ✅ 데이터가 없을 경우 메시지 출력 -->
+        <tr th:if="${#lists.isEmpty(contests)}">
+            <td colspan="5" style="text-align:center; color: gray;">등록된 공모전이 없습니다.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 페이지네이션 -->
+    <div class="pagination">
+        <button id="prev-page" disabled>◀</button>
+        <span id="page-numbers"></span>
+        <button id="next-page">▶</button>
+    </div>
+</section>
+
+</body>
+</html>

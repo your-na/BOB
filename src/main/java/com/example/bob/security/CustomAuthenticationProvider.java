@@ -33,9 +33,14 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             // 먼저 일반 사용자로 시도
             user = userService.loadUserByUsername(username);
         } catch (UsernameNotFoundException e) {
+            try{
             // 일반 사용자 없으면 기업 사용자로 시도
             user = companyDetailsService.loadUserByUsername(username);
+        }catch (UsernameNotFoundException ex){
+            throw new UsernameNotFoundException("존재하지 않는 아이디입니다.");
         }
+        }
+
 
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");

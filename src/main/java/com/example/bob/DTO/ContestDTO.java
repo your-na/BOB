@@ -20,6 +20,7 @@ public class ContestDTO {
     private String category;
     private String target;
     private String region;
+
     private String imageUrl;
 
     private LocalDate startDate;
@@ -36,6 +37,8 @@ public class ContestDTO {
     private long remainingDays; // D-day 계산용
 
     private String creatorType; // "ADMIN", "COMPANY"
+    private Long creatorId;
+
     private boolean isApproved;
     private boolean isOnlyBOB;
 
@@ -67,6 +70,7 @@ public class ContestDTO {
                 .description(description)
                 .status(status)
                 .creatorType(creatorType)
+                .creatorId(this.creatorId)
                 .isApproved(isApproved)
                 .isOnlyBOB(isOnlyBOB)
                 .createdAt(createdAt)
@@ -96,8 +100,10 @@ public class ContestDTO {
                 .applicationMethod(entity.getApplicationMethod())
                 .description(entity.getDescription())
                 .creatorType(entity.getCreatorType())
+                .creatorId(entity.getCreatorId())
                 .isOnlyBOB(entity.isOnlyBOB())
                 .isApproved(entity.isApproved())
+                .createdAt(entity.getCreatedAt())
                 .status(entity.getStatus())
                 .remainingDays(daysLeft)
                 .build();

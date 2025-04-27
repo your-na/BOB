@@ -38,15 +38,6 @@ public class ContestService {
         return saved;
     }
 
-    // 공모전 승인
-    public void approve(Long contestId) {
-        ContestEntity contest = contestRepository.findById(contestId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 공모전을 찾을 수 없습니다."));
-        contest.setApproved(true);
-        contestRepository.save(contest);
-        saveHistory(contest);
-    }
-
     public void reject(Long id) {
         ContestEntity c = contestRepository.findById(id).orElseThrow();
         c.setApproved(false);
@@ -81,8 +72,35 @@ public class ContestService {
                 .collect(Collectors.toList());
     }
 
+    public List<ContestDTO> getAllPendingContests() {
+        return contestRepository.findByIsApprovedFalseAndIsDeletedFalse()  // 🔥 조건 추가 필요
+                .stream()
+                .map(ContestDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    public void approveContest(Long id) {
+        ContestEntity contest = contestRepository.findById(id).orElseThrow();
+        contest.setApproved(true);
+        contestRepository.save(contest);
+    }
+
+    public void rejectContest(Long id) {
+        ContestEntity contest = contestRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 공모전 없음"));
+        contest.setDeleted(true); // 실제 삭제하지 않고 숨김 처리
+        contestRepository.save(contest);
+        saveHistory(contest);     // 변경 내용 히스토리에도 저장
+    }
+
     public ContestEntity getById(Long id) {
         return contestRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 공모전 없음"));
+    }
+
+    public ContestDTO getContestById(Long id) {
+        return contestRepository.findById(id)
+                .map(ContestDTO::fromEntity)
+                .orElseThrow(() -> new IllegalArgumentException("공모전을 찾을 수 없습니다."));
     }
 
     private final String uploadDir = "uploads/contestImages/";
@@ -134,6 +152,14 @@ public class ContestService {
                 .map(ContestDTO::fromEntity)
                 .collect(Collectors.toList());
     }
+
+
+    public List<ContestDTO> getContestsByCreatorType(String creatorType) {
+        return contestRepository.findByCreatorTypeAndIsDeletedFalse(creatorType).stream()
+                .map(ContestDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
 
 
 }

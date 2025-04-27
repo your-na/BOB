@@ -33,4 +33,15 @@ public class TestController {
     //프로젝트쪽 제출한 신청서 보기 버튼 눌렀을 때
     @GetMapping("/projapplication2")
     public String appform() {return "projapplication2";}
+
+    @GetMapping("/copostcon")
+    public String coconform() {return "co_postcontest";}
+
+    //관리자 첫화면?
+    @GetMapping("/placeholder")
+    public String placeform() {return "ad_placeholder";}
+
+    //기업 주최한 공모전 목록
+    @GetMapping("/comycontest")
+    public String myconform() {return "co_mycontest";}
 }

@@ -359,3 +359,11 @@
     cursor: pointer;
 }
 
+.aa {
+    text-decoration: none;
+    color: #494949;
+}
+
+.aa:hover {
+    font-weight: bold;
+}

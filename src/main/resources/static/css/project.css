@@ -220,6 +220,15 @@
 }
 
 /* ✅ 버튼 구조 변경 */
-<form action="/newproject" method="get">
-<button type="submit" class="create-post-button">프로젝트 생성</button>
-</form>
+/*<form action="/newproject" method="get">*/
+/*<button type="submit" class="create-post-button">프로젝트 생성</button>*/
+/*</form>*/
+
+.kbw {
+    text-decoration: none;
+    color: #494949;
+}
+
+.kbw:hover {
+    font-weight: bold;
+}

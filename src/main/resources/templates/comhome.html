@@ -21,7 +21,7 @@
     <div class="left-section">
         <h3 class="hot-title">지금 핫한 공모전!!</h3>
         <img src="/images/hot.png" alt="핫한 공모전" class="hot-image">
-        <button class="apply-btn"><a href="/comhost" class="gkdms">공모전 주최 신청</a></button>
+        <button class="apply-btn"><a href="/comcontest" class="gkdms">공모전 주최 신청</a></button>
     </div>
 
     <!-- 오른쪽 메인: 검색, 필터, only BOB 버튼, 테이블 -->
@@ -85,7 +85,20 @@
                 <th>현황</th>
             </tr>
             </thead>
+            <tbody>
+            <tr th:each="contest : ${contestList}">
+                <td><a class="aa" th:href="@{'/comhome/' + ${contest.id}}" th:text="${contest.title}">공모전 제목</a></td>
+                <td th:text="${contest.organizer}">주최자</td>
+                <td th:text="'D-' + ${contest.remainingDays}">D-day</td>
+                <td>
+                    <span th:text="${contest.startDate}">시작일</span> ~
+                    <span th:text="${contest.endDate}">종료일</span>
+                </td>
+                <td th:text="${contest.status}">상태</td>
+            </tr>
+            </tbody>
         </table>
+
     </div>
 </section>
 

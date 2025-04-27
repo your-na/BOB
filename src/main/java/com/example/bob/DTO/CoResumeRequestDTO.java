@@ -2,35 +2,19 @@ package com.example.bob.DTO;
 
 import java.util.List;
 import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
+@AllArgsConstructor
 public class CoResumeRequestDTO {
 
-    private String title;
-    private List<CoResumeSectionRequestDTO> sections;
-    private Date createdAt;
+    private String title;                          // 이력서 제목
+    private List<CoResumeSectionRequestDTO> sections;  // 섹션 목록
+    private Date createdAt;                        // 작성일
+    private List<String> jobTags;                  // 희망직무 태그 필드 추가
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public List<CoResumeSectionRequestDTO> getSections() {
-        return sections;
-    }
-
-    public void setSections(List<CoResumeSectionRequestDTO> sections) {
-        this.sections = sections;
-    }
-
-    public Date getCreatedAt() {  // 작성일 getter 추가
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {  // 작성일 setter 추가
-        this.createdAt = createdAt;
-    }
+    // Lombok이 @Getter, @Setter, @AllArgsConstructor로 기본적으로 처리
 }
-

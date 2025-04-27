@@ -11,6 +11,7 @@
 <!-- header -->
 <div th:insert="~{header2 :: header}"></div>
 
+<!-- 모달 -->
 <div id="confirmModal" class="modal-overlay" style="display: none;">
     <div class="modal-box">
         <p class="modal-title">신청하시겠습니까?</p>
@@ -22,73 +23,77 @@
     </div>
 </div>
 
-<div class="com-contest-wrapper">
+<form class="contest-form"
+      th:action="@{/comcontest}"
+      method="post"
+      enctype="multipart/form-data"
+      th:object="${contestDTO}">
 
-    <h2 class="form-title">공모전 주최 신청서</h2>
-    <p class="submission-date">신청일 <span id="submissionDate"></span></p>
+    <div class="com-contest-wrapper">
 
-    <div class="com-contest-container">
+        <h2 class="form-title">공모전 주최 신청서</h2>
+        <p class="submission-date">신청일 <span id="submissionDate"></span></p>
 
-        <div class="poster-upload">
-            <!-- 클릭 가능한 포스터 영역 -->
-            <label for="posterInput" class="poster-box clickable-box">
-                <!-- 미리보기 이미지 -->
-                <img id="posterPreview" src="" alt="포스터 이미지 미리보기" style="display: none; max-width: 100%; height: 100%; object-fit: cover;">
-                <span class="poster-text" id="posterText">포스터 이미지</span>
-            </label>
+        <div class="com-contest-container">
 
-            <!-- 숨겨진 파일 input -->
-            <input type="file" id="posterInput" accept="image/*" style="display: none;">
+            <!-- 포스터 업로드 -->
+            <div class="poster-upload">
+                <label for="posterInput" class="poster-box clickable-box">
+                    <img id="posterPreview" src="" alt="포스터 이미지 미리보기" style="display: none;">
+                    <span class="poster-text" id="posterText">포스터 이미지</span>
+                </label>
+                <input type="file" id="posterInput" name="imageFile" accept="image/*" style="display: none;">
+                <p class="poster-warning" id="posterWarning">해당 공모전 포스터 이미지를 업로드 해주세요.</p>
+            </div>
 
-            <!-- 경고 문구 -->
-            <p class="poster-warning" id="posterWarning">해당 공모전 포스터 이미지를 업로드 해주세요.</p>
-        </div>
+            <label>공모전명 <input type="text" name="title" placeholder="공모전명을 입력해주세요."></label>
 
-        <form class="contest-form">
-            <label>공모전명 <input type="text" placeholder="공모전명을 입력해주세요."></label>
-
-            <label>주최/주관 <input type="text" placeholder="주최 및 주관 기관을 입력해주세요."></label>
+            <label>주최/주관 <input type="text" name="organizer" placeholder="주최 및 주관 기관을 입력해주세요."></label>
 
             <label>대표분야
-                <select id="fieldSelect">
+                <select id="fieldSelect" name="category">
                     <option disabled selected>분야를 선택하세요</option>
                     <option>프론트 / 웹, 앱 디자인</option>
                     <option>백 / 웹, 앱 개발</option>
                     <option value="custom">직접 입력</option>
                 </select>
             </label>
+            <input type="text" id="customFieldInput" name="categoryCustom" placeholder="직접 분야를 입력해주세요." style="display: none; margin-top: 10px;" />
 
-            <!-- 직접 입력창은 기본으로 숨겨져 있음 -->
-            <input type="text" id="customFieldInput" placeholder="직접 분야를 입력해주세요." style="display: none; margin-top: 10px;" />
+            <label>참가대상 <input type="text" name="target" placeholder="참가 대상을 입력해주세요."></label>
 
-
-            <label>참가대상 <input type="text" placeholder="참가 대상을 입력해주세요."></label>
-
-            <label>대회지역 <input type="text" placeholder="대회 지역을 입력해주세요."></label>
+            <label>대회지역 <input type="text" name="region" placeholder="대회 지역을 입력해주세요."></label>
 
             <label>진행 기간</label>
             <div class="date-row">
-                <input type="date" class="date-input">
+                <input type="date" name="startDate" class="date-input">
                 <span class="date-tilde">~</span>
-                <input type="date" class="date-input">
+                <input type="date" name="endDate" class="date-input">
             </div>
 
-            <label>심사기관 <input type="text" placeholder="심사 기관을 입력해주세요."></label>
+            <label>심사기관 <input type="text" name="judge" placeholder="심사 기관을 입력해주세요."></label>
 
-            <label>시상내역 <input type="text" placeholder="시상 내역을 입력해주세요."></label>
+            <label>시상내역 <input type="text" name="awardDetails" placeholder="시상 내역을 입력해주세요."></label>
 
+            <label>웹사이트
+                <input type="text" name="applicationMethod"
+                       onblur="prependHttp(this)"
+                       placeholder="웹사이트 링크를 첨부해주세요.">
+            </label>
             <label>공모전 설명</label>
-            <textarea id="description" class="description-textarea" placeholder="공모전 설명을 적어주세요."></textarea>
+            <textarea id="description" name="description" class="description-textarea" placeholder="공모전 설명을 적어주세요."></textarea>
 
-            <label>웹사이트 <input type="text" placeholder="웹사이트 링크를 첨부해주세요."></label>
+<<<<<<< HEAD
 
-        </form>
+=======
+            <!-- 모달을 통해 submit -->
+            <button type="button" class="submit-btn">신청하기</button>
+            <input type="submit" id="realSubmit" style="display: none;" />
+>>>>>>> 3a3e1a02dee473b89851da3dc5539d6159cc00d8
 
-        <button type="submit" class="submit-btn">신청하기</button>
-
+        </div>
     </div>
-
-</div>
+</form>
 
 <script src="/js/comcontest.js"></script>
 

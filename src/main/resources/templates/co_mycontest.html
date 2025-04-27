@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/css/co_mycontest.css">
+    <link rel="stylesheet" th:href="@{/css/header2.css}">
+</head>
+<body>
+
+<!-- 헤더 -->
+<div th:insert="~{header2 :: header}"></div>
+
+<div class="content">
+    <section class="contest-list">
+        <h2>주최한 공모전</h2>
+        <hr>
+        <div class="filter-wrapper">
+            <div class="filter-container">
+                <select id="sort-filter">
+                    <option value="latest">최신순</option>
+                    <option value="popular">인기순</option>
+                </select>
+
+                <input type="date" id="start-date">
+                <span>~</span>
+                <input type="date" id="end-date">
+
+                <div class="search-wrapper">
+                    <button class="search-btn" id="searchicon">
+                        <img src="/images/search-icon.png" alt="검색">
+                    </button>
+
+                    <div class="search-box" id="search-box">
+                        <div class="search-header">
+                            <input type="text" placeholder="프로젝트 검색..." id="search-input">
+                            <button id="search-close">&times;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ✅ 테이블 위치 이곳으로 이동 -->
+        <table class="contest-table">
+            <thead>
+            <tr>
+                <th>공모명</th>
+                <th>주최</th>
+                <th>남은 기간</th>
+                <th>진행 일정</th>
+                <th>현황</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="contest : ${contests}">
+                <td>
+                    <a class="aa" th:href="@{'/contest/' + ${contest.id}}" th:text="${contest.title}">공모전 제목</a>
+                </td>
+                <td th:text="${contest.organizer}">주최 기관</td>
+                <td th:text="'D-' + ${contest.remainingDays}">D-5456</td>
+                <td th:text="${contest.startDate} + ' ~ ' + ${contest.endDate}">2024.01.01 ~ 2024.06.30</td>
+                <td th:text="${contest.status}">진행 중</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+
+<script>
+    document.getElementById("searchicon").addEventListener("click", () => {
+        document.getElementById("search-box").classList.add("active");
+    });
+
+    document.getElementById("search-close").addEventListener("click", () => {
+        document.getElementById("search-box").classList.remove("active");
+    });
+</script>
+</body>
+</html>

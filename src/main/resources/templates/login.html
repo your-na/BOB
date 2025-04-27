@@ -13,6 +13,11 @@
     <form action="/login" method="post">
       <input type="text" name="username" placeholder="아이디" class="input-field" required>
       <input type="password" name="password" placeholder="비밀번호" class="input-field" required>
+      <!-- 로그인 폼 위에 에러 메시지 표시 -->
+      <div th:if="${param.error}">
+        <div class="error-message" th:text="${session.SPRING_SECURITY_LAST_EXCEPTION?.message}"></div>
+      </div>
+
       <button type="submit" class="login-btn">로그인</button>
     </form>
     <div class="options">

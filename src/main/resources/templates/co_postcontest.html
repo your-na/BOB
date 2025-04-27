@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>공모전 상세 페이지</title>
+    <link rel="stylesheet" href="/css/postcontest.css" />
+    <link rel="stylesheet" th:href="@{/css/header2.css}" />
+</head>
+<body>
+
+<!-- header -->
+<div sec:authorize="!hasAuthority('ADMIN')" th:replace="~{header2 :: header}"></div>
+
+<div id="haeunamuhani">
+    <a href="/comhome" class="haeunbabo">< 뒤로가기 </a>
+</div>
+<!-- 공모전 상세 정보 -->
+<section class="contest-detail">
+    <div class="contest-header">
+        <h2 th:text="${contest.title}">2025 통계 청소년 IT 학술대회</h2> <!-- 공모전명-->
+        <div class="status-badge" id="status-badge">모집중</div>
+        <button class="bookmark-btn" id="bookmark-btn" sec:authorize="!hasRole('ADMIN')">⭐</button>
+    </div>
+
+    <div class="contest-content">
+        <!-- 공모전 대표 이미지 -->
+        <img th:src="@{${contest.imageUrl}}" alt="공모전 배너" class="contest-banner" />
+
+        <!-- 공모전 정보 테이블 -->
+        <table class="contest-table">
+            <tr><th>주최/주관</th><td th:text="${contest.organizer}">한국정보기술융합회</td></tr>
+            <tr><th>대표 분야</th><td th:text="${contest.category}">논문</td></tr>
+            <tr><th>참가 대상</th><td th:text="${contest.target}">청소년, 어린이</td></tr>
+            <tr><th>대회 지역</th><td th:text="${contest.region}">대전지역</td></tr>
+            <tr>
+                <th>진행 기간</th>
+                <td th:text="${contest.startDate} + ' ~ ' + ${contest.endDate}">2024.11.14 ~ 2025.03.12</td>
+            </tr>
+            <tr><th>심사 기관</th><td th:text="${contest.judge}">서울 소재 대학교</td></tr>
+            <tr><th>시상 내역</th><td th:text="${contest.awardDetails}">장학금(대학진학 혜택)</td></tr>
+            <tr>
+                <th>웹사이트</th>
+                <td><a th:href="@{${contest.applicationMethod}}" target="_blank">공식 홈페이지</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 공모전 상세 내용 -->
+    <section class="contest-details">
+        <div th:text="${contest.description}" id="contest-description">상세페이지</div>
+    </section>
+</div>
+</section>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        // 북마크 토글
+        document.getElementById("bookmark-btn").addEventListener("click", function () {
+            this.classList.toggle("active");
+        });
+
+        // 상태 뱃지 변경
+        const statusBadge = document.getElementById("status-badge");
+
+        const startDate = new Date([[${contest.startDate}]]);
+        const endDate = new Date([[${contest.endDate}]]);
+        const today = new Date();
+
+
+        if (today > endDate) {
+            statusBadge.textContent = "진행완료";
+            statusBadge.style.backgroundColor = "#ff4040";
+        } else {
+            statusBadge.textContent = "진행중";
+            statusBadge.style.backgroundColor = "#02b902";
+        }
+
+        // 참여하기 버튼
+        document.querySelector(".apply-btn").addEventListener("click", function () {
+            alert("공모전 참여 신청 페이지로 이동합니다.");
+        });
+
+        // 팀원 모집글 작성
+        document.querySelector(".recruit-btn").addEventListener("click", function () {
+            alert("팀원 모집글 작성 페이지로 이동합니다.");
+        });
+    });
+
+    function removeMember(id) {
+        selectedList = selectedList.filter(u => u.id !== id);
+        renderSelectedMembers();
+    }
+
+    // 상태 뱃지 변경
+    const statusBadge = document.getElementById("status-badge");
+    const start = new Date([[${contest.startDate}]]);
+    const end = new Date([[${contest.endDate}]]);
+    const today = new Date();
+
+    if (today < start) {
+        statusBadge.textContent = "모집전";
+        statusBadge.style.backgroundColor = "#aaaaaa"; // 회색
+    } else if (today >= start && today <= end) {
+        statusBadge.textContent = "진행중";
+        statusBadge.style.backgroundColor = "#0078ff"; // 파란색
+    } else {
+        statusBadge.textContent = "진행완료";
+        statusBadge.style.backgroundColor = "#ff4040"; // 빨간색
+    }
+
+</script>
+</body>
+</html>

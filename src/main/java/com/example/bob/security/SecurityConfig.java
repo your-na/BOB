@@ -55,8 +55,8 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/sign").anonymous()
                         .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject", "/api/todos", "/api/resumes").authenticated()
                         .requestMatchers("/signup", "/co_signup", "/check-nickname", "/check-username", "/api/my-projects").permitAll()
-                        .requestMatchers("/comhome/**", "/comhost").hasAuthority("COMPANY")
-                        .requestMatchers("/admin/**", "/sidebar", "/ad_contest").hasAuthority("ADMIN")
+                        .requestMatchers("/comhome", "/comhome/**", "/comcontest").hasAuthority("COMPANY")
+                        .requestMatchers("/admin/**", "/sidebar", "/ad_contest", "/adcomcont", "/adcomcont").hasAuthority("ADMIN")
                         .requestMatchers("/contest/create", "/contest/submit").hasAnyAuthority("ADMIN", "COMPANY")
                         .anyRequest().authenticated()
                 )
@@ -70,6 +70,8 @@ public class SecurityConfig {
                                 if ("ADMIN".equals(user.getUserEntity().getRole())) {
                                     redirectUrl = "/sidebar";
                                 }
+                            } else if (principal instanceof com.example.bob.security.CompanyDetailsImpl) {
+                                redirectUrl = "/main";
                             }
                             response.sendRedirect(redirectUrl);
                         })

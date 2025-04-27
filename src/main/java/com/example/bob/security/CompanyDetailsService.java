@@ -15,7 +15,7 @@ public class CompanyDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         CompanyEntity company = companyRepository.findByCoIdLogin(username)
-                .orElseThrow(() -> new UsernameNotFoundException("기업 아이디를 찾을 수 없습니다: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 아이디입니다."));
 
         return new CompanyDetailsImpl(company); // CompanyDetailsImpl은 아래에서 만들어요!
     }

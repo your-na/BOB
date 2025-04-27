@@ -39,24 +39,28 @@ public class ContestController {
         }
     }
 
+    @GetMapping("/adnewcon")
+    public String adnewform() {return "ad_newcontest";}
+
     // ✅ 사용자용 공모전 목록
     @GetMapping("/contest")
     public String contestList(Model model) {
-        model.addAttribute("contests", contestService.getAllContests());
+        model.addAttribute("contests", contestService.getApprovedContests());
         return "contest";
     }
 
     // ✅ 관리자 공모전 목록
     @GetMapping("/ad_contest")
     public String adminContestList(Model model) {
-        model.addAttribute("contests", contestService.getAllContests());
+        model.addAttribute("contests", contestService.getApprovedContests());
         return "ad_contest";
     }
 
     // 기업 공모전 목록
     @GetMapping("/comhome")
-    public String coContestList(Model model){
-        model.addAttribute("contests", contestService.getAllContests());
+    public String comHomePage(Model model) {
+        List<ContestDTO> contestList = contestService.getApprovedContests(); // 승인된 공모전만
+        model.addAttribute("contestList", contestList);
         return "comhome";
     }
 
@@ -65,13 +69,6 @@ public class ContestController {
     public String pendingList(Model model) {
         model.addAttribute("contests", contestService.getPendingContests());
         return "ad_contest_list";
-    }
-
-    // ✅ 공모전 상세 보기 (관리자 요청 상세)
-    @GetMapping("/ad_contest_request/{id}")
-    public String requestDetail(@PathVariable Long id, Model model) {
-        model.addAttribute("contest", contestService.getById(id));
-        return "ad_contest_request";
     }
 
     // ✅ 공모전 상세 보기 (사용자용)
@@ -87,22 +84,10 @@ public class ContestController {
     public String showCoContestDetail(@PathVariable Long id, Model model) {
         ContestEntity contest = contestService.getById(id);
         model.addAttribute("contest", ContestDTO.fromEntity(contest));
-        return "postcontest";
+        return "co_postcontest";
     }
 
-    // ✅ 공모전 승인
-    @PostMapping("/admin/contest/approve/{id}")
-    public String approve(@PathVariable Long id) {
-        contestService.approve(id);
-        return "redirect:/ad_contest_list";
-    }
 
-    // ✅ 공모전 거절
-    @PostMapping("/admin/contest/reject/{id}")
-    public String reject(@PathVariable Long id) {
-        contestService.reject(id);
-        return "redirect:/ad_contest_list";
-    }
 
     // ✅ 공모전 삭제
     @PostMapping("/admin/contest/delete")
@@ -113,6 +98,8 @@ public class ContestController {
         return "redirect:/ad_contest";
     }
 
+
+
     // ✅ 공모전 이미지 서빙
     @GetMapping("/uploads/contestImages/{fileName}")
     public ResponseEntity<Resource> serveContestImage(@PathVariable String fileName) {
@@ -122,7 +109,7 @@ public class ContestController {
     // ✅ 공모전 등록 (기업 or 관리자)
     @PostMapping("/contest/create")
     public String createContest(@ModelAttribute ContestDTO dto,
-                                @RequestParam("imageUrl") MultipartFile imageUrl,
+                                @RequestParam("imageFile") MultipartFile imageFile,
                                 @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         String creatorType = "UNKNOWN";
@@ -142,17 +129,17 @@ public class ContestController {
         }
 
         String status = dto.getStartDate().isAfter(LocalDate.now()) ? "대기중" : "모집중";
-        String imageFile = "/images/sample.png";
+        String imageUrl = "/images/sample.png";
 
-        if (imageUrl != null && !imageUrl.isEmpty()) {
+        if (imageFile != null && !imageFile.isEmpty()) {
             try {
-                String originalName = imageUrl.getOriginalFilename();
+                String originalName = imageFile.getOriginalFilename();
                 String fileName = System.currentTimeMillis() + "_" + originalName;
                 Path folderPath = Paths.get("uploads/contestImages");
                 Files.createDirectories(folderPath);
                 Path savePath = folderPath.resolve(fileName);
-                Files.copy(imageUrl.getInputStream(), savePath);
-                imageFile = "/uploads/contestImages/" + fileName;
+                Files.copy(imageFile.getInputStream(), savePath);
+                imageUrl = "/uploads/contestImages/" + fileName;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -170,7 +157,7 @@ public class ContestController {
                 .awardDetails(dto.getAwardDetails())
                 .applicationMethod(dto.getApplicationMethod())
                 .description(dto.getDescription())
-                .imageUrl(imageFile)
+                .imageUrl(imageUrl)
                 .status(status)
                 .creatorType(creatorType)
                 .isOnlyBOB(isOnlyBOB)
@@ -181,4 +168,12 @@ public class ContestController {
 
         return isApproved ? "redirect:/ad_contest" : "redirect:/comhome";
     }
+
+    @GetMapping("/adnotcont")
+    public String showExternalContests(Model model) {
+        List<ContestDTO> adminContests = contestService.getContestsByCreatorType("ADMIN");
+        model.addAttribute("contests", adminContests);
+        return "ad_notcomcontest"; // 외부 공모전 목록 HTML
+    }
+
 }
