@@ -8,6 +8,26 @@ document.addEventListener("DOMContentLoaded", function () {
     const resumeOutput = document.getElementById("resume-output");
     const addResumeText = document.querySelector(".add-resume-text");
 
+    fetch('/api/coresumes')
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById("savedResumeList");
+            container.innerHTML = ''; // 기존 내용 비우기
+
+            data.forEach(resume => {
+                const div = document.createElement("div");
+                div.className = "resume-tab";
+                div.setAttribute("draggable", "true");
+                div.dataset.id = resume.id;
+                div.textContent = resume.title;
+
+                container.appendChild(div);
+            });
+        })
+        .catch(error => {
+            console.error("이력서 불러오기 실패:", error);
+        });
+
     const resumeTemplates = {
         "백엔드 모집용 이력서": "Java, Spring Boot, MySQL 등 백엔드 기술 중심의 이력서입니다.",
         "프론트 모집용 이력서": "HTML, CSS, JS, React 등을 포함한 프론트엔드 이력서입니다.",
@@ -15,21 +35,69 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     // 모달 열기 & 드래그 등록
-    resumeButtons.forEach(button => {
-        const title = button.textContent;
-        const content = resumeTemplates[title] || "내용 없음";
+    document.getElementById("savedResumeList").addEventListener("click", (e) => {
+        if (e.target.classList.contains("resume-tab")) {
+            const resumeId = e.target.dataset.id;
 
-        button.addEventListener("click", () => {
-            modalTitle.textContent = title;
-            modalBody.textContent = content;
-            modal.style.display = "flex";
-        });
+            fetch(`/api/coresumes/${resumeId}`)
+                .then(res => res.json())
+                .then(data => {
+                    const modal = document.getElementById("resume-modal");
+                    const modalTitle = document.getElementById("modal-title");
+                    const modalBody = document.getElementById("modal-body");
 
-        button.setAttribute("draggable", "true");
-        button.addEventListener("dragstart", (e) => {
-            e.dataTransfer.setData("text/plain", title);
-        });
+                    modalTitle.textContent = data.title;
+
+                    let html = `<div class="resume-preview-wrapper">`;
+
+                    data.sections.forEach((section, index) => {
+                        html += `
+      <section class="resume-section preview-mode">
+        <div class="section-header">
+          <span>${index + 1}. ${section.title}</span>
+        </div>
+
+        ${section.comment ? `<p class="section-note">${section.comment}</p>` : ''}
+
+        ${section.conditions?.length ? `
+          <div class="tag-list">
+            ${section.conditions.map(cond => `<span class="tag condition">${cond}</span>`).join("")}
+          </div>
+        ` : ''}
+
+        ${section.tags?.length ? `
+          <div class="tag-list">
+            ${section.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}
+          </div>
+        ` : ''}
+
+        ${section.content ? `
+          <div class="section-content">
+            <textarea readonly class="preview-textarea">${section.content}</textarea>
+          </div>
+        ` : ''}
+      </section>
+    `;
+                    });
+
+
+
+                    html += `</div>`;
+                    modalBody.innerHTML = html;
+                    modal.style.display = "flex";
+                });
+        }
     });
+
+
+// 드래그 이벤트도 여기에 추가
+    document.getElementById("savedResumeList").addEventListener("dragstart", (e) => {
+        if (e.target.classList.contains("resume-tab")) {
+            const title = e.target.textContent;
+            e.dataTransfer.setData("text/plain", title);
+        }
+    });
+
 
     modalClose.addEventListener("click", () => {
         modal.style.display = "none";
