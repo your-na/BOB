@@ -153,4 +153,71 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // ✅ 작성 버튼 클릭 시 구인글 저장
+    document.querySelector(".submit-btn").addEventListener("click", function (e) {
+        e.preventDefault();
+
+        // 1. 기본 입력값 수집
+        const data = {
+            title: document.querySelector(".title-input").value,
+            companyIntro: document.querySelector("textarea[name='companyIntro']").value,
+            email: document.querySelector("input[name='email']").value,
+            phone: document.querySelector("input[name='phone']").value,
+            companyLink: document.querySelector("input[name='companyLink']").value,
+            career: document.querySelector("input[name='career']").value,
+            education: document.querySelector("input[name='education']").value,
+            preference: document.querySelector("input[name='preference']").value,
+            salary: document.querySelector("input[name='salary']").value,
+            time: document.querySelector("input[name='time']").value,
+            startDate: document.querySelector("#startDate").value,
+            endDate: document.querySelector("#endDate").value,
+            employmentTypes: [],
+            resumeIds: []
+        };
+
+        // 2. 고용형태 체크박스
+        document.querySelectorAll("input[name='employmentType']:checked").forEach(cb => {
+            data.employmentTypes.push(cb.value);
+        });
+
+        // 3. 드래그로 추가된 이력서 → title로 매칭해서 id 추출
+        const resumeItems = document.querySelectorAll("#resume-output .resume-item span");
+        const savedResumeMap = {}; // 텍스트 → ID 매핑을 위해
+        document.querySelectorAll("#savedResumeList .resume-tab").forEach(tab => {
+            savedResumeMap[tab.textContent] = tab.dataset.id;
+        });
+        resumeItems.forEach(span => {
+            const id = savedResumeMap[span.textContent];
+            if (id) data.resumeIds.push(Number(id));
+        });
+
+        // 4. 서버 전송 (POST)
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        fetch("/api/cojobs", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                [csrfHeader]: csrfToken      // 👉 CSRF 헤더 추가!
+            },
+            body: JSON.stringify(data)
+        })
+
+            .then(res => {
+                if (!res.ok) throw new Error("서버 오류 발생");
+                return res.text();  // ✅ 문자열로 받아야 함
+            })
+            .then(message => {
+                alert(message);     // 서버에서 받은 메시지 출력
+                location.reload();
+            })
+
+            .catch(err => {
+                console.error(err);
+                alert("저장 중 오류 발생!");
+            });
+    });
+
+
 });
