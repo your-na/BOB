@@ -14,10 +14,6 @@ public class TestController {
     @GetMapping("/coresumelist")
     public String resumelistform() {return "co_resumelist";}
 
-    //구직 공고 상세
-    @GetMapping("/jobindex")
-    public String jobinform() {return "jobindex";}
-
     //기업 구인글 작성
     @GetMapping("/cojobwrite")
     public String jobwriteform() {return "co_jobwrite";}
