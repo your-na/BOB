@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    fetch(`/api/cojobs/${jobId}`)
+    fetch(`/api/cojobs/${jobId}/with-resumes`)
         .then(res => res.json())
         .then(data => {
             // 제목 표시
@@ -62,6 +62,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 <li><strong>시간:</strong> ${data.time}</li>
                 <li><strong>우대:</strong> ${data.preference}</li>
             `;
+
+            // 👉 이력서 양식 리스트 추가
+            const resumeSection = document.querySelector(".resume-template");
+            const resumeListContainer = document.createElement("div"); // 여러 개 담을 div
+
+            data.resumeTitles.forEach(title => {
+                const item = document.createElement("div");
+                item.className = "resume-item";
+                item.textContent = `📄 ${title}`;
+                item.onclick = () => openResumeModal(title);
+                resumeListContainer.appendChild(item);
+            });
+
+            resumeSection.appendChild(resumeListContainer);
+
         })
         .catch(err => {
             console.error("상세 공고 불러오기 실패:", err);

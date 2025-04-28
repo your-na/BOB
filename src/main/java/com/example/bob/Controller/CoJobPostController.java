@@ -44,4 +44,11 @@ public class CoJobPostController {
         return ResponseEntity.ok(coJobPostService.getJobPostDetail(id));
     }
 
+    // 이력서 양식 제목 포함된 공고 상세보기
+    @GetMapping("/{id}/with-resumes")
+    public ResponseEntity<?> getJobPostDetailWithResumes(@PathVariable Long id) {
+        return ResponseEntity.ok(coJobPostService.getJobPostWithResumeTitles(id));
+    }
+
+
 }

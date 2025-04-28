@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.example.bob.DTO.CoJobPostResponseDTO;
+import com.example.bob.DTO.CoJobPostDetailDTO;
 import com.example.bob.Entity.JobStatus;
 
 
@@ -126,6 +127,35 @@ public class CoJobPostService {
         return coJobPostRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("해당 ID의 공고를 찾을 수 없습니다."));
     }
+
+    // 공고 상세 정보 + 이력서 제목 리스트 반환
+    public CoJobPostDetailDTO getJobPostWithResumeTitles(Long id) {
+        CoJobPostEntity entity = coJobPostRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("공고를 찾을 수 없습니다."));
+
+        // 이력서 제목만 추출
+        List<String> resumeTitles = entity.getResumes().stream()
+                .map(CoResumeEntity::getTitle)
+                .collect(Collectors.toList());
+
+        // DTO로 변환해서 반환
+        return new CoJobPostDetailDTO(
+                entity.getTitle(),
+                entity.getCompanyIntro(),
+                entity.getEmail(),
+                entity.getPhone(),
+                entity.getCareer(),
+                entity.getEducation(),
+                entity.getEmploymentTypes(),
+                entity.getSalary(),
+                entity.getTime(),
+                entity.getPreference(),
+                entity.getStartDate(),
+                entity.getEndDate(),
+                resumeTitles
+        );
+    }
+
 
 }
 
