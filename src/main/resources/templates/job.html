@@ -66,24 +66,7 @@
         </div>
         <!-- 채용 공고 리스트 -->
         <div class="job-list">
-            <div class="job-card">
-                <span class="urgent">채용 마감 임박</span>
-                <h3>[dskjhkchks] 개발자 채용</h3>
-                <p><span class="job-phone"><img src="/images/job_phone.png"></span> 02-271-xxxx | 경력 1년 이상</p>
-                <p><span class="job-place"><img src="/images/job_place.png"></span> 경제나무딩딩(주)</p>
-            </div>
-            <div class="job-card">
-                <span class="urgent">채용 마감 임박</span>
-                <h3>[dskjhkchks] 개발자 채용</h3>
-                <p><span class="job-phone"><img src="/images/job_phone.png"></span> 02-271-xxxx | 경력 1년 이상</p>
-                <p><span class="job-place"><img src="/images/job_place.png"></span> 경제나무딩딩(주)</p>
-            </div>
-            <div class="job-card">
-                <span class="urgent">채용 마감 임박</span>
-                <h3>[dskjhkchks] 개발자 채용</h3>
-                <p><span class="job-phone"><img src="/images/job_phone.png"></span> 02-271-xxxx | 경력 1년 이상</p>
-                <p><span class="job-place"><img src="/images/job_place.png"></span> 경제나무딩딩(주)</p>
-            </div>
+            <!-- 여기를 JavaScript로 동적으로 채움 -->
         </div>
     </div>
 </div>
@@ -102,6 +85,31 @@
                 searchBox.style.display = "none"; // 검색창 숨기기
             }
         });
+        fetch('/api/cojobs')
+            .then(res => res.json())
+            .then(data => {
+                const jobListContainer = document.querySelector(".job-list");
+                const jobCount = document.querySelector(".job-count");
+                jobListContainer.innerHTML = '';
+
+                jobCount.textContent = `총 ${data.length}건`;
+
+                data.forEach(job => {
+                    const jobCard = document.createElement("div");
+                    jobCard.className = "job-card";
+                    jobCard.innerHTML = `
+                    <span class="urgent">채용 마감 임박</span>
+                    <h3>[${job.title}]</h3>
+                    <p><span class="job-phone"><img src="/images/job_phone.png"></span> ${job.phone} | 경력 ${job.career} 이상</p>
+                 <p><span class="job-place"><img src="/images/job_place.png"></span> ${job.companyNick}</p>
+
+                `;
+                    jobListContainer.appendChild(jobCard);
+                });
+            })
+            .catch(error => {
+                console.error("공고 불러오기 실패:", error);
+            });
 
         // 닫기 버튼 클릭 시 검색창 숨기기
         searchClose.addEventListener("click", function () {
