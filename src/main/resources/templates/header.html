@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -81,18 +82,18 @@
                     <div class="dropdown-section">
                         <ul>
                             <!-- 로그인 상태일 때 -->
-                            <li th:if="${user != null}"><a href="/profile">내 정보 / 평점</a></li>
-                            <li th:if="${user != null}"><a href="#" class="notification-icon" id="notification-icon">알림</a><span class="notification-badge" id="notification-badge"></span></li>
-                            <li th:if="${user != null}"><a th:href="@{/history}">경력 내역</a></li>
-                            <li th:if="${user != null}"><a th:href="@{/appstatus}">지원 현황</a></li>
-                            <li th:if="${user != null}">
+                            <li sec:authorize="isAuthenticated()"><a href="/profile">내 정보 / 평점</a></li>
+                            <li sec:authorize="isAuthenticated()"><a href="#" class="notification-icon" id="notification-icon">알림</a><span class="notification-badge" id="notification-badge"></span></li>
+                            <li sec:authorize="isAuthenticated()"><a th:href="@{/history}">경력 내역</a></li>
+                            <li sec:authorize="isAuthenticated()"><a th:href="@{/appstatus}">지원 현황</a></li>
+                            <li sec:authorize="isAuthenticated()">
                                 <form id="logoutForm" th:action="@{/logout}" method="post">
                                     <button type="submit" class="logout">로그아웃</button>
                                 </form>
                             </li>
 
                             <!-- 비로그인 상태일 때 -->
-                            <li th:unless="${user != null}"><a href="/login" id="plz"><img src="/images/login.png">로그인 해주세요</a></li>
+                            <li sec:authorize="isAnonymous()"><a href="/login" id="plz"><img src="/images/login.png">로그인 해주세요</a></li>
                         </ul>
                     </div>
                 </div>

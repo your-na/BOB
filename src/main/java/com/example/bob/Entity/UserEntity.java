@@ -47,7 +47,7 @@ public class UserEntity {
 
     //관리자 유저 구분
     @Column(nullable = false)
-    private String role = "USER";
+    private String role;
 
     @Column(length = 255)
     private String profileImageUrl = "/images/user.png"; // 기본 이미지 경로
@@ -78,7 +78,7 @@ public class UserEntity {
         userEntity.profileImageUrl = (userDTO.getProfileImageUrl() != null) ? userDTO.getProfileImageUrl() : "/images/user.png";
         userEntity.userBio = (userDTO.getBio() != null) ? userDTO.getBio() : "소개를 작성해보세요.";
         userEntity.accountCreatedAt = (userDTO.getAccountCreatedAt() != null) ? userDTO.getAccountCreatedAt() : LocalDateTime.now();
-        userEntity.role = userDTO.getRole();
+        userEntity.role = (userDTO.getRole() != null) ? userDTO.getRole() : "USER";
 
         return userEntity;
     }

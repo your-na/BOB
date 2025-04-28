@@ -27,6 +27,13 @@ public class ContestTeamMemberEntity {
     private UserEntity user;
 
     @Column(nullable = false)
+    private boolean isAccepted; // 초대 수락 여부
+
+    @Column(nullable = false)
+    private boolean isInvitePending; // 초대 상태인지 여부
+
+
+    @Column(nullable = false)
     private String role; // "LEADER" 또는 "MEMBER"
 
     @Column

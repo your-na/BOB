@@ -4,6 +4,7 @@ import com.example.bob.Entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository //객체타입, PK타입
@@ -17,4 +18,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     boolean existsByUserNick(String userNick);
 
     Optional<UserEntity> findByUserNick(String userNick);  // 추가된 메서드
+
+    List<UserEntity> findByUserNickContainingIgnoreCaseOrUserIdLoginContainingIgnoreCase(String userNick, String userIdLogin);
+
 }

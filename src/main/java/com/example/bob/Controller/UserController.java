@@ -145,6 +145,25 @@ public class UserController {
         return "redirect:/";
     }
 
+    @GetMapping("/api/users/search")
+    @ResponseBody
+    public ResponseEntity<?> searchUsers(@RequestParam String keyword) {
+        // 닉네임 또는 아이디에 keyword가 포함된 사용자 검색
+        var users = userRepository
+                .findByUserNickContainingIgnoreCaseOrUserIdLoginContainingIgnoreCase(keyword, keyword);
+
+        var result = users.stream().map(user -> {
+            Map<String, String> map = new HashMap<>();
+            map.put("id", user.getUserIdLogin());
+            map.put("nickname", user.getUserNick());
+            map.put("avatar", user.getProfileImageUrl());
+            return map;
+        }).toList();
+
+        return ResponseEntity.ok(result);
+    }
+
+
 
     @GetMapping("/bowon")
     public String postform() {return "postproject";}

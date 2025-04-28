@@ -5,6 +5,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
     <title>공모전 상세 페이지</title>
     <link rel="stylesheet" href="/css/postcontest.css" />
     <link rel="stylesheet" th:href="@{/css/header.css}" />
@@ -167,56 +169,99 @@
             }
         });
 
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
+
+        // 현재 로그인한 사용자 정보는 서버에서 세션/인증을 통해 자동 포함됨
         inviteBtn.addEventListener("click", () => {
-            const nickname = nicknameInput.value.trim();
-            if (!nickname) {
-                alert("닉네임 또는 ID를 입력해주세요.");
+            const memberIds = selectedMembers(); // 선택된 팀원들
+
+            if (memberIds.length === 0) {
+                alert("함께 참가할 팀원을 선택해주세요.");
                 return;
             }
-            alert(`팀원 초대 링크가 ${nickname} 님에게 전송되었습니다.`);
-            modal.style.display = "none";
+
+            fetch("/contest/team/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    [csrfHeader]: csrfToken
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    contestId: contestId,
+                    memberIds: memberIds  // 나 + 친구들은 서버에서 처리
+                })
+            }).then(res => {
+                if (res.ok) {
+                    alert("팀 생성 완료! 친구들에게 초대가 전송되었습니다.");
+                    modal.style.display = "none";
+                    location.reload();
+                } else {
+                    alert("팀 생성에 실패했습니다.");
+                }
+            });
         });
+
+
+
 
         soloBtn.addEventListener("click", () => {
-            alert("참가 신청 완료되었습니다. 팀 모집을 통해 팀 참여도 가능합니다.");
-            modal.style.display = "none";
+            fetch("/contest/team/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    [csrfHeader]: csrfToken
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    contestId: contestId,
+                    memberIds: []  // 아무도 초대하지 않음 → 나 혼자만 포함됨
+                })
+            }).then(res => {
+                if (res.ok) {
+                    alert("혼자 참가 완료되었습니다.");
+                    modal.style.display = "none";
+                    location.reload();
+                } else {
+                    alert("참가에 실패했습니다.");
+                }
+            });
         });
-    });
 
-    const users = [
-        { nickname: '나는윤냥', id: 'wannaturi', email: 'wannaturi@gmail.com', avatar: 'https://via.placeholder.com/20?text=윤' },
-        { nickname: '코딩냥이', id: 'devcat', email: 'devcat@gmail.com', avatar: 'https://via.placeholder.com/20?text=냥' },
-        { nickname: '윤디자이너', id: 'yoondesign', email: 'yoon@gmail.com', avatar: 'https://via.placeholder.com/20?text=디' }
-    ];
+    });
 
     const input = document.getElementById('invite-input');
     const list = document.getElementById('autocomplete-list');
     const selected = document.getElementById('selected-members');
     let selectedList = [];
 
-    input.addEventListener('input', () => {
-        const query = input.value.toLowerCase();
+    input.addEventListener('input', async () => {
+        const query = input.value.trim().toLowerCase();
         list.innerHTML = '';
 
         if (!query) return;
 
-        const filtered = users.filter(u =>
-            u.nickname.toLowerCase().includes(query) || u.id.toLowerCase().includes(query)
-        );
+        try {
+            const response = await fetch(`/api/users/search?keyword=${encodeURIComponent(query)}`);
+            const users = await response.json();
 
-        filtered.forEach(user => {
-            const li = document.createElement('li');
-            li.textContent = `${user.nickname} (${user.id})`;
-            li.addEventListener('click', () => {
-                if (!selectedList.some(sel => sel.id === user.id)) {
-                    selectedList.push(user);
-                    renderSelectedMembers();
-                }
-                input.value = '';
-                list.innerHTML = '';
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.textContent = `${user.nickname} (${user.id})`;
+                li.addEventListener('click', () => {
+                    if (!selectedList.some(sel => sel.userId === user.userId)) {
+                        selectedList.push(user);
+                        renderSelectedMembers();
+                    }
+                    input.value = '';
+                    list.innerHTML = '';
+                });
+                list.appendChild(li);
             });
-            list.appendChild(li);
-        });
+        } catch (error) {
+            console.error('❌ 자동완성 에러:', error);
+        }
     });
 
     function renderSelectedMembers() {
@@ -225,18 +270,19 @@
             const tag = document.createElement('div');
             tag.className = 'member-tag';
             tag.innerHTML = `
-      <img src="${user.avatar}" alt="avatar" />
-      ${user.nickname}
-      <button onclick="removeMember('${user.id}')">&times;</button>
-    `;
+          <img src="${user.avatar}" alt="avatar" />
+          ${user.nickname}
+          <button onclick="removeMember(${user.userId})">&times;</button>
+        `;
             selected.appendChild(tag);
         });
     }
 
     function removeMember(id) {
-        selectedList = selectedList.filter(u => u.id !== id);
+        selectedList = selectedList.filter(u => u.userId !== id);
         renderSelectedMembers();
     }
+
 
     // 상태 뱃지 변경
     const statusBadge = document.getElementById("status-badge");
@@ -254,6 +300,70 @@
         statusBadge.textContent = "진행완료";
         statusBadge.style.backgroundColor = "#ff4040"; // 빨간색
     }
+
+    // ✅ 현재 선택된 유저 ID만 추출하는 함수
+    const selectedMembers = () => selectedList.map(user => user.userId);
+
+    // ✅ 공모전 ID 가져오기 (Thymeleaf로 주입)
+    const contestId = /*[[${contest.id}]]*/ 0;
+
+    // 친구와 함께 참가하기
+    inviteBtn.addEventListener("click", () => {
+        const memberIds = selectedMembers();
+
+        if (memberIds.length === 0) {
+            alert("함께 참가할 팀원을 선택해주세요.");
+            return;
+        }
+
+
+
+        fetch("/contest/team/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                [csrfHeader]: csrfToken
+            },
+            credentials: "include",
+            body: JSON.stringify({
+                contestId: contestId,
+                memberIds: memberIds
+            })
+        }).then(res => {
+            if (res.ok) {
+                alert("팀 생성 완료! 함께 참가했습니다.");
+                modal.style.display = "none";
+                location.reload();
+            } else {
+                alert("팀 생성에 실패했습니다.");
+            }
+        });
+    });
+
+    // 혼자 참가하기
+    soloBtn.addEventListener("click", () => {
+        fetch("/contest/team/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                [csrfHeader]: csrfToken
+            },
+            credentials: "include",
+            body: JSON.stringify({
+                contestId: contestId,
+                memberIds: []  // 본인만 참가
+            })
+        }).then(res => {
+            if (res.ok) {
+                alert("혼자 참가 완료되었습니다.");
+                modal.style.display = "none";
+                location.reload();
+            } else {
+                alert("참가에 실패했습니다.");
+            }
+        });
+    });
+
 
 </script>
 </body>

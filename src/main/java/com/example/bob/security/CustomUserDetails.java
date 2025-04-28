@@ -7,5 +7,5 @@ public interface CustomUserDetails extends UserDetails {
     Long getId();
     String getUserType(); // "user" 또는 "company"
 
-    UserEntity getUserEntity();
+    Object getUserEntity();
 }
