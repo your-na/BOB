@@ -30,8 +30,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     let selectedDate = null;
-    let month = 11;
-    let year = 2024;
+    const today = new Date();
+    let month = today.getMonth(); // 0~11
+    let year = today.getFullYear();
+
 
     function renderCalendar() {
         calendarBody.innerHTML = "";
@@ -49,6 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
             cell.classList.add("calendar-cell");
 
             cell.addEventListener("click", function () {
+
                 if (selectedDate) {
                     selectedDate.classList.remove("selected");
                 }

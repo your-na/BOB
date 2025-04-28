@@ -14,7 +14,7 @@
     <div class="calendar-container">
       <div class="header">
         <button class="back-btn">&lt;</button>
-        <h2>프로젝트A</h2>
+        <h2 id="project-name" th:text="${project != null} ? ${project.title} : '제목 없음'">프로젝트 제목</h2>
         <button class="close-btn">&times;</button>
       </div>
       <div class="calendar-header">
@@ -45,7 +45,7 @@
     <div class="sidebar">
       <button class="sidebar-btn">홈</button>
       <button class="sidebar-btn active">할 일</button>
-      <button class="sidebar-btn">CRUD</button>
+      <button class="sidebar-btn">WBS</button>
       <button class="sidebar-btn">+</button>
     </div>
   </div>
