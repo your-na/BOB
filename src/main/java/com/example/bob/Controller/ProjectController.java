@@ -514,17 +514,5 @@ public class ProjectController {
     }
 
 
-    @GetMapping("/todohome")
-    public String showHomePage() {
-        return "todo_home";
-    }
-
-    @GetMapping("/todoplan")
-    public String showTodoPlanPage() {
-        return "todo_plan"; // templates/todo_plan.html로 이동
-    }
-
-
-
 }
 

@@ -77,7 +77,7 @@
     <!-- 사이드바 -->
     <div class="sidebar">
         <button class="sidebar-btn active">홈</button>
-        <a th:href="@{/todo_plan}">
+        <a th:href="@{/todo_plan/{id}(id=${project.id})}">
             <button class="sidebar-btn">할 일</button>
         </a>
         <a th:href="@{'/todocrud/' + ${project.id}}">

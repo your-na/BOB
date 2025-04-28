@@ -119,13 +119,15 @@ public class SpaceController {
     }
 
 
-    @GetMapping("/todo_plan")
-    public String todoPlanPage() {
-        return "todo_plan"; // 확장자 .html은 생략
+    // /todo_plan/{id}로 요청을 처리할 수 있게 설정
+    @GetMapping("/todo_plan/{id}")
+    public String todoPlanPage(@PathVariable Long id, Model model) {
+        // 프로젝트 ID로 프로젝트를 조회
+        ProjectEntity project = projectService.getProjectById(id);
+        // 실제 프로젝트 제목을 모델에 추가
+        model.addAttribute("projectTitle", project.getTitle());
+        return "todo_plan"; // "todo_plan.html" 템플릿 반환
     }
-
-
-
 
 
 
