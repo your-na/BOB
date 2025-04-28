@@ -56,6 +56,8 @@ function loadPopupTodos() {
                 const li = document.createElement("li");
                 li.classList.add("task-item");
                 li.setAttribute("data-category", todo.workspace);
+                li.setAttribute("data-id", todo.id); // ✅ 이 줄 추가!
+
 
                 // 체크박스 만들고 클릭 가능하게 설정
                 const checkbox = document.createElement("input");
@@ -123,3 +125,79 @@ function loadPopupTodos() {
             console.error("❌ 팝업 할 일 로딩 실패:", err);
         });
 }
+
+// ✅ 우클릭 메뉴 삭제 처리
+document.addEventListener("DOMContentLoaded", () => {
+    const popupList = document.querySelector(".popup-todo-list");
+
+    // 마우스 우클릭 시 컨텍스트 메뉴 표시
+    popupList.addEventListener("contextmenu", function (e) {
+        const targetLi = e.target.closest(".task-item");
+        if (!targetLi) return;
+
+        e.preventDefault(); // 기본 우클릭 메뉴 막기
+
+        // 기존 삭제 메뉴 있으면 제거
+        const existingMenu = document.querySelector(".context-menu");
+        if (existingMenu) existingMenu.remove();
+
+        // 삭제 메뉴 생성
+        const menu = document.createElement("div");
+        menu.className = "context-menu";
+        menu.textContent = "삭제";
+        menu.style.position = "absolute";
+        menu.style.top = `${e.pageY}px`;
+        menu.style.left = `${e.pageX}px`;
+        menu.style.background = "#fff";
+        menu.style.border = "1px solid #ccc";
+        menu.style.padding = "5px 10px";
+        menu.style.cursor = "pointer";
+        menu.style.zIndex = "9999";
+
+        // 삭제 클릭 시
+        menu.addEventListener("click", () => {
+            const todoId = targetLi.getAttribute("data-id");
+
+            if (!todoId) {
+                alert("할 일 ID가 없습니다.");
+                menu.remove();
+                return;
+            }
+
+            if (!confirm("이 할 일을 삭제하시겠습니까?")) {
+                menu.remove();
+                return;
+            }
+
+            fetch(`http://localhost:8888/api/todos/${todoId}`, {
+                method: "DELETE",
+                headers: {
+                    "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
+                },
+                credentials: "include"
+            })
+                .then(res => {
+                    if (res.ok) {
+                        console.log(`✅ 삭제 완료: ${todoId}`);
+                        targetLi.remove();
+                    } else {
+                        alert("삭제 실패");
+                    }
+                })
+                .catch(err => {
+                    alert("삭제 중 오류 발생: " + err);
+                })
+                .finally(() => {
+                    menu.remove();
+                });
+        });
+
+        document.body.appendChild(menu);
+
+        // 다른 곳 클릭 시 메뉴 제거
+        document.addEventListener("click", function closeMenu() {
+            menu.remove();
+            document.removeEventListener("click", closeMenu);
+        });
+    });
+});
