@@ -13,12 +13,11 @@
 <div class="container">
     <!-- 오른쪽 채용 정보 섹션 -->
     <div class="jobs-section">
-        <h2>채용정보 <span class="job-count">총 115건</span></h2>
+        <h2>채용정보 <span class="job-count" id="job-count">총 0건</span></h2>
 
         <div class="job-head">
             <form>
                 <!-- 검색 아이콘 -->
-
                 <div class="search-container">
                     <div class="searchicon" id="searchicon">
                         <img src="/images/search-icon.png" alt="">
@@ -41,37 +40,21 @@
                 <a href="/cojobwrite" class="job-create-btn">구인글 작성</a>
             </div>
         </div>
-        <!-- 채용 공고 리스트 -->
-        <div class="job-list">
-            <div class="job-card">
-                <span class="urgent">채용 마감 임박</span>
-                <h3>[dskjhkchks] 개발자 채용</h3>
-                <p><span class="job-phone"><img src="/images/job_phone.png"></span> 02-271-xxxx | 경력 1년 이상</p>
-                <p><span class="job-place"><img src="/images/job_place.png"></span> 경제나무딩딩(주)</p>
-            </div>
-            <div class="job-card">
-                <span class="urgent">채용 마감 임박</span>
-                <h3>[dskjhkchks] 개발자 채용</h3>
-                <p><span class="job-phone"><img src="/images/job_phone.png"></span> 02-271-xxxx | 경력 1년 이상</p>
-                <p><span class="job-place"><img src="/images/job_place.png"></span> 경제나무딩딩(주)</p>
-            </div>
-            <div class="job-card">
-                <span class="urgent">채용 마감 임박</span>
-                <h3>[dskjhkchks] 개발자 채용</h3>
-                <p><span class="job-phone"><img src="/images/job_phone.png"></span> 02-271-xxxx | 경력 1년 이상</p>
-                <p><span class="job-place"><img src="/images/job_place.png"></span> 경제나무딩딩(주)</p>
-            </div>
+
+        <!-- 채용 공고 리스트 (동적으로 추가될 부분) -->
+        <div class="job-list" id="job-list">
+            <!-- 동적으로 공고 카드가 추가될 영역 -->
         </div>
     </div>
 </div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        var searchIcon = document.getElementById("searchicon");
-        var searchBox = document.getElementById("search-box");
-        var searchClose = document.getElementById("search-close");
-
         // 검색 아이콘 클릭 시 검색창 표시/숨김
+        const searchIcon = document.getElementById("searchicon");
+        const searchBox = document.getElementById("search-box");
+        const searchClose = document.getElementById("search-close");
+
         searchIcon.addEventListener("click", function () {
             if (searchBox.style.display === "none" || searchBox.style.display === "") {
                 searchBox.style.display = "flex"; // 검색창 보이기
@@ -84,8 +67,46 @@
         searchClose.addEventListener("click", function () {
             searchBox.style.display = "none";
         });
-    });
 
+        // 채용 공고 리스트 가져오기
+        fetch('/api/cojobs')  // 서버에서 구인글 데이터 받아오기
+            .then(res => res.json())
+            .then(data => {
+                console.log("받은 데이터:", data);  // 로그 추가: 데이터 확인
+
+                const jobListContainer = document.getElementById("job-list");
+                const jobCount = document.getElementById("job-count");
+                jobListContainer.innerHTML = '';  // 기존 내용 비우기
+
+                jobCount.textContent = `총 ${data.length}건`;  // 공고 개수 업데이트
+
+                // 구인글 데이터로 job-card 동적으로 추가
+                data.forEach(jobPost => {
+                    const jobCard = document.createElement("div");
+                    jobCard.className = "job-card";
+
+                    //클릭이벤트 (상세보기)
+                    jobCard.addEventListener("click", function () {
+                        window.location.href = `/jobdetail?id=${jobPost.id}`;
+                    });
+
+                    // 동적으로 공고 내용 채우기
+                    jobCard.innerHTML = `
+                        <span class="urgent">${jobPost.urgent ? '채용 마감 임박' : ''}</span>
+                        <h3>[${jobPost.title}]</h3>
+                        <p><span class="job-phone"><img src="/images/job_phone.png"></span> ${jobPost.phone} | 경력 ${jobPost.career} 이상</p>
+                       <p><span class="job-place"><img src="/images/job_place.png"></span> ${jobPost.companyNick}</p>
+
+
+                    `;
+
+                    jobListContainer.appendChild(jobCard);
+                });
+            })
+            .catch(error => {
+                console.error("채용 공고 불러오기 실패:", error);  // 오류가 발생한 경우 로그 출력
+            });
+    });
 </script>
 </body>
 </html>

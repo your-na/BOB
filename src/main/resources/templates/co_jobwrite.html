@@ -5,6 +5,10 @@
     <title>구인글 작성</title>
     <link rel="stylesheet" href="/css/co_jobwrite.css">
     <link rel="stylesheet" th:href="@{/css/header2.css}">
+
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
 </head>
 <body>
 <!-- header -->
@@ -91,10 +95,8 @@
             <span class="resume-title">저장된 이력서</span>
             <span class="add-resume-text">+ 이력서 추가</span>
         </div>
-        <div class="resume-tabs">
-            <div class="resume-tab" draggable="true">백엔드 모집용 이력서</div>
-            <div class="resume-tab" draggable="true">프론트 모집용 이력서</div>
-            <div class="resume-tab" draggable="true">인턴 모집용 이력서</div>
+        <div class="resume-tabs" id="savedResumeList">
+            <!-- JS가 여기 안에 이력서 제목들을 자동으로 채워줄 거예요 -->
         </div>
         <p class="resume-hint">※ 등록하길 원하시는 이력서 양식을 추가하기에 드래그 해서 추가가 가능합니다.</p>
     </div>

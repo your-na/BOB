@@ -25,6 +25,7 @@
 
 <div class="resume-container">
   <div class="left-content">
+    <!-- 이력서 제목 영역 -->
     <div class="resume-title">
       <h2><b>tjdbwls</b>이력서 작성</h2>
       <p>안녕하세요 tjdbwls회사 이력서 작성 폼입니다.</p>
@@ -57,96 +58,11 @@
       </div>
     </section>
 
-    <!-- 2. 학력사항 -->
-    <section class="section-box">
-      <div class="section-title">
-        <div class="number">2.</div>
-        <div class="title-content">
-          <h3>학력사항(최종)</h3>
-          <p class="section-desc">구직자 설명입력 칸 입니다.</p>
-        </div>
-      </div>
-      <div id="education-list">
-        <div class="form-group education-item">
-          <input type="text" placeholder="학교명">
-          <input type="text" placeholder="학과명">
-          <select class="edu-status">
-            <option disabled selected>상태</option>
-            <option value="재학">재학</option>
-            <option value="졸업">졸업</option>
-          </select>
-          <select class="start-year"></select>
-          <select class="start-month"></select>
-          <span class="tilde">~</span>
-          <select class="end-year"></select>
-          <select class="end-month"></select>
-
-          <button type="button" class="del-btn">✖</button>
-        </div>
-      </div>
-
-      <button class="edu-btn" id="add-education-btn">
-        <span class="plus">＋</span> 추가하기
-      </button>
-    </section>
-
-    <!-- 3. 희망직무 -->
-    <section class="section-box">
-      <div class="section-title">
-        <div class="number">3.</div>
-        <div class="title-content">
-          <h3>희망직무(복수선택 가능)</h3>
-          <p class="section-desc">구직자 설명입력 칸 입니다.</p>
-        </div>
-      </div>
-      <label><input type="checkbox" checked> 직무1</label>
-      <label><input type="checkbox"> 직무2</label>
-      <label><input type="checkbox"> 직무3</label>
-    </section>
-
-    <!-- 4. 경력사항 -->
-    <section class="section-box">
-      <div class="section-title">
-        <div class="number">4.</div>
-        <div class="title-content">
-          <h3>경력사항(6개월 이내, 3개 이상)</h3>
-          <p class="section-desc">구직자 설명입력 칸 입니다.</p>
-        </div>
-      </div>
-      <textarea placeholder="경력 입력"></textarea>
-      <div class="upload-box">드래그해서 파일 첨부하기</div>
-    </section>
-
-    <!-- 5. 포트폴리오 -->
-    <section class="section-box">
-      <div class="section-title">
-        <div class="number">5.</div>
-        <div class="title-content">
-          <h3>포트폴리오(6개월 이내, 3개 이상)</h3>
-          <p class="section-desc">구직자 설명입력 칸 입니다.</p>
-        </div>
-      </div>
-      <textarea placeholder="설명 입력"></textarea>
-      <div class="upload-box">드래그해서 파일 첨부하기</div>
-    </section>
-
-    <!-- 6. 자기소개 -->
-    <section class="section-box">
-      <div class="section-title">
-        <div class="number">6.</div>
-        <div class="title-content">
-          <h3>자기소개(500자 이상)</h3>
-          <p class="section-desc">구직자 설명입력 칸 입니다.</p>
-        </div>
-      </div>
-      <textarea id="selfIntro" placeholder="입력해주세요."></textarea>
-      <div id="charCount" class="char-count">0 / 500</div>
-    </section>
+    <!-- ✅ 나머지 섹션은 JS에서 자동으로 추가됨 -->
 
     <div class="submit-wrapper">
       <button type="submit" class="sub-btn">제출하기</button>
     </div>
-
   </div>
 
   <div class="right-content">
@@ -161,7 +77,6 @@
         <li class="tab" data-tab="cert">자격증</li>
       </ul>
     </div>
-    <!-- 각 콘텐츠 -->
     <div class="award-list tab-content" data-content="award">
       <div class="award-item">ANUY 공모전 수상<br><small>2004.10.20</small></div>
     </div>
@@ -176,6 +91,7 @@
     </div>
   </div>
 </div>
+
 <script src="/js/user_resume.js"></script>
 </body>
 </html>

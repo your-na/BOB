@@ -1,16 +1,21 @@
-package com.example.bob.Repository;
+    package com.example.bob.Repository;
 
-import com.example.bob.Entity.CompanyEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+    import com.example.bob.Entity.CompanyEntity;
+    import org.springframework.data.jpa.repository.JpaRepository;
+    import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+    import java.util.Optional;
 
-@Repository
-public interface CompanyRepository extends JpaRepository<CompanyEntity, Long> {
-    // 회원가입
-    Boolean existsByCoIdLogin(String coIdLogin);
+    @Repository
+    public interface CompanyRepository extends JpaRepository<CompanyEntity, Long> {
+        // 회원가입
+        Boolean existsByCoIdLogin(String coIdLogin);
 
-    //로그인
-    Optional<CompanyEntity> findByCoIdLogin(String coIdLogin);
-}
+        //로그인
+        Optional<CompanyEntity> findByCoIdLogin(String coIdLogin);
+
+        // 기업명으로 회사 찾기
+        CompanyEntity findByCoNick(String coNick);
+    }
+
+
