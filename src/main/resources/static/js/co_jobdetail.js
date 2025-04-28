@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(res => res.json())
         .then(data => {
             // 제목 표시
-            document.getElementById("job-title").textContent = `[${data.title}]`;
+            document.getElementById("job-title").textContent = `${data.title}`;
 
             // 회사 소개
             document.querySelector(".job-desc").textContent = data.companyIntro;
@@ -76,6 +76,10 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             resumeSection.appendChild(resumeListContainer);
+
+
+
+
 
         })
         .catch(err => {

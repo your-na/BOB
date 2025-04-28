@@ -37,7 +37,8 @@ public class CoJobPostService {
     private CompanyRepository companyRepository;
 
     // 구인글 등록
-    public void saveJobPost(CoJobPostRequestDTO dto) {
+    public Long saveJobPost(CoJobPostRequestDTO dto) {
+
         CoJobPostEntity entity = new CoJobPostEntity();
 
         entity.setTitle(dto.getTitle());
@@ -81,7 +82,9 @@ public class CoJobPostService {
         entity.setResumes(resumes);
 
         // 구인글 저장
-        coJobPostRepository.save(entity);
+        CoJobPostEntity saved = coJobPostRepository.save(entity);
+        return saved.getId();
+
     }
 
     // 구인글 목록 조회 (모집 중인 공고만 반환)

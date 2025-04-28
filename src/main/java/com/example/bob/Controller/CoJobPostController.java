@@ -21,10 +21,11 @@ public class CoJobPostController {
 
     // 구인글 등록
     @PostMapping
-    public ResponseEntity<String> createJobPost(@RequestBody CoJobPostRequestDTO dto) {
-        coJobPostService.saveJobPost(dto);
-        return ResponseEntity.ok("구인글 등록 성공");
+    public ResponseEntity<Long> createJobPost(@RequestBody CoJobPostRequestDTO dto) {
+        Long jobPostId = coJobPostService.saveJobPost(dto); // ⭐ ID 반환 받기!
+        return ResponseEntity.ok(jobPostId); // 👉 ID를 응답으로 보내기!
     }
+
 
     // 구인글 목록 조회
     @GetMapping

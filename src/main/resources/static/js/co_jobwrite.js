@@ -208,9 +208,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (!res.ok) throw new Error("서버 오류 발생");
                 return res.text();  // ✅ 문자열로 받아야 함
             })
-            .then(message => {
-                alert(message);     // 서버에서 받은 메시지 출력
-                location.reload();
+            .then(jobId => {
+                alert("공고가 성공적으로 등록되었습니다.");
+                window.location.href = `/cojobdetail?id=${jobId}`;  // 상세페이지로 이동
             })
 
             .catch(err => {
