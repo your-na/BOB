@@ -97,6 +97,12 @@
                 data.forEach(job => {
                     const jobCard = document.createElement("div");
                     jobCard.className = "job-card";
+
+                    // 클릭 시 상세보기 페이지로 이동
+                    jobCard.addEventListener("click", function () {
+                        window.location.href = `/jobindex?id=${job.id}`;
+                    });
+
                     jobCard.innerHTML = `
                     <span class="urgent">채용 마감 임박</span>
                     <h3>[${job.title}]</h3>
