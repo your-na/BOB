@@ -36,4 +36,12 @@ public class CoJobPostController {
 
         return jobPosts;
     }
+
+    // 특정 공고 상세 정보 조회 (기업용 상세보기 페이지)
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getJobPostDetail(@PathVariable Long id) {
+        // 서비스에서 공고 ID를 기준으로 상세 정보를 조회
+        return ResponseEntity.ok(coJobPostService.getJobPostDetail(id));
+    }
+
 }

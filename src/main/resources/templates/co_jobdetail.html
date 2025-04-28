@@ -14,7 +14,7 @@
 <div class="job-wrapper">
   <div class="job-card">
     <div class="job-header">
-      <h2>[dskjhdkchs] 개발자 채용</h2>
+      <h2 id="job-title">[공고 제목 자리]</h2>
       <span class="badge">D-38</span>
     </div>
 
@@ -26,10 +26,7 @@
           글로벌 <strong>No.1 IT기업</strong>으로 끊임없는 혁신을 통해 전 세계인이 더욱 행복하고 건강한 삶을 누리는 데 도움이 될 기술을 발전시켜 나갈 것입니다.
         </p>
         <div class="contact-bottom">
-          <div class="contact-info">
-            <p><img src="/images/email.png"> dskjhdkchs@mail.com</p>
-            <p><img src="/images/phone.png"> 010 1111 1111</p>
-          </div>
+          <div class="contact-info"></div>
           <div class="arrow">➤</div>
         </div>
       </div>
@@ -37,16 +34,8 @@
 
     <section class="condition-info">
       <h3>지원자격 및 근무 조건</h3>
-      <ul>
-        <li><strong>경력:</strong> 신입 또는 2년 이하 경력자</li>
-        <li><strong>학력:</strong> 고졸 이상</li>
-        <li><strong>고용형태:</strong> 정규직</li>
-        <li><strong>급여:</strong> 면접 후 결정</li>
-        <li><strong>시간:</strong> 09:00~17:00 (주5일)</li>
-        <li><strong>우대:</strong> 인근 거주자, 관련직무 경험자 우대</li>
-      </ul>
-
-<!--      추후 타임리프할 때 아래걸로 하면 돼영-->
+      <ul id="condition-list"></ul>
+      <!--      추후 타임리프할 때 아래걸로 하면 돼영-->
 <!--      <ul class="condition-list">-->
 <!--        <li><strong>경력:</strong> <span th:text="${job.career}">경력 내용</span></li>-->
 <!--        <li><strong>학력:</strong> <span th:text="${job.education}">학력 내용</span></li>-->

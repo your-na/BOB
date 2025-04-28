@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.List;
+import com.example.bob.Entity.JobStatus;
 
 @Entity
 @Getter
@@ -46,6 +47,11 @@ public class CoJobPostEntity {
     @JsonManagedReference  // 직렬화 시 문제 해결을 위한 추가
     private List<CoResumeEntity> resumes = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private JobStatus status = JobStatus.WAITING;
+
+
     @Override
     public String toString() {
         return "CoJobPostEntity{" +
@@ -62,6 +68,7 @@ public class CoJobPostEntity {
                 ", time='" + time + '\'' +
                 ", startDate='" + startDate + '\'' +
                 ", endDate='" + endDate + '\'' +
+                ", status='" + status + '\'' +
                 '}';
     }
 }

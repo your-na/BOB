@@ -13,9 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.example.bob.DTO.CoJobPostResponseDTO;
+import com.example.bob.Entity.JobStatus;
+
+
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
+
 
 
 @Service
@@ -48,6 +53,16 @@ public class CoJobPostService {
         entity.setStartDate(dto.getStartDate());
         entity.setEndDate(dto.getEndDate());
 
+        // 모집 상태 설정
+        LocalDate today = LocalDate.now();
+        LocalDate startDate = LocalDate.parse(dto.getStartDate());
+
+        if (today.isBefore(startDate)) {
+            entity.setStatus(JobStatus.WAITING);
+        } else {
+            entity.setStatus(JobStatus.OPEN);
+        }
+
         // 현재 로그인된 사용자의 기업 정보 가져오기
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         CompanyDetailsImpl companyDetails = (CompanyDetailsImpl) userDetails;  // CustomUserDetails에서 CompanyDetailsImpl로 캐스팅
@@ -68,17 +83,49 @@ public class CoJobPostService {
         coJobPostRepository.save(entity);
     }
 
-    // 구인글 목록 조회
+    // 구인글 목록 조회 (모집 중인 공고만 반환)
     public List<CoJobPostResponseDTO> getAllJobPosts() {
-        return coJobPostRepository.findAll().stream().map(post -> {
-            String coNick = post.getCompany() != null ? post.getCompany().getCoNick() : "알 수 없음";
-            return new CoJobPostResponseDTO(
-                    post.getTitle(),
-                    post.getPhone(),
-                    post.getCareer(),
-                    coNick
-            );
-        }).collect(Collectors.toList());
+        LocalDate today = LocalDate.now();
+
+        return coJobPostRepository.findAll().stream()
+                .peek(post -> {
+                    LocalDate start = LocalDate.parse(post.getStartDate());
+                    LocalDate end = LocalDate.parse(post.getEndDate());
+
+                    // ✅ 상태 자동 업데이트 로직 (순서 중요)
+                    if (today.isAfter(end)) {
+                        post.setStatus(JobStatus.CLOSED);
+                    } else if (today.isBefore(start)) {
+                        post.setStatus(JobStatus.WAITING);
+                    } else {
+                        post.setStatus(JobStatus.OPEN);
+                    }
+
+                    coJobPostRepository.save(post); // 변경 저장
+                })
+
+                .filter(post -> post.getStatus() == JobStatus.OPEN)
+                .map(post -> {
+                    String coNick = post.getCompany() != null ? post.getCompany().getCoNick() : "알 수 없음";
+                    return new CoJobPostResponseDTO(
+                            post.getId(),
+                            post.getTitle(),
+                            post.getPhone(),
+                            post.getCareer(),
+                            coNick
+                    );
+                })
+                .collect(Collectors.toList());
     }
+
+
+
+    // 특정 구인 공고 상세 정보 조회
+    public CoJobPostEntity getJobPostDetail(Long id) {
+        // ID로 공고 조회 (없으면 예외 발생)
+        return coJobPostRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("해당 ID의 공고를 찾을 수 없습니다."));
+    }
+
 }
 
