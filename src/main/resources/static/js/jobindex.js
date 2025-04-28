@@ -25,6 +25,18 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
             console.log('API 응답 데이터:', data);  // 응답 데이터 출력
 
+            // 공고 제목 업데이트
+            const jobTitleElement = document.querySelector('.job-header h2');
+            if (jobTitleElement && data.title) {
+                jobTitleElement.textContent = data.title; // 공고 제목 설정
+            }
+
+            // 회사 소개글 업데이트
+            const jobDescriptionElement = document.querySelector('.job-desc');
+            if (jobDescriptionElement && data.companyIntro) {
+                jobDescriptionElement.textContent = data.companyIntro; // 회사 소개글 설정
+            }
+
             // 지원자격 및 근무 조건 동적으로 추가
             const conditionList = document.getElementById("condition-list");
             if (!conditionList) return;  // null 체크
