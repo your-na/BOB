@@ -42,6 +42,19 @@ document.addEventListener("DOMContentLoaded", () => {
             // 제목 표시
             document.getElementById("job-title").textContent = `${data.title}`;
 
+            // ⭐ D-Day 계산 및 출력
+            const badge = document.querySelector(".badge");
+            const endDate = new Date(data.endDate);
+            const today = new Date();
+            const diffTime = endDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            badge.textContent = diffDays >= 0 ? `D-${diffDays}` : "마감됨";
+            if (diffDays < 0) {
+                badge.classList.add("expired"); // 👉 CSS에서 스타일 조절 가능
+            }
+
+
             // 회사 소개
             document.querySelector(".job-desc").textContent = data.companyIntro;
 

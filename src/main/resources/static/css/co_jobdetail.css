@@ -188,3 +188,11 @@ ul li {
     font-size: 22px;
     cursor: pointer;
 }
+/*
+마감된은 회색
+ */
+.badge.expired {
+    background-color: gray;
+    color: white;
+}
+
