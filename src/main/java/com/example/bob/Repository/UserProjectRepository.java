@@ -43,6 +43,9 @@ public interface UserProjectRepository extends JpaRepository<UserProjectEntity, 
 
 
 
+
+
+
     // ✅ 프로젝트와 관련된 팀 신청 삭제
     @Modifying
     @Query("DELETE FROM UserProjectEntity up WHERE up.project = :project")
@@ -54,3 +57,4 @@ public interface UserProjectRepository extends JpaRepository<UserProjectEntity, 
     // 유저의 userId와 "완료" 상태에 해당하는 UserProjectEntity 목록을 조회
     List<UserProjectEntity> findByUser_UserIdAndStatus(Long userId, String status);
 }
+

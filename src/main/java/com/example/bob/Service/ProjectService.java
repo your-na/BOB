@@ -326,7 +326,7 @@ public class ProjectService {
 
 
 
-    public void applyForProject(Long projectId, UserEntity user) {
+    public void applyForProject(Long projectId, UserEntity user, String message) {
         ProjectEntity project = getProjectById(projectId);
 
         // ✅ 신청한 적이 있는지 확인 (쿼리 한 번으로 처리)
@@ -334,13 +334,15 @@ public class ProjectService {
             throw new IllegalArgumentException("이미 신청한 프로젝트입니다.");
         }
 
-        // ✅ 신청 정보 저장 (처음에는 "승인 대기" 상태)
+        // ✅ 신청 정보 저장 (처음에는 "신청중" 상태 + 메세지 저장)
         UserProjectEntity userProjectEntity = UserProjectEntity.builder()
                 .user(user)
                 .project(project)
                 .joinDate(LocalDate.now())
                 .status("신청중") // ✅ 처음에는 "승인 대기" 상태
+                .message(message) // 🔥 여기 추가
                 .build();
+
         userProjectRepository.save(userProjectEntity);
 
         // ✅ 프로젝트의 모집 인원 업데이트
@@ -348,14 +350,13 @@ public class ProjectService {
         projectRepository.save(project);
     }
 
+
     // 프로젝트 신청 처리 메서드 추가
     public void submitApplication(UserEntity userEntity, ProjectEntity project, String message) {
-        // 신청 정보 저장
-        applyForProject(project.getId(), userEntity);
-
-        // 신청 메세지 로직 추가 (필요한 경우)
-        // 예: 신청 메시지를 저장하거나 추가적인 처리 수행
+        applyForProject(project.getId(), userEntity, message);
     }
+
+
 
 
     // 신청 수락 로직
@@ -426,6 +427,9 @@ public class ProjectService {
                 project.getTitle()         // 프로젝트 제목
         );
     }
+
+
+
 
 
 
@@ -663,6 +667,17 @@ public class ProjectService {
                 .orElseThrow(() -> new IllegalArgumentException("❌ 프로젝트를 찾을 수 없습니다: " + projectTitle));
         return project.getCreatedBy().equals(userNick);
     }
+
+    /**
+     * ✅ 특정 프로젝트에 대해 사용자가 작성한 신청 메시지를 반환
+     */
+    @Transactional(readOnly = true)
+    public String getSubmittedMessage(Long projectId, UserEntity user) {
+        return userProjectRepository.findByUserAndProject(user, getProjectById(projectId))
+                .map(UserProjectEntity::getMessage)
+                .orElse("신청 메시지가 없습니다.");
+    }
+
 
 
 
