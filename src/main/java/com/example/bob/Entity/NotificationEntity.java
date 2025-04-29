@@ -31,6 +31,11 @@ public class NotificationEntity {
     private LocalDateTime timestamp;  // 알림 시간
 
     @ManyToOne
+    @JoinColumn(name = "contest_team_id")
+    private ContestTeamEntity contestTeam; // 공모전 팀 관련 알림
+
+
+    @ManyToOne
     @JoinColumn(name = "sender_id")  // 신청을 보낸 사람
     private UserEntity sender;
 
@@ -52,8 +57,11 @@ public class NotificationEntity {
     public String getLink() {
         if (project != null && sender != null && sender.getUserId() != null) {
             return "/teamrequest/" + project.getId() + "/" + sender.getUserId();
+        } else if (contestTeam != null) {
+            return "/contest/team/invite?teamId=" + contestTeam.getId();
         }
-        return "#"; // 데이터가 없을 경우 기본값
+        return "#";
     }
+
 
 }

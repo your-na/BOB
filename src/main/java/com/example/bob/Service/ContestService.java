@@ -3,8 +3,10 @@ package com.example.bob.Service;
 import com.example.bob.DTO.ContestDTO;
 import com.example.bob.Entity.ContestEntity;
 import com.example.bob.Entity.ContestHistoryEntity;
+import com.example.bob.Entity.ContestTeamEntity;
 import com.example.bob.Repository.ContestHistoryRepository;
 import com.example.bob.Repository.ContestRepository;
+import com.example.bob.Repository.ContestTeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -30,6 +32,8 @@ public class ContestService {
 
     private final ContestRepository contestRepository;
     private final ContestHistoryRepository contestHistoryRepository;
+    private final ContestTeamRepository contestTeamRepository;
+
 
     // 공모전 저장
     public ContestEntity save(ContestEntity contest) {
@@ -160,6 +164,10 @@ public class ContestService {
                 .collect(Collectors.toList());
     }
 
+
+    public void saveContestTeam(ContestTeamEntity team) {
+        contestTeamRepository.save(team);
+    }
 
 
 }

@@ -49,6 +49,10 @@ public class CompanyDetailsImpl implements CustomUserDetails {
         return "company";
     }
 
+    public Object getUserEntity() {
+        return companyEntity;
+    }
+
     public CompanyEntity getCompanyEntity() {
         return companyEntity;
     }
