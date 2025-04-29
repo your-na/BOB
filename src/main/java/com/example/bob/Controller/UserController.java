@@ -154,7 +154,8 @@ public class UserController {
 
         var result = users.stream().map(user -> {
             Map<String, String> map = new HashMap<>();
-            map.put("id", user.getUserIdLogin());
+            map.put("id", user.getUserId().toString());
+            map.put("userIdLogin", user.getUserIdLogin());
             map.put("nickname", user.getUserNick());
             map.put("avatar", user.getProfileImageUrl());
             return map;

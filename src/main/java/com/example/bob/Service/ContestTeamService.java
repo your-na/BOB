@@ -50,8 +50,8 @@ public class ContestTeamService {
         contestTeamMemberRepository.save(leaderMember);
 
         // 3. 초대할 팀원들 처리
-        for (String userId : dto.getMemberIds()) {
-            UserEntity member = userRepository.findByUserIdLogin(userId)
+        for (Long userId : dto.getMemberIds()) {
+            UserEntity member = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("초대할 사용자를 찾을 수 없습니다: " + userId));
 
             ContestTeamMemberEntity memberEntity = ContestTeamMemberEntity.builder()
