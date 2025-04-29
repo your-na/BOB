@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/", "/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**", "/project", "/project/api","/contest").permitAll()
                         .requestMatchers("/login", "/sign").anonymous()
-                        .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject", "/api/todos", "/api/resumes", "/api/users/search", "/contest/team/create").authenticated()
+                        .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject", "/api/todos", "/api/resumes", "/api/users/search", "/contest/team/**").authenticated()
                         .requestMatchers("/signup", "/co_signup", "/check-nickname", "/check-username", "/api/my-projects").permitAll()
                         .requestMatchers("/comhome", "/comhome/**", "/comcontest").hasAuthority("COMPANY")
                         .requestMatchers("/admin/**", "/sidebar", "/ad_contest", "/adcomcont", "/adcomcont").hasAuthority("ADMIN")
