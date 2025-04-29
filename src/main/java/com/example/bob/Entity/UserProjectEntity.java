@@ -36,6 +36,9 @@ public class UserProjectEntity {
 
     private Long teamMemberId; // 🔥 팀원 아이디 추가
 
+    @Column(length = 2000) // ✨ 추가
+    private String message; // 🔥 사용자가 작성한 신청 메시지
+
     @Column(nullable = false)
     @Builder.Default
     private boolean visible = true; // ✅ 기본값 true (삭제되지 않은 상태)
