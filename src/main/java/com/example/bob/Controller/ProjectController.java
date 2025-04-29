@@ -335,6 +335,8 @@ public class ProjectController {
         return "projectapplication";  // 참가 신청서 페이지를 반환
     }
 
+
+
     // 프로젝트 신청 처리
     @PostMapping("/projectapplication")
     public String submitApplication(@RequestParam Long projectId,
@@ -356,6 +358,41 @@ public class ProjectController {
         // 신청 완료 후 success 페이지로 리디렉션
         return "redirect:/success?projectId=" + project.getId();  // 프로젝트 ID를 쿼리 파라미터로 전달
     }
+
+    @GetMapping("/projapplication2")
+    public String showSubmittedApplication(@RequestParam Long projectId,
+                                           @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                           Model model) {
+
+        if (userDetails == null) {
+            throw new IllegalStateException("❌ 로그인된 유저 정보가 없습니다.");
+        }
+
+        UserEntity user = userDetails.getUserEntity();
+        if (user == null) {
+            throw new IllegalStateException("❌ UserEntity가 없습니다.");
+        }
+
+        ProjectEntity project = projectService.getProjectById(projectId);
+        if (project == null) {
+            throw new IllegalArgumentException("❌ 해당 ID에 프로젝트가 없습니다: " + projectId);
+        }
+
+        String submittedMessage = projectService.getSubmittedMessage(projectId, user);
+
+        // 디버깅 로그
+        System.out.println("✅ userName: " + user.getUserName());
+        System.out.println("✅ projectTitle: " + project.getTitle());
+        System.out.println("✅ submittedMessage: " + submittedMessage);
+
+        model.addAttribute("user", user);
+        model.addAttribute("project", project);
+        model.addAttribute("message", submittedMessage);
+
+        return "projapplication2";
+    }
+
+
 
 
     // 성공 페이지 처리
@@ -381,6 +418,8 @@ public class ProjectController {
         // 성공 페이지를 반환
         return "success";
     }
+
+
 
     // ✅ 신청 수락 API
     @PostMapping("/teamrequest/accept")
