@@ -4,6 +4,10 @@ import com.example.bob.Entity.ContestTeamMemberEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ContestTeamMemberRepository extends JpaRepository<ContestTeamMemberEntity, Long> {
+    Optional<ContestTeamMemberEntity> findByTeamIdAndUserId(Long teamId, Long userId);
+
 }

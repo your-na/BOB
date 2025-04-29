@@ -5,10 +5,12 @@ import com.example.bob.Entity.UserEntity;
 import com.example.bob.Repository.CompanyRepository;
 import com.example.bob.Repository.UserRepository;
 import com.example.bob.Service.UserService;
+import com.example.bob.security.UserDetailsImpl;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -147,23 +150,30 @@ public class UserController {
 
     @GetMapping("/api/users/search")
     @ResponseBody
-    public ResponseEntity<?> searchUsers(@RequestParam String keyword) {
-        // 닉네임 또는 아이디에 keyword가 포함된 사용자 검색
-        var users = userRepository
-                .findByUserNickContainingIgnoreCaseOrUserIdLoginContainingIgnoreCase(keyword, keyword);
+    public ResponseEntity<?> searchUsers(
+            @RequestParam String keyword,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        Long currentUserId = userDetails.getUserEntity().getUserId();
 
-        var result = users.stream().map(user -> {
-            Map<String, String> map = new HashMap<>();
-            map.put("id", user.getUserId().toString());
-            map.put("userIdLogin", user.getUserIdLogin());
-            map.put("nickname", user.getUserNick());
-            map.put("avatar", user.getProfileImageUrl());
-            return map;
-        }).toList();
+        var users = userRepository.findByUserNickContainingIgnoreCaseOrUserIdLoginContainingIgnoreCase(keyword, keyword);
 
-        return ResponseEntity.ok(result);
+        var filtered = users.stream()
+                .filter(user -> !user.getUserId().equals(currentUserId)) // 본인 제외
+                .filter(user -> !"ADMIN".equals(user.getRole())) // 관리자 제외
+                .map(user -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", user.getUserId());
+                    map.put("userIdLogin", user.getUserIdLogin());
+                    map.put("nickname", user.getUserNick());
+                    map.put("avatar", user.getProfileImageUrl());
+                    map.put("role", user.getRole());
+                    return map;
+                })
+                .toList();
+
+        return ResponseEntity.ok(filtered); // 꼭 JSON 배열로 반환해야 함!
     }
-
 
 
     @GetMapping("/bowon")

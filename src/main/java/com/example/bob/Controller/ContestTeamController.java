@@ -29,4 +29,30 @@ public class ContestTeamController {
             return ResponseEntity.badRequest().body("팀 생성 중 오류: " + e.getMessage());
         }
     }
+
+    @PostMapping("/solo")
+    public ResponseEntity<?> joinSolo(@RequestBody ContestTeamRequestDTO dto,
+                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            contestTeamService.createSoloTeam(dto.getContestId(), userDetails.getUserEntity());
+            return ResponseEntity.ok("혼자 참가 완료");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("혼자 참가 중 오류: " + e.getMessage());
+        }
+    }
+
+    // 초대 수락 / 거절 API
+    @PostMapping("/invite/respond")
+    public ResponseEntity<?> respondToInvite(@RequestParam Long teamId,
+                                             @RequestParam boolean accept,
+                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            contestTeamService.handleInviteResponse(teamId, userDetails.getUserEntity(), accept);
+            return ResponseEntity.ok("응답 처리 완료");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("응답 처리 중 오류: " + e.getMessage());
+        }
+    }
+
+
 }
