@@ -1,0 +1,94 @@
+.container {
+    max-width: 800px;
+    margin-top: 8%;
+    margin-left: 12%;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.page-title {
+    font-size: 24px;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-toggle {
+    padding: 8px 14px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 36px;
+    right: 0;
+    width: 120px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    list-style: none;
+    padding: 0;
+    z-index: 99;
+}
+
+.dropdown-menu li {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.dropdown-menu li:hover {
+    background-color: #f0f0f0;
+}
+
+.history-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.history-card h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+    color: #333;
+}
+
+.history-card .date {
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 5px;
+}
+
+.history-card .selected {
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.view-resume {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #2ea44f;
+    color: white;
+    border-radius: 4px;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.view-resume:hover {
+    background-color: #228e3a;
+}

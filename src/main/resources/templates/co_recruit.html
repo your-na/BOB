@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>구인 내역</title>
+  <link rel="stylesheet" href="/css/co_recruit.css">
+  <script defer src="/js/co_recruit.js"></script>
+  <link rel="stylesheet" th:href="@{/css/header2.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header2 :: header}"></div>
+
+<div class="container">
+  <h2 class="page-title">구인 내역</h2>
+
+  <!-- 필터링 -->
+  <div class="top-bar">
+    <div class="dropdown">
+      <button class="dropdown-toggle">최신순</button>
+      <ul class="dropdown-menu">
+        <li data-value="latest">최신순</li>
+        <li data-value="oldest">오래된순</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 구인 내역 목록 -->
+  <div class="history-list">
+    <div class="history-card">
+      <h3>백엔드 개발자 모집</h3>
+      <p class="date">2025.04.20</p>
+      <p class="selected">채용된 인재: <strong>김지원</strong></p>
+      <a href="/resume/view/1" class="view-resume">이력서 보기</a>
+    </div>
+
+    <div class="history-card">
+      <h3>프론트 디자이너 채용</h3>
+      <p class="date">2025.03.11</p>
+      <p class="selected">채용된 인재: <strong>박유정</strong></p>
+      <a href="/resume/view/2" class="view-resume">이력서 보기</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>
