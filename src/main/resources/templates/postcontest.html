@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="_csrf" th:content="${_csrf.token}" />
     <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    <meta name="logged-in-user-id" th:content="${#authentication.principal.userEntity.userId}" />
     <title>공모전 상세 페이지</title>
     <link rel="stylesheet" href="/css/postcontest.css" />
     <link rel="stylesheet" th:href="@{/css/header.css}" />
@@ -19,46 +18,39 @@
 <!-- 공모전 상세 정보 -->
 <section class="contest-detail">
     <div class="contest-header">
-        <h2 th:text="${contest.title}">2025 통계 청소년 IT 학술대회</h2> <!-- 공모전명-->
-        <div class="status-badge" id="status-badge">모집중</div>
-        <button class="bookmark-btn" id="bookmark-btn" sec:authorize="!hasRole('ADMIN')">⭐</button>
+        <h2 th:text="${contest.title}">2025 통계 청소년 IT 학술대회</h2>
+        <div class="status-badge" id="status-badge" th:text="${contest.status} ?: '모집중'"></div>
+        <button class="bookmark-btn" sec:authorize="!hasRole('ADMIN')">⭐</button>
     </div>
 
     <div class="contest-content">
-        <!-- 공모전 대표 이미지 -->
         <img th:src="@{${contest.imageUrl}}" alt="공모전 배너" class="contest-banner" />
-
-        <!-- 공모전 정보 테이블 -->
         <table class="contest-table">
-            <tr><th>주최/주관</th><td th:text="${contest.organizer}">한국정보기술융합회</td></tr>
-            <tr><th>대표 분야</th><td th:text="${contest.category}">논문</td></tr>
-            <tr><th>참가 대상</th><td th:text="${contest.target}">청소년, 어린이</td></tr>
-            <tr><th>대회 지역</th><td th:text="${contest.region}">대전지역</td></tr>
-            <tr>
-                <th>진행 기간</th>
-                <td th:text="${contest.startDate} + ' ~ ' + ${contest.endDate}">2024.11.14 ~ 2025.03.12</td>
+            <tr><th>주최/주관</th><td th:text="${contest.organizer}">주최</td></tr>
+            <tr><th>대표 분야</th><td th:text="${contest.category}">분야</td></tr>
+            <tr><th>참가 대상</th><td th:text="${contest.target}">대상</td></tr>
+            <tr><th>대회 지역</th><td th:text="${contest.region}">지역</td></tr>
+            <tr><th>진행 기간</th>
+                <td th:text="${contest.startDate} + ' ~ ' + ${contest.endDate}">2025-01-01 ~ 2025-03-01</td>
             </tr>
-            <tr><th>심사 기관</th><td th:text="${contest.judge}">서울 소재 대학교</td></tr>
-            <tr><th>시상 내역</th><td th:text="${contest.awardDetails}">장학금(대학진학 혜택)</td></tr>
-            <tr>
-                <th>웹사이트</th>
-                <td><a th:href="@{${contest.applicationMethod}}" target="_blank">공식 홈페이지</a>
-                </td>
+            <tr><th>심사 기관</th><td th:text="${contest.judge}">심사</td></tr>
+            <tr><th>시상 내역</th><td th:text="${contest.awardDetails}">상세</td></tr>
+            <tr><th>웹사이트</th>
+                <td><a th:href="@{${contest.applicationMethod}}" target="_blank">공식 홈페이지</a></td>
             </tr>
         </table>
     </div>
 
-    <!-- 공모전 상세 내용 -->
+    <!-- 상세 설명 -->
     <section class="contest-details">
-        <div th:text="${contest.description}" id="contest-description">상세페이지</div>
+        <div th:text="${contest.description}" id="contest-description">상세설명</div>
     </section>
 
-    <!-- 버튼 영역 -->
+    <!-- 버튼 -->
     <div class="button-box" sec:authorize="!hasRole('ADMIN')">
         <button class="apply-btn" id="openModalBtn">공모전 참가하기</button>
         <button class="recruit-btn">팀원 모집글 작성하기</button>
     </div>
-
 
     <!-- 팀원 모집글 리스트 -->
     <section class="recruit-list">
@@ -75,11 +67,11 @@
             </thead>
             <tbody>
             <tr th:each="recruit : ${recruitList}">
-                <td th:text="${recruit.title}">AI 공모전 함께하실 분!</td>
-                <td th:text="${recruit.writer}">홍길동</td>
+                <td th:text="${recruit.title}">모집글 제목</td>
+                <td th:text="${recruit.writer}">작성자</td>
                 <td th:text="${recruit.recruitCount}">3명</td>
-                <td th:text="${#temporals.format(recruit.createdAt, 'yyyy.MM.dd')}">2025.03.20</td>
-                <td><a th:href="@{'/recruit/' + ${recruit.id}}" class="detail-link">보기</a></td>
+                <td th:text="${#temporals.format(recruit.createdAt, 'yyyy.MM.dd')}">2025.04.01</td>
+                <td><a th:href="@{'/recruit/' + ${recruit.id}}">보기</a></td>
             </tr>
             <tr th:if="${#lists.isEmpty(recruitList)}">
                 <td colspan="5" style="text-align:center; color:gray;">모집 글이 없습니다.</td>
@@ -89,283 +81,184 @@
     </section>
 </section>
 
-<div id="contestModal" class="modal">
+<!-- 모달 -->
+<div id="contestModal" class="modal" style="display:none;">
     <div class="modal-content">
         <span class="close-btn">&times;</span>
         <h2>공모전 참가하기</h2>
 
         <div class="invite-section">
-            <label for="invite-input" id="invite-title">팀원 닉네임 또는 ID</label>
-            <input type="text" id="invite-input" placeholder="Enter nickname or ID" />
-
-            <!-- 자동완성 리스트 -->
+            <label for="invite-input">팀원 닉네임 또는 ID</label>
+            <input type="text" id="invite-input" placeholder="닉네임 또는 ID 입력" autocomplete="off" />
             <ul id="autocomplete-list" class="autocomplete-list"></ul>
-
-            <!-- 선택된 팀원들 -->
             <div id="selected-members" class="selected-members"></div>
         </div>
 
-        <button class="btn invite-btn">👥 친구와 함께 참가하기</button>
-        <button class="btn solo-btn">🧍 혼자 참가하기</button>
-
-        <p class="terms">혼자 참가하기 눌러서 팀 모집을 통해 다른 사용자와 함께 참가 가능합니다.</p>
+        <button class="btn invite-btn">👥 친구와 참가</button>
+        <button class="btn solo-btn">🧍 혼자 참가</button>
     </div>
 </div>
 
 <script th:inline="javascript">
-    document.addEventListener("DOMContentLoaded", function () {
-        // 북마크 토글
-        document.getElementById("bookmark-btn").addEventListener("click", function () {
-            this.classList.toggle("active");
-        });
-
-        // 상태 뱃지 변경
-        const statusBadge = document.getElementById("status-badge");
-
-        const startDate = new Date([[${contest.startDate}]]);
-        const endDate = new Date([[${contest.endDate}]]);
-        const today = new Date();
-
-
-        if (today > endDate) {
-            statusBadge.textContent = "진행완료";
-            statusBadge.style.backgroundColor = "#ff4040";
-        } else {
-            statusBadge.textContent = "진행중";
-            statusBadge.style.backgroundColor = "#02b902";
-        }
-
-        // 참여하기 버튼
-        document.querySelector(".apply-btn").addEventListener("click", function () {
-            document.getElementById("contestModal").style.display = "block";
-        });
-
-        // 팀원 모집글 작성
-        document.querySelector(".recruit-btn").addEventListener("click", function () {
-            alert("팀원 모집글 작성 페이지로 이동합니다.");
-            window.location.href = "/newcontest";
-        });
-    });
-
-    //모달창><
     document.addEventListener("DOMContentLoaded", () => {
-        const modal = document.getElementById("contestModal");
-        const openBtn = document.getElementById("openModalBtn");
-        const closeBtn = document.querySelector(".close-btn");
-        const inviteBtn = document.querySelector(".invite-btn");
-        const soloBtn = document.querySelector(".solo-btn");
-        const nicknameInput = document.getElementById("invite-input");
+        const openModalBtn = document.getElementById('openModalBtn');
+        const contestModal = document.getElementById('contestModal');
+        const closeModalBtn = document.querySelector('.close-btn');
+        const input = document.getElementById('invite-input');
+        const list = document.getElementById('autocomplete-list');
+        const selected = document.getElementById('selected-members');
+        const loggedInUserId = document.querySelector('meta[name="logged-in-user-id"]')?.content || 0;
 
-        openBtn.addEventListener("click", () => {
-            modal.style.display = "block";
+        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+        let selectedList = [];
+
+        // 모달 열기
+        openModalBtn?.addEventListener('click', () => {
+            contestModal.style.display = 'block';
+            list.innerHTML = '';   // 리스트 초기화
+            input.value = '';      // 입력창 초기화
         });
 
-        closeBtn.addEventListener("click", () => {
-            modal.style.display = "none";
+        // 모달 닫기
+        closeModalBtn?.addEventListener('click', () => contestModal.style.display = 'none');
+        window.addEventListener('click', (e) => {
+            if (e.target === contestModal) contestModal.style.display = 'none';
         });
 
-        window.addEventListener("click", (e) => {
-            if (e.target === modal) {
-                modal.style.display = "none";
-            }
-        });
+        // ❗ input 리스너: "한 번만 등록" (DOMContentLoaded 안에서)
+        input.addEventListener('input', async () => {
+            const query = input.value.trim();
+            list.innerHTML = '';
+            if (!query) return;
 
-        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
-        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
+            try {
+                const response = await fetch(`/api/users/search?keyword=${encodeURIComponent(query)}`);
+                const users = await response.json();
 
-        // 현재 로그인한 사용자 정보는 서버에서 세션/인증을 통해 자동 포함됨
-        inviteBtn.addEventListener("click", () => {
-            const memberIds = selectedMembers(); // 선택된 팀원들
+                const filtered = users.filter(user =>
+                    user.role !== 'ADMIN' &&
+                    Number(user.id) !== Number(loggedInUserId) &&
+                    !selectedList.some(selected => Number(selected.userId) === Number(user.id))
+                );
 
-            if (memberIds.length === 0) {
-                alert("함께 참가할 팀원을 선택해주세요.");
-                return;
-            }
+                filtered.forEach(user => {
+                    if (list.querySelector(`li[data-user-id="${user.id}"]`)) return;
 
-            fetch("/contest/team/create", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    [csrfHeader]: csrfToken
-                },
-                credentials: "include",
-                body: JSON.stringify({
-                    contestId: contestId,
-                    memberIds: memberIds  // 나 + 친구들은 서버에서 처리
-                })
-            }).then(res => {
-                if (res.ok) {
-                    alert("팀 생성 완료! 친구들에게 초대가 전송되었습니다.");
-                    modal.style.display = "none";
-                    location.reload();
-                } else {
-                    alert("팀 생성에 실패했습니다.");
-                }
-            });
-        });
-
-
-
-
-        soloBtn.addEventListener("click", () => {
-            fetch("/contest/team/create", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    [csrfHeader]: csrfToken
-                },
-                credentials: "include",
-                body: JSON.stringify({
-                    contestId: contestId,
-                    memberIds: []  // 아무도 초대하지 않음 → 나 혼자만 포함됨
-                })
-            }).then(res => {
-                if (res.ok) {
-                    alert("혼자 참가 완료되었습니다.");
-                    modal.style.display = "none";
-                    location.reload();
-                } else {
-                    alert("참가에 실패했습니다.");
-                }
-            });
-        });
-
-    });
-
-    const input = document.getElementById('invite-input');
-    const list = document.getElementById('autocomplete-list');
-    const selected = document.getElementById('selected-members');
-    let selectedList = [];
-
-    input.addEventListener('input', async () => {
-        const query = input.value.trim().toLowerCase();
-        list.innerHTML = '';
-
-        if (!query) return;
-
-        try {
-            const response = await fetch(`/api/users/search?keyword=${encodeURIComponent(query)}`);
-            const users = await response.json();
-
-            users.forEach(user => {
-                const li = document.createElement('li');
-                li.textContent = `${user.nickname} (${user.id})`;
-                li.addEventListener('click', () => {
-                    if (!selectedList.some(sel => sel.userId === user.userId)) {
-                        selectedList.push(user);
-                        renderSelectedMembers();
-                    }
-                    input.value = '';
-                    list.innerHTML = '';
+                    const li = document.createElement('li');
+                    li.textContent = `${user.nickname} (${user.userIdLogin})`;
+                    li.dataset.userId = user.id;
+                    li.dataset.nickname = user.nickname;
+                    li.dataset.avatar = user.avatar || '/images/user.png';
+                    list.appendChild(li);
                 });
-                list.appendChild(li);
-            });
-        } catch (error) {
-            console.error('❌ 자동완성 에러:', error);
-        }
-    });
 
-    function renderSelectedMembers() {
-        selected.innerHTML = '';
-        selectedList.forEach(user => {
+            } catch (err) {
+                console.error('검색 실패:', err);
+            }
+        });
+
+        if (!list.dataset.listenerAdded) {
+            list.addEventListener('click', (e) => {
+                const target = e.target.closest('li');
+                if (!target) return;
+
+                const userId = Number(target.dataset.userId);
+                const nickname = target.dataset.nickname;
+                const avatar = target.dataset.avatar;
+
+                if (selectedList.some(user => Number(user.userId) === userId)) {
+                    console.warn('이미 선택된 사용자입니다:', nickname);
+                    return;
+                }
+
+                selectedList.push({ userId, nickname, avatar });
+                addSelectedMember(userId, nickname, avatar);
+
+                input.value = '';
+                list.innerHTML = '';
+            });
+
+            list.dataset.listenerAdded = "true"; // 중복 방지
+        }
+
+
+        function addSelectedMember(userId, nickname, avatar) {
             const tag = document.createElement('div');
             tag.className = 'member-tag';
+            tag.dataset.id = userId;
             tag.innerHTML = `
-          <img src="${user.avatar}" alt="avatar" />
-          ${user.nickname}
-          <button onclick="removeMember(${user.userId})">&times;</button>
+            <img src="${avatar}" alt="avatar" />
+            ${nickname}
+            <button type="button" class="remove-btn">&times;</button>
         `;
+            tag.querySelector('.remove-btn').addEventListener('click', () => {
+                removeMember(userId, tag);
+            });
             selected.appendChild(tag);
-        });
-    }
-
-    function removeMember(id) {
-        selectedList = selectedList.filter(u => u.userId !== id);
-        renderSelectedMembers();
-    }
-
-
-    // 상태 뱃지 변경
-    const statusBadge = document.getElementById("status-badge");
-    const start = new Date([[${contest.startDate}]]);
-    const end = new Date([[${contest.endDate}]]);
-    const today = new Date();
-
-    if (today < start) {
-        statusBadge.textContent = "모집전";
-        statusBadge.style.backgroundColor = "#aaaaaa"; // 회색
-    } else if (today >= start && today <= end) {
-        statusBadge.textContent = "진행중";
-        statusBadge.style.backgroundColor = "#0078ff"; // 파란색
-    } else {
-        statusBadge.textContent = "진행완료";
-        statusBadge.style.backgroundColor = "#ff4040"; // 빨간색
-    }
-
-    // ✅ 현재 선택된 유저 ID만 추출하는 함수
-    const selectedMembers = () => selectedList.map(user => user.userId);
-
-    // ✅ 공모전 ID 가져오기 (Thymeleaf로 주입)
-    const contestId = /*[[${contest.id}]]*/ 0;
-
-    // 친구와 함께 참가하기
-    inviteBtn.addEventListener("click", () => {
-        const memberIds = selectedMembers();
-
-        if (memberIds.length === 0) {
-            alert("함께 참가할 팀원을 선택해주세요.");
-            return;
         }
 
+        function removeMember(userId, tagElement) {
+            selectedList = selectedList.filter(u => String(u.userId) !== String(userId));
+            tagElement.remove();
+        }
 
+        window.selectedMembers = () => selectedList.map(u => u.userId);
 
-        fetch("/contest/team/create", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                [csrfHeader]: csrfToken
-            },
-            credentials: "include",
-            body: JSON.stringify({
-                contestId: contestId,
-                memberIds: memberIds
-            })
-        }).then(res => {
-            if (res.ok) {
-                alert("팀 생성 완료! 함께 참가했습니다.");
-                modal.style.display = "none";
-                location.reload();
-            } else {
-                alert("팀 생성에 실패했습니다.");
+        // 친구랑 참여
+        document.querySelector('.invite-btn')?.addEventListener('click', async () => {
+            const userIds = selectedMembers(); // 선택된 친구들
+            const contestId = /*[[${contest.id}]]*/ 0;
+
+            try {
+                const response = await fetch('/contest/team/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify({ contestId, memberIds: userIds })
+                });
+
+                if (response.ok) {
+                    alert('참가 요청이 전송되었습니다!');
+                    location.reload();
+                } else {
+                    alert('요청 실패!');
+                }
+            } catch (err) {
+                console.error('친구와 참가 실패:', err);
+            }
+        });
+
+        // 혼자 참여
+        document.querySelector('.solo-btn')?.addEventListener('click', async () => {
+            const contestId = /*[[${contest.id}]]*/ 0;
+
+            try {
+                const response = await fetch('/contest/team/solo', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify({ contestId })
+                });
+
+                if (response.ok) {
+                    alert('단독 참가 완료!');
+                    location.reload();
+                } else {
+                    alert('요청 실패!');
+                }
+            } catch (err) {
+                console.error('혼자 참가 실패:', err);
             }
         });
     });
-
-    // 혼자 참가하기
-    soloBtn.addEventListener("click", () => {
-        fetch("/contest/team/create", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                [csrfHeader]: csrfToken
-            },
-            credentials: "include",
-            body: JSON.stringify({
-                contestId: contestId,
-                memberIds: []  // 본인만 참가
-            })
-        }).then(res => {
-            if (res.ok) {
-                alert("혼자 참가 완료되었습니다.");
-                modal.style.display = "none";
-                location.reload();
-            } else {
-                alert("참가에 실패했습니다.");
-            }
-        });
-    });
-
 
 </script>
+
 </body>
 </html>

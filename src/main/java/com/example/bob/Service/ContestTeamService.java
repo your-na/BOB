@@ -50,8 +50,8 @@ public class ContestTeamService {
         contestTeamMemberRepository.save(leaderMember);
 
         // 3. 초대할 팀원들 처리
-        for (String userId : dto.getMemberIds()) {
-            UserEntity member = userRepository.findByUserIdLogin(userId)
+        for (Long userId : dto.getMemberIds()) {
+            UserEntity member = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("초대할 사용자를 찾을 수 없습니다: " + userId));
 
             ContestTeamMemberEntity memberEntity = ContestTeamMemberEntity.builder()
@@ -80,5 +80,42 @@ public class ContestTeamService {
 
         notificationRepository.save(notification);
     }
+
+    @Transactional
+    public void createSoloTeam(Long contestId, UserEntity user) {
+        ContestEntity contest = contestRepository.findById(contestId)
+                .orElseThrow(() -> new RuntimeException("공모전 정보를 찾을 수 없습니다."));
+
+        ContestTeamEntity team = ContestTeamEntity.builder()
+                .teamName(user.getUserNick() + "의 1인 팀")
+                .contest(contest)
+                .createdBy(user.getUserNick())
+                .status("참가완료")
+                .build();
+        contestTeamRepository.save(team);
+
+        ContestTeamMemberEntity member = ContestTeamMemberEntity.builder()
+                .team(team)
+                .user(user)
+                .role("LEADER")
+                .isAccepted(true)
+                .isInvitePending(false)
+                .build();
+        contestTeamMemberRepository.save(member);
+    }
+
+    @Transactional
+    public void handleInviteResponse(Long teamId, UserEntity user, boolean accept) {
+        ContestTeamMemberEntity member = contestTeamMemberRepository
+                .findByTeamIdAndUserId(teamId, user.getUserId())
+                .orElseThrow(() -> new RuntimeException("해당 초대를 찾을 수 없습니다."));
+
+        if (!member.isInvitePending()) throw new RuntimeException("이미 응답 처리된 초대입니다.");
+
+        member.setInvitePending(false);
+        member.setAccepted(accept);
+        contestTeamMemberRepository.save(member);
+    }
+
 
 }
