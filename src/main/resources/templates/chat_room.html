@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>채팅방</title>
+  <link rel="stylesheet" href="/css/chat_room.css">
+</head>
+<body>
+<div class="chat-container"> <!-- ✅ 전체 감싸는 컨테이너 -->
+  <div class="chat-header">
+    <button class="back-button" onclick="goBack()"><</button>
+    나유정1228
+  </div>
+
+  <div class="chat-box">
+    <div class="message partner">안녕하세요!!</div>
+    <div class="message user">안녕하세요 공모전 참가 관련해서 여쭤볼게 있어서 채팅 드려요!</div>
+    <div class="message user">공모전 팀원을 구하고 있는데 프로필 보니까 마음에 들어서요...!</div>
+    <div class="message user">혹시 000공모전 같이 하실 의향이 있으실까요?</div>
+    <div class="message partner">제가 000공모전은 생각이 없어서ㅠㅠ</div>
+    <div class="message partner">다음에 기회 있으면 같이 해요~</div>
+    <div class="message user">아ㅠㅠ 아쉽게 됐네요</div>
+    <div class="message user">네! 다음에 좋은 기회로 봬요~</div>
+  </div>
+
+  <div class="chat-input-wrapper">
+    <button class="icon-button">+</button>
+    <input type="text" id="chat-input" placeholder="메시지를 입력해주세요.">
+    <button class="send-button">➤</button>
+  </div>
+</div>
+
+<script src="/js/chat_room.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,64 @@
+.chat-popup-header {
+    background-color: #63e676;
+    padding: 14px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    border-radius: 10px 10px 0 0;
+}
+
+.chat-container {
+    padding: 10px;
+}
+
+/* 채팅 항목 */
+.chat-room {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    position: relative;
+}
+
+.profile {
+    width: 40px;
+    height: 40px;
+    background-color: #ccc;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.info strong {
+    display: block;
+    font-size: 15px;
+}
+
+.info p {
+    font-size: 13px;
+    color: gray;
+}
+
+/* 우클릭 메뉴 */
+.chat-context-menu {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ccc;
+    list-style: none;
+    padding: 4px 0;
+    width: 130px; /* ⬅️ 기존 150px → 130px로 줄임 */
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+    font-size: 13px; /* ⬅️ 약간 작게 */
+}
+
+.chat-context-menu li {
+    padding: 6px 10px; /* ⬅️ padding도 줄임 */
+    cursor: pointer;
+}
+
+.chat-context-menu li:hover {
+    background-color: #f0f0f0;
+}

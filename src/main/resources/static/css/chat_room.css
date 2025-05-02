@@ -1,0 +1,99 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+}
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* 헤더 고정 */
+.chat-header {
+    background-color: #6de16d;
+    color: white;
+    padding: 15px;
+    font-weight: bold;
+    font-size: 18px;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+}
+
+/* 채팅 영역: 스크롤 가능 */
+.chat-box {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* 메시지 */
+.message {
+    max-width: 70%;
+    padding: 8px 12px;
+    border-radius: 15px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.message.user {
+    align-self: flex-end;
+    background-color: #e2fbd7;
+}
+
+.message.partner {
+    align-self: flex-start;
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+}
+
+/* 입력창 고정 */
+.chat-input-wrapper {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+    background: white;
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.send-button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: green;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+#chat-input {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+}
+
+/* 뒤로가기 */
+.back-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    margin-right: 10px;
+    cursor: pointer;
+}

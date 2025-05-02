@@ -36,4 +36,12 @@ public class TestController {
     //기업 주최한 공모전 목록
     @GetMapping("/comycontest")
     public String myconform() {return "co_mycontest";}
+
+    //chat
+    @GetMapping("/chatting")
+    public String chatform() {return "chat_popup";}
+
+    //chatroom
+    @GetMapping("/chatroom")
+    public String chatroomform() {return "chat_room";}
 }

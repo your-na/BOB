@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>채팅창</title>
+    <link rel="stylesheet" href="/css/chat_popup.css">
+</head>
+<body>
+
+<div class="chat-popup-header">
+    <span>채팅목록</span>
+</div>
+
+<div class="chat-container">
+    <!-- 예시 채팅방 -->
+    <div class="chat-room" oncontextmenu="openContextMenu(event, this)">
+        <div class="profile"></div>
+        <div class="info" onclick="openChatWindow()">
+            <strong>나유정1228</strong>
+            <p>네! 다음에 좋은 기회로 봬요~</p>
+        </div>
+    </div>
+
+    <!-- 더 많은 채팅방 반복 가능 -->
+</div>
+
+<!-- 우클릭 메뉴 -->
+<ul class="chat-context-menu" id="chatContextMenu">
+    <li onclick="handleChatOption('open')">채팅방 열기</li>
+    <li onclick="handleChatOption('rename')">채팅방 이름 설정</li>
+    <li onclick="handleChatOption('pin')">채팅방 상단 고정</li>
+    <li onclick="handleChatOption('leave')">채팅방 나가기</li>
+</ul>
+
+<script src="/js/chat_popup.js"></script>
+</body>
+</html>

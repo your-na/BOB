@@ -71,7 +71,7 @@
                     <span class="search-icon"><img src="/images/search.png" alt=""></span>
                 </form>
             </div>
-            <a class="chatting-icon">
+            <a class="chatting-icon" onclick="openChatWindow()">
                 <img src="/images/chatting.png" alt="">
             </a>
             <div class="nav-item1">
@@ -279,6 +279,10 @@
             });
 
         });
+
+        function openChatWindow() {
+            window.open("/chatting", "ChatWindow", "width=400,height=600,resizable=yes");
+        }
     </script>
 </header>
 </div>
