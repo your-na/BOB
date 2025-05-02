@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>지원자 목록</title>
+    <link rel="stylesheet" href="/css/co_applicant.css">
+    <link rel="stylesheet" th:href="@{/css/header2.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header2 :: header}"></div>
+
+<div class="applicant-container">
+    <h2>채용공고 지원자 목록</h2>
+    <p><strong>공고명:</strong> 인턴채용공고</p>
+    <p><strong>모집기간:</strong> 2025-04-09 ~ 2025-05-15</p>
+    <p><strong>총 지원자:</strong> 3명</p>
+
+    <table class="applicant-table">
+        <thead>
+        <tr>
+            <th>이름</th>
+            <th>지원일시</th>
+            <th>이력서 보기</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>김지원</td>
+            <td>2025-04-12 13:40</td>
+            <td><button class="view-resume-btn" onclick="viewResume('kim')">이력서 열기</button></td>
+        </tr>
+        <!-- 여기에 다른 지원자도 반복 출력 -->
+        </tbody>
+    </table>
+</div>
+
+<script src="/js/applicants.js"></script>
+</body>
+</html>

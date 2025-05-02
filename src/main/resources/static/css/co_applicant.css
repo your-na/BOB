@@ -1,0 +1,40 @@
+.applicant-container {
+    max-width: 900px;
+    margin-top: 10%;
+    margin-left: 13%;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.applicant-container h2 {
+    margin-bottom: 10px;
+    font-size: 24px;
+    color: #2e7d32;
+}
+
+.applicant-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.applicant-table th,
+.applicant-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
+
+.view-resume-btn {
+    padding: 6px 12px;
+    background-color: #4caf50;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.view-resume-btn:hover {
+    background-color: #388e3c;
+}

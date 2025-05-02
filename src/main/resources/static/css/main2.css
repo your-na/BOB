@@ -1,0 +1,136 @@
+.hero-section {
+    background: linear-gradient(to right, #00a86b, #66cdaa);
+    color: white;
+    padding: 60px 20px;
+    text-align: center;
+    margin-top: 10%;
+}
+
+.hero-text h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.hero-text .highlight {
+    color: #ffe600;
+}
+
+.hero-text p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.primary-btn {
+    background-color: white;
+    color: #00a86b;
+    padding: 12px 24px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.primary-btn:hover {
+    background-color: #e6e6e6;
+}
+
+.dashboard-section {
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.dashboard-cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    max-width: 1200px;
+}
+
+.dashboard-card {
+    background: white;
+    padding: 20px;
+    flex: 1 1 300px;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.dashboard-card h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.dashboard-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #00a86b;
+    text-decoration: none;
+}
+
+.recent-users li {
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+.recent-jobs {
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    font-size: 20px;
+}
+
+.job-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.job-item {
+    background: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.job-item h4 {
+    margin: 0 0 5px 0;
+}
+
+.job-item .badge {
+    background-color: #00a86b;
+    color: white;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-top: 5px;
+    display: inline-block;
+}
+
+.footer {
+    background-color: #eee;
+    padding: 20px;
+    text-align: center;
+    font-size: 14px;
+    margin-top: 40px;
+}
+
+.allall {
+    text-decoration: none;
+    color: dimgrey;
+    cursor: pointer;
+}
+
+.allall :hover {
+    font-weight: bold;
+}

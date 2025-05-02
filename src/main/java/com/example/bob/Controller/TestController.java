@@ -48,4 +48,8 @@ public class TestController {
     //기업 내가 쓴 공고
     @GetMapping("/comyjob")
     public String myjobform() {return "co_myjob";}
+
+    //기업 지원자 현황 보기
+    @GetMapping("/applicant")
+    public String applicantform() {return "co_applicant";}
 }

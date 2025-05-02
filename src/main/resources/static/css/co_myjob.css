@@ -84,6 +84,13 @@
     padding: 15px;
     border-radius: 10px;
     margin-bottom: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.job-card:hover {
+    background-color: #f7fff6;
+    border-color: #6de16d;
 }
 
 .job-status {
