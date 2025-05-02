@@ -44,4 +44,8 @@ public class TestController {
     //chatroom
     @GetMapping("/chatroom")
     public String chatroomform() {return "chat_room";}
+
+    //기업 내가 쓴 공고
+    @GetMapping("/comyjob")
+    public String myjobform() {return "co_myjob";}
 }

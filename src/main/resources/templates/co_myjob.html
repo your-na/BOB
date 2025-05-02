@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>내가 작성한 공고</title>
+    <link rel="stylesheet" href="/css/co_myjob.css">
+    <script defer src="/js/co_myjob.js"></script>
+    <link rel="stylesheet" th:href="@{/css/header2.css}" />
+</head>
+<body>
+<!-- 헤더 -->
+<div th:insert="~{header2 :: header}"></div>
+
+<div class="container">
+    <h2 class="page-title">내가 작성한 공고</h2>
+
+    <!-- 필터 & 검색 -->
+    <div class="top-bar">
+        <div class="dropdown">
+            <button class="dropdown-toggle">최신순</button>
+            <ul class="dropdown-menu">
+                <li data-value="latest">최신순</li>
+                <li data-value="oldest">오래된순</li>
+            </ul>
+        </div>
+        <div class="search-box">
+            <input type="text" id="search-box" placeholder="검색어를 입력해주세요" onkeyup="filterContests()">
+        </div>
+    </div>
+
+    <!-- 공고 목록 -->
+    <div class="job-card">
+        <div class="job-status">모집중</div>
+        <div class="job-info">
+            <h3 class="job-title">인턴채용공고</h3>
+            <p class="job-dates">2025-04-09 ~ 2025-05-15</p>
+        </div>
+        <div class="job-extra">
+            <div class="d-day">D-36</div>
+            <div class="applicants">3명 지원 중</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
