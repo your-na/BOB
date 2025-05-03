@@ -35,6 +35,6 @@ function handleChatOption(option) {
     }
 }
 
-function openChatWindow() {
-    window.open("/chatroom", "ChatWindow", "width=400,height=600,resizable=yes");
+function openChatWindow(roomId) {
+    window.open(`/chatroom?roomId=${roomId}`, "ChatWindow", "width=400,height=600,resizable=yes");
 }

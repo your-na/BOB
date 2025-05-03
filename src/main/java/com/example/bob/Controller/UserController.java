@@ -175,6 +175,16 @@ public class UserController {
         return ResponseEntity.ok(filtered); // 꼭 JSON 배열로 반환해야 함!
     }
 
+    @GetMapping("/user/me")
+    @ResponseBody
+    public String getCurrentUserNick(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if (userDetails == null || userDetails.getUserEntity() == null) {
+            return "";
+        }
+        return userDetails.getUserEntity().getUserNick();
+    }
+
+
 
     @GetMapping("/bowon")
     public String postform() {return "postproject";}
