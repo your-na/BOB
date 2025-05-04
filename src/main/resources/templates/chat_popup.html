@@ -11,7 +11,15 @@
 
 <div class="chat-popup-header">
     <span>채팅목록</span>
+    <div class="add-chat-wrapper">
+        <button class="add-chat-btn" onclick="toggleAddMenu()">+</button>
+        <ul class="add-chat-menu" id="addChatMenu">
+            <li onclick="createNewChat()">1:1 채팅 시작</li>
+            <li onclick="createGroupChat()">단체 채팅 만들기</li>
+        </ul>
+    </div>
 </div>
+
 
 <div class="chat-container">
     <!-- 예시 채팅방 -->

@@ -78,3 +78,23 @@ document.addEventListener("DOMContentLoaded", function () {
         appendMessage("partner", sender, text);
     };
 });
+
+// ✅ 이 코드는 DOMContentLoaded 바깥에 존재해야 합니다
+function toggleAttachMenu() {
+    const menu = document.getElementById('attachMenu');
+    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+}
+
+// 파일 선택 처리도 밖에 정의해야 HTML에서 사용할 수 있어요
+function handleFileSelect(event, type) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (type === 'image') {
+        alert(`📷 선택된 이미지: ${file.name}`);
+    } else {
+        alert(`📁 선택된 파일: ${file.name}`);
+    }
+
+    document.getElementById('attachMenu').style.display = 'none';
+}

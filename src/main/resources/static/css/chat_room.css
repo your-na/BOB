@@ -97,3 +97,65 @@ body, html {
     margin-right: 10px;
     cursor: pointer;
 }
+
+.message-row {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 10px;
+}
+
+.message-row.partner {
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.profile-image {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    margin: 0 8px;
+}
+
+.message-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.nickname {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 4px;
+}
+
+.message-row.user .message {
+    background-color: #e2fbd7;
+    align-self: flex-end;
+}
+
+.message-row.partner .message {
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    align-self: flex-start;
+}
+
+.attach-menu {
+    position: absolute;
+    bottom: 70px; /* 입력창 위에 보이게 */
+    left: 15px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    padding: 10px;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 1000;
+}
+
+.attach-menu label {
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+}

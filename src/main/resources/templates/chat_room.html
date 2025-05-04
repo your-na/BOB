@@ -21,10 +21,31 @@
 
   <div class="chat-box">
     <!-- 채팅 내용 -->
+    <!-- 상대방 메시지 -->
+    <div class="message-row partner">
+      <img class="profile-image" src="/images/profile.png" alt="프로필">
+      <div class="message-content">
+        <span class="nickname">나유정1228</span>
+        <div class="message">네! 다음에 좋은 기회로 봬요~</div>
+      </div>
+    </div>
   </div>
 
   <div class="chat-input-wrapper">
-    <button class="icon-button">+</button>
+    <button class="icon-button" onclick="toggleAttachMenu()">+</button>
+
+    <!-- 첨부 메뉴 (숨겨진 상태로 시작) -->
+    <div class="attach-menu" id="attachMenu">
+      <label>
+        📷 사진 첨부
+        <input type="file" accept="image/*" style="display: none;" onchange="handleFileSelect(event, 'image')">
+      </label>
+      <label>
+        📁 파일 첨부
+        <input type="file" style="display: none;" onchange="handleFileSelect(event, 'file')">
+      </label>
+    </div>
+
     <input type="text" id="chat-input" placeholder="메시지를 입력해주세요.">
     <button class="send-button">➤</button>
   </div>
