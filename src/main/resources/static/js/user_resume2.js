@@ -273,6 +273,42 @@ function renderEducationSection(section, number) {
 
     return sectionBox;
 }
+// ✅ 희망직무 섹션을 동적으로 렌더링하는 함수
+function renderJobSection(section, number) {
+    const sectionBox = document.createElement("section");
+    sectionBox.className = "section-box";
+
+    const conditionText = [];
+    if (section.multiSelect) conditionText.push("복수선택 가능");
+    if (!section.multiSelect && section.type === "선택형") conditionText.push("단일선택");
+    conditionText.push(...section.conditions);
+
+    const title = `${section.title}(${conditionText.join(", ")})`;
+
+    const sectionTitle = document.createElement("div");
+    sectionTitle.className = "section-title";
+    sectionTitle.innerHTML = `
+        <div class="number">${number}.</div>
+        <div class="title-content">
+            <h3>${title}</h3>
+            <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+        </div>
+    `;
+
+    const tagList = document.createElement("div");
+    tagList.className = "tag-list";
+
+    section.tags?.forEach((tag, idx) => {
+        const label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" ${idx === 0 ? "checked" : ""}> ${tag}`;
+        tagList.appendChild(label);
+    });
+
+    sectionBox.appendChild(sectionTitle);
+    sectionBox.appendChild(tagList);
+    return sectionBox;
+}
+
 
 
 // ✅ 페이지 로드시 수상 탭이 비어있으면 empty-content 보이게 하기
@@ -299,20 +335,22 @@ window.addEventListener('DOMContentLoaded', () => {
             // 페이지 상단 제목 변경
             document.querySelector('.resume-title h2').textContent = `${data.title} 이력서 작성`;
 
-            // ✅ section.title === '학력사항'인 경우 렌더링
+            // ✅ 모든 섹션을 순서대로 렌더링
             data.sections.forEach((section, index) => {
+                let rendered;
                 if (section.title === '학력사항') {
-                    const rendered = renderEducationSection(section, index + 1);
-                    const leftContent = document.querySelector('.left-content');
-                    const submitWrapper = document.querySelector('.submit-wrapper');
-
-                    // section을 제출 버튼 위에 순서대로 삽입
-                    leftContent.insertBefore(rendered, submitWrapper);
-
+                    rendered = renderEducationSection(section, index + 1);
+                } else if (section.title === '희망직무') {
+                    rendered = renderJobSection(section, index + 1);
                 }
 
-                // TODO: 추후에 희망직무 등 분기 처리 추가 가능
+                if (rendered) {
+                    const leftContent = document.querySelector('.left-content');
+                    const submitWrapper = document.querySelector('.submit-wrapper');
+                    leftContent.insertBefore(rendered, submitWrapper);
+                }
             });
+
 
         })
         .catch(err => console.error('양식 불러오기 실패:', err));

@@ -288,15 +288,17 @@ document.addEventListener("DOMContentLoaded", () => {
             const multiSelect = section.querySelector(".mode-btn.selected-tag")?.textContent.includes("⭕") || false;
 
             let type = "서술형";
-            const placeholder = textarea?.getAttribute("placeholder") || "";
 
-            if (placeholder.includes("사진")) {
-                type = "사진 첨부";
-            } else if (placeholder.includes("파일")) {
-                type = "파일 첨부";
-            } else if (section.querySelector("select")) {
+            // ✅ 선택형인지 판단: tag-list 또는 tag-input이 존재하는 경우
+            if (section.querySelector(".tag-list") || section.querySelector(".tag-input")) {
                 type = "선택형";
+            } else if (textarea?.placeholder?.includes("사진")) {
+                type = "사진 첨부";
+            } else if (textarea?.placeholder?.includes("파일")) {
+                type = "파일 첨부";
             }
+
+
 
 
             sectionsData.push({
