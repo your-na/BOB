@@ -429,6 +429,207 @@ function renderSelfIntroSection(section, number) {
     return sectionBox;
 }
 
+// ✅ 선택형 섹션 렌더링 함수
+function renderSelectSection(section, number) {
+    const sectionBox = document.createElement("section");
+    sectionBox.className = "section-box";
+
+    const conditionText = [];
+    if (!section.multiSelect && section.type === "선택형") conditionText.push("단일선택");
+    if (section.multiSelect) conditionText.push("복수선택 가능");
+    conditionText.push(...section.conditions);
+
+    const title = `${section.title}(${conditionText.join(", ")})`;
+
+    const sectionTitle = document.createElement("div");
+    sectionTitle.className = "section-title";
+    sectionTitle.innerHTML = `
+    <div class="number">${number}.</div>
+    <div class="title-content">
+      <h3>${title}</h3>
+      <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+    </div>
+  `;
+
+    const tagList = document.createElement("div");
+    tagList.className = "tag-list";
+
+    section.tags?.forEach(tag => {
+        const label = document.createElement("label");
+        label.innerHTML = `<input type="${section.multiSelect ? "checkbox" : "radio"}" name="select-${number}"> ${tag}`;
+        tagList.appendChild(label);
+    });
+
+    sectionBox.appendChild(sectionTitle);
+    sectionBox.appendChild(tagList);
+    return sectionBox;
+}
+// ✅ 서술형 섹션 렌더링 함수
+function renderDescriptiveSection(section, number) {
+    const sectionBox = document.createElement("section");
+    sectionBox.className = "section-box";
+
+    const conditionText = [...section.conditions];  // 복수선택 안 넣음
+    const title = conditionText.length > 0
+        ? `${section.title}(${conditionText.join(", ")})`
+        : section.title;
+
+    const sectionTitle = document.createElement("div");
+    sectionTitle.className = "section-title";
+    sectionTitle.innerHTML = `
+    <div class="number">${number}.</div>
+    <div class="title-content">
+      <h3>${title}</h3>
+      <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+    </div>
+  `;
+
+    const conditionBox = document.createElement("div");
+    conditionBox.className = "tag-list";
+    section.conditions?.forEach(cond => {
+        const span = document.createElement("span");
+        span.className = "tag condition selected-tag";
+        span.textContent = cond;
+        conditionBox.appendChild(span);
+    });
+
+    const textarea = document.createElement("textarea");
+    textarea.placeholder = "자유롭게 입력해주세요.";
+    textarea.value = section.content || "";
+
+    sectionBox.appendChild(sectionTitle);
+    if (section.conditions?.length) sectionBox.appendChild(conditionBox);
+    sectionBox.appendChild(textarea);
+
+    return sectionBox;
+}
+// ✅ 사진 첨부 섹션을 렌더링하는 함수
+function renderPhotoSection(section, number) {
+    // section-box 생성
+    const sectionBox = document.createElement("section");
+    sectionBox.className = "section-box";
+
+    // 조건 텍스트(복수선택은 제외하고 조건만 사용)
+    const conditionText = [...section.conditions];
+    const title = conditionText.length > 0
+        ? `${section.title}(${conditionText.join(", ")})`
+        : section.title;
+
+    // 섹션 제목 + 설명 영역 생성
+    const sectionTitle = document.createElement("div");
+    sectionTitle.className = "section-title";
+    sectionTitle.innerHTML = `
+    <div class="number">${number}.</div>
+    <div class="title-content">
+      <h3>${title}</h3>
+      <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+    </div>
+  `;
+
+    // ✅ 사진 설명 입력용 textarea
+    const textarea = document.createElement("textarea");
+    textarea.placeholder = "사진 관련 설명 입력";
+    textarea.value = section.content || "";
+
+    // ✅ 파일 업로드 UI 생성
+    const wrapper = document.createElement("div");
+    wrapper.className = "file-upload-wrapper";
+
+    // "사진 선택" 버튼 역할을 하는 label
+    const label = document.createElement("label");
+    label.setAttribute("for", `photoUpload${number}`);
+    label.className = "file-label";
+    label.textContent = "사진 선택";
+
+    // 실제 파일 input (숨김 처리됨)
+    const input = document.createElement("input");
+    input.type = "file";
+    input.id = `photoUpload${number}`;
+    input.accept = "image/*";  // 이미지 파일만 선택 가능
+    input.style.display = "none";
+
+    // 선택된 파일명을 표시하는 영역
+    const fileNameSpan = document.createElement("span");
+    fileNameSpan.className = "file-name";
+    fileNameSpan.textContent = "선택된 파일 없음";
+
+    // 파일 선택 시 파일명 표시
+    input.addEventListener("change", () => {
+        const file = input.files[0];
+        fileNameSpan.textContent = file ? file.name : "선택된 파일 없음";
+    });
+
+    // 업로드 UI 조립
+    wrapper.appendChild(label);
+    wrapper.appendChild(input);
+    wrapper.appendChild(fileNameSpan);
+
+    // 전체 섹션 조립
+    sectionBox.appendChild(sectionTitle);
+    sectionBox.appendChild(textarea);
+    sectionBox.appendChild(wrapper);
+
+    return sectionBox;
+}
+// ✅ 파일첨부 섹션을 동적으로 렌더링하는 함수
+function renderFileSection(section, number) {
+    const sectionBox = document.createElement("section");
+    sectionBox.className = "section-box";
+
+    // 조건 텍스트 (복수선택은 포함 안 함)
+    const conditionText = [...section.conditions];
+    const title = conditionText.length > 0
+        ? `${section.title}(${conditionText.join(", ")})`
+        : section.title;
+
+    // 제목 + 설명
+    const sectionTitle = document.createElement("div");
+    sectionTitle.className = "section-title";
+    sectionTitle.innerHTML = `
+      <div class="number">${number}.</div>
+      <div class="title-content">
+        <h3>${title}</h3>
+        <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+      </div>
+    `;
+
+    // 설명 입력 textarea
+    const textarea = document.createElement("textarea");
+    textarea.placeholder = "파일 관련 설명 입력";
+
+    // ✅ 파일 업로드 UI
+    const uploadWrapper = document.createElement("div");
+    uploadWrapper.className = "file-upload-wrapper";
+
+    const label = document.createElement("label");
+    label.className = "file-label";
+    label.textContent = "파일 선택";
+
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.className = "file-input";
+    fileInput.style.display = "none";
+
+    const fileName = document.createElement("span");
+    fileName.className = "file-name";
+    fileName.textContent = "선택된 파일 없음";
+
+    // ✅ 파일 선택 시 파일명 표시
+    fileInput.addEventListener("change", () => {
+        fileName.textContent = fileInput.files.length > 0 ? fileInput.files[0].name : "선택된 파일 없음";
+    });
+
+    label.appendChild(fileInput);
+    uploadWrapper.appendChild(label);
+    uploadWrapper.appendChild(fileName);
+
+    // 조립
+    sectionBox.appendChild(sectionTitle);
+    sectionBox.appendChild(textarea);
+    sectionBox.appendChild(uploadWrapper);
+
+    return sectionBox;
+}
 
 
 
@@ -461,23 +662,32 @@ window.addEventListener('DOMContentLoaded', () => {
             // ✅ 모든 섹션을 순서대로 렌더링
             data.sections.forEach((section, index) => {
                 let rendered;
+
+                // 고정 항목들 먼저 처리
                 if (section.title === '학력사항') {
                     rendered = renderEducationSection(section, index + 1);
                 } else if (section.title === '희망직무') {
                     rendered = renderJobSection(section, index + 1);
-                }
-                else if (section.title === '경력사항') {
+                } else if (section.title === '경력사항') {
                     rendered = renderCareerSection(section, index + 1);
-                }
-                else if (section.title === '포트폴리오') {
+                } else if (section.title === '포트폴리오') {
                     rendered = renderPortfolioSection(section, index + 1);
-                }
-                if (section.title === '자기소개') {
+                } else if (section.title === '자기소개') {
+                    // 자기소개는 따로! 여기서 처리했으면 return
                     rendered = renderSelfIntroSection(section, index + 1);
+                } else {
+                    // 나머지 사용자 추가 섹션 처리
+                    if (section.type === '선택형') {
+                        rendered = renderSelectSection(section, index + 1);
+                    } else if (section.type === '서술형') {
+                        rendered = renderDescriptiveSection(section, index + 1);
+                    } else if (section.type === '사진 첨부') {
+                        rendered = renderPhotoSection(section, index + 1);  // 📌 요 줄 추가!
+                    } else if (section.type === '파일 첨부') {
+                        rendered = renderFileSection(section, index + 1);
+                    }
+
                 }
-
-
-
 
                 if (rendered) {
                     const leftContent = document.querySelector('.left-content');
@@ -485,6 +695,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     leftContent.insertBefore(rendered, submitWrapper);
                 }
             });
+
 
 
         })

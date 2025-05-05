@@ -155,6 +155,80 @@
       <div id="charCount" class="char-count">0 / 500</div>
     </section>
 
+    <!-- ✅ 선택형 섹션 템플릿 (숨김 처리) -->
+    <section id="static-select" class="section-box" style="display: none;">
+      <div class="section-title">
+        <div class="number">7.</div>
+        <div class="title-content">
+          <h3>선택형 항목(예시조건)</h3>
+          <p class="section-desc">구직자 설명입력 칸 입니다.</p>
+        </div>
+      </div>
+      <div class="tag-list">
+        <label><input type="checkbox"> 항목1</label>
+        <label><input type="checkbox"> 항목2</label>
+        <label><input type="checkbox"> 항목3</label>
+      </div>
+    </section>
+
+    <!-- ✅ 서술형 섹션 템플릿 (숨김 처리) -->
+    <section id="static-descriptive" class="section-box" style="display: none;">
+      <div class="section-title">
+        <div class="number">X.</div>
+        <div class="title-content">
+          <h3>제목(조건1, 조건2)</h3>
+          <p class="section-desc">구직자 설명입력 칸 입니다.</p>
+        </div>
+      </div>
+      <textarea placeholder="자유롭게 입력해주세요."></textarea>
+    </section>
+
+    <!-- ✅ 사진 첨부 섹션 템플릿 (숨김 처리) -->
+    <section id="static-image" class="section-box" style="display: none;">
+      <div class="section-title">
+        <div class="number">N.</div>
+        <div class="title-content">
+          <h3>사진 첨부(조건)</h3> <!-- 조건은 JS에서 괄호 안에 삽입 -->
+          <p class="section-desc">구직자 설명입력 칸 입니다.</p>
+        </div>
+      </div>
+
+      <textarea placeholder="사진에 대해 설명해주세요."></textarea>
+
+      <!-- ✅ 파일 업로드 버튼 방식 -->
+      <div class="file-upload-wrapper">
+        <label for="imageUpload" class="file-label">사진 선택</label>
+        <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+        <span class="file-name">선택된 파일 없음</span>
+      </div>
+    </section>
+
+    <!-- ✅ 파일첨부 섹션 템플릿 (숨김 처리) -->
+    <section id="static-file" class="section-box" style="display: none;">
+      <div class="section-title">
+        <div class="number">X.</div>
+        <div class="title-content">
+          <h3>파일첨부(예시 조건)</h3>
+          <p class="section-desc">구직자 설명입력 칸 입니다.</p>
+        </div>
+      </div>
+
+      <textarea placeholder="파일 관련 설명 입력"></textarea>
+
+      <!-- ✅ 파일 선택 영역 -->
+      <div class="file-upload-wrapper">
+        <label class="file-label">
+          파일 선택
+          <input type="file" class="file-input" style="display: none;">
+        </label>
+        <span class="file-name">선택된 파일 없음</span>
+      </div>
+    </section>
+
+
+
+
+
 
     <div class="submit-wrapper">
       <button type="submit" class="sub-btn">제출하기</button>
