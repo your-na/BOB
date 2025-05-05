@@ -663,6 +663,9 @@ window.addEventListener('DOMContentLoaded', () => {
             data.sections.forEach((section, index) => {
                 let rendered;
 
+                // ✅ '일반회원 정보'는 스킵 (이미 내 정보에서 표현됨)
+                if (section.title === '일반회원 정보') return;
+
                 // 고정 항목들 먼저 처리
                 if (section.title === '학력사항') {
                     rendered = renderEducationSection(section, index + 1);
