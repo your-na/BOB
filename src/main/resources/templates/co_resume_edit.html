@@ -529,18 +529,23 @@
                         <div class="section-content">
                                 ${section.type === "서술형" || section.type === "선택형" ? `<div class="conditions-list">${conditionList}</div>` : ""}
                             </div>
-                           <div class="section-content">
-    ${section.type === "선택형" ? `
-        <div class="tag-list job-tags">
-            ${section.tags && section.tags.length > 0 ? section.tags.map(tag => `
-                <span class="tag selected-tag">
-                    <span class="tag-label">${tag}</span>
-                    <span class="tag-remove">✕</span>
-                </span>`).join('') : ''}
-        </div>
-        <input class="tag-input" type="text" placeholder="항목 입력 후 엔터">  <!-- ✅ 요 줄 추가 -->
-    ` : ""}
+                         <div class="section-content">
+  ${section.type === "선택형" ? `
+    <div class="tag-list job-tags">
+      ${section.tags && section.tags.length > 0 ? section.tags.map(tag => `
+        <span class="tag selected-tag">
+          <span class="tag-label">${tag}</span>
+          <span class="tag-remove">✕</span>
+        </span>`).join('') : ''}
+    </div>
+    ${section.title === "경력사항" || section.title === "자기소개" ? `
+      <textarea placeholder="${section.title} 입력">${section.content || ''}</textarea>
+    ` : `
+      <input class="tag-input" type="text" placeholder="항목 입력 후 엔터">
+    `}
+  ` : ""}
 </div>
+
 
                             ${multiSelectButton}
                         `;
