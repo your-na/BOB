@@ -646,6 +646,24 @@ window.addEventListener('DOMContentLoaded', () => {
 
     document.querySelector('.empty-content').style.display = isEmpty ? 'block' : 'none';
 
+    // ✅ 사용자 정보 동적 렌더링
+    fetch("/api/user/resumes/me")
+        .then(res => res.json())
+        .then(user => {
+            if (!user) return;
+
+            document.getElementById("profileImage").src = user.profileImageUrl || "/images/user.png";
+            document.getElementById("userName").textContent = user.userName || "이름 없음";
+            document.getElementById("mainLanguage").textContent = user.mainLanguage || "";
+            document.getElementById("sex").textContent = user.sex || "";
+            document.getElementById("birthday").textContent = user.birthday || "";
+            document.getElementById("phone").textContent = user.userPhone || "";
+            document.getElementById("email").textContent = user.userEmail || "";
+            document.getElementById("bio").textContent = user.bio || "";
+        })
+        .catch(err => console.error("내 정보 불러오기 실패:", err));
+
+
     // ✅  기업 이력서 양식 동적 불러오기
     const urlParams = new URLSearchParams(window.location.search);  // 주소에서 쿼리스트링 추출
     const resumeId = urlParams.get("id");  // ex: ?id=42 형태에서 id=42 가져오기
