@@ -189,6 +189,92 @@ redirectCancel.addEventListener('click', () => {
     redirectModal.style.display = "none";
 });
 
+// ✅ 학력사항 섹션을 동적으로 렌더링하는 함수
+function renderEducationSection(section, number) {
+    const sectionBox = document.createElement("section");
+    sectionBox.className = "section-box";
+
+    const conditionText = [];
+
+// ✅ 학력사항일 경우엔 multiSelect 조건은 제목에 안 넣고, 오직 조건만 넣기
+    if (section.title !== '학력사항') {
+        if (section.multiSelect) conditionText.push("복수선택 가능");
+        if (!section.multiSelect && section.type === "선택형") conditionText.push("단일선택");
+    }
+
+// 공통: 조건은 항상 포함
+    conditionText.push(...section.conditions);
+
+// 조건이 있을 경우에만 괄호 붙이기
+    const title = conditionText.length > 0
+        ? `${section.title}(${conditionText.join(", ")})`
+        : section.title;
+
+
+    const sectionTitle = document.createElement("div");
+    sectionTitle.className = "section-title";
+    sectionTitle.innerHTML = `
+        <div class="number">${number}.</div>
+        <div class="title-content">
+            <h3>${title}</h3>
+            <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+        </div>
+    `;
+
+    const eduList = document.createElement("div");
+    eduList.id = "education-list";
+
+    const formGroup = document.createElement("div");
+    formGroup.className = "form-group education-item";
+    formGroup.innerHTML = `
+        <input type="text" placeholder="학교명">
+        <input type="text" placeholder="학과명">
+        <select class="edu-status">
+            <option disabled selected>상태</option>
+            <option value="재학">재학</option>
+            <option value="졸업">졸업</option>
+        </select>
+        <select class="start-year"></select>
+        <select class="start-month"></select>
+        <span class="tilde">~</span>
+        <select class="end-year"></select>
+        <select class="end-month"></select>
+        <button type="button" class="del-btn">✖</button>
+    `;
+
+    createYearOptions(formGroup.querySelector(".start-year"));
+    createMonthOptions(formGroup.querySelector(".start-month"));
+    createYearOptions(formGroup.querySelector(".end-year"));
+    createMonthOptions(formGroup.querySelector(".end-month"));
+    setupStatusListener(formGroup);
+    addDeleteFunction(formGroup.querySelector(".del-btn"));
+
+    eduList.appendChild(formGroup);
+
+    const addBtn = document.createElement("button");
+    addBtn.className = "edu-btn";
+    addBtn.innerHTML = `<span class="plus">＋</span> 추가하기`;
+    addBtn.addEventListener("click", () => {
+        const clone = formGroup.cloneNode(true);
+        clone.querySelectorAll("input, select").forEach(el => el.value = "");
+        createYearOptions(clone.querySelector(".start-year"));
+        createMonthOptions(clone.querySelector(".start-month"));
+        createYearOptions(clone.querySelector(".end-year"));
+        createMonthOptions(clone.querySelector(".end-month"));
+        setupStatusListener(clone);
+        addDeleteFunction(clone.querySelector(".del-btn"));
+        clone.style.marginTop = "10px";
+        eduList.appendChild(clone);
+    });
+
+    sectionBox.appendChild(sectionTitle);
+    sectionBox.appendChild(eduList);
+    sectionBox.appendChild(addBtn);
+
+    return sectionBox;
+}
+
+
 // ✅ 페이지 로드시 수상 탭이 비어있으면 empty-content 보이게 하기
 window.addEventListener('DOMContentLoaded', () => {
     const defaultTab = document.querySelector('.tab.active');
@@ -199,4 +285,36 @@ window.addEventListener('DOMContentLoaded', () => {
     const isEmpty = !targetContent || targetContent.children.length === 0;
 
     document.querySelector('.empty-content').style.display = isEmpty ? 'block' : 'none';
+
+    // ✅  기업 이력서 양식 동적 불러오기
+    const urlParams = new URLSearchParams(window.location.search);  // 주소에서 쿼리스트링 추출
+    const resumeId = urlParams.get("id");  // ex: ?id=42 형태에서 id=42 가져오기
+
+    // 기업에서 설정한 이력서 양식 정보를 API로 요청
+    fetch(`/api/user/resumes/init?id=${resumeId}`)
+        .then(res => res.json())
+        .then(data => {
+            console.log("기업 이력서 양식:", data);
+
+            // 페이지 상단 제목 변경
+            document.querySelector('.resume-title h2').textContent = `${data.title} 이력서 작성`;
+
+            // ✅ section.title === '학력사항'인 경우 렌더링
+            data.sections.forEach((section, index) => {
+                if (section.title === '학력사항') {
+                    const rendered = renderEducationSection(section, index + 1);
+                    const leftContent = document.querySelector('.left-content');
+                    const submitWrapper = document.querySelector('.submit-wrapper');
+
+                    // section을 제출 버튼 위에 순서대로 삽입
+                    leftContent.insertBefore(rendered, submitWrapper);
+
+                }
+
+                // TODO: 추후에 희망직무 등 분기 처리 추가 가능
+            });
+
+        })
+        .catch(err => console.error('양식 불러오기 실패:', err));
+
 });
