@@ -309,6 +309,129 @@ function renderJobSection(section, number) {
     return sectionBox;
 }
 
+// ✅ 경력사항 섹션을 동적으로 렌더링하는 함수
+function renderCareerSection(section, number) {
+    const sectionBox = document.createElement("section");
+    sectionBox.className = "section-box";
+
+    // multiSelect는 경력사항엔 표시 안 함
+    const conditionText = [...section.conditions];
+    const title = conditionText.length > 0
+        ? `${section.title}(${conditionText.join(", ")})`
+        : section.title;
+
+    const sectionTitle = document.createElement("div");
+    sectionTitle.className = "section-title";
+    sectionTitle.innerHTML = `
+        <div class="number">${number}.</div>
+        <div class="title-content">
+            <h3>${title}</h3>
+            <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+        </div>
+    `;
+
+    const textarea = document.createElement("textarea");
+    textarea.placeholder = "경력 입력";
+
+    const uploadBox = document.createElement("div");
+    uploadBox.className = "upload-box";
+    uploadBox.textContent = "드래그해서 파일 첨부하기";
+
+    sectionBox.appendChild(sectionTitle);
+    sectionBox.appendChild(textarea);
+    sectionBox.appendChild(uploadBox);
+
+    return sectionBox;
+}
+
+// ✅ 포트폴리오 섹션을 동적으로 렌더링하는 함수
+function renderPortfolioSection(section, number) {
+    const sectionBox = document.createElement("section");
+    sectionBox.className = "section-box";
+
+    const conditionText = [...section.conditions]; // 복수선택 제외
+    const title = conditionText.length > 0
+        ? `${section.title}(${conditionText.join(", ")})`
+        : section.title;
+
+    const sectionTitle = document.createElement("div");
+    sectionTitle.className = "section-title";
+    sectionTitle.innerHTML = `
+        <div class="number">${number}.</div>
+        <div class="title-content">
+            <h3>${title}</h3>
+            <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+        </div>
+    `;
+
+    const textarea = document.createElement("textarea");
+    textarea.placeholder = "설명 입력";
+
+    const uploadBox = document.createElement("div");
+    uploadBox.className = "upload-box";
+    uploadBox.textContent = "드래그해서 파일 첨부하기";
+
+    sectionBox.appendChild(sectionTitle);
+    sectionBox.appendChild(textarea);
+    sectionBox.appendChild(uploadBox);
+
+    return sectionBox;
+}
+
+// ✅ 자기소개 섹션 렌더링 함수
+function renderSelfIntroSection(section, number) {
+    const sectionBox = document.createElement("section");
+    sectionBox.className = "section-box";
+
+    // 복수선택 여부 제외하고 조건만 괄호에 넣음
+    const conditionText = [...section.conditions];
+    const title = conditionText.length > 0
+        ? `${section.title}(${conditionText.join(", ")})`
+        : section.title;
+
+    // 제목과 설명
+    const sectionTitle = document.createElement("div");
+    sectionTitle.className = "section-title";
+    sectionTitle.innerHTML = `
+        <div class="number">${number}.</div>
+        <div class="title-content">
+            <h3>${title}</h3>
+            <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+        </div>
+    `;
+
+    // 자기소개 textarea + 글자 수
+    const textarea = document.createElement("textarea");
+    textarea.id = "selfIntro";
+    textarea.placeholder = "입력해주세요.";
+
+    const charCount = document.createElement("div");
+    charCount.id = "charCount";
+    charCount.className = "char-count";
+    charCount.textContent = "0 / 500";
+
+    // 글자 수 실시간 반영
+    textarea.addEventListener("input", () => {
+        const len = textarea.value.length;
+        charCount.textContent = `${len} / 500`;
+        if (len < 500) {
+            charCount.classList.add("warning");
+        } else {
+            charCount.classList.remove("warning");
+        }
+    });
+
+    // 조립
+    sectionBox.appendChild(sectionTitle);
+    sectionBox.appendChild(textarea);
+    sectionBox.appendChild(charCount);
+
+    return sectionBox;
+}
+
+
+
+
 
 
 // ✅ 페이지 로드시 수상 탭이 비어있으면 empty-content 보이게 하기
@@ -343,6 +466,18 @@ window.addEventListener('DOMContentLoaded', () => {
                 } else if (section.title === '희망직무') {
                     rendered = renderJobSection(section, index + 1);
                 }
+                else if (section.title === '경력사항') {
+                    rendered = renderCareerSection(section, index + 1);
+                }
+                else if (section.title === '포트폴리오') {
+                    rendered = renderPortfolioSection(section, index + 1);
+                }
+                if (section.title === '자기소개') {
+                    rendered = renderSelfIntroSection(section, index + 1);
+                }
+
+
+
 
                 if (rendered) {
                     const leftContent = document.querySelector('.left-content');

@@ -476,7 +476,11 @@
 
                         // ✅ 나머지 섹션 렌더링 (기존 코드 유지)
                         let multiSelectButton = '';
-                        if (section.type === "선택형" && section.title !== "학력사항") {
+                        if (
+                            section.type === "선택형" &&
+                            section.title !== "학력사항" &&
+                            section.title !== "자기소개"
+                        ) {
                             multiSelectButton = `
             <div class="tag-mode">
                 <button class="mode-btn ${section.multiSelect === true ? "selected-tag" : ""}">복수선택 ⭕</button>
