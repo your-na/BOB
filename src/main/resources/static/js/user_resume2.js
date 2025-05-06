@@ -664,9 +664,11 @@ window.addEventListener('DOMContentLoaded', () => {
         .catch(err => console.error("내 정보 불러오기 실패:", err));
 
 
+
     // ✅  기업 이력서 양식 동적 불러오기
     const urlParams = new URLSearchParams(window.location.search);  // 주소에서 쿼리스트링 추출
-    const resumeId = urlParams.get("id");  // ex: ?id=42 형태에서 id=42 가져오기
+    const resumeId = urlParams.get("id");
+    const jobPostId = urlParams.get("jobPostId");
 
     // 기업에서 설정한 이력서 양식 정보를 API로 요청
     fetch(`/api/user/resumes/init?id=${resumeId}`)
@@ -716,6 +718,18 @@ window.addEventListener('DOMContentLoaded', () => {
                     leftContent.insertBefore(rendered, submitWrapper);
                 }
             });
+
+
+            // ✅ 공고 정보 동적 렌더링
+            if (jobPostId) {
+                fetch(`/api/job-post/info?jobPostId=${jobPostId}`)
+                    .then(res => res.json())
+                    .then(info => {
+                        document.querySelector('.resume-title p').textContent = `안녕하세요 ${info.companyName}회사 이력서 작성 폼입니다.`;
+                        document.querySelector('.resume-title small').textContent = `${info.startDate} ~ ${info.endDate}`;
+                    })
+                    .catch(err => console.error("공고 정보 불러오기 실패:", err));
+            }
 
 
 
