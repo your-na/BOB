@@ -1,222 +1,242 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BOB 메인 페이지</title>
-    <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" th:href="@{/css/header.css}">
-</head>
-<body>
-<!-- header -->
-<div th:insert="~{header :: header}"></div>
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>BOB 메인 페이지</title>
+        <link rel="stylesheet" href="/css/main.css">
+        <link rel="stylesheet" th:href="@{/css/header.css}">
+    </head>
+    <body>
+    <!-- header -->
+    <div th:insert="~{header :: header}"></div>
 
-<!-- 메인 배너 -->
-<section class="carousel">
-    <div class="carousel-content">
-        <div class="carousel-item"><img src="/images/banner001.png" alt="배너1"></div>
-        <div class="carousel-item"><img src="/images/banner002.png" alt="배너2"></div>
-        <div class="carousel-item"><img src="/images/banner003.png" alt="배너3"></div>
-    </div>
-    <div class="carousel-controls">
-        <button class="prev-btn">◀</button>
-        <button class="next-btn">▶</button>
-    </div>
-    <div class="carousel-dots">
-        <span class="dot active"></span>
-        <span class="dot"></span>
-        <span class="dot"></span>
-    </div>
-</section>
-
-
-<!-- 콘텐츠 섹션 -->
-<section class="content-container">
-    <!-- 최신 공모전 -->
-    <div class="content-section">
-        <div class="content-section-header">
-            <h2>관심 분야 공모전</h2>
-            <p>더보기 ></p>
+    <!-- 메인 배너 -->
+    <section class="carousel">
+        <div class="carousel-content">
+            <div class="carousel-item"><img src="/images/banner001.png" alt="배너1"></div>
+            <div class="carousel-item"><img src="/images/banner002.png" alt="배너2"></div>
+            <div class="carousel-item"><img src="/images/banner003.png" alt="배너3"></div>
         </div>
-        <div class="card popular-competitions">
-            <div class="poster-grid">
-                <img src="/images/banner.png" alt="인기 공모전 포스터 넣">
-                <img src="/images/banner1.png" alt="인기 공모전 포스터 어">
-                <img src="/images/banner1.png" alt="인기 공모전 포스터 야">
-                <img src="/images/banner.png" alt="인기 공모전 포스터 함">
+        <div class="carousel-controls">
+            <button class="prev-btn">◀</button>
+            <button class="next-btn">▶</button>
+        </div>
+        <div class="carousel-dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </section>
+
+
+    <!-- 콘텐츠 섹션 -->
+    <section class="content-container">
+        <!-- 최신 공모전 -->
+        <div class="content-section">
+            <div class="content-section-header">
+                <h2>관심 분야 공모전</h2>
+                <p>더보기 ></p>
+            </div>
+            <div class="card popular-competitions">
+                <div class="poster-grid">
+                    <img src="/images/banner.png" alt="인기 공모전 포스터 넣">
+                    <img src="/images/banner1.png" alt="인기 공모전 포스터 어">
+                    <img src="/images/banner1.png" alt="인기 공모전 포스터 야">
+                    <img src="/images/banner.png" alt="인기 공모전 포스터 함">
+                </div>
             </div>
         </div>
+        <!-- 미니 프로젝트 -->
+        <div class="content-section">
+            <div class="content-section-header">
+                <h2>관심 가졌던 채용 공고</h2>
+                <p><a href="/jobs">더보기 ></a></p>
+            </div>
+            <div class="card latest-competitions">
+                <ul id="job-list">
+                    <!-- 여기에 자바스크립트가 공고를 추가할 거예요 -->
+                </ul>
+            </div>
+        </div>
+
+    </section>
+
+
+    <section class="extra-content">
+        <div class="board">
+            <div class="board-header">
+                <h3>전체 게시판</h3>
+            </div>
+            <a id="qh">게시판은 모두 최신순으로 보여집니다.</a>
+            <!-- 필터 버튼 -->
+            <div class="filter-container">
+                <button class="filter-btn active">공모전</button>
+                <button class="filter-btn" id="project-btn">프로젝트</button>
+                <button class="filter-btn">자유</button>
+            </div>
+
+            <!-- 프로젝트 목록 -->
+            <div id="project-list" class="project-list">
+                <!-- 프로젝트 목록이 이곳에 표시됩니다. -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 플로팅 캘린더 버튼 -->
+    <button class="floating-calendar" onclick="toggleTaskPlanButtons()"><img src="/images/schedule.png" alt=""></button>
+
+    <!-- 새롭게 나타날 버튼들 (초기에는 숨김 상태) -->
+    <div id="task-plan-buttons" class="hidden">
+        <button class="task-button" onclick="openTaskPopup()">✔<br>TODO</button>
+        <button class="plan-button" onclick="openPlanPopup()">✏<br>PLAN</button>
     </div>
-    <!-- 미니 프로젝트 -->
-    <div class="content-section">
-        <div class="content-section-header">
-            <h2>관심 가졌던 채용 공고</h2>
-            <p>더보기 ></p>
-        </div>
-        <div class="card latest-competitions">
-            <ul>
-                <li><a href="#">채용 공고1</a></li>
-                <li><a href="#">채용 공고2</a></li>
-                <li><a href="#">채용 공고3</a></li>
-                <li><a href="#">채용 공고4</a></li>
-                <li><a href="#">채용 공고5</a></li>
-                <li><a href="#">채용 공고6</a></li>
-                <li><a href="#">채용 공고7</a></li>
-                <li><a href="#">채용 공고8</a></li>
-                <li><a href="#">채용 공고9</a></li>
-            </ul>
-        </div>
-    </div>
-</section>
 
+    <!-- 푸터 -->
+    <footer class="footer">
+        <p>© 2024 BOB. All rights reserved.</p>
+    </footer>
 
-<section class="extra-content">
-    <div class="board">
-        <div class="board-header">
-            <h3>전체 게시판</h3>
-        </div>
-        <a id="qh">게시판은 모두 최신순으로 보여집니다.</a>
-        <!-- 필터 버튼 -->
-        <div class="filter-container">
-            <button class="filter-btn active">공모전</button>
-            <button class="filter-btn" id="project-btn">프로젝트</button>
-            <button class="filter-btn">자유</button>
-        </div>
-
-        <!-- 프로젝트 목록 -->
-        <div id="project-list" class="project-list">
-            <!-- 프로젝트 목록이 이곳에 표시됩니다. -->
-        </div>
-    </div>
-</section>
-
-<!-- 플로팅 캘린더 버튼 -->
-<button class="floating-calendar" onclick="toggleTaskPlanButtons()"><img src="/images/schedule.png" alt=""></button>
-
-<!-- 새롭게 나타날 버튼들 (초기에는 숨김 상태) -->
-<div id="task-plan-buttons" class="hidden">
-    <button class="task-button" onclick="openTaskPopup()">✔<br>TODO</button>
-    <button class="plan-button" onclick="openPlanPopup()">✏<br>PLAN</button>
-</div>
-
-<!-- 푸터 -->
-<footer class="footer">
-    <p>© 2024 BOB. All rights reserved.</p>
-</footer>
-
-<script>
-    function toggleTaskPlanButtons() {
-        var buttons = document.getElementById("task-plan-buttons");
-        if (buttons.style.display === "none" || buttons.style.display === "") {
-            buttons.style.display = "flex"; // 버튼 보이기
-        } else {
-            buttons.style.display = "none"; // 버튼 숨기기
-        }
-    }
-
-    function openTaskPopup() {
-        let popup = window.open("/popup", "PopupWindow", "width=500,height=600,resizable=no,scrollbars=no");
-
-        // 팝업 창 크기를 내부 컨텐츠에 맞게 조정
-        popup.onload = function () {
-            popup.resizeTo(popup.document.body.scrollWidth, popup.document.body.scrollHeight);
-        };
-    }
-
-    function openPlanPopup() {
-        window.open('/plan', 'planPopup', 'width=400,height=500,resizable=no,scrollbars=no');
-    }
-
-    // 배너 수정할거양 흥.
-    document.addEventListener('DOMContentLoaded', () => {
-        const prevBtn = document.querySelector('.prev-btn');
-        const nextBtn = document.querySelector('.next-btn');
-        const dots = document.querySelectorAll('.dot');
-        const carouselItems = document.querySelectorAll('.carousel-item');
-        const carouselContent = document.querySelector('.carousel-content');
-        let currentIndex = 0;
-
-        function showSlide(index) {
-            if (index >= carouselItems.length) index = 0;
-            if (index < 0) index = carouselItems.length - 1;
-
-            carouselContent.style.transform = `translateX(-${index * 100}%)`;
-
-            dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === index);
-            });
-
-            currentIndex = index;
-        }
-
-        function nextSlide() {
-            showSlide(currentIndex + 1);
-        }
-
-        function prevSlide() {
-            showSlide(currentIndex - 1);
-        }
-
-        prevBtn.addEventListener('click', prevSlide);
-        nextBtn.addEventListener('click', nextSlide);
-
-        dots.forEach((dot, i) => {
-            dot.addEventListener('click', () => {
-                showSlide(i);
-            });
-        });
-
-        // Auto-slide feature (optional)
-        setInterval(nextSlide, 3000); // Change slide every 3 seconds
-    });
-
-    // active 버튼 스크립트~
-    const buttons = document.querySelectorAll('.filter-btn');
-
-    buttons.forEach(button => {
-        button.addEventListener('click', () => {
-            // 모든 버튼에서 active 클래스 제거
-            buttons.forEach(btn => btn.classList.remove('active'));
-            // 클릭한 버튼에 active 클래스 추가
-            button.classList.add('active');
-
-            // 필터된 버튼에 맞게 프로젝트 목록을 표시하는 로직 추가
-            if (button.textContent === '프로젝트') {
-                loadProjects(); // 프로젝트 목록을 동적으로 로드
+    <script>
+        function toggleTaskPlanButtons() {
+            var buttons = document.getElementById("task-plan-buttons");
+            if (buttons.style.display === "none" || buttons.style.display === "") {
+                buttons.style.display = "flex"; // 버튼 보이기
+            } else {
+                buttons.style.display = "none"; // 버튼 숨기기
             }
-        });
-    });
+        }
 
-    // 프로젝트 목록을 동적으로 로드하는 함수
-    // 프로젝트 목록을 동적으로 로드하는 함수
-    function loadProjects() {
-        fetch('/project/api')  // 백엔드에서 JSON 형식의 프로젝트 목록을 가져오는 API
-            .then(response => response.json())
-            .then(projects => {
-                console.log(projects);  // 받아온 데이터 확인
-                const projectListDiv = document.getElementById('project-list');
-                projectListDiv.innerHTML = ''; // 초기화
+        function openTaskPopup() {
+            let popup = window.open("/popup", "PopupWindow", "width=500,height=600,resizable=no,scrollbars=no");
 
-                const ul = document.createElement('ul'); // 🟢 ul 생성
+            // 팝업 창 크기를 내부 컨텐츠에 맞게 조정
+            popup.onload = function () {
+                popup.resizeTo(popup.document.body.scrollWidth, popup.document.body.scrollHeight);
+            };
+        }
 
-                projects.forEach(project => {
-                    const li = document.createElement('li');
-                    const a = document.createElement('a');
-                    a.href = `/postproject/${project.id}`;
-                    a.classList.add('project-title');
-                    a.textContent = project.title;
+        function openPlanPopup() {
+            window.open('/plan', 'planPopup', 'width=400,height=500,resizable=no,scrollbars=no');
+        }
 
-                    li.appendChild(a);
-                    ul.appendChild(li); // 🟢 li를 ul에 추가
+        // 배너 수정할거양 흥.
+        document.addEventListener('DOMContentLoaded', () => {
+            const prevBtn = document.querySelector('.prev-btn');
+            const nextBtn = document.querySelector('.next-btn');
+            const dots = document.querySelectorAll('.dot');
+            const carouselItems = document.querySelectorAll('.carousel-item');
+            const carouselContent = document.querySelector('.carousel-content');
+            let currentIndex = 0;
+
+            function showSlide(index) {
+                if (index >= carouselItems.length) index = 0;
+                if (index < 0) index = carouselItems.length - 1;
+
+                carouselContent.style.transform = `translateX(-${index * 100}%)`;
+
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
                 });
 
-                projectListDiv.appendChild(ul); // 🟢 ul을 project-list에 넣기
+                currentIndex = index;
+            }
 
-            })
-            .catch(error => console.log('Error loading projects:', error)); // 오류 시 로그
-    }
+            function nextSlide() {
+                showSlide(currentIndex + 1);
+            }
+
+            function prevSlide() {
+                showSlide(currentIndex - 1);
+            }
+
+            prevBtn.addEventListener('click', prevSlide);
+            nextBtn.addEventListener('click', nextSlide);
+
+            dots.forEach((dot, i) => {
+                dot.addEventListener('click', () => {
+                    showSlide(i);
+                });
+            });
+
+            // Auto-slide feature (optional)
+            setInterval(nextSlide, 3000); // Change slide every 3 seconds
+        });
+
+        // active 버튼 스크립트~
+        const buttons = document.querySelectorAll('.filter-btn');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                // 모든 버튼에서 active 클래스 제거
+                buttons.forEach(btn => btn.classList.remove('active'));
+                // 클릭한 버튼에 active 클래스 추가
+                button.classList.add('active');
+
+                // 필터된 버튼에 맞게 프로젝트 목록을 표시하는 로직 추가
+                if (button.textContent === '프로젝트') {
+                    loadProjects(); // 프로젝트 목록을 동적으로 로드
+                }
+            });
+        });
+
+        // 프로젝트 목록을 동적으로 로드하는 함수
+        // 프로젝트 목록을 동적으로 로드하는 함수
+        function loadProjects() {
+            fetch('/project/api')  // 백엔드에서 JSON 형식의 프로젝트 목록을 가져오는 API
+                .then(response => response.json())
+                .then(projects => {
+                    console.log(projects);  // 받아온 데이터 확인
+                    const projectListDiv = document.getElementById('project-list');
+                    projectListDiv.innerHTML = ''; // 초기화
+
+                    const ul = document.createElement('ul'); // 🟢 ul 생성
+
+                    projects.forEach(project => {
+                        const li = document.createElement('li');
+                        const a = document.createElement('a');
+                        a.href = `/postproject/${project.id}`;
+                        a.classList.add('project-title');
+                        a.textContent = project.title;
+
+                        li.appendChild(a);
+                        ul.appendChild(li); // 🟢 li를 ul에 추가
+                    });
+
+                    projectListDiv.appendChild(ul); // 🟢 ul을 project-list에 넣기
+
+                })
+                .catch(error => console.log('Error loading projects:', error)); // 오류 시 로그
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("/api/cojobs") // ✅ 백엔드 실제 경로
+                .then(response => response.json())
+                .then(jobs => {
+                    const jobList = document.getElementById("job-list");
+                    jobList.innerHTML = '';
+
+                    const emojis = ["💼", "📢", "📝", "🧑‍💼", "✅", "🚀", "🔥", "📌", "🎯"];
+
+                    jobs.slice(0, 9).forEach((job, index) => {
+                        const li = document.createElement("li");
+                        const a = document.createElement("a");
+
+                        const emoji = emojis[index % emojis.length];
+                        a.href = `/job/detail?id=${job.id}`; // 상세 페이지 경로
+                        a.textContent = `${emoji} ${job.title}`; // 제목 + 임티
+
+                        li.appendChild(a);
+                        jobList.appendChild(li);
+                    });
+                })
+                .catch(error => {
+                    console.error("공고 불러오기 실패:", error);
+                });
+        });
 
 
-</script>
-</body>
-</html>
+
+
+    </script>
+    </body>
+    </html>

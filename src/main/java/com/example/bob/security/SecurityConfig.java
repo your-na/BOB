@@ -54,7 +54,7 @@ public class SecurityConfig {
                         .requestMatchers("/", "/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**", "/project", "/project/api","/contest", "/app/**", "/topic/**", "/user/me").permitAll()
                         .requestMatchers("/login", "/sign").anonymous()
                         .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject", "/api/todos", "/api/resumes", "/api/users/search", "/contest/team/**", "/ws-chat/**").authenticated()
-                        .requestMatchers("/signup", "/co_signup", "/check-nickname", "/check-username", "/api/my-projects").permitAll()
+                        .requestMatchers("/signup", "/co_signup", "/check-nickname", "/check-username", "/api/my-projects","/api/cojobs").permitAll()
                         .requestMatchers("/comhome", "/comhome/**", "/comcontest").hasAuthority("COMPANY")
                         .requestMatchers("/admin/**", "/sidebar", "/ad_contest", "/adcomcont", "/adcomcont").hasAuthority("ADMIN")
                         .requestMatchers("/contest/create", "/contest/submit").hasAnyAuthority("ADMIN", "COMPANY")
