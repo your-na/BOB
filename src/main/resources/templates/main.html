@@ -209,21 +209,43 @@
                 .catch(error => console.log('Error loading projects:', error)); // 오류 시 로그
         }
         document.addEventListener("DOMContentLoaded", function () {
-            fetch("/api/cojobs") // ✅ 백엔드 실제 경로
+            fetch("/api/cojobs")
                 .then(response => response.json())
                 .then(jobs => {
                     const jobList = document.getElementById("job-list");
                     jobList.innerHTML = '';
 
                     const emojis = ["💼", "📢", "📝", "🧑‍💼", "✅", "🚀", "🔥", "📌", "🎯"];
+                    const positions = ["emoji-before", "emoji-after", "emoji-above"]; // 3가지 위치 스타일
 
                     jobs.slice(0, 9).forEach((job, index) => {
                         const li = document.createElement("li");
                         const a = document.createElement("a");
 
-                        const emoji = emojis[index % emojis.length];
-                        a.href = `/job/detail?id=${job.id}`; // 상세 페이지 경로
-                        a.textContent = `${emoji} ${job.title}`; // 제목 + 임티
+                        const emojiSpan = document.createElement("span");
+                        const position = positions[index % positions.length];
+
+                        emojiSpan.classList.add("job-emoji", position);
+                        emojiSpan.textContent = emojis[index % emojis.length];
+
+                        const textNode = document.createTextNode(" " + job.title);
+
+                        a.href = `/job/detail?id=${job.id}`;
+
+                        // 이모지 위치에 따라 append 순서 다르게
+                        if (position === "emoji-before") {
+                            a.appendChild(emojiSpan);
+                            a.appendChild(textNode);
+                        } else if (position === "emoji-after") {
+                            a.appendChild(textNode);
+                            a.appendChild(emojiSpan);
+                        } else if (position === "emoji-above") {
+                            const wrapper = document.createElement("span");
+                            wrapper.classList.add("emoji-wrapper");
+                            wrapper.appendChild(emojiSpan);
+                            wrapper.appendChild(textNode);
+                            a.appendChild(wrapper);
+                        }
 
                         li.appendChild(a);
                         jobList.appendChild(li);
@@ -233,6 +255,8 @@
                     console.error("공고 불러오기 실패:", error);
                 });
         });
+
+
 
 
 
