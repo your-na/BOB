@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import com.example.bob.DTO.CoJobPostResponseDTO;
 import com.example.bob.DTO.CoJobPostDetailDTO;
 import com.example.bob.Entity.JobStatus;
+import com.example.bob.DTO.ResumeTitleDto;
+
 
 
 
@@ -136,12 +138,10 @@ public class CoJobPostService {
         CoJobPostEntity entity = coJobPostRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("공고를 찾을 수 없습니다."));
 
-        // 이력서 제목만 추출
-        List<String> resumeTitles = entity.getResumes().stream()
-                .map(CoResumeEntity::getTitle)
+        List<ResumeTitleDto> resumeTitles = entity.getResumes().stream()
+                .map(resume -> new ResumeTitleDto(resume.getId(), resume.getTitle()))
                 .collect(Collectors.toList());
 
-        // DTO로 변환해서 반환
         return new CoJobPostDetailDTO(
                 entity.getTitle(),
                 entity.getCompanyIntro(),
@@ -158,6 +158,7 @@ public class CoJobPostService {
                 resumeTitles
         );
     }
+
 
 
 }

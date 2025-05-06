@@ -22,5 +22,5 @@ public class CoJobPostDetailDTO {
     private String endDate;
 
     // ⬇️ 이력서 양식 제목들
-    private List<String> resumeTitles;
+    private List<ResumeTitleDto> resumeTitles;
 }
