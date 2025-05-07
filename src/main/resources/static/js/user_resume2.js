@@ -663,6 +663,29 @@ window.addEventListener('DOMContentLoaded', () => {
         })
         .catch(err => console.error("내 정보 불러오기 실패:", err));
 
+    // ✅ 사용자 완료 프로젝트 목록 불러오기 (오른쪽 경력 및 포트폴리오 탭에 표시)
+    fetch("/api/user/resumes/projects")
+        .then(res => res.json())
+        .then(projects => {
+            const container = document.querySelector(".tab-content[data-content='portfolio']"); // ✅ portfolio 탭으로 수정
+            container.innerHTML = ""; // ✅ 기존 하드코딩된 우따따 프로젝트 삭제
+            if (!projects || projects.length === 0) return;
+
+            // 수정된 코드 - 기존 "우따따 만들기 프로젝트"와 동일한 마크업
+            projects.forEach(project => {
+                const div = document.createElement("div");
+                div.className = "award-item";
+                div.innerHTML = `
+        ${project.title}<br>
+        <small>${project.submittedDate}</small>
+    `;
+                container.appendChild(div);
+            });
+
+        })
+        .catch(err => console.error("경력 불러오기 실패:", err));
+
+
 
 
     // ✅  기업 이력서 양식 동적 불러오기

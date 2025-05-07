@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.example.bob.DTO.UserProjectResponseDTO;
+
 
 
 
@@ -60,6 +62,7 @@ public class ProjectService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
 
 
     /**
@@ -323,6 +326,22 @@ public class ProjectService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * ✅ 사용자 ID로 완료된 프로젝트를 조회 (이력서 오른쪽 탭용)
+     */
+    @Transactional(readOnly = true)
+    public List<UserProjectResponseDTO> getCompletedProjectsForUser(Long userId) {
+        return userProjectRepository
+                .findByUser_UserIdAndStatusAndSubmittedFileNameIsNotNullAndVisibleTrue(userId, "완료")
+                .stream()
+                .map(up -> new UserProjectResponseDTO(
+                        up.getProject().getTitle(),
+                        up.getSubmissionDate() != null ? up.getSubmissionDate().toString() : "제출일 없음"
+                ))
+                .collect(Collectors.toList());
+    }
+
 
 
 
