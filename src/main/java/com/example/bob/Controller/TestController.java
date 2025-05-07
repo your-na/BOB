@@ -52,4 +52,8 @@ public class TestController {
     //기업 구인 내역
     @GetMapping("/corecruit")
     public String recruitform() {return "co_recruit";}
+
+    //프로필보기
+    @GetMapping("/profileview")
+    public String profileform() {return "profile_view";}
 }
