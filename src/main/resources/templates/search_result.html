@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>검색 결과</title>
+  <link rel="stylesheet" href="/css/search_result.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<div class="search-container">
+  <h2>
+    <span class="keyword" th:text="'&quot;' + ${kw} + '&quot;'">"디자인"</span>
+    으로 검색한 결과입니다
+    <span class="count" th:text="'(총 ' + ${totalResults} + '개)'">(총 10개)</span>
+  </h2>
+
+
+  <div class="search-tabs">
+    <button class="tab active" onclick="showTab('contests')">공모전</button>
+    <button class="tab" onclick="showTab('projects')">프로젝트</button>
+    <button class="tab" onclick="showTab('posts')">게시글</button>
+    <button class="tab" onclick="showTab('profiles')">프로필</button>
+  </div>
+
+  <div id="contests" class="tab-content active">
+    <div class="result-card"><h4>디자인 아이디어 공모전</h4><p>접수: 2025.04.01 ~ 2025.05.10</p></div>
+    <div class="result-card"><h4>UX 혁신 챌린지</h4><p>접수: 2025.03.20 ~ 2025.04.30</p></div>
+  </div>
+
+  <div id="projects" class="tab-content">
+    <div class="result-card"><h4>디자인 협업 프로젝트 모집</h4><p>이하은 2025.03.15 게시</p></div>
+  </div>
+
+  <div id="posts" class="tab-content">
+    <div class="result-card"><h4>디자인 같이 하실 분?</h4><p>2025.03.01 · 좋아요 3개</p></div>
+    <div class="result-card"><h4>디자인 툴 추천 좀요</h4><p>2025.02.28 · 조회수 88</p></div>
+  </div>
+
+  <div id="profiles" class="tab-content">
+    <div class="profile-card">
+      <img src="/images/profile.png" alt="프로필" class="profile-img">
+      <div>
+        <strong>김디자인</strong>
+        <p>UI 디자이너 · 서울 강남</p>
+      </div>
+    </div>
+    <div class="profile-card">
+      <img src="/images/profile.png" alt="프로필" class="profile-img">
+      <div>
+        <strong>홍길동</strong>
+        <p>그래픽 디자이너 · 경기 수원</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/search_result.js"></script>
+</body>
+</html>

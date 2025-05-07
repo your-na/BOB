@@ -66,7 +66,7 @@
         </div>
         <div class="nav-right">
             <div class="search-bar-container">
-                <form id="searchForm">
+                <form id="searchForm" action="/search" method="get">
                     <input type="text" name="kw" id="search_kw" class="search-bar" placeholder="검색어 입력" th:value="${kw}">
                     <span class="search-icon"><img src="/images/search.png" alt=""></span>
                 </form>
