@@ -133,6 +133,11 @@ body, html {
     align-self: flex-end;
 }
 
+.message-row.user {
+    flex-direction: row-reverse;
+    align-items: flex-start;
+}
+
 .message-row.partner .message {
     background-color: #ffffff;
     border: 1px solid #dcdcdc;

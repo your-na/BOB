@@ -30,19 +30,21 @@ public class ChatRoomController {
     public String chatRoomPage(@RequestParam Long roomId,
                                @AuthenticationPrincipal UserDetailsImpl userDetails,
                                Model model) {
-        // 로그인한 사용자 정보를 모델에 담음
-        model.addAttribute("user", userDetails.getUserEntity());
-
-        // 채팅방 정보도 함께 넘기고자 할 경우
-        PrivateChatRoom room = chatRoomService.findById(roomId);
         UserEntity currentUser = userDetails.getUserEntity();
 
-        // 상대방 닉네임만 넘기기
-        String opponentNick = room.getUserA().getId().equals(currentUser.getId())
-                ? room.getUserB().getUserNick()
-                : room.getUserA().getUserNick();
-        model.addAttribute("opponentNick", opponentNick);
+        // 로그인한 사용자 정보를 모델에 담음
+        model.addAttribute("user", currentUser);
 
+        PrivateChatRoom room = chatRoomService.findById(roomId);
+        UserEntity opponent = room.getUserA().getId().equals(currentUser.getId())
+                ? room.getUserB()
+                : room.getUserA();
+
+        model.addAttribute("opponent", opponent); // 이 줄이 없으면 오류 발생합니다
+
+//        model.addAttribute("currentUserNick", currentUser.getUserNick());
+//        model.addAttribute("currentUserId", currentUser.getId());
+//        model.addAttribute("currentProfileImage", currentUser.getProfileImageUrl());
         return "chat_room";
     }
 

@@ -8,8 +8,10 @@ function getRoomIdFromURL() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+    const opponentNick = document.querySelector("meta[name='opponent-nick']")?.content || "상대";
+    const opponentProfileUrl = document.querySelector("meta[name='opponent-profile-url']")?.content || "/images/user.png";
+
     const currentUserNick = document.querySelector("meta[name='current-user']").content.trim();
-    const opponentNick = document.querySelector("meta[name='opponent-user']").content;
     const currentUserId = parseInt(document.querySelector("meta[name='current-user-id']").content);
 
     document.getElementById("chat-partner-name").textContent = opponentNick;
@@ -23,6 +25,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const socket = new SockJS("/ws-chat");
     const stompClient = Stomp.over(socket);
 
+    loadMessages(roomId);
+
     stompClient.connect({}, () => {
         stompClient.subscribe(`/topic/room.${roomId}`, (msg) => {
             const payload = JSON.parse(msg.body);
@@ -31,8 +35,6 @@ document.addEventListener("DOMContentLoaded", function () {
             const type = isMine ? "user" : "partner";
             appendMessage(type, payload.senderName, payload.message);
         });
-
-        loadMessages(roomId);
     });
 
     sendBtn.addEventListener("click", sendMessage);
@@ -42,13 +44,39 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 메세지 추가 함수
     function appendMessage(type, sender, text) {
-        const message = document.createElement("div");
-        message.classList.add("message", type);
-        message.textContent = text;
-        chatBox.appendChild(message);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
+        const messageRow = document.createElement("div");
+        messageRow.className = `message-row ${type}`;
 
+        const messageContent = document.createElement("div");
+        messageContent.className = "message-content";
+
+        const messageBubble = document.createElement("div");
+        messageBubble.className = `message ${type}`;
+        messageBubble.textContent = text;
+
+        if (type === "user") {
+            messageContent.appendChild(messageBubble);
+            messageRow.appendChild(messageContent);
+        } else {
+            const profileImg = document.createElement("img");
+            profileImg.className = "profile-image";
+            profileImg.src = opponentProfileUrl;
+            profileImg.alt = "프로필";
+
+            const nicknameSpan = document.createElement("span");
+            nicknameSpan.className = "nickname";
+            nicknameSpan.textContent = opponentNick;
+
+            messageContent.appendChild(nicknameSpan);
+            messageContent.appendChild(messageBubble);
+
+            messageRow.appendChild(profileImg);
+            messageRow.appendChild(messageContent);
+        }
+
+        document.querySelector(".chat-box").appendChild(messageRow);
+        document.querySelector(".chat-box").scrollTop = chatBox.scrollHeight;
+    }
 
     function loadMessages(roomId) {
         fetch(`/chat/messages?roomId=${roomId}`)

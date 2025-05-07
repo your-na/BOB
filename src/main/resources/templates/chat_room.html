@@ -1,15 +1,19 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>채팅방</title>
   <link rel="stylesheet" href="/css/chat_room.css">
   <meta th:name="_csrf" th:content="${_csrf.token}"/>
   <meta th:name="_csrf_header" th:content="${_csrf.headerName}"/>
-  <meta th:name="current-user" th:content="${user.userNick}"/>
-  <meta th:name="opponent-user" th:content="${opponentNick}"/>
-  <meta th:name="current-user-id" th:content="${user.id}" />
+  <!-- 현재 로그인한 사용자 정보 -->
+  <meta name="current-user-id" th:content="${user.id}" />
+  <meta name="current-user" th:content="${user.userNick}" />
+  <meta name="current-profile-url" th:content="@{${user.profileImageUrl}}" />
 
+  <!-- 채팅 상대방 정보 -->
+  <meta name="opponent-nick" th:content="${opponent.userNick}" />
+  <meta name="opponent-profile-url" th:content="@{${opponent.profileImageUrl}}" />
 
 </head>
 <body>
@@ -22,13 +26,6 @@
   <div class="chat-box">
     <!-- 채팅 내용 -->
     <!-- 상대방 메시지 -->
-    <div class="message-row partner">
-      <img class="profile-image" src="/images/profile.png" alt="프로필">
-      <div class="message-content">
-        <span class="nickname">나유정1228</span>
-        <div class="message">네! 다음에 좋은 기회로 봬요~</div>
-      </div>
-    </div>
   </div>
 
   <div class="chat-input-wrapper">
@@ -50,8 +47,6 @@
     <button class="send-button">➤</button>
   </div>
 </div>
-
-
 
 
 <script src="/js/chat_room.js"></script>
