@@ -102,6 +102,33 @@
     font-weight: bold;
     margin-right: 15px;
 }
+/* 모집전: 노랑 */
+.status-waiting {
+    background-color: #f1c40f;
+    color: white;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 999px;
+}
+
+/* 모집중: 초록 (이미 있으므로 기존 `.job-status`를 확장해도 됨) */
+.status-open {
+    background-color: #00c400;
+    color: white;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 999px;
+}
+
+/* 마감: 회색 */
+.status-closed {
+    background-color: #7f8c8d;
+    color: white;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 999px;
+}
+
 
 .job-info {
     flex: 1;
