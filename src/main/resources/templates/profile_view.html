@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>회원 프로필</title>
+    <link rel="stylesheet" href="/css/profile_view.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<form>
+<div class="profile-container">
+    <!-- 좌측 회원 기본 정보 -->
+    <div class="profile-left">
+        <div class="profile-header">
+            <div class="profile-info">
+                <img src="/images/profile.png" alt="프로필 사진" class="profile-img">
+                <h2 class="nickname">닉네임</h2>
+                <p class="bio">안녕하세요~ 이런 소개글</p>
+            </div>
+            <button class="message-btn">메시지 보내기</button>
+        </div>
+
+
+        <!-- 탭 메뉴 -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('info')">회원 정보</button>
+            <button class="tab" onclick="showTab('history')">공모전/프로젝트 참가내역</button>
+        </div>
+
+        <!-- 회원 정보 탭 -->
+        <div class="tab-content" id="info">
+            <h4>회원의 주언어</h4>
+            <div class="languages">
+                <label><input type="checkbox" disabled checked> JAVA</label>
+                <label><input type="checkbox" disabled> Python</label>
+                <label><input type="checkbox" disabled checked> Springboot</label>
+                <label><input type="checkbox" disabled checked> React</label>
+            </div>
+
+            <h4>회원이 쓴 게시글</h4>
+            <table class="posts-table">
+                <thead>
+                <tr><th>제목</th><th>작성일</th><th>좋아요</th></tr>
+                </thead>
+                <tbody>
+                <tr><td>공모전 같이 하실 분 모집합니다!</td><td>2024-12-26</td><td>0</td></tr>
+                <tr><td>같이 팀할 사람?</td><td>2024-12-25</td><td>1</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 이력서/경력 탭 -->
+        <div class="tab-content" id="history" style="display: none;">
+            <h4>공모전</h4>
+            <ul>
+                <li>A공모전 수상 <span>2024.12.19</span></li>
+                <li>B공모전 수상 <span>2024.11</span></li>
+            </ul>
+
+            <h4>프로젝트</h4>
+            <ul>
+                <li>A프로젝트 참여 <span>포트폴리오 보기</span></li>
+                <li>B프로젝트 참여 <span>포트폴리오 보기</span></li>
+            </ul>
+        </div>
+    </div>
+</div>
+</form>
+
+<script>
+    function showTab(tabId) {
+        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
+        document.querySelector(`.tab[onclick*="${tabId}"]`).classList.add('active');
+        document.getElementById(tabId).style.display = 'block';
+    }
+</script>
+</body>
+</html>
