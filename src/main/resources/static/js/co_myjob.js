@@ -1,3 +1,8 @@
+// 🧭 공고 카드를 클릭하면 상세 페이지로 이동 (HTML에서도 호출 가능하도록 전역에 선언)
+function goToJobDetail(id) {
+    // 💡 공고 상세보기 페이지로 이동하면서 ID를 쿼리로 전달
+    window.location.href = `/jobdetail?id=${id}`;
+}
 document.addEventListener("DOMContentLoaded", () => {
     const toggle = document.querySelector(".dropdown-toggle");
     const menu = document.querySelector(".dropdown-menu");
@@ -48,20 +53,22 @@ document.addEventListener("DOMContentLoaded", () => {
             // ⏳ 마감일까지 남은 일수 계산
             const dDay = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
 
-            // 🧱 공고 하나의 HTML 카드 생성
+            // 🧱 공고 하나의 HTML 카드 생성 + 클릭 시 상세페이지로 이동
             const jobCard = `
-            <div class="job-card">
-                <div class="job-status ${statusClass}">${statusLabel}</div>
-                <div class="job-info">
-                    <h3 class="job-title">${post.title}</h3>
-                    <p class="job-dates">${post.startDate} ~ ${post.endDate}</p>
-                </div>
-                <div class="job-extra">
-                    <div class="d-day">D-${dDay}</div>
-                    <div class="applicants">지원자 수: 알 수 없음</div>
-                </div>
-            </div>
-        `;
+    <div class="job-card" onclick="goToJobDetail('${post.id}')">
+        <div class="job-status ${statusClass}">${statusLabel}</div>
+        <div class="job-info">
+            <h3 class="job-title">${post.title}</h3>
+            <p class="job-dates">${post.startDate} ~ ${post.endDate}</p>
+        </div>
+        <div class="job-extra">
+            <div class="d-day">D-${dDay}</div>
+            <div class="applicants">지원자 수: 알 수 없음</div>
+        </div>
+    </div>
+`;
+
+
 
             // 📥 생성한 HTML을 페이지에 추가
             container.insertAdjacentHTML("beforeend", jobCard);
@@ -74,4 +81,5 @@ document.addEventListener("DOMContentLoaded", () => {
             menu.style.display = "none";
         }
     });
+
 });

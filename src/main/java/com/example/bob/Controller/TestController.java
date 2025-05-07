@@ -18,9 +18,6 @@ public class TestController {
     @GetMapping("/cojobwrite")
     public String jobwriteform() {return "co_jobwrite";}
 
-    //기업 구인글 공고 상세
-    @GetMapping("/jobdetail")
-    public String jobdetailform() {return "co_jobdetail";}
 
     //기업 구인 공고 목록
     @GetMapping("/job2")
