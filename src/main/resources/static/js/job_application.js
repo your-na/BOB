@@ -46,7 +46,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     <ul class="dropdown-menu">
                         <li onclick="viewDetail(${item.id})">지원내역</li>
                         <li onclick="cancelApply(${item.id})">지원취소</li>
-                        <li onclick="hideItem(${item.id}, '${type}')">숨기기</li>
+                        ${
+                type === "hidden"
+                    ? `<li onclick="unhideItem(${item.id})">숨기기 취소</li>`
+                    : `<li onclick="hideItem(${item.id}, '${type}')">숨기기</li>`
+            }
                     </ul>
                 </div>
             `;
@@ -72,30 +76,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
     renderList("online");
 
-    // 외부에서도 호출 가능하도록 전역 함수로 등록
+    // 숨기기
     window.hideItem = function (id, fromType) {
         const itemIndex = dummyData[fromType].findIndex(item => item.id === id);
         if (itemIndex !== -1) {
             const [item] = dummyData[fromType].splice(itemIndex, 1);
-            item.desc += " (숨김)";
-            dummyData.hidden.push(item);
-
-            if (currentTab === fromType) {
-                renderList(currentTab);
+            if (!item.desc.includes("(숨김)")) {
+                item.desc += " (숨김)";
             }
+            dummyData.hidden.push(item);
+            renderList(currentTab);
         }
     };
 
+    // 숨기기 취소
+    window.unhideItem = function (id) {
+        const itemIndex = dummyData.hidden.findIndex(item => item.id === id);
+        if (itemIndex !== -1) {
+            const [item] = dummyData.hidden.splice(itemIndex, 1);
+            item.desc = item.desc.replace(" (숨김)", "");
+            dummyData.online.push(item); // 기본적으로 online에 복원
+            renderList(currentTab);
+        }
+    };
+
+    // 지원내역 보기
     window.viewDetail = function (id) {
         alert(`📄 ${id}번 항목 상세보기`);
     };
 
+    // 지원취소
     window.cancelApply = function (id) {
         alert(`❌ ${id}번 항목 지원취소`);
     };
 });
 
-// 메뉴 열기/닫기
+// 메뉴 토글
 function toggleMenu(button) {
     const menu = button.nextElementSibling;
     document.querySelectorAll(".dropdown-menu").forEach(m => {
