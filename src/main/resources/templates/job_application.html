@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>신청한 구직 내역</title>
+    <link rel="stylesheet" href="/css/job_application.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<div class="application-container">
+    <h2 class="page-title">신청한 구직 내역</h2>
+    <p class="sub-desc">최근 1년 이내의 지원내역을 확인할 수 있습니다.</p>
+
+    <!-- 통계 박스 -->
+    <div class="status-summary">
+        <div><strong>11</strong><span>전체</span></div>
+        <div><strong>6</strong><span>지원완료</span></div>
+        <div><strong>0</strong><span>합격</span></div>
+        <div><strong>5</strong><span>불합격/취소</span></div>
+    </div>
+
+    <!-- 필터 탭 -->
+    <div class="tabs">
+        <button class="tab active" data-type="online">지원한 공고</button>
+        <button class="tab" data-type="other">합격 공고</button>
+        <button class="tab" data-type="other2">불합격 공고</button>
+        <button class="tab" data-type="hidden">숨긴 내역</button>
+    </div>
+
+    <!-- 지원 목록 -->
+    <div class="application-list">
+        <div class="application-card">
+            <div class="left">
+                <div class="apply-date">2025.03.01</div>
+                <div class="job-title">7Days COFFEE</div>
+                <div class="job-desc">주말 미들 근무 하실분을 모집합니다. 카페/커피 (마감)</div>
+            </div>
+            <div class="right">
+                <button class="open-menu-btn" onclick="toggleMenu(this)">⋯</button>
+                <ul class="dropdown-menu">
+                    <li>지원내역</li>
+                    <li>지원취소</li>
+                    <li>숨기기</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/job_application.js"></script>
+</body>
+</html>

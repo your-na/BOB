@@ -1,0 +1,124 @@
+.application-container {
+    max-width: 1000px;
+    margin-top: 10%;
+    margin-left: 14%;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.sub-desc {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.status-summary {
+    display: flex;
+    gap: 30px;
+    margin: 20px 0;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.status-summary div {
+    text-align: center;
+}
+
+.status-summary strong {
+    font-size: 22px;
+    color: #005700;
+    display: block;
+}
+
+.status-summary span {
+    font-size: 14px;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.tab {
+    padding: 10px 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: #333;
+}
+
+.tab.active {
+    border-bottom: 3px solid #30b530;
+    color: #30b530;
+}
+
+.application-list {
+    margin-top: 10px;
+}
+
+.application-card {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background: #fff;
+    position: relative;
+}
+
+.left .apply-date {
+    font-size: 13px;
+    color: gray;
+}
+
+.left .job-title {
+    font-weight: bold;
+    font-size: 17px;
+    margin: 5px 0;
+}
+
+.left .job-desc {
+    font-size: 14px;
+    color: #444;
+}
+
+.open-menu-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 10px;
+    top: 40px;
+    background: white;
+    border: 1px solid #ccc;
+    list-style: none;
+    padding: 5px 0;
+    border-radius: 6px;
+    width: 120px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 100;
+}
+
+.dropdown-menu li {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.dropdown-menu li:hover {
+    background-color: #f2f2f2;
+}
