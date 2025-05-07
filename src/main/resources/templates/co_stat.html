@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>채용 통계</title>
+    <link rel="stylesheet" href="/css/co_stat.css">
+    <link rel="stylesheet" th:href="@{/css/header2.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header2 :: header}"></div>
+
+<div class="container">
+    <h2 class="title">채용 공고 통계</h2>
+    <p class="desc">최근 1년간 귀사에서 등록한 공고에 대한 채용 통계입니다.</p>
+
+    <div class="summary-box">
+        <div class="summary-item">
+            <strong>15</strong>
+            <span>등록한 공고</span>
+        </div>
+        <div class="summary-item">
+            <strong>120</strong>
+            <span>총 지원자</span>
+        </div>
+        <div class="summary-item">
+            <strong>28</strong>
+            <span>채용 완료</span>
+        </div>
+        <div class="summary-item">
+            <strong>34</strong>
+            <span>불합격</span>
+        </div>
+        <div class="summary-item">
+            <strong>7</strong>
+            <span>지원 취소</span>
+        </div>
+    </div>
+
+    <div class="filter-bar">
+        <label for="month-select">월별 통계</label>
+        <select id="month-select">
+            <option value="2025-05">2025년 5월</option>
+            <option value="2025-04">2025년 4월</option>
+            <option value="2025-03">2025년 3월</option>
+        </select>
+    </div>
+
+    <div class="chart-box">
+        <h3>공고별 지원 현황</h3>
+        <ul class="chart-list">
+            <li>
+                <span class="job-title">[인턴] 웹디자인 채용</span>
+                <span class="status">지원자 35명 / 채용 5명</span>
+            </li>
+            <li>
+                <span class="job-title">[정규직] 프론트엔드 개발자</span>
+                <span class="status">지원자 21명 / 채용 3명</span>
+            </li>
+            <li>
+                <span class="job-title">[파트타임] 사무보조</span>
+                <span class="status">지원자 13명 / 채용 2명</span>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script src="/js/co_stat.js"></script>
+</body>
+</html>

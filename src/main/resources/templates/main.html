@@ -51,7 +51,7 @@
         <div class="content-section">
             <div class="content-section-header">
                 <h2>관심 가졌던 채용 공고</h2>
-                <p><a href="/jobs" class="more">더보기 ></a></p>
+                <p><a href="/job" class="more">더보기 ></a></p>
             </div>
             <div class="card latest-competitions">
                 <ul id="job-list">
@@ -230,7 +230,7 @@
 
                         const textNode = document.createTextNode(" " + job.title);
 
-                        a.href = `/job/detail?id=${job.id}`;
+                        a.href = `/jobindex?id=${job.id}`;
 
                         // 이모지 위치에 따라 append 순서 다르게
                         if (position === "emoji-before") {

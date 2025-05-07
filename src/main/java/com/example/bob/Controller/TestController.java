@@ -57,4 +57,8 @@ public class TestController {
     //신청한 구직 내역
     @GetMapping("/jobapplication")
     public String jobappform() {return "job_application";}
+
+    //기업 구인통계
+    @GetMapping("/costat")
+    public String costatform() {return "co_stat";}
 }

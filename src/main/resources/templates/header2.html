@@ -24,7 +24,7 @@
             <div class="dropdown-section">
               <ul>
                 <li><a href="comhome">전체 공모전</a></li>
-                <li><a href="#">주최하기</a></li>
+                <li><a href="/comcontest">주최하기</a></li>
                 <li><a href="/comycontest">주최한 공모전</a></li>
               </ul>
             </div>
@@ -76,7 +76,7 @@
             <ul>
               <li sec:authorize="isAuthenticated()"><a href="/profile">내 정보 / 평점</a></li>
               <li sec:authorize="isAuthenticated()"><a href="#" class="notification-icon" id="notification-icon">알림</a><span class="notification-badge" id="notification-badge"></span></li>
-              <li sec:authorize="isAuthenticated()"><a href="#">구인 통계</a></li>
+              <li sec:authorize="isAuthenticated()"><a href="/costat">채용 공고 통계</a></li>
               <li sec:authorize="isAuthenticated()">
                 <form id="logoutForm" th:action="@{/logout}" method="post">
                   <button type="submit" class="logout">로그아웃</button>

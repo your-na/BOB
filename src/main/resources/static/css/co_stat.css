@@ -1,0 +1,83 @@
+.container {
+    max-width: 900px;
+    margin-top: 10%;
+    margin-left: 14%;
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.desc {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.summary-box {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    justify-content: space-between;
+}
+
+.summary-item {
+    text-align: center;
+    background: #f1fdf1;
+    padding: 20px;
+    border-radius: 10px;
+    flex: 1;
+}
+
+.summary-item strong {
+    font-size: 22px;
+    color: #28a745;
+    display: block;
+}
+
+.summary-item span {
+    font-size: 14px;
+    color: #444;
+}
+
+.filter-bar {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-bar select {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.chart-box {
+    margin-top: 20px;
+}
+
+.chart-list {
+    list-style: none;
+    padding: 0;
+}
+
+.chart-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.job-title {
+    font-weight: bold;
+}
+
+.status {
+    color: #666;
+}
