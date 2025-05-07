@@ -10,12 +10,12 @@
 <!-- header -->
 <div th:insert="~{header :: header}"></div>
 
+<form>
 <div class="resume-detail-container">
 
   <!-- 수정/삭제 버튼 -->
   <div class="resume-buttons">
-    <button class="edit-btn">수정하기</button>
-    <button class="delete-btn">삭제하기</button>
+    <button class="delete-btn">지원 취소하기</button>
   </div>
 
   <!-- 프로필 정보 -->
@@ -42,6 +42,10 @@
     <span>2004 03 ~ 2008 02 00대학교 00과 졸업<br>2008 03 ~ 2010 02 00대학교 00과 졸업</span>
   </div>
 
+  <div class="info-section"><strong>희망직무</strong>
+    <span>프론트</span>
+  </div>
+
   <div class="info-section"><strong>경력사항</strong>
     <span>수상<br>2024.10.20 <strong>ANUY</strong> 공모전 수상</span>
   </div>
@@ -50,18 +54,31 @@
     <span>(포트폴리오)</span>
   </div>
 
-  <div class="info-section"><strong>구직</strong>
-    <span>2001 08 ~ 현재 (주)000테크 부장<br>1년 2개월 편의점 알바</span>
-  </div>
-
-  <div class="info-section"><strong>자격증</strong>
-    <span>컴활 1급<br>엑셀</span>
-  </div>
-
   <div class="info-section"><strong>자기소개</strong>
     <textarea readonly>준비된 인재 진유서</textarea>
   </div>
 
+  <!-- 첨부 이미지/파일 -->
+  <div class="info-section">
+    <strong>사진형</strong>
+    <div class="attachments">
+      <!-- 이미지 미리보기 -->
+      <div class="image-preview">
+        <img src="/uploads/sample-image.png" alt="첨부 이미지">
+      </div>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <strong>파일형</strong>
+    <div class="attachments">
+      <!-- 파일 다운로드 링크 -->
+      <div class="file-download">
+        <a href="/uploads/sample-file.pdf" download>📄 sample-file.pdf 다운로드</a>
+      </div>
+    </div>
+  </div>
 </div>
+</form>
 </body>
 </html>

@@ -104,3 +104,25 @@
     padding: 10px;
     font-size: 14px;
 }
+
+/* 첨부자료 섹션 스타일 */
+.attachments {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 14px;
+}
+
+/* 이미지 미리보기 */
+.image-preview img {
+    max-width: 300px;
+    max-height: 200px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+/* 파일 다운로드 링크 */
+.file-download a {
+    color: #0066cc;
+    text-decoration: underline;
+}
