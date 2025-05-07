@@ -51,5 +51,18 @@ public class CoJobPostController {
         return ResponseEntity.ok(coJobPostService.getJobPostWithResumeTitles(id));
     }
 
+    // 🔗 [GET] /api/cojobs/my-posts
+    // ✅ 로그인된 기업이 작성한 모든 공고 목록을 조회하는 API
+    // 상태(모집전, 모집중, 마감)는 서비스에서 자동 계산됨
+    @GetMapping("/my-posts")
+    public ResponseEntity<List<CoJobPostResponseDTO>> getMyJobPosts() {
+        // 📞 서비스에서 현재 로그인 기업의 공고 목록 가져오기
+        List<CoJobPostResponseDTO> myJobPosts = coJobPostService.getMyJobPosts();
+
+        // 📤 클라이언트에 200 OK 상태로 응답 반환
+        return ResponseEntity.ok(myJobPosts);
+    }
+
+
 
 }

@@ -13,7 +13,7 @@
 
 <div class="container">
     <h2 class="page-title">내가 작성한 공고</h2>
-
+    <div id="job-list-container"></div>
     <!-- 필터 & 검색 -->
     <div class="top-bar">
         <div class="dropdown">
@@ -28,8 +28,8 @@
         </div>
     </div>
 
-    <!-- 공고 목록 -->
-    <div class="job-card" onclick="location.href='/applicant'">
+    <!-- 공고 목록 (숨김 처리됨) -->
+    <div class="job-card" style="display: none;" onclick="location.href='/applicant'">
         <div class="job-status">모집중</div>
         <div class="job-info">
             <h3 class="job-title">인턴채용공고</h3>

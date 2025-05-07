@@ -118,7 +118,10 @@ public class CoJobPostService {
                             post.getTitle(),
                             post.getPhone(),
                             post.getCareer(),
-                            coNick
+                            coNick,
+                            post.getStartDate(),     // ✅ 추가
+                            post.getEndDate(),       // ✅ 추가
+                            post.getStatus()         // ✅ 추가
                     );
                 })
                 .collect(Collectors.toList());
@@ -158,6 +161,59 @@ public class CoJobPostService {
                 resumeTitles
         );
     }
+
+    // 로그인한 기업이 작성한 모든 공고 목록을 반환
+    public List<CoJobPostResponseDTO> getMyJobPosts() {
+        // 🔐 로그인한 사용자 정보에서 기업 계정 정보 가져오기
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        CompanyDetailsImpl companyDetails = (CompanyDetailsImpl) userDetails;
+        String currentUsername = companyDetails.getUsername();
+
+        // 🔍 로그인된 기업 정보 DB에서 조회
+        CompanyEntity company = companyRepository.findByCoIdLogin(currentUsername)
+                .orElseThrow(() -> new RuntimeException("로그인된 기업 정보를 찾을 수 없습니다."));
+
+        // 📅 오늘 날짜 기준으로 상태 계산
+        LocalDate today = LocalDate.now();
+
+        // 📦 이 기업이 작성한 모든 공고 가져오기
+        return coJobPostRepository.findByCompany_CompanyId(company.getCompanyId()).stream()  // ✅ 수정된 부분
+                .peek(post -> {
+                    // 📅 공고의 시작일과 마감일을 LocalDate로 파싱
+                    LocalDate start = LocalDate.parse(post.getStartDate());
+                    LocalDate end = LocalDate.parse(post.getEndDate());
+
+                    // ✅ 상태 자동 계산 및 저장
+                    if (today.isAfter(end)) {
+                        post.setStatus(JobStatus.CLOSED);      // 마감
+                    } else if (today.isBefore(start)) {
+                        post.setStatus(JobStatus.WAITING);     // 모집 전
+                    } else {
+                        post.setStatus(JobStatus.OPEN);        // 모집 중
+                    }
+
+                    // 📝 상태 업데이트 DB 저장
+                    coJobPostRepository.save(post);
+                })
+                // 📤 DTO로 변환 (프론트에 필요한 정보만 추출)
+                .map(post -> {
+                    String coNick = post.getCompany() != null ? post.getCompany().getCoNick() : "알 수 없음";
+                    return new CoJobPostResponseDTO(
+                            post.getId(),
+                            post.getTitle(),
+                            post.getPhone(),
+                            post.getCareer(),
+                            coNick,
+                            post.getStartDate(),
+                            post.getEndDate(),
+                            post.getStatus()
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
+
+
 
 
 
