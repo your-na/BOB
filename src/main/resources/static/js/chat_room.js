@@ -9,7 +9,17 @@ function getRoomIdFromURL() {
 
 document.addEventListener("DOMContentLoaded", function () {
     const opponentNick = document.querySelector("meta[name='opponent-nick']")?.content || "상대";
-    const opponentProfileUrl = document.querySelector("meta[name='opponent-profile-url']")?.content || "/images/user.png";
+    let rawOpponentUrl = document.querySelector("meta[name='opponent-profile-url']")?.content || "/images/user.png";
+
+    if (!rawOpponentUrl.startsWith("/")) {
+        rawOpponentUrl = "/" + rawOpponentUrl;
+    }
+
+    // ✅ encodeURI 제거
+    const opponentProfileUrl = rawOpponentUrl;
+
+
+    console.log("🔥 최종 상대 프로필 URL:", opponentProfileUrl);
 
     const currentUserNick = document.querySelector("meta[name='current-user']").content.trim();
     const currentUserId = parseInt(document.querySelector("meta[name='current-user-id']").content);
@@ -60,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             const profileImg = document.createElement("img");
             profileImg.className = "profile-image";
-            profileImg.src = opponentProfileUrl;
+            profileImg.src = encodeURI(opponentProfileUrl);
             profileImg.alt = "프로필";
 
             const nicknameSpan = document.createElement("span");
