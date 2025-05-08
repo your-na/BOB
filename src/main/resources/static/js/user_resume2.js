@@ -281,15 +281,19 @@ confirmBtn.addEventListener("click", () => {
         const draggedDivs = box.querySelectorAll(".uploaded-item");
         if (draggedDivs.length > 0) {
             section.dragItems = [...draggedDivs].map(div => {
+                const rawId = div.dataset.id;
+                const referenceId = rawId && !isNaN(Number(rawId)) ? Number(rawId) : null;
+
                 return {
-                    coSectionId: Number(coSectionId),  // 꼭 포함!
-                    itemType: div.dataset.type || "PROJECT",  // 드래그 시 설정한 타입
-                    referenceId: Number(div.dataset.id),      // 실제 ID
+                    coSectionId: Number(coSectionId),
+                    itemType: div.dataset.type || "PROJECT",
+                    referenceId: referenceId,
                     displayText: div.textContent.trim(),
-                    filePath: div.dataset.file || null        // 파일 경로가 있을 경우
+                    filePath: div.dataset.file || null
                 };
             });
         }
+
 
 
         // ✅ 학력사항인 경우, education 정보 수집
@@ -351,8 +355,9 @@ confirmBtn.addEventListener("click", () => {
         })
         .then(() => {
             alert("제출이 완료되었습니다!");
-            window.location.href = "/job-application-history";
+            window.location.href = `/jobindex?id=${jobPostId}`;  // ✅ 공고 상세보기 페이지로 이동
         })
+
         .catch(err => {
             console.error("제출 오류:", err);
             alert("제출에 실패했습니다.");
@@ -766,11 +771,6 @@ function renderPhotoSection(section, number) {
     const wrapper = document.createElement("div");
     wrapper.className = "file-upload-wrapper";
 
-// ✅ 진짜 드롭 대상 요소 생성
-    const dropBox = document.createElement("div");
-    dropBox.className = "upload-box";
-    dropBox.textContent = "드래그해서 파일 첨부하기";
-    setupDropBox(dropBox); // ✅ 여기에만 적용해야 드롭 가능
 
 // ✅ 파일 선택 라벨 및 input
     const label = document.createElement("label");
@@ -799,7 +799,6 @@ function renderPhotoSection(section, number) {
     wrapper.appendChild(label);
     wrapper.appendChild(input);
     wrapper.appendChild(fileNameSpan);
-    wrapper.appendChild(dropBox); // ✅ 드롭박스도 넣기
 
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(textarea);
@@ -835,12 +834,6 @@ function renderFileSection(section, number) {
     const textarea = document.createElement("textarea");
     textarea.placeholder = "파일 관련 설명 입력";
 
-    // ✅ 진짜 드롭 대상 요소 생성
-    const dropBox = document.createElement("div");
-    dropBox.className = "upload-box";
-    dropBox.textContent = "드래그해서 파일 첨부하기";
-    setupDropBox(dropBox);  // 진짜 드롭박스!
-
     const uploadWrapper = document.createElement("div");
     uploadWrapper.className = "file-upload-wrapper";
 
@@ -864,7 +857,6 @@ function renderFileSection(section, number) {
     label.appendChild(fileInput);
     uploadWrapper.appendChild(label);
     uploadWrapper.appendChild(fileName);
-    uploadWrapper.appendChild(dropBox); // 드롭박스도 함께!
 
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(textarea);
