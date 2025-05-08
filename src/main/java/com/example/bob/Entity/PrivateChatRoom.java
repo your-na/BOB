@@ -23,6 +23,12 @@ public class PrivateChatRoom {
     @ManyToOne
     private UserEntity userB;
 
+    @Column(nullable = false)
+    private boolean pinnedByA = false;
+
+    @Column(nullable = false)
+    private boolean pinnedByB = false;
+
     private LocalDateTime createdAt;
 
 }
