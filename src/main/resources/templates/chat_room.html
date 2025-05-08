@@ -12,15 +12,16 @@
   <meta name="current-profile-url" th:content="@{${user.profileImageUrl}}" />
 
   <!-- 채팅 상대방 정보 -->
-  <meta name="opponent-nick" th:content="${opponent.userNick}" />
-  <meta name="opponent-profile-url" th:content="@{${opponent.profileImageUrl}}" />
+  <meta name="opponent-nick" th:content="${opponent != null ? opponent.userNick : '상대'}" />
+  <meta name="opponent-profile-url"
+        th:content="@{${opponent != null ? opponent.profileImageUrl : '/images/user.png'}}" />
 
 </head>
 <body>
 <div class="chat-container"> <!-- ✅ 전체 감싸는 컨테이너 -->
   <div class="chat-header">
     <button class="back-button" onclick="goBack()"><</button>
-    <span id="chat-partner-name" th:text="${opponentNick}"></span>
+    <span id="chat-partner-name"></span>
   </div>
 
   <div class="chat-box">

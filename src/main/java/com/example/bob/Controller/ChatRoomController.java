@@ -36,15 +36,18 @@ public class ChatRoomController {
         model.addAttribute("user", currentUser);
 
         PrivateChatRoom room = chatRoomService.findById(roomId);
+
         UserEntity opponent = room.getUserA().getId().equals(currentUser.getId())
                 ? room.getUserB()
                 : room.getUserA();
 
         model.addAttribute("opponent", opponent); // 이 줄이 없으면 오류 발생합니다
 
-//        model.addAttribute("currentUserNick", currentUser.getUserNick());
-//        model.addAttribute("currentUserId", currentUser.getId());
-//        model.addAttribute("currentProfileImage", currentUser.getProfileImageUrl());
+        System.out.println("✅ opponent: " + opponent);
+        System.out.println("🟢 opponent.getUserNick(): " + opponent.getUserNick());
+        System.out.println("🖼 opponent.getProfileImageUrl(): " + opponent.getProfileImageUrl());
+
+
         return "chat_room";
     }
 

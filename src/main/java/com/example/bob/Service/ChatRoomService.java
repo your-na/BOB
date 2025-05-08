@@ -40,7 +40,7 @@ public class ChatRoomService {
     }
 
     public PrivateChatRoom findById(Long roomId) {
-        return chatRoomRepository.findById(roomId)
+        return chatRoomRepository.findByIdWithUsers(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅방이 존재하지 않습니다."));
     }
 
