@@ -1,3 +1,37 @@
+// ✅ 드롭 가능한 upload-box에 drag 이벤트 연결하는 함수
+function setupDropBox(box) {
+    box.addEventListener('dragover', e => {
+        e.preventDefault();
+        box.style.border = '2px dashed #4CAF50';
+    });
+
+    box.addEventListener('dragleave', () => {
+        box.style.border = '1px dashed #ccc';
+    });
+
+    box.addEventListener('drop', e => {
+        e.preventDefault();
+        box.style.border = '1px solid #ccc';
+
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            [...e.dataTransfer.files].forEach(file => {
+                const item = document.createElement('div');
+                item.className = 'uploaded-item';
+                item.textContent = file.name;
+                box.appendChild(item);
+            });
+        } else {
+            const title = e.dataTransfer.getData('text/plain');
+            const item = document.createElement('div');
+            item.className = 'uploaded-item';
+            item.textContent = title;
+            box.appendChild(item);
+        }
+    });
+}
+
+
+
 // ✅ 1. section-box 강조
 document.querySelectorAll('.section-box textarea, .section-box input, .section-box select').forEach(el => {
     el.addEventListener('focus', function () {
@@ -92,6 +126,7 @@ addBtn.addEventListener("click", () => {
     // X 버튼 연결
     const deleteBtn = clone.querySelector(".del-btn");
     addDeleteFunction(deleteBtn);
+
 
     // 상태 이벤트 연결
     setupStatusListener(clone);
@@ -337,6 +372,7 @@ function renderCareerSection(section, number) {
     uploadBox.className = "upload-box";
     uploadBox.textContent = "드래그해서 파일 첨부하기";
 
+    setupDropBox(uploadBox);
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(textarea);
     sectionBox.appendChild(uploadBox);
@@ -371,6 +407,7 @@ function renderPortfolioSection(section, number) {
     uploadBox.className = "upload-box";
     uploadBox.textContent = "드래그해서 파일 첨부하기";
 
+    setupDropBox(uploadBox);
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(textarea);
     sectionBox.appendChild(uploadBox);
@@ -535,39 +572,45 @@ function renderPhotoSection(section, number) {
     const wrapper = document.createElement("div");
     wrapper.className = "file-upload-wrapper";
 
-    // "사진 선택" 버튼 역할을 하는 label
+// ✅ 진짜 드롭 대상 요소 생성
+    const dropBox = document.createElement("div");
+    dropBox.className = "upload-box";
+    dropBox.textContent = "드래그해서 파일 첨부하기";
+    setupDropBox(dropBox); // ✅ 여기에만 적용해야 드롭 가능
+
+// ✅ 파일 선택 라벨 및 input
     const label = document.createElement("label");
     label.setAttribute("for", `photoUpload${number}`);
     label.className = "file-label";
     label.textContent = "사진 선택";
 
-    // 실제 파일 input (숨김 처리됨)
     const input = document.createElement("input");
     input.type = "file";
     input.id = `photoUpload${number}`;
-    input.accept = "image/*";  // 이미지 파일만 선택 가능
+    input.accept = "image/*";
     input.style.display = "none";
 
-    // 선택된 파일명을 표시하는 영역
+// ✅ 파일명 표시 영역
     const fileNameSpan = document.createElement("span");
     fileNameSpan.className = "file-name";
     fileNameSpan.textContent = "선택된 파일 없음";
 
-    // 파일 선택 시 파일명 표시
+// ✅ 파일 선택 시 파일명 표시
     input.addEventListener("change", () => {
         const file = input.files[0];
         fileNameSpan.textContent = file ? file.name : "선택된 파일 없음";
     });
 
-    // 업로드 UI 조립
+// ✅ 조립
     wrapper.appendChild(label);
     wrapper.appendChild(input);
     wrapper.appendChild(fileNameSpan);
+    wrapper.appendChild(dropBox); // ✅ 드롭박스도 넣기
 
-    // 전체 섹션 조립
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(textarea);
     sectionBox.appendChild(wrapper);
+
 
     return sectionBox;
 }
@@ -597,7 +640,12 @@ function renderFileSection(section, number) {
     const textarea = document.createElement("textarea");
     textarea.placeholder = "파일 관련 설명 입력";
 
-    // ✅ 파일 업로드 UI
+    // ✅ 진짜 드롭 대상 요소 생성
+    const dropBox = document.createElement("div");
+    dropBox.className = "upload-box";
+    dropBox.textContent = "드래그해서 파일 첨부하기";
+    setupDropBox(dropBox);  // 진짜 드롭박스!
+
     const uploadWrapper = document.createElement("div");
     uploadWrapper.className = "file-upload-wrapper";
 
@@ -614,7 +662,6 @@ function renderFileSection(section, number) {
     fileName.className = "file-name";
     fileName.textContent = "선택된 파일 없음";
 
-    // ✅ 파일 선택 시 파일명 표시
     fileInput.addEventListener("change", () => {
         fileName.textContent = fileInput.files.length > 0 ? fileInput.files[0].name : "선택된 파일 없음";
     });
@@ -622,21 +669,23 @@ function renderFileSection(section, number) {
     label.appendChild(fileInput);
     uploadWrapper.appendChild(label);
     uploadWrapper.appendChild(fileName);
+    uploadWrapper.appendChild(dropBox); // 드롭박스도 함께!
 
-    // 조립
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(textarea);
     sectionBox.appendChild(uploadWrapper);
+
 
     return sectionBox;
 }
 
 
-
-
-
 // ✅ 페이지 로드시 수상 탭이 비어있으면 empty-content 보이게 하기
 window.addEventListener('DOMContentLoaded', () => {
+    // 📌 이거 꼭 필요합니다!
+    window.addEventListener('dragover', e => e.preventDefault());
+    window.addEventListener('drop', e => e.preventDefault());
+
     const defaultTab = document.querySelector('.tab.active');
     if (!defaultTab) return;
 
@@ -665,6 +714,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // ✅ 사용자 완료 프로젝트 목록 불러오기 (오른쪽 경력 및 포트폴리오 탭에 표시)
     fetch("/api/user/resumes/projects")
+
         .then(res => res.json())
         .then(projects => {
             const container = document.querySelector(".tab-content[data-content='portfolio']"); // ✅ portfolio 탭으로 수정
@@ -679,12 +729,27 @@ window.addEventListener('DOMContentLoaded', () => {
         ${project.title}<br>
         <small>${project.submittedDate}</small>
     `;
+
+                // ✅ 드래그 가능 설정
+                div.setAttribute('draggable', true);
+                div.addEventListener('dragstart', e => {
+                    const title = project.title;
+                    e.dataTransfer.setData('text/plain', title);
+                });
                 container.appendChild(div);
             });
 
         })
-        .catch(err => console.error("경력 불러오기 실패:", err));
+        .catch(err => console.error("경력 불러오기 실패:", err))
 
+    // ✅ 드래그 가능한 항목 설정
+    document.querySelectorAll('.award-item').forEach(item => {
+        item.setAttribute('draggable', true);
+        item.addEventListener('dragstart', e => {
+            const title = item.innerText.split('\n')[0];
+            e.dataTransfer.setData('text/plain', title);
+        });
+    });
 
 
 
