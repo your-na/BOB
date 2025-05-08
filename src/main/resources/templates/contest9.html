@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <meta name="logged-in-user-id" th:content="${#authentication.principal.userEntity.userId}" />
+  <title th:text="${contest.title}">공모전 상세보기</title>
+
+  <link rel="stylesheet" href="/css/contest9.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<!-- 제목과 모집현황 -->
+<div class="title-row">
+  <div class="title" th:text="${contest.title}">공모전 제목</div>
+  <span class="deadline" th:text="'D-' + ${contest.dDay}">D-14</span>
+  <div class="status">
+    모집현황
+    <div class="team">
+      <div id="yes"><img src="/images/team.png"></div>
+      <div id="no"><img src="/images/user.png"><img src="/images/user.png"><img src="/images/user.png"></div>
+    </div>
+  </div>
+</div>
+<hr>
+
+<!-- 작성자 및 작성일 -->
+<div class="meta">
+  <span class="meta1" th:text="${contest.createdBy}">작성자</span>
+  <span class="meta2" th:text="'작성일 : ' + ${today}">작성일</span>
+</div>
+
+<!-- 진행 일정 -->
+<div class="form-group">
+  <label>진행 일정</label>
+  <div class="date-inputs">
+    <span th:text="${contest.startDate}"></span>
+    <span>~</span>
+    <span th:text="${contest.endDate}"></span>
+  </div>
+</div>
+
+<!-- 모집 일정 -->
+<div class="form-group">
+  <label>모집 일정</label>
+  <div class="date-inputs">
+    <span th:text="${contest.recruitmentStartDate}"></span>
+    <span>~</span>
+    <span th:text="${contest.recruitmentEndDate}"></span>
+  </div>
+</div>
+
+<!-- 공모전 소개 -->
+<div class="good">
+  <p>공모전 소개</p>
+  <div class="goal">
+    <span th:text="${contest.goal}">공모전 목표</span>
+  </div>
+</div>
+
+<!-- 공모전 상세 내용 -->
+<div class="good">
+  <p>공모전 상세 내용</p>
+  <div class="content" th:text="${contest.description}">공모전 설명 내용</div>
+</div>
+
+<!-- 공모전 참가 & 팀원 모집 버튼 -->
+<div class="button-box">
+  <form action="/contestapplication" method="get">
+    <input type="hidden" name="contestId" th:value="${contest.id}">
+    <button type="submit"
+            class="apply-btn"
+            th:disabled="${isOwner}"
+            th:style="${isOwner} ? 'background: grey; cursor: not-allowed;' : ''">
+      공모전 참가하기
+    </button>
+    <p th:if="${isOwner}" style="color: red; font-size: 13px; margin-top: 5px;">
+      본인이 작성한 공모전에는 참가할 수 없습니다.
+    </p>
+  </form>
+  <a th:href="@{/newcontest(contestId=${contest.id})}">
+    <button class="apply-btn">팀원 모집글 작성하기</button>
+  </a>
+</div>
+<hr>
+
+<!-- 좋아요 & 스크랩 -->
+<div class="interaction">
+  <div id="heart" onclick="toggleHeart()">
+    <img id="heartImage" th:if="${isLiked}" src="/images/fillheart.png">
+    <img id="heartImage" th:unless="${isLiked}" src="/images/heart.png">
+    <span id="likesCount" th:text="${likesCount}">0</span>
+  </div>
+  <div id="scrap"><img src="/images/scrap.png"> <span>0</span></div>
+</div>
+
+<!-- 댓글 입력 -->
+<form>
+  <input type="text" class="comment-box" placeholder="댓글을 작성해주세요.">
+  <button class="postbutton">등록</button>
+</form>
+
+<script defer>
+  function toggleHeart() {
+    const contestId = window.location.pathname.split("/")[2];
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+    fetch(`/contest/${contestId}/like`, {
+      method: 'POST',
+      headers: {
+        [csrfHeader]: csrfToken,
+        'Content-Type': 'application/json'
+      }
+    })
+            .then(response => response.json())
+            .then(data => {
+              const heartImg = document.getElementById("heartImage");
+              heartImg.src = data.liked ? "/images/fillheart.png" : "/images/heart.png";
+              document.getElementById("likesCount").innerText = data.likes;
+            })
+            .catch(error => {
+              console.error("좋아요 처리 실패:", error);
+              alert("좋아요 처리 중 오류 발생");
+            });
+  }
+</script>
+
+</body>
+</html>

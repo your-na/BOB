@@ -49,7 +49,9 @@
     <!-- 버튼 -->
     <div class="button-box" sec:authorize="!hasRole('ADMIN')">
         <button class="apply-btn" id="openModalBtn">공모전 참가하기</button>
-        <button class="recruit-btn">팀원 모집글 작성하기</button>
+        <a th:href="@{/newcontest(contestId=${contest.id})}">
+            <button class="recruit-btn">팀원 모집글 작성하기</button>
+        </a>
     </div>
 
     <!-- 팀원 모집글 리스트 -->

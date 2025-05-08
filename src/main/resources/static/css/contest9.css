@@ -1,0 +1,201 @@
+.title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 170px;
+}
+
+.title {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.deadline {
+    color: red;
+    font-weight: bold;
+    margin-left: -20px;
+    font-size: 20px;
+}
+
+.status {
+    display: flex;
+    font-size: 17px;
+    margin-right: 20px;
+    font-weight: bold;
+    color : grey;
+}
+
+.team {
+    display: flex;
+    align-items: center;
+    margin-left: 10px; /* "모집현황:"과 아이콘 사이 간격 조절 */
+}
+
+#yes, #no {
+    display: flex;
+    align-items: center;
+}
+
+#yes img {
+    width: 20px;
+    height: 23px;
+}
+#no img {
+    margin-left: 5px; /* 아이콘 간격 조절 */
+    width: 25px;
+    height: 25px;
+}
+
+.meta {
+    font-size: 14px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.meta1 {
+    display: inline-block;
+}
+
+.meta2 {
+    display: inline-block;
+    margin-left: 20px; /* 간격 조정 */
+}
+
+.goal {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: white;
+    height: auto;
+    min-height: 30px;
+    line-height: 1.5;
+}
+
+.content {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: white;
+    min-height: 170px;
+    line-height: 1.6;
+}
+
+.apply-btn {
+    display: block;
+    margin: 15px auto;
+    padding: 10px 20px;
+    background: #5aec5e;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.apply-btn:hover {
+    background: #45a049;
+}
+
+.interaction {
+    display: flex;
+    font-size: 14px;
+    margin-top: 10px;
+    align-items: center;
+}
+
+.interaction img {
+    width: 18px;
+    height: 18px;
+}
+
+#scrap {
+    margin-left: 15px;
+}
+
+.comment-box {
+    margin-top: 30px;
+    padding: 8px;
+    width: 80%;
+    height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #f9f9f9;
+    font-size: 14px;
+}
+
+.comment-box:focus {
+    border-color: #00c800;
+}
+
+.postbutton {
+    margin-left: 10px;
+    width: 60px;
+    height: 34px;
+    border: none;
+    background: #2fd12f;
+    color: white;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.postdetail {
+    height: 23px;
+}
+
+/* 드롭다운 메뉴 */
+.dropdownmenu {
+    display: none;
+    position: absolute;
+    top: 200px;
+    right: 20px;
+    background-color: white;
+    border: 1px solid #eaeaea;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dropdownmenu a {
+    display: block;
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    text-align: left;
+    cursor: pointer;
+    white-space: normal;
+}
+
+.dropdownmenu a:hover {
+    color: #0e8a0e;
+    font-weight: bold;
+}
+
+.dropdownmenu button:hover {
+    background-color: #f1f1f1;
+}
+
+.form-group {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.apply-btn-applied {
+    background-color: orange;
+    color: white;
+    cursor: not-allowed;
+}
+
+.action-button {
+    text-decoration: none;
+    color: grey;
+}

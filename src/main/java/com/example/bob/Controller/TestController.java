@@ -61,4 +61,10 @@ public class TestController {
     //기업 구인통계
     @GetMapping("/costat")
     public String costatform() {return "co_stat";}
+
+    //공몸전 상세보기
+    @GetMapping("/contest9")
+    public String contest9form() {return "contest9";}
+
+
 }

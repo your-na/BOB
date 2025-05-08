@@ -13,11 +13,12 @@
 
 <main class="main-content">
     <section class="contest-create">
-        <h1> 공모전 팀 모집하기</h1>
+        <h1> 공모전 팀원 모집글 작성하기</h1>
         <hr>
 
-        <form action="/bw" method="post" class="contest-form">
+        <form th:action="@{/bw}" method="post" class="contest-form">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <input type="hidden" name="contestId" th:value="${param.contestId}" />
 
             <!-- 진행 일정 -->
             <div class="form-group">
