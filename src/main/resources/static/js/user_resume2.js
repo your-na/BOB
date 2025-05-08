@@ -45,6 +45,18 @@ function setupDropBox(box) {
                 item.textContent = file.name;
                 box.appendChild(item);
             });
+        }  else if (e.dataTransfer.types.includes("application/json")) {
+            const json = JSON.parse(e.dataTransfer.getData("application/json"));
+            const item = document.createElement('div');
+            item.className = 'uploaded-item';
+            item.textContent = json.title;
+
+            // ✅ 추가: 드래그 항목 속성 주입
+            item.dataset.id = json.id;
+            item.dataset.type = json.type;
+            item.dataset.file = json.file;
+
+            box.appendChild(item);
         } else {
             const title = e.dataTransfer.getData('text/plain');
             const item = document.createElement('div');
@@ -235,6 +247,14 @@ confirmBtn.addEventListener("click", () => {
         const selectedTags = [...box.querySelectorAll("input[type=checkbox]:checked, input[type=radio]:checked")]
             .map(input => input.parentElement.textContent.trim());
 
+        // ✅ 드래그드롭된 항목이 있다면 selectedTags에 덮어쓰기
+        const uploadBox = box.querySelector(".upload-box");
+        if (uploadBox) {
+            const draggedItems = [...uploadBox.querySelectorAll(".uploaded-item")].map(el => el.textContent.trim());
+            if (draggedItems.length > 0) selectedTags.splice(0, selectedTags.length, ...draggedItems);
+        }
+
+
         const textarea = box.querySelector("textarea");
         const content = textarea ? textarea.value.trim() : "";
 
@@ -256,6 +276,21 @@ confirmBtn.addEventListener("click", () => {
             selectedTags,
             uploadedFileName: null // 나중에 주입
         };
+
+        // ✅ 드래그된 항목 수집
+        const draggedDivs = box.querySelectorAll(".uploaded-item");
+        if (draggedDivs.length > 0) {
+            section.dragItems = [...draggedDivs].map(div => {
+                return {
+                    coSectionId: Number(coSectionId),  // 꼭 포함!
+                    itemType: div.dataset.type || "PROJECT",  // 드래그 시 설정한 타입
+                    referenceId: Number(div.dataset.id),      // 실제 ID
+                    displayText: div.textContent.trim(),
+                    filePath: div.dataset.file || null        // 파일 경로가 있을 경우
+                };
+            });
+        }
+
 
         // ✅ 학력사항인 경우, education 정보 수집
         if (box.querySelector("#education-list")) {
@@ -892,24 +927,69 @@ window.addEventListener('DOMContentLoaded', () => {
         <small>${project.submittedDate}</small>
     `;
 
-                // ✅ 드래그 가능 설정
+                // ✅ 여기 추가: 드래그된 항목에 필요한 데이터 속성 심기
+                div.dataset.id = project.id;
+                div.dataset.type = "PROJECT"; // 고정값이지만 명시
+                div.dataset.file = project.filePath || "";
+
+                // ✅ 드래그 시 JSON 형태로 전체 정보 담아서 전송
                 div.setAttribute('draggable', true);
                 div.addEventListener('dragstart', e => {
-                    const title = project.title;
-                    e.dataTransfer.setData('text/plain', title);
+                    const dragData = JSON.stringify({
+                        id: project.id,
+                        type: "PROJECT",
+                        file: project.filePath || "",
+                        title: project.title
+                    });
+                    e.dataTransfer.setData("application/json", dragData);
                 });
+
+
                 container.appendChild(div);
             });
-
         })
-        .catch(err => console.error("경력 불러오기 실패:", err))
+        .catch(err => console.error("프로젝트 불러오기 실패:", err));
+    // ✅ 📌 여기 공모전 fetch 넣기 – 프로젝트 fetch 밖으로!
+    fetch("/api/user/resumes/contests")
+        .then(res => res.json())
+        .then(contests => {
+            const container = document.querySelector(".tab-content[data-content='job']");
+            container.innerHTML = "";
+            contests.forEach(contest => {
+                const div = document.createElement("div");
+                div.className = "award-item";
+                div.textContent = `${contest.title}\n${contest.date}`;
+                div.dataset.id = contest.id;
+                div.dataset.type = "CONTEST";
+                div.dataset.file = contest.filePath || "";
+
+                div.setAttribute("draggable", true);
+                div.addEventListener("dragstart", e => {
+                    const data = JSON.stringify({
+                        id: contest.id,
+                        type: "CONTEST",
+                        file: contest.filePath,
+                        title: contest.title
+                    });
+                    e.dataTransfer.setData("application/json", data);
+                });
+
+                container.appendChild(div);
+            });
+        })
+        .catch(err => console.error("공모전 불러오기 실패:", err));
 
     // ✅ 드래그 가능한 항목 설정
     document.querySelectorAll('.award-item').forEach(item => {
         item.setAttribute('draggable', true);
         item.addEventListener('dragstart', e => {
-            const title = item.innerText.split('\n')[0];
-            e.dataTransfer.setData('text/plain', title);
+            const title = item.innerText.split('\n')[0];e.dataTransfer.setData('application/json', JSON.stringify({
+                id: item.dataset.id,
+                type: item.dataset.type,
+                file: item.dataset.file || "",
+                title: title
+            }));
+
         });
     });
 

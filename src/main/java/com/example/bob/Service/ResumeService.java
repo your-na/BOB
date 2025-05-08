@@ -16,6 +16,7 @@ import com.example.bob.Entity.ResumeSectionEntity;
 import com.example.bob.Entity.UserEntity;
 import com.example.bob.Entity.ResumeEducationEntity;
 import com.example.bob.Entity.ResumeFileEntity;
+import com.example.bob.Entity.ResumeDragItemEntity;
 
 import com.example.bob.Repository.CoResumeRepository;
 import com.example.bob.Repository.CoResumeSectionRepository;
@@ -24,6 +25,7 @@ import com.example.bob.Repository.ResumeSectionRepository;
 import com.example.bob.Repository.UserProjectRepository;
 import com.example.bob.Repository.ResumeEducationRepository;
 import com.example.bob.Repository.ResumeFileRepository;
+import com.example.bob.Repository.ResumeDragItemRepository;
 
 
 
@@ -65,8 +67,8 @@ public class ResumeService {
     @Autowired
     private ResumeFileRepository resumeFileRepository;
 
-
-
+    @Autowired
+    private ResumeDragItemRepository resumeDragItemRepository;
 
 
 
@@ -202,6 +204,27 @@ public class ResumeService {
                 resumeFileRepository.save(fileEntity);
             }
         }
+        // 8️⃣ 드래그 항목 저장
+        for (ResumeSectionSubmitDTO dto : request.getSections()) {
+            if (dto.getDragItems() != null && !dto.getDragItems().isEmpty()) {
+                ResumeSectionEntity targetSection = sectionEntities.stream()
+                        .filter(sec -> sec.getCoSection().getId().equals(dto.getCoSectionId()))
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("매칭되는 섹션이 없습니다."));
+
+                dto.getDragItems().forEach(dragDTO -> {
+                    ResumeDragItemEntity drag = new ResumeDragItemEntity();
+                    drag.setSection(targetSection);
+                    drag.setItemType(dragDTO.getItemType());
+                    drag.setReferenceId(dragDTO.getReferenceId());
+                    drag.setDisplayText(dragDTO.getDisplayText());
+                    drag.setFilePath(dragDTO.getFilePath());
+
+                    resumeDragItemRepository.save(drag);
+                });
+            }
+        }
+
 
 
     }
