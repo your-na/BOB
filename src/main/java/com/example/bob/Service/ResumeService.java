@@ -28,9 +28,6 @@ import com.example.bob.Repository.ResumeFileRepository;
 import com.example.bob.Repository.ResumeDragItemRepository;
 
 
-
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +37,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 
 @Service
@@ -69,9 +65,6 @@ public class ResumeService {
 
     @Autowired
     private ResumeDragItemRepository resumeDragItemRepository;
-
-
-
 
     // 기업 양식을 기반으로 사용자용 이력서 초기 구조를 생성
     public ResumeDTO generateUserResumeFromCo(Long coResumeId) {
