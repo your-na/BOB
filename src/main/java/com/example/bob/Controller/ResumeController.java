@@ -10,9 +10,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import com.example.bob.DTO.UserProjectResponseDTO;
+import com.example.bob.DTO.ResumeSubmitRequestDTO;
 
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.File;
+import java.util.UUID;
+
 
 
 @RestController
@@ -51,6 +59,43 @@ public class ResumeController {
         }
         return new ArrayList<>();
     }
+
+    // ✅ 사용자가 작성한 이력서를 제출하는 API
+    @PostMapping("/submit")
+    public ResponseEntity<String> submitResume(@RequestBody ResumeSubmitRequestDTO request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetailsImpl userDetails) {
+            UserEntity user = userDetails.getUserEntity();
+            resumeService.submitUserResume(request, user);
+            return ResponseEntity.ok("이력서가 성공적으로 제출되었습니다.");
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자만 제출할 수 있습니다.");
+    }
+
+    // ✅ 사용자가 넣은 파일
+    @PostMapping("/upload")  // 🔥 경로는 /api/user/resumes/upload
+    public ResponseEntity<String> uploadResumeFile(@RequestParam("file") MultipartFile file) {
+        try {
+            String uploadDir = "C:/uploads/resume/";
+            File dir = new File(uploadDir);
+            if (!dir.exists()) dir.mkdirs();
+
+            String originalName = file.getOriginalFilename();
+            String extension = originalName.substring(originalName.lastIndexOf("."));
+            String uniqueName = UUID.randomUUID() + extension;
+
+            File dest = new File(dir, uniqueName);
+            file.transferTo(dest);
+
+            return ResponseEntity.ok(uniqueName);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("파일 업로드 실패: " + e.getMessage());
+        }
+    }
+
+
+
+
 
 
 }

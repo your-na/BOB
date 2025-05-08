@@ -115,6 +115,7 @@ public class CoResumeServiceImpl implements CoResumeService {
                                 .collect(Collectors.toList());
 
                         return new CoResumeSectionRequestDTO(
+                                sectionEntity.getId(),
                                 sectionEntity.getType(),
                                 sectionEntity.getTitle(),
                                 sectionEntity.getComment(),
@@ -137,9 +138,10 @@ public class CoResumeServiceImpl implements CoResumeService {
             boolean hasJobSection = sectionDTOList.stream()
                     .anyMatch(section -> "희망직무".equals(section.getTitle()));
 
-// ✅ 중복되지 않은 경우에만 섹션에 추가
+           // ✅ 중복되지 않은 경우에만 섹션에 추가
             if (!jobTagStrings.isEmpty() && !hasJobSection) {
                 CoResumeSectionRequestDTO jobSection = new CoResumeSectionRequestDTO(
+                        null, // ❗ id 없음 (DB에 없는 가상 섹션이므로 null로 설정)
                         "선택형",
                         "희망직무",
                         "희망하는 직무를 선택해주세요.",
@@ -149,8 +151,9 @@ public class CoResumeServiceImpl implements CoResumeService {
                         new ArrayList<>(),
                         null
                 );
-                sectionDTOList.add(jobSection); // 👈 조건 통과 시만 추가됨!
+                sectionDTOList.add(jobSection);
             }
+
 
 
             // 5️⃣ DTO 리턴

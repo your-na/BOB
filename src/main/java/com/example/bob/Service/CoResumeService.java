@@ -2,6 +2,7 @@ package com.example.bob.Service; //기능 "선언"만 하는 인터페이스
 
 import com.example.bob.DTO.CoResumeRequestDTO;
 import com.example.bob.Entity.CoResumeEntity;
+
 import java.util.List;
 
 public interface CoResumeService {

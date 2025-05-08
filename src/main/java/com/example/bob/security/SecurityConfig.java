@@ -44,7 +44,8 @@ public class SecurityConfig {
                         .ignoringRequestMatchers(
                                 "/login", "/signup", "/co_signup", "/profile/update", "/logout",
                                 "/teamrequest", "/teamrequest/accept", "/teamrequest/reject",
-                                "/file/project/submit", "/api/todos/**", "/api/notifications/delete-all","/ws-chat"
+                                "/file/project/submit", "/api/todos/**", "/api/notifications/delete-all","/ws-chat", "/api/user/resumes/upload",
+                                "/api/user/resumes/submit"
                         )
                 )
                 .headers(headers -> headers
@@ -53,7 +54,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/", "/main", "/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**", "/project", "/project/api","/contest", "/app/**", "/topic/**", "/user/me").permitAll()
                         .requestMatchers("/login", "/sign").anonymous()
-                        .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject", "/api/todos", "/api/resumes", "/api/chat/**", "/api/users/search", "/contest/team/**", "/ws-chat/**").authenticated()
+                        .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject", "/api/todos", "/api/resumes", "/api/chat/**", "/api/users/search", "/contest/team/**", "/ws-chat/**"
+                        ,"/api/user/resumes/submit", "/api/user/resumes/upload").authenticated()
                         .requestMatchers("/signup", "/co_signup", "/check-nickname", "/check-username", "/api/my-projects","/api/cojobs").permitAll()
                         .requestMatchers("/comhome", "/comhome/**", "/comcontest").hasAuthority("COMPANY")
                         .requestMatchers("/admin/**", "/sidebar", "/ad_contest", "/adcomcont", "/adcomcont").hasAuthority("ADMIN")

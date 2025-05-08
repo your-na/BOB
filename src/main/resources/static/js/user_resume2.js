@@ -1,3 +1,28 @@
+// ✅ 파일을 서버에 업로드하고 저장된 파일명을 반환하는 함수
+async function uploadFileToServer(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    // ✅ CSRF 토큰 설정 여기 넣기!
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+    const response = await fetch("/api/user/resumes/upload", {
+        method: "POST",
+        headers: {
+            [csrfHeader]: csrfToken   // ✅ 여기 주의!
+        },
+        body: formData,
+        credentials: "include"
+    });
+
+    if (!response.ok) throw new Error("파일 업로드 실패");
+
+    const fileName = await response.text(); // 서버에서 저장된 파일명 반환
+    return fileName;
+}
+
+
 // ✅ 드롭 가능한 upload-box에 drag 이벤트 연결하는 함수
 function setupDropBox(box) {
     box.addEventListener('dragover', e => {
@@ -176,12 +201,130 @@ cancelBtn.addEventListener("click", () => {
     modal.style.display = "none";
 });
 
-// "네" 클릭 → 제출 처리
+// ✅ "네" 클릭 → 제출 처리
 confirmBtn.addEventListener("click", () => {
     modal.style.display = "none";
-    alert("제출되었습니다!");
-    // 실제 폼 제출이 필요하면 여기에 submit 처리 추가
+
+    // ✅ 쿼리스트링에서 coResumeId, jobPostId 가져오기
+    const urlParams = new URLSearchParams(window.location.search);
+    const coResumeId = urlParams.get("id");
+    const jobPostId = urlParams.get("jobPostId");
+
+    // 🚨 유효성 검사 추가
+    if (!coResumeId || isNaN(Number(coResumeId))) {
+        alert("이력서 양식 ID(coResumeId)가 존재하지 않거나 잘못되었습니다.");
+        return;
+    }
+
+    if (!jobPostId || isNaN(Number(jobPostId))) {
+        alert("공고 ID(jobPostId)가 존재하지 않거나 잘못되었습니다.");
+        return;
+    }
+
+
+
+    // ✅ 사용자 입력값 수집 + 파일 업로드 처리 포함
+    const sectionBoxes = document.querySelectorAll(".section-box[data-co-section-id]");
+    const sections = [];
+    const uploadPromises = [];
+
+    sectionBoxes.forEach(box => {
+        const coSectionId = box.dataset.coSectionId;
+        console.log("section id:", coSectionId); // 👈 이거 추가
+
+        const selectedTags = [...box.querySelectorAll("input[type=checkbox]:checked, input[type=radio]:checked")]
+            .map(input => input.parentElement.textContent.trim());
+
+        const textarea = box.querySelector("textarea");
+        const content = textarea ? textarea.value.trim() : "";
+
+        const fileInput = box.querySelector("input[type=file]");
+        let uploadedFileName = null;
+
+        let uploadPromise = Promise.resolve();
+
+        if (fileInput && fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            uploadPromise = uploadFileToServer(file).then(fileName => {
+                uploadedFileName = fileName;
+            });
+        }
+
+        const section = {
+            coSectionId: Number(coSectionId),
+            content,
+            selectedTags,
+            uploadedFileName: null // 나중에 주입
+        };
+
+        // ✅ 학력사항인 경우, education 정보 수집
+        if (box.querySelector("#education-list")) {
+            const educationItems = box.querySelectorAll(".education-item");
+            const educations = [];
+
+            educationItems.forEach(item => {
+                educations.push({
+                    schoolName: item.querySelector("input[placeholder='학교명']").value,
+                    majorName: item.querySelector("input[placeholder='학과명']").value,
+                    status: item.querySelector(".edu-status").value,
+                    startYear: item.querySelector(".start-year").value,
+                    startMonth: item.querySelector(".start-month").value,
+                    endYear: item.querySelector(".end-year").value,
+                    endMonth: item.querySelector(".end-month").value
+                });
+            });
+
+            section.educations = educations;  // ✅ 핵심: section에 추가
+        }
+
+        sections.push(section);
+
+        uploadPromises.push(
+            uploadPromise.then(() => {
+                section.uploadedFileName = uploadedFileName;
+            })
+        );
+    });
+
+// ✅ 모든 업로드 끝나고 서버에 제출
+    Promise.all(uploadPromises)
+        .then(() => {
+            console.log("📤 최종 제출할 sections:", sections);
+
+            const requestData = {
+                coResumeId: Number(coResumeId),
+                jobPostId: jobPostId ? Number(jobPostId) : null,
+                sections
+            };
+
+            // ✅ CSRF 토큰 설정 여기!
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+            return fetch("/api/user/resumes/submit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    [csrfHeader]: csrfToken  // ✅ 추가!
+                },
+                body: JSON.stringify(requestData)
+            });
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("제출 실패");
+            return res.text();
+        })
+        .then(() => {
+            alert("제출이 완료되었습니다!");
+            window.location.href = "/job-application-history";
+        })
+        .catch(err => {
+            console.error("제출 오류:", err);
+            alert("제출에 실패했습니다.");
+        });
+
 });
+
 
 // ✅ 탭 클릭 시 콘텐츠 보여주고, 데이터 없을 경우 안내 메시지 처리
 document.querySelectorAll('.tab').forEach(tab => {
@@ -306,6 +449,8 @@ function renderEducationSection(section, number) {
     sectionBox.appendChild(eduList);
     sectionBox.appendChild(addBtn);
 
+    sectionBox.dataset.coSectionId = section.id;
+
     return sectionBox;
 }
 // ✅ 희망직무 섹션을 동적으로 렌더링하는 함수
@@ -341,6 +486,9 @@ function renderJobSection(section, number) {
 
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(tagList);
+
+    sectionBox.dataset.coSectionId = section.id;
+
     return sectionBox;
 }
 
@@ -377,6 +525,8 @@ function renderCareerSection(section, number) {
     sectionBox.appendChild(textarea);
     sectionBox.appendChild(uploadBox);
 
+    sectionBox.dataset.coSectionId = section.id;
+
     return sectionBox;
 }
 
@@ -411,6 +561,8 @@ function renderPortfolioSection(section, number) {
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(textarea);
     sectionBox.appendChild(uploadBox);
+
+    sectionBox.dataset.coSectionId = section.id;
 
     return sectionBox;
 }
@@ -463,6 +615,8 @@ function renderSelfIntroSection(section, number) {
     sectionBox.appendChild(textarea);
     sectionBox.appendChild(charCount);
 
+    sectionBox.dataset.coSectionId = section.id;
+
     return sectionBox;
 }
 
@@ -499,6 +653,9 @@ function renderSelectSection(section, number) {
 
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(tagList);
+
+    sectionBox.dataset.coSectionId = section.id;
+
     return sectionBox;
 }
 // ✅ 서술형 섹션 렌더링 함수
@@ -537,6 +694,8 @@ function renderDescriptiveSection(section, number) {
     sectionBox.appendChild(sectionTitle);
     if (section.conditions?.length) sectionBox.appendChild(conditionBox);
     sectionBox.appendChild(textarea);
+
+    sectionBox.dataset.coSectionId = section.id;
 
     return sectionBox;
 }
@@ -611,6 +770,7 @@ function renderPhotoSection(section, number) {
     sectionBox.appendChild(textarea);
     sectionBox.appendChild(wrapper);
 
+    sectionBox.dataset.coSectionId = section.id;
 
     return sectionBox;
 }
@@ -674,6 +834,8 @@ function renderFileSection(section, number) {
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(textarea);
     sectionBox.appendChild(uploadWrapper);
+
+    sectionBox.dataset.coSectionId = section.id;
 
 
     return sectionBox;
@@ -769,6 +931,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
             // ✅ 모든 섹션을 순서대로 렌더링
             data.sections.forEach((section, index) => {
+
+                console.log(`[${index}] section.id =`, section.id, section);
+
+                if (!section.id) {
+                    console.warn("⚠️ section.id가 없습니다!", section);
+                }
+
                 let rendered;
 
                 // ✅ '일반회원 정보'는 스킵 (이미 내 정보에서 표현됨)
@@ -801,10 +970,18 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (rendered) {
+                    if (!section.id) {
+                        console.warn(`❌ section.id 누락 – dataset 설정 안됨`, section);
+                    } else {
+                        rendered.dataset.coSectionId = section.id;
+                    }
+
                     const leftContent = document.querySelector('.left-content');
                     const submitWrapper = document.querySelector('.submit-wrapper');
                     leftContent.insertBefore(rendered, submitWrapper);
                 }
+
+
             });
 
 

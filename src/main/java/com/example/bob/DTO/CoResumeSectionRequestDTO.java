@@ -11,6 +11,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CoResumeSectionRequestDTO {
 
+    private Long id;
+
     private String type;               // 섹션 유형 (선택형, 서술형 등)
     private String title;              // 섹션 제목
     private String comment;            // 설명/가이드

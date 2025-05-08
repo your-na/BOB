@@ -3,14 +3,25 @@ package com.example.bob.DTO;
 import java.util.List;
 
 public class ResumeSectionDTO {
+    private Long id;
     private String title;
     private String comment;
     private String type;
     private boolean multiSelect;
     private List<String> tags;        // 선택지로 쓸 태그
-    private List<String> conditions;  // 조건: 500자 이상, 상태입력 등
+    private List<String> conditions;
 
     // Getter / Setter
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }// 조건: 500자 이상, 상태입력 등
+
+
     public String getTitle() {
         return title;
     }
