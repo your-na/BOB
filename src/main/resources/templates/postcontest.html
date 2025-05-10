@@ -129,7 +129,6 @@
             if (e.target === contestModal) contestModal.style.display = 'none';
         });
 
-        // ❗ input 리스너: "한 번만 등록" (DOMContentLoaded 안에서)
         input.addEventListener('input', async () => {
             const query = input.value.trim();
             list.innerHTML = '';
@@ -182,9 +181,8 @@
                 list.innerHTML = '';
             });
 
-            list.dataset.listenerAdded = "true"; // 중복 방지
+            list.dataset.listenerAdded = "true";
         }
-
 
         function addSelectedMember(userId, nickname, avatar) {
             const tag = document.createElement('div');
@@ -208,9 +206,20 @@
 
         window.selectedMembers = () => selectedList.map(u => u.userId);
 
+        // ✅ 버튼 변경 함수
+        function changeToParticipating() {
+            const btn = document.getElementById('openModalBtn');
+            if (btn) {
+                btn.textContent = '공모전 참가중';
+                btn.disabled = true;
+                btn.style.backgroundColor = '#ccc';
+                btn.style.cursor = 'not-allowed';
+            }
+        }
+
         // 친구랑 참여
         document.querySelector('.invite-btn')?.addEventListener('click', async () => {
-            const userIds = selectedMembers(); // 선택된 친구들
+            const userIds = selectedMembers();
             const contestId = /*[[${contest.id}]]*/ 0;
 
             try {
@@ -225,7 +234,8 @@
 
                 if (response.ok) {
                     alert('참가 요청이 전송되었습니다!');
-                    location.reload();
+                    contestModal.style.display = 'none';
+                    changeToParticipating(); // ✅ 상태 바꾸기
                 } else {
                     alert('요청 실패!');
                 }
@@ -250,7 +260,8 @@
 
                 if (response.ok) {
                     alert('단독 참가 완료!');
-                    location.reload();
+                    contestModal.style.display = 'none';
+                    changeToParticipating(); // ✅ 상태 바꾸기
                 } else {
                     alert('요청 실패!');
                 }
