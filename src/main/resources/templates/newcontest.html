@@ -15,8 +15,7 @@
     <section class="contest-create">
         <h1> 공모전 팀원 모집글 작성하기</h1>
         <hr>
-
-        <form th:action="@{/bw}" method="post" class="contest-form">
+        <form action="/contest/recruit" method="post">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <input type="hidden" name="contestId" th:value="${param.contestId}" />
 
@@ -24,9 +23,9 @@
             <div class="form-group">
                 <label for="start-date">진행 일정</label>
                 <div class="date-inputs">
-                    <input type="date" id="start-date" name="start-date">
+                    <input type="date" id="start-date" name="projectStartDate">
                     <span>~</span>
-                    <input type="date" id="end-date" name="end-date">
+                    <input type="date" id="end-date" name="projectEndDate">
                 </div>
             </div>
 
@@ -34,16 +33,16 @@
             <div class="form-group">
                 <label for="recruitment-start-date">모집 일정</label>
                 <div class="date-inputs">
-                    <input type="date" id="recruitment-start-date" name="recruitment-start-date">
+                    <input type="date" id="recruitment-start-date" name="recruitStartDate">
                     <span>~</span>
-                    <input type="date" id="recruitment-end-date" name="recruitment-end-date">
+                    <input type="date" id="recruitment-end-date" name="recruitEndDate">
                 </div>
             </div>
 
             <!-- 모집 인원 -->
             <div class="form-group">
                 <label for="recruitment">모집 인원</label>
-                <select id="recruitment" name="recruitment">
+                <select id="recruitment" name="recruitCount">
                     <option value="0">0명</option>
                     <option value="1">1명</option>
                     <option value="2">2명</option>
@@ -58,14 +57,14 @@
 
             <!-- 공모전명 -->
             <div class="form-group">
-                <label for="contest-name">공모전명</label>
-                <input type="text" id="contest-name" name="contest-name" placeholder="공모전명을 입력하세요.">
+                <label for="contest-name">제목</label>
+                <input type="text" id="contest-name" name="title" placeholder="공모전명을 입력하세요.">
             </div>
 
             <!-- 상세 내용 -->
             <div class="form-group">
                 <label for="contest-description">상세내용</label>
-                <textarea id="contest-description" name="contest-description" placeholder="내용을 입력해주세요."></textarea>
+                <textarea id="contest-description" name="content" placeholder="내용을 입력해주세요."></textarea>
             </div>
 
             <!-- 버튼 -->
@@ -105,17 +104,9 @@
             }
         });
 
-        if (startDateInput.value < today) {
-            startDateInput.value = today;
-        }
-
         let recruitmentSelect = document.getElementById("recruitment");
         let customInputGroup = document.getElementById("custom-input-group");
         let customRecruitmentInput = document.getElementById("custom-recruitment");
-
-        if (recruitmentSelect.value !== "plus") {
-            customInputGroup.style.display = "none";
-        }
 
         recruitmentSelect.addEventListener("change", function() {
             if (this.value === "plus") {
@@ -125,6 +116,23 @@
                 customInputGroup.style.display = "none";
             }
         });
+
+        const form = document.querySelector("form");
+        const recruitSelect = document.getElementById("recruitment");
+        const customRecruitInput = document.getElementById("custom-recruitment");
+
+        form.addEventListener("submit", function (e) {
+            let selectedValue = recruitSelect.value;
+
+            if (selectedValue === "plus") {
+                const customValue = customRecruitInput.value;
+                if (!customValue || isNaN(customValue) || Number(customValue) <= 0) {
+                    e.preventDefault();
+                    alert("기타 인원을 정확히 입력해주세요.");
+                    return;
+                }}
+        });
+
     });
 </script>
 </body>
