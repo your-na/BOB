@@ -70,7 +70,7 @@
             <tbody>
             <tr th:each="recruit : ${recruitList}">
                 <td th:text="${recruit.title}">모집글 제목</td>
-                <td th:text="${recruit.writer}">작성자</td>
+                <td th:text="${recruit.writer.userNick}">작성자</td>
                 <td th:text="${recruit.recruitCount}">3명</td>
                 <td th:text="${#temporals.format(recruit.createdAt, 'yyyy.MM.dd')}">2025.04.01</td>
                 <td><a th:href="@{'/recruit/' + ${recruit.id}}">보기</a></td>
