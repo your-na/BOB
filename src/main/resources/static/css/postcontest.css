@@ -88,9 +88,7 @@
 
 /* 참여하기 버튼 */
 .apply-btn {
-    display: block;
     width: 200px;
-    margin: 20px auto;
     padding: 12px 0;
     font-size: 16px;
     background: #00b800;
@@ -98,18 +96,17 @@
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    margin-left: 25%;
 }
 
 .apply-btn:hover {
     background: #008f00;
 }
 
-/* 버튼 2개 나란히 배치 */
 .button-box {
     display: flex;
     justify-content: center;
-    gap: 5px;
+    align-items: center;
+    gap: 20px; /* 버튼 간격 */
     margin-top: 20px;
 }
 
@@ -122,8 +119,6 @@
     border-radius: 10px;
     font-size: 16px;
     cursor: pointer;
-    margin-right: 25%;
-    margin-top: 18px;
 
 }
 
