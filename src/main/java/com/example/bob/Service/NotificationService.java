@@ -39,20 +39,16 @@ public class NotificationService {
         return notificationRepository.countByCompanyAndIsRead(company , false); // 기업이 읽지 않은 알림 수
     }
 
-    // 알림 목록을 가져오는 메서드 (페이지네이션 추가)
+    // 알림 목록을 가져오는 메서드 (프로젝트/공모전 팀 알림 모두 지원)
     public List<NotificationDTO> getNotifications(UserEntity userEntity, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size); // 페이지 요청
+        Pageable pageable = PageRequest.of(page, size);
         Page<NotificationEntity> notificationsPage = notificationRepository.findByUser(userEntity, pageable);
 
         return notificationsPage.getContent().stream()
-                .map(notification -> new NotificationDTO(
-                        notification.getId(),
-                        notification.getMessage(),
-                        notification.isRead(),
-                        notification.getTimestamp(),
-                        new UserDTO(notification.getUser().getUserId(), notification.getUser().getUserName()),  // 알림을 받은 사용자 정보
-                        new UserDTO(notification.getSender().getUserId(), notification.getSender().getUserName()),  // 알림을 보낸 사용자 정보
-                        new ProjectDTO(
+                .map(notification -> {
+                    ProjectDTO projectDTO = null;
+                    if (notification.getProject() != null) {
+                        projectDTO = new ProjectDTO(
                                 notification.getProject().getId(),
                                 notification.getProject().getTitle(),
                                 notification.getProject().getCreatedBy(),
@@ -68,11 +64,23 @@ public class NotificationService {
                                 notification.getProject().getRecruitmentPeriod(),
                                 notification.getProject().getRecruitmentEndDate(),
                                 notification.getProject().getRecruitmentStartDate()
-                        ), // 알림과 관련된 프로젝트 정보
-                        notification.getLink()  // 알림 링크
-                ))
+                        );
+                    }
+
+                    return new NotificationDTO(
+                            notification.getId(),
+                            notification.getMessage(),
+                            notification.isRead(),
+                            notification.getTimestamp(),
+                            new UserDTO(notification.getUser().getUserId(), notification.getUser().getUserName()),
+                            new UserDTO(notification.getSender().getUserId(), notification.getSender().getUserName()),
+                            projectDTO,
+                            notification.getLink()
+                    );
+                })
                 .collect(Collectors.toList());
     }
+
 
     // 알림을 읽음 상태로 변경하는 메서드
     public boolean markAsRead(Long id) {

@@ -1,11 +1,10 @@
 package com.example.bob.Service;
 
 import com.example.bob.DTO.ContestRecruitDTO;
-import com.example.bob.Entity.ContestEntity;
-import com.example.bob.Entity.ContestRecruitEntity;
-import com.example.bob.Entity.UserEntity;
+import com.example.bob.Entity.*;
 import com.example.bob.Repository.ContestRecruitRepository;
 import com.example.bob.Repository.ContestRepository;
+import com.example.bob.Repository.ContestTeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +17,7 @@ public class ContestRecruitService {
 
     private final ContestRecruitRepository contestRecruitRepository;
     private final ContestRepository contestRepository;
+    private final ContestTeamRepository contestTeamRepository;
 
     @Transactional
     public void createRecruitPost(ContestRecruitDTO dto, UserEntity writer) {
@@ -36,6 +36,24 @@ public class ContestRecruitService {
                 .contest(contest)
                 .build();
 
+        ContestTeamEntity team = ContestTeamEntity.builder()
+                .teamName(dto.getTitle() + " 팀")
+                .contest(contest)
+                .createdBy(writer.getUserNick())
+                .status("모집중")
+                .build();
+
+        ContestTeamMemberEntity leader = ContestTeamMemberEntity.builder()
+                .team(team)
+                .user(writer)
+                .isAccepted(true)
+                .isInvitePending(false)
+                .role("LEADER")
+                .build();
+
+        team.getMembers().add(leader);
+
+        contestTeamRepository.save(team);
         contestRecruitRepository.save(recruit);
     }
 
