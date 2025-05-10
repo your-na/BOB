@@ -2,6 +2,8 @@ package com.example.bob.Controller;
 
 import com.example.bob.DTO.ContestDTO;
 import com.example.bob.Entity.ContestEntity;
+import com.example.bob.Entity.ContestRecruitEntity;
+import com.example.bob.Service.ContestRecruitService;
 import com.example.bob.Service.ContestService;
 import com.example.bob.security.CompanyDetailsImpl;
 import com.example.bob.security.CustomUserDetails;
@@ -26,6 +28,7 @@ import java.util.List;
 public class ContestController {
 
     private final ContestService contestService;
+    private final ContestRecruitService recruitService;
 
     // ✅ 사용자 유형에 따라 공모전 홈 리디렉션
     @GetMapping("/contest-redirect")
@@ -75,7 +78,9 @@ public class ContestController {
     @GetMapping("/contest/{id}")
     public String showContestDetail(@PathVariable Long id, Model model) {
         ContestEntity contest = contestService.getById(id);
+        List<ContestRecruitEntity> recruitList = recruitService.findByContestId(id);
         model.addAttribute("contest", ContestDTO.fromEntity(contest));
+        model.addAttribute("recruitList", recruitList);
         return "postcontest";
     }
 
