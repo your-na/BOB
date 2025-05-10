@@ -29,21 +29,6 @@ public class ChatRoomController {
         return ResponseEntity.ok(roomId);
     }
 
-    @GetMapping("/api/chat/rooms")
-    @ResponseBody
-    public ResponseEntity<List<ChatRoomSummaryDTO>> getChatRoomSummaries(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        Long userId = userDetails.getUserEntity().getId();
-        List<ChatRoomSummaryDTO> summaries = chatRoomService.getChatRoomsWithLastMessages(userId);
-        return ResponseEntity.ok(summaries);
-    }
-
-    @PostMapping("/{roomId}/pin")
-    public ResponseEntity<?> pinRoom(@PathVariable Long roomId,
-                                     @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        chatRoomService.pinRoom(roomId, userDetails.getUserEntity());
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/chatroom")
     public String chatRoomPage(@RequestParam Long roomId,
                                @AuthenticationPrincipal UserDetailsImpl userDetails,

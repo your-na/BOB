@@ -34,10 +34,6 @@ public class TestController {
     @GetMapping("/comycontest")
     public String myconform() {return "co_mycontest";}
 
-    //chat
-    @GetMapping("/chatting")
-    public String chatform() {return "chat_popup";}
-
     //기업 내가 쓴 공고
     @GetMapping("/comyjob")
     public String myjobform() {return "co_myjob";}

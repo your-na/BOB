@@ -39,7 +39,16 @@ function renderChatRooms(rooms) {
         // 프로필 이미지
         const profileDiv = document.createElement("div");
         profileDiv.className = "profile";
-        profileDiv.style.backgroundImage = `url('${room.opponentProfileUrl || "/images/user.png"}')`;
+
+        let imageUrl = room.opponentProfileUrl || "/images/user.png";
+
+        // 업로드 이미지인 경우 경로 앞에 '/' 붙이기
+        if (!imageUrl.startsWith("/")) {
+            imageUrl = "/" + imageUrl;
+        }
+
+        profileDiv.style.backgroundImage = `url('${imageUrl}')`;
+
 
         // 텍스트 정보
         const infoDiv = document.createElement("div");
