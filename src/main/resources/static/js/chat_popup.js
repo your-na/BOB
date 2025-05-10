@@ -103,16 +103,6 @@ function toggleAddMenu() {
     menu.style.display = (menu.style.display === "block") ? "none" : "block";
 }
 
-function createNewChat() {
-    alert("새 채팅 시작 기능 (백엔드 연동 예정)");
-    // 예: location.href = "/chat/new";
-}
-
-function createGroupChat() {
-    alert("단체 채팅 만들기 기능 (백엔드 연동 예정)");
-    // 예: location.href = "/chat/group/create";
-}
-
 // 외부 클릭 시 메뉴 닫기
 document.addEventListener("click", function(event) {
     const menu = document.getElementById("addChatMenu");
@@ -125,5 +115,77 @@ document.addEventListener("click", function(event) {
 function openChatWindow(roomId) {
     if (!roomId) return;
     window.open(`/chat/chatroom?roomId=${roomId}`, "_blank", "width=500,height=700,resizable=yes");
+}
+
+// 예시 사용자 데이터
+const dummyUsers = [
+    { id: 1, name: "서유진", profile: "/images/profile.png" },
+    { id: 2, name: "이하은", profile: "/images/profile.png" },
+    { id: 3, name: "임채민", profile: "/images/profile.png" },
+    { id: 4, name: "정유나", profile: "/images/profile.png" },
+    { id: 5, name: "최연주", profile: "/images/profile.png" }
+];
+
+let selectedUsers = [];
+
+// 모달 열기
+function openInviteModal(isGroup = false) {
+    document.getElementById("inviteModal").style.display = "block";
+    renderUserList(dummyUsers);
+}
+
+// 모달 닫기
+function closeInviteModal() {
+    document.getElementById("inviteModal").style.display = "none";
+    selectedUsers = [];
+}
+
+// 사용자 리스트 렌더링
+function renderUserList(users) {
+    const list = document.getElementById("userList");
+    list.innerHTML = "";
+
+    users.forEach(user => {
+        const item = document.createElement("div");
+        item.className = "user-item";
+        item.innerHTML = `
+      <img src="${user.profile}" alt="profile">
+      <span>${user.name}</span>
+      <input type="checkbox" value="${user.id}" onchange="toggleUserSelect(this)">
+    `;
+        list.appendChild(item);
+    });
+}
+
+// 검색 기능
+function searchUsers() {
+    const keyword = document.getElementById("searchInput").value.toLowerCase();
+    const filtered = dummyUsers.filter(user =>
+        user.name.toLowerCase().includes(keyword)
+    );
+    renderUserList(filtered);
+}
+
+// 선택 추가/제거
+function toggleUserSelect(checkbox) {
+    const id = parseInt(checkbox.value);
+    if (checkbox.checked) {
+        selectedUsers.push(id);
+    } else {
+        selectedUsers = selectedUsers.filter(uid => uid !== id);
+    }
+}
+
+// 확인 버튼
+function confirmInvite() {
+    if (selectedUsers.length === 0) {
+        alert("최소 한 명 이상 선택해주세요.");
+        return;
+    }
+
+    console.log("선택된 유저 ID:", selectedUsers);
+    // TODO: 이곳에서 WebSocket 채팅방 생성 요청 등 연결
+
+    closeInviteModal();
 }
 

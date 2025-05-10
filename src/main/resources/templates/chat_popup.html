@@ -6,6 +6,7 @@
     <meta name="_csrf_header" content="${_csrf.headerName}"/>
     <title>채팅창</title>
     <link rel="stylesheet" href="/css/chat_popup.css">
+
 </head>
 <body>
 
@@ -14,12 +15,32 @@
     <div class="add-chat-wrapper">
         <button class="add-chat-btn" onclick="toggleAddMenu()">+</button>
         <ul class="add-chat-menu" id="addChatMenu">
-            <li onclick="createNewChat()">1:1 채팅 시작</li>
-            <li onclick="createGroupChat()">단체 채팅 만들기</li>
+            <li onclick="openInviteModal(false)">1:1 채팅 시작</li>
+            <li onclick="openInviteModal(true)">단체 채팅 만들기</li>
+
         </ul>
     </div>
 </div>
 
+<div id="inviteModal" class="invite-modal" style="display: none;">
+    <div class="invite-header">
+        <span>대화상대 선택</span>
+        <button onclick="closeInviteModal()">✕</button>
+    </div>
+
+    <div class="search-section">
+        <input type="text" id="searchInput" placeholder="닉네임 또는 아이디 검색" oninput="searchUsers()">
+    </div>
+
+    <div class="user-list" id="userList">
+        <!-- JS로 사용자 목록 렌더링 -->
+    </div>
+
+    <div class="modal-actions">
+        <button class="confirm-btn" onclick="confirmInvite()">확인</button>
+        <button class="cancel-btn" onclick="closeInviteModal()">취소</button>
+    </div>
+</div>
 
 <div class="chat-container">
     <!-- 채팅방 목록 -->
