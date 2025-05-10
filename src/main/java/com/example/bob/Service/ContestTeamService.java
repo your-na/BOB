@@ -117,5 +117,69 @@ public class ContestTeamService {
         contestTeamMemberRepository.save(member);
     }
 
+    // ✅ 내가 팀원으로 참여 중인 공모전 목록 반환
+    public List<ContestEntity> getContestsJoinedByUser(UserEntity user) {
+        List<ContestTeamMemberEntity> members = contestTeamMemberRepository.findByUserAndIsAcceptedTrue(user);
+
+        return members.stream()
+                .filter(m -> !"LEADER".equals(m.getRole())) // 먼저 팀장이 아닌 것만 남김
+                .map(m -> m.getTeam().getContest())
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+
+    public String getNotice(Long contestId) {
+        ContestEntity contest = contestRepository.findById(contestId)
+                .orElseThrow(() -> new RuntimeException("공모전 정보를 찾을 수 없습니다."));
+
+        List<ContestTeamEntity> teams = contestTeamRepository.findByContest(contest);
+
+        // 예시: 가장 먼저 생성된 팀의 공지 가져오기
+        ContestTeamEntity team = teams.stream()
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+
+        return team.getNotice();
+    }
+
+    public void updateNotice(Long contestId, String content, UserEntity requester) {
+        ContestEntity contest = contestRepository.findById(contestId)
+                .orElseThrow(() -> new RuntimeException("공모전 정보를 찾을 수 없습니다."));
+
+        List<ContestTeamEntity> teams = contestTeamRepository.findByContest(contest);
+
+        ContestTeamEntity team = teams.stream()
+                .filter(t -> t.getMembers().stream()
+                        .anyMatch(m -> m.getUser().getUserId().equals(requester.getUserId()) && "LEADER".equals(m.getRole())))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("수정 권한이 있는 팀을 찾을 수 없습니다."));
+
+        team.setNotice(content);
+        contestTeamRepository.save(team);
+    }
+
+    public ContestTeamEntity findTeamByContestAndLeader(ContestEntity contest, UserEntity leader) {
+        return contestTeamRepository.findByContest(contest).stream()
+                .filter(team -> team.getMembers().stream()
+                        .anyMatch(member -> member.getUser().getUserId().equals(leader.getUserId()) && "LEADER".equals(member.getRole())))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("팀장을 포함한 팀을 찾을 수 없습니다."));
+    }
+
+    public List<ContestEntity> getContestsLedByUser(UserEntity user) {
+        List<ContestTeamEntity> allTeams = contestTeamRepository.findAll();
+
+        return allTeams.stream()
+                .filter(team -> team.getMembers().stream()
+                        .anyMatch(member ->
+                                member.getUser().getUserId().equals(user.getUserId()) &&
+                                        "LEADER".equals(member.getRole())))
+                .map(ContestTeamEntity::getContest)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+
 
 }

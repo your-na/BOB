@@ -40,6 +40,10 @@ public class ContestTeamEntity {
     @Column
     private LocalDate createdAt;
 
+    @Column(length = 2000)
+    private String notice;
+
+
     @PrePersist
     public void setCreateDate() {
         this.createdAt = LocalDate.now();

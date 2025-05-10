@@ -28,6 +28,26 @@
             <a th:href="@{/todohome/{id}(id=${project.id})}" th:text="${project.title}" class="protitle">프로젝트 제목</a>
         </li>
     </div>
+
+    <!-- 팀장 공모전 -->
+    <div>
+        <h3>팀장 공모전</h3>
+        <li th:each="contest : ${leaderContests}"
+            th:if="${contest.status != '완료' and contest.status != '신청중' and contest.status != '거절됨'}">
+            <a th:href="@{/contesthome/{id}(id=${contest.id})}"
+               th:text="${contest.title}" class="protitle">공모전 제목</a>
+        </li>
+    </div>
+
+    <!-- 참여 공모전 -->
+    <div>
+        <h3>참여 공모전</h3>
+        <li th:each="contest : ${joinedContests}"
+            th:if="${contest.status != '완료' and contest.status != '신청중' and contest.status != '거절됨'}">
+            <a th:href="@{/contesthome/{id}(id=${contest.id})}"
+               th:text="${contest.title}" class="protitle">공모전 제목</a>
+        </li>
+    </div>
 </ul>
 
 <script>

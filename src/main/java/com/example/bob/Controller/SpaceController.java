@@ -1,9 +1,11 @@
 package com.example.bob.Controller;
 
+import com.example.bob.Entity.ContestEntity;
 import com.example.bob.Entity.UserEntity;
 import com.example.bob.DTO.ProjectDTO;
 import com.example.bob.Entity.ProjectEntity;
 import com.example.bob.Entity.UserProjectEntity;
+import com.example.bob.Service.ContestTeamService;
 import com.example.bob.Service.ProjectService;
 import com.example.bob.security.UserDetailsImpl;
 
@@ -24,23 +26,30 @@ public class SpaceController {
 
     @Autowired
     private ProjectService projectService;
+    @Autowired
+    private ContestTeamService contestTeamService;
 
     // 프로젝트 목록
     @GetMapping("/plan")
     public String getUserProjects(Model model, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         UserEntity userEntity = userDetails.getUserEntity();
 
-        // 사용자가 주최한 프로젝트 목록
+        // ✅ 기존 프로젝트
         List<ProjectDTO> createdProjects = projectService.getCreatedProjects(userEntity);
-
-        // 사용자가 참여한 프로젝트 목록
         List<ProjectDTO> joinedProjects = projectService.getJoinedProjects(userEntity);
 
-        // 모델에 프로젝트 데이터를 추가하여 전달
+        // ✅ 공모전 팀 - 팀장 목록
+        List<ContestEntity> leaderContests = contestTeamService.getContestsLedByUser(userEntity);
+
+        // ✅ 공모전 팀 - 참여자 목록
+        List<ContestEntity> joinedContests = contestTeamService.getContestsJoinedByUser(userEntity);
+
         model.addAttribute("createdProjects", createdProjects);
         model.addAttribute("joinedProjects", joinedProjects);
+        model.addAttribute("leaderContests", leaderContests);   // 공모전 팀장 목록
+        model.addAttribute("joinedContests", joinedContests);   // 공모전 팀원 목록
 
-        return "plan"; // plan.html 템플릿 렌더링
+        return "plan";
     }
 
     @GetMapping("/todohome/{id}")
@@ -92,6 +101,8 @@ public class SpaceController {
 
         return "todo_home"; // todo_home.html로 프로젝트 정보를 넘김
     }
+
+
 
     // ✅ 공지사항 조회 (팀원, 팀장 모두 가능)
     @ResponseBody
