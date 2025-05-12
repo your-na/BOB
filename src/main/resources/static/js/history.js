@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // ✅ 검색 기능 (각 테이블별로 적용)
+    // ✅ 검색 기능
     document.addEventListener("keyup", function (event) {
         if (event.target.classList.contains("searchbar")) {
             const searchKeyword = event.target.value.toLowerCase();
@@ -27,14 +27,13 @@ document.addEventListener("DOMContentLoaded", function () {
             rows.forEach(row => {
                 const titleCell = row.querySelector("td:nth-child(5)");
                 if (!titleCell) return;
-
                 const title = titleCell.textContent.toLowerCase();
                 row.style.display = title.includes(searchKeyword) ? "table-row" : "none";
             });
         }
     });
 
-    // ✅ 추가 버튼 기능 (공모전/프로젝트 모두)
+    // ✅ 추가 버튼 기능
     document.addEventListener("click", function (event) {
         if (event.target.classList.contains("add-project-btn")) {
             const section = event.target.closest(".history-section");
@@ -50,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // ✅ 삭제 버튼 (백엔드 연동 포함 + CSRF 토큰 처리)
+    // ✅ 삭제 버튼
     document.addEventListener("click", function (event) {
         if (event.target.classList.contains("delete-btn")) {
             const row = event.target.closest("tr");
@@ -66,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
-                        [getCsrfHeader()]: getCsrfToken()  // ✅ 동적 헤더 키 사용
+                        [getCsrfHeader()]: getCsrfToken()
                     }
                 })
                     .then(response => {
@@ -85,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // ✅ CSRF 토큰 가져오기 함수
+    // ✅ CSRF 관련 함수
     function getCsrfToken() {
         const csrfMeta = document.querySelector('meta[name="_csrf"]');
         return csrfMeta ? csrfMeta.getAttribute("content") : "";
@@ -110,13 +109,73 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // ✅ 페이지 로드시 기본 탭 보이도록 설정
+    // ✅ 셀 더블클릭 시 수정 (자격증 + 구직 상태 드롭다운 포함)
+    document.addEventListener("dblclick", function (event) {
+        const target = event.target;
+
+        if (!target.matches("td") || target.querySelector("input, select")) return;
+
+        const row = target.closest("tr");
+        const section = target.closest(".history-section");
+        const sectionId = section?.id;
+        const colIndex = target.cellIndex;
+        const originalText = target.textContent.trim();
+
+        const editableMap = {
+            "career-history": {
+                editableCols: [1, 2, 3],
+                dateCols: [3],
+                selectCols: []
+            },
+            "job-history": {
+                editableCols: [1, 2, 3, 4, 5],
+                dateCols: [2, 3],
+                selectCols: [1] // ✅ 상태만 select로
+            }
+        };
+
+        if (!editableMap[sectionId] || !editableMap[sectionId].editableCols.includes(colIndex)) return;
+
+        const isDate = editableMap[sectionId].dateCols.includes(colIndex);
+        const isSelect = editableMap[sectionId].selectCols.includes(colIndex);
+
+        let input;
+
+        if (isSelect) {
+            input = document.createElement("select");
+            ["재직", "퇴직"].forEach(opt => {
+                const option = document.createElement("option");
+                option.value = opt;
+                option.textContent = opt;
+                if (opt === originalText) option.selected = true;
+                input.appendChild(option);
+            });
+        } else {
+            input = document.createElement("input");
+            input.type = isDate ? "date" : "text";
+            input.value = isDate && !isNaN(Date.parse(originalText))
+                ? new Date(originalText).toISOString().split("T")[0]
+                : originalText;
+        }
+
+        input.className = "editable-input";
+        input.onblur = () => {
+            target.textContent = input.value.trim() || originalText;
+        };
+        input.onkeydown = (e) => {
+            if (e.key === "Enter") input.blur();
+        };
+
+        target.innerHTML = "";
+        target.appendChild(input);
+        input.focus();
+    });
+
+    // ✅ 기본 탭 표시
     const defaultSection = document.querySelector(".tab-item.active")?.getAttribute("data-target");
     if (defaultSection) {
         document.querySelectorAll(".history-section").forEach(sec => sec.style.display = "none");
         const section = document.getElementById(defaultSection);
-        if (section) {
-            section.style.display = "block";
-        }
+        if (section) section.style.display = "block";
     }
 });

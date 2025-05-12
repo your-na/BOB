@@ -151,3 +151,25 @@
     color: grey;
     cursor: pointer;
 }
+
+/* ✅ 자격증 항목 인라인 편집 스타일 */
+.editable-cell {
+    cursor: pointer;
+}
+
+.editable-input {
+    width: 100%;
+    height: 30px;
+    font-size: 14px;
+    padding: 4px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+}
+
+select.editable-input {
+    width: 100%;
+    height: 30px;
+    font-size: 14px;
+    border: none;
+    box-sizing: border-box;
+}
