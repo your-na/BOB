@@ -135,6 +135,14 @@ form input{
     padding-left: 10px;
 }
 
+#region {
+    border-radius: 10px;
+    margin-top: 10px;
+    height: 30px;
+    border: 1px solid grey;
+    padding-left: 10px;
+    width: 26%;
+}
 form .checkbox-group {
     display: flex;
     flex-wrap: wrap;
