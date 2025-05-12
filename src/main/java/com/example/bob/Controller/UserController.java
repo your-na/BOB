@@ -234,4 +234,8 @@ public class UserController {
 
     @GetMapping("/resume_detail")
     public String resume_detailform() {return "resume_detail";}
+
+    @GetMapping("/contest_detail")
+    public String contest_detailform() {return "contest_detail";}
+
 }

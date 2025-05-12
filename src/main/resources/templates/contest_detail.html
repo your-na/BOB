@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    <title th:text="${contest.title}">팀원 모집 상세보기</title>
+
+    <link rel="stylesheet" href="/css/contest_detail.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+
+<!-- ✅ Header -->
+<div th:insert="~{header :: header}"></div>
+
+<!-- ✅ 제목과 D-Day -->
+<div class="title-row">
+    <div class="title" th:text="${contest.title}">팀원 모집 제목</div>
+    <span class="deadline" th:text="'D-' + ${contest.dDay}">D-7</span>
+</div>
+<hr>
+
+<!-- ✅ 작성자 및 작성일 -->
+<div class="meta">
+    <span class="meta1" th:text="${contest.writer}">작성자</span>
+    <span class="meta2" th:text="'작성일 : ' + ${today}">작성일</span>
+</div>
+
+<!-- ✅ 모집 분야 -->
+<div class="form-group">
+    <label>모집 분야</label>
+    <div class="value" th:text="${contest.category}">앱 개발</div>
+</div>
+
+<!-- ✅ 모집 인원 -->
+<div class="form-group">
+    <label>모집 인원</label>
+    <div class="value" th:text="${contest.recruitCount} + '명'">3명</div>
+</div>
+
+<!-- ✅ 공모전 기간 -->
+<div class="form-group">
+    <label>진행 일정</label>
+    <div class="date-inputs">
+        <span th:text="${contest.startDate}">2025.05.15</span>
+        <span> ~ </span>
+        <span th:text="${contest.endDate}">2025.06.30</span>
+    </div>
+</div>
+
+<!-- ✅ 설명 -->
+<div class="good">
+    <p>설명</p>
+    <div class="content" th:text="${contest.description}">
+        함께 참여할 팀원을 모집합니다!
+    </div>
+</div>
+
+<!-- ✅ 팀 신청 버튼 -->
+<form action="/contestapplication" method="get">
+    <input type="hidden" name="contestId" th:value="${contest.id}">
+    <button type="submit"
+            class="apply-btn"
+            th:disabled="${isOwner}"
+            th:style="${isOwner} ? 'background: grey; cursor: not-allowed;' : ''">
+        팀 신청하기
+    </button>
+    <p th:if="${isOwner}" style="color: red; font-size: 13px; margin-top: 5px;">
+        본인이 작성한 모집글에는 신청할 수 없습니다.
+    </p>
+</form>
+<hr>
+
+<!-- ✅ 좋아요 & 스크랩 -->
+<div class="interaction">
+    <div id="heart" onclick="toggleHeart()">
+        <img id="heartImage" th:if="${isLiked}" src="/images/fillheart.png">
+        <img id="heartImage" th:unless="${isLiked}" src="/images/heart.png">
+        <span id="likesCount" th:text="${likesCount}">0</span>
+    </div>
+    <div id="scrap"><img src="/images/scrap.png"> <span>0</span></div>
+</div>
+
+<!-- ✅ 댓글 입력 -->
+<form>
+    <input type="text" class="comment-box" placeholder="댓글을 작성해주세요.">
+    <button class="postbutton">등록</button>
+</form>
+
+<!-- ✅ 댓글 목록 -->
+<div class="comment-list" th:each="comment : ${comments}">
+    <div class="comment">
+        <div class="profile-img"></div>
+        <div class="comment-body">
+            <div class="name-time">
+                <span class="name" th:text="${comment.nickname}">닉네임</span>
+                <span class="time" th:text="${comment.timeAgo}">1분 전</span>
+            </div>
+            <div class="text" th:text="${comment.content}">댓글 내용</div>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ JavaScript -->
+<script defer>
+    document.addEventListener("DOMContentLoaded", function () {
+        window.toggleHeart = function () {
+            const contestId = window.location.pathname.split("/")[2];
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+            fetch(`/contest/${contestId}/like`, {
+                method: 'POST',
+                headers: {
+                    [csrfHeader]: csrfToken,
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const heartImg = document.getElementById("heartImage");
+                    heartImg.src = data.liked ? "/images/fillheart.png" : "/images/heart.png";
+                    document.getElementById("likesCount").innerText = data.likes;
+                })
+                .catch(error => {
+                    console.error("❌ 좋아요 실패:", error);
+                    alert("❌ 좋아요 실패");
+                });
+        };
+    });
+</script>
+
+</body>
+</html>
