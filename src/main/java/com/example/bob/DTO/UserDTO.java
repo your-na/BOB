@@ -27,6 +27,8 @@ public class UserDTO {
     private LocalDateTime accountCreatedAt; // 계정 생성 날짜
     private String profileImageUrl;
     private String bio;
+    private String region;
+
 
     // UserDTO(Long, String) 생성자 명시적으로 추가
     public UserDTO(Long userId, String userName) {

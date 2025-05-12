@@ -45,6 +45,10 @@ public class UserEntity {
     @Column(length = 100)
     private String Birthday;
 
+    @Column(length = 100)
+    private String region;
+
+
     //관리자 유저 구분
     @Column(nullable = false)
     private String role;

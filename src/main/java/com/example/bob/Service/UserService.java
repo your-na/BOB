@@ -107,6 +107,7 @@ public class UserService implements UserDetailsService {
         userEntity.setUserEmail(userUpdateDTO.getUserEmail());
         userEntity.setUserBio(userUpdateDTO.getUserBio());
         userEntity.setMainLanguage(userUpdateDTO.getMainLanguage());
+        userEntity.setRegion(userUpdateDTO.getRegion());
 
         userRepository.save(userEntity);  // 사용자 정보 저장
 

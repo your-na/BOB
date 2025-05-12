@@ -6,6 +6,8 @@ public class UserUpdateDTO {
     private String userBio;
     private String mainLanguage;
     private String profileImageUrl;
+    private String region;
+
 
     // Getters and Setters
     public String getUserNick() {
@@ -47,6 +49,15 @@ public class UserUpdateDTO {
     public void setProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
     }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
 
     @Override
     public String toString() {

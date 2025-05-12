@@ -217,10 +217,9 @@ public class ResumeService {
                 });
             }
         }
-
-
-
     }
+
+
 
 
 
