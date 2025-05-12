@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로젝트</title>
+    <link rel="stylesheet" href="/css/todo_home.css">
+
+    <!-- ✅ CSRF 토큰 메타태그 추가 -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+
+<div class="container">
+    <div class="modal">
+        <div class="input-container">
+            <div class="header">
+                <button class="back-btn">&lt;</button>
+                <!-- 프로젝트 제목을 동적으로 출력 -->
+                <h2 id="project-name" th:text="${project.title != null ? project.title : '제목 없음'}">프로젝트 제목</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+
+            <!-- 프로젝트 정보 -->
+            <div class="project-info">
+                <h3><strong>홈</strong></h3>
+                <!-- 프로젝트 목표와 진행일정을 동적으로 출력 -->
+                <p th:text="'목표: ' + ${goal}"></p>
+                <p><span th:text="'진행일정: ' + ${project.startDate} + ' ~ ' + ${project.endDate}"></span></p>
+            </div>
+
+            <!-- 버튼 섹션 -->
+            <div class="button-group">
+                <button class="submit-btn">제출하기</button>
+                <button class="chat-btn">팀 채팅</button>
+            </div>
+
+            <!-- 공지사항 텍스트 영역 -->
+            <div class="notice-section">
+                <textarea id="notice"
+                          th:text="${project.notice}"
+                          th:readonly="${owner.userNick != #authentication.principal.userEntity.userNick}">
+                </textarea>
+            </div>
+
+            <!-- 멤버 리스트 -->
+            <div class="member-section">
+                <h3>멤버</h3>
+                <ul>
+                    <!-- 주최자 정보 출력 -->
+                    <th:block th:if="${owner != null}">
+                        <li class="member-item">
+                            <div class="member-info">
+                                <span class="member-name" th:text="${owner.userNick}"></span> <!-- 주최자 이름 -->
+                                <span class="crown">👑</span> <!-- 왕관 아이콘을 닉네임 뒤에 배치 -->
+                            </div>
+                            <button class="chat-send">채팅 보내기 ></button>
+                        </li>
+                    </th:block>
+
+                    <!-- 팀원 목록을 동적으로 출력 -->
+                    <th:block th:each="member : ${teamMembers}">
+                        <li class="member-item">
+                            <div class="member-info">
+                                <!-- 팀원에게는 왕관 아이콘을 표시하지 않음 -->
+                                <span class="member-name" th:text="${member}"></span> <!-- 팀원 이름 -->
+                            </div>
+                            <button class="chat-send">채팅 보내기 ></button>
+                        </li>
+                    </th:block>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 사이드바 -->
+    <div class="sidebar">
+        <button class="sidebar-btn active">홈</button>
+        <a th:href="@{/todo_plan/{id}(id=${project.id})}">
+            <button class="sidebar-btn">할 일</button>
+        </a>
+        <a th:href="@{'/todocrud/' + ${project.id}}">
+            <button class="sidebar-btn">WBS</button>
+        </a>
+
+        <button class="sidebar-btn">+</button>
+    </div>
+</div>
+
+<!-- ✅ 공지사항 자동 저장 및 버튼 이동 스크립트 -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    let projectId = /*[[${project.id}]]*/ 0;
+    /*]]>*/
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // ✅ 페이지 이동: 왼쪽 < 버튼 → plan 페이지
+        const backBtn = document.querySelector(".back-btn");
+        if (backBtn) {
+            backBtn.addEventListener("click", function () {
+                window.location.href = "http://localhost:8888/plan";
+            });
+        }
+
+        // ✅ 페이지 이동: 오른쪽 X 버튼 → main 페이지
+        const closeBtn = document.querySelector(".close-btn");
+        if (closeBtn) {
+            closeBtn.addEventListener("click", function () {
+                window.location.href = "http://localhost:8888/main";
+            });
+        }
+
+        // ✅ 공지사항 자동 저장 처리
+        const textarea = document.getElementById("notice");
+        let timer = null;
+
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+        // 내용이 바뀌면 2초 후 저장
+        textarea?.addEventListener("input", function () {
+            if (textarea.readOnly) return;
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(saveNotice, 2000);
+        });
+
+        // 포커스 벗어날 때 저장
+        textarea?.addEventListener("blur", function () {
+            if (textarea.readOnly) return;
+            saveNotice();
+        });
+
+        function saveNotice() {
+            if (!textarea || textarea.readOnly) return;
+
+            fetch(`/api/project/${projectId}/notice`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify({ content: textarea.value })
+            }).then(() => {
+                console.log("✅ 공지사항 저장됨");
+            }).catch((error) => {
+                console.error("❌ 저장 실패:", error);
+            });
+        }
+    });
+</script>
+
+
+</body>
+</html>
