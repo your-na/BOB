@@ -16,6 +16,7 @@
   <meta name="opponent-profile-url"
         th:content="@{${opponent != null ? opponent.profileImageUrl : '/images/user.png'}}" />
 
+  <meta name="chat-type" th:content="${chatType}" />
 </head>
 <body>
 <div class="chat-container"> <!-- ✅ 전체 감싸는 컨테이너 -->

@@ -1,5 +1,6 @@
 package com.example.bob.Api;
 
+import com.example.bob.DTO.ChatRoomRequestDTO;
 import com.example.bob.DTO.ChatRoomSummaryDTO;
 import com.example.bob.Service.ChatRoomService;
 import com.example.bob.security.UserDetailsImpl;
@@ -21,9 +22,17 @@ public class ChatRoomApiController {
     @GetMapping("/rooms")
     public ResponseEntity<List<ChatRoomSummaryDTO>> getChatRoomSummaries(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         Long userId = userDetails.getUserEntity().getId();
-        List<ChatRoomSummaryDTO> summaries = chatRoomService.getChatRoomsWithLastMessages(userId);
+        List<ChatRoomSummaryDTO> summaries = chatRoomService.getUnifiedChatRoomSummaries(userId);
         return ResponseEntity.ok(summaries);
     }
+
+    // 1:1 채팅방 생성 또는 조회
+    @PostMapping("/room/create")
+    public ResponseEntity<Long> createOrGetRoom(@RequestBody ChatRoomRequestDTO dto) {
+        Long roomId = chatRoomService.getOrCreateRoom(dto.getUserNickA(), dto.getUserNickB());
+        return ResponseEntity.ok(roomId);
+    }
+
 
     // 채팅방 상단 고정
     @PostMapping("/room/{roomId}/pin")

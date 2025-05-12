@@ -53,7 +53,8 @@ function renderChatRooms(rooms) {
         // 텍스트 정보
         const infoDiv = document.createElement("div");
         infoDiv.className = "info";
-        infoDiv.onclick = () => openChatWindow(room.roomId);
+        infoDiv.onclick = () => openChatWindow(room.roomId, room.chatType || "private");
+
 
         const name = document.createElement("strong");
         name.textContent = room.opponentNick;
@@ -112,27 +113,29 @@ document.addEventListener("click", function(event) {
     }
 });
 
-function openChatWindow(roomId) {
+function openChatWindow(roomId, type = "private") {
     if (!roomId) return;
-    window.open(`/chat/chatroom?roomId=${roomId}`, "_blank", "width=500,height=700,resizable=yes");
+    const url = type === "group"
+        ? `/chat/chatroom?roomId=${roomId}&type=group`
+        : `/chat/chatroom?roomId=${roomId}`;
+    window.open(url, "_blank", "width=500,height=700,resizable=yes");
 }
 
-// 예시 사용자 데이터
-const dummyUsers = [
-    { id: 1, name: "서유진", profile: "/images/profile.png" },
-    { id: 2, name: "이하은", profile: "/images/profile.png" },
-    { id: 3, name: "임채민", profile: "/images/profile.png" },
-    { id: 4, name: "정유나", profile: "/images/profile.png" },
-    { id: 5, name: "최연주", profile: "/images/profile.png" }
-];
-
 let selectedUsers = [];
+let allUsers = [];
+let isGroupMode = false;
+
 
 // 모달 열기
 function openInviteModal(isGroup = false) {
+    isGroupMode = isGroup; // ✅ 현재 모드 저장
+
     document.getElementById("inviteModal").style.display = "block";
-    renderUserList(dummyUsers);
+    document.getElementById("searchInput").value = "";
+    renderUserList(lastSearchResults);
+    renderSelectedUsers();
 }
+
 
 // 모달 닫기
 function closeInviteModal() {
@@ -141,40 +144,96 @@ function closeInviteModal() {
 }
 
 // 사용자 리스트 렌더링
-function renderUserList(users) {
-    const list = document.getElementById("userList");
-    list.innerHTML = "";
+function renderSelectedUsers() {
+    const container = document.getElementById("selectedUserList");
+    container.innerHTML = "";
 
-    users.forEach(user => {
-        const item = document.createElement("div");
-        item.className = "user-item";
-        item.innerHTML = `
-      <img src="${user.profile}" alt="profile">
-      <span>${user.name}</span>
-      <input type="checkbox" value="${user.id}" onchange="toggleUserSelect(this)">
-    `;
-        list.appendChild(item);
+    selectedUsers.forEach(userId => {
+        const user = allUsers.find(u => u.id === userId);
+        if (!user) return;
+
+        const tag = document.createElement("div");
+        tag.className = "selected-user-tag";
+        tag.style.cssText = `
+            background: #f0f0f0;
+            border-radius: 20px;
+            padding: 4px 10px;
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+        `;
+
+        const img = document.createElement("img");
+        img.src = user.avatar || "/images/user.png";
+        img.alt = "profile";
+        img.style.width = "24px";
+        img.style.height = "24px";
+        img.style.borderRadius = "50%";
+        img.style.marginRight = "6px";
+
+        const name = document.createElement("span");
+        name.textContent = user.nickname;
+
+        const removeBtn = document.createElement("span");
+        removeBtn.textContent = "×";
+        removeBtn.style.cssText = `
+            margin-left: 8px;
+            cursor: pointer;
+            color: #999;
+            font-weight: bold;
+        `;
+        removeBtn.onclick = () => {
+            selectedUsers = selectedUsers.filter(id => id !== userId);
+            renderSelectedUsers();       // 상단에서 제거
+            renderUserList(lastSearchResults); // 하단 목록도 다시 그림
+        };
+
+        tag.appendChild(img);
+        tag.appendChild(name);
+        tag.appendChild(removeBtn);
+        container.appendChild(tag);
     });
 }
 
+
 // 검색 기능
 function searchUsers() {
-    const keyword = document.getElementById("searchInput").value.toLowerCase();
-    const filtered = dummyUsers.filter(user =>
-        user.name.toLowerCase().includes(keyword)
-    );
-    renderUserList(filtered);
+    const keyword = document.getElementById("searchInput").value.trim();
+
+    // ✅ 검색어 없으면 목록 비우기
+    if (!keyword) {
+        renderUserList([]); // 빈 배열 전달 → 화면 비움
+        return;
+    }
+
+    fetch(`/api/users/search?keyword=${encodeURIComponent(keyword)}`)
+        .then(res => res.json())
+        .then(data => {
+            allUsers = data;
+            renderUserList(data);
+        })
+        .catch(err => {
+            console.error("유저 검색 실패:", err);
+        });
 }
+
 
 // 선택 추가/제거
 function toggleUserSelect(checkbox) {
     const id = parseInt(checkbox.value);
     if (checkbox.checked) {
-        selectedUsers.push(id);
+        if (!selectedUsers.includes(id)) {
+            selectedUsers.push(id);
+        }
     } else {
         selectedUsers = selectedUsers.filter(uid => uid !== id);
     }
+
+    renderSelectedUsers();
 }
+
+const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
 
 // 확인 버튼
 function confirmInvite() {
@@ -183,9 +242,117 @@ function confirmInvite() {
         return;
     }
 
-    console.log("선택된 유저 ID:", selectedUsers);
-    // TODO: 이곳에서 WebSocket 채팅방 생성 요청 등 연결
+    // ✅ 사용자가 '1:1 채팅' 모드를 선택한 경우
+    if (!isGroupMode) {
+        if (selectedUsers.length > 1) {
+            alert("1:1 채팅은 한 명만 선택할 수 있습니다.");
+            return;
+        }
 
+        const selectedUser = allUsers.find(u => u.id === selectedUsers[0]);
+        createPrivateChat(selectedUser.nickname);
+    }
+
+    // ✅ 사용자가 '그룹 채팅' 모드를 선택한 경우
+    else {
+        if (selectedUsers.length < 2) {
+            alert("그룹 채팅은 두 명 이상 선택해야 합니다.");
+            return;
+        }
+
+        const roomName = prompt("그룹 채팅방 이름을 입력하세요", "새 그룹채팅");
+        if (!roomName) return;
+
+        fetch("/api/group-chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify({
+                roomName: roomName,
+                userIds: selectedUsers
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                const roomId = data.roomId;
+                window.open(`/chat/chatroom?roomId=${roomId}&type=group`, "_blank", "width=500,height=700");
+            })
+            .catch(err => {
+                alert("그룹 채팅방 생성 실패");
+                console.error(err);
+            });
+    }
+
+    // ✅ 마무리
+    selectedUsers = [];
+    renderSelectedUsers();
     closeInviteModal();
 }
+
+
+function createPrivateChat(opponentNick) {
+    const currentUserNick = document.querySelector("meta[name='current-user']")?.content;
+
+    if (!currentUserNick || !csrfToken || !csrfHeader) {
+        alert("인증 정보를 불러오지 못했습니다.");
+        return;
+    }
+
+    fetch("/api/chat/room/create", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            [csrfHeader]: csrfToken
+        },
+        credentials: "include",
+        body: JSON.stringify({
+            userNickA: currentUserNick,
+            userNickB: opponentNick
+        })
+    })
+        .then(res => res.json())
+        .then(data => {
+            const roomId = typeof data === "object" ? data.roomId ?? data : data;
+            if (!roomId || roomId === "undefined") {
+                alert("채팅방 생성 실패: 잘못된 응답");
+                return;
+            }
+            window.open(`/chat/chatroom?roomId=${roomId}`, "_blank", "width=500,height=700");
+        })
+        .catch(err => {
+            alert("채팅방 생성 실패");
+            console.error(err);
+        });
+}
+
+
+let lastSearchResults = [];
+
+function renderUserList(users) {
+    lastSearchResults = users;
+    const list = document.getElementById("userList");
+    list.innerHTML = "";
+
+    users.forEach(user => {
+        const isChecked = selectedUsers.includes(user.id);
+
+        const item = document.createElement("div");
+        item.className = "user-item";
+
+        // 1:1 모드에서 이미 1명 선택되어 있으면 다른 항목 비활성화
+        const disabled = isGroupMode ? "" : (selectedUsers.length >= 1 && !isChecked ? "disabled" : "");
+
+        item.innerHTML = `
+            <img src="${user.avatar}" alt="avatar">
+            <span>${user.nickname}</span>
+            <input type="checkbox" value="${user.id}" ${isChecked ? "checked" : ""} ${disabled} onchange="toggleUserSelect(this)">
+        `;
+        list.appendChild(item);
+    });
+}
+
+
+
 

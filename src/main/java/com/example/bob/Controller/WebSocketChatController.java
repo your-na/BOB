@@ -40,6 +40,7 @@ public class WebSocketChatController {
 
         message.setSenderId(sender.getId());  // 사용자 ID 추가
         message.setSenderName(sender.getUserNick());
+        message.setRoomId(roomId);
 
         chatMessageService.saveMessage(message, sender);
         return message;
