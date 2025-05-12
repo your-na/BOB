@@ -20,6 +20,8 @@ public class CoJobPostDetailDTO {
     private String preference;
     private String startDate;
     private String endDate;
+    private String surew;
+
 
     // ⬇️ 이력서 양식 제목들
     private List<ResumeTitleDto> resumeTitles;

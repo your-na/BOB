@@ -56,6 +56,7 @@ public class CoJobPostService {
         entity.setTime(dto.getTime());
         entity.setStartDate(dto.getStartDate());
         entity.setEndDate(dto.getEndDate());
+        entity.setSurew(dto.getSurew());
 
         // 모집 상태 설정
         LocalDate today = LocalDate.now();
@@ -158,6 +159,7 @@ public class CoJobPostService {
                 entity.getPreference(),
                 entity.getStartDate(),
                 entity.getEndDate(),
+                entity.getSurew(),
                 resumeTitles
         );
     }

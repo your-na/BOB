@@ -32,6 +32,7 @@ public class CoJobPostEntity {
     private String time;
     private String startDate;
     private String endDate;
+    private String surew;
 
     @ManyToOne
     @JoinColumn(name = "company_id")
@@ -68,6 +69,7 @@ public class CoJobPostEntity {
                 ", time='" + time + '\'' +
                 ", startDate='" + startDate + '\'' +
                 ", endDate='" + endDate + '\'' +
+                ", surew='" + surew + '\'' +
                 ", status='" + status + '\'' +
                 '}';
     }

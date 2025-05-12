@@ -39,6 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch(`/api/cojobs/${jobId}/with-resumes`)
         .then(res => res.json())
         .then(data => {
+            console.log("서버에서 받은 공고 데이터:", data);  // ✅ 이거 추가!
             // 제목 표시
             document.getElementById("job-title").textContent = `${data.title}`;
 
@@ -75,6 +76,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 <li><strong>시간:</strong> ${data.time}</li>
                 <li><strong>우대:</strong> ${data.preference}</li>
             `;
+            // 제출 서류 동적 출력
+            const documentsSection = document.querySelector(".documents");
+            documentsSection.innerHTML = `
+    <h3>제출서류</h3>
+    <p>${data.surew || '제출 서류 정보 없음'}</p>
+    <p class="notice">* 필수 제출 안내 확인</p>
+`;
+
 
             // 👉 이력서 양식 리스트 추가
             const resumeSection = document.querySelector(".resume-template");
