@@ -74,6 +74,7 @@ public class UserDTO {
                 .sex(userEntity.getSex())
                 .mainLanguage(userEntity.getMainLanguage())
                 .birthday(userEntity.getBirthday())
+                .region(userEntity.getRegion())
                 .userNick(userEntity.getUserNick())
                 .profileImageUrl(userEntity.getProfileImageUrl() != null ? userEntity.getProfileImageUrl() : "/images/user.png")
                 .bio(userEntity.getUserBio() != null ? userEntity.getUserBio() : "소개를 작성해보세요.")
