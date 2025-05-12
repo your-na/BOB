@@ -8,6 +8,12 @@ function getRoomIdFromURL() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+    const chatType = document.querySelector("meta[name='chat-type']")?.content || "private";
+
+    const topicPrefix = chatType === "group" ? "/topic/grouproom." : "/topic/room.";
+    const sendPrefix = chatType === "group" ? "/app/groupchat.send/" : "/app/chat.send/";
+
+
     const opponentNick = document.querySelector("meta[name='opponent-nick']")?.content || "상대";
     let rawOpponentUrl = document.querySelector("meta[name='opponent-profile-url']")?.content || "/images/user.png";
 
@@ -38,14 +44,14 @@ document.addEventListener("DOMContentLoaded", function () {
     loadMessages(roomId);
 
     stompClient.connect({}, () => {
-        stompClient.subscribe(`/topic/room.${roomId}`, (msg) => {
+        stompClient.subscribe(`${topicPrefix}${roomId}`, (msg) => {
             const payload = JSON.parse(msg.body);
-            console.log("[수신]", payload);
             const isMine = parseInt(payload.senderId) === currentUserId;
             const type = isMine ? "user" : "partner";
             appendMessage(type, payload.senderName, payload.message);
         });
     });
+
 
     sendBtn.addEventListener("click", sendMessage);
     input.addEventListener("keydown", function (e) {
@@ -103,13 +109,13 @@ document.addEventListener("DOMContentLoaded", function () {
     function sendMessage() {
         const text = input.value.trim();
         if (text !== "") {
-            stompClient.send(`/app/chat.send/${roomId}`, {}, JSON.stringify({
-                roomId: roomId,
+            stompClient.send(`${sendPrefix}${roomId}`, {}, JSON.stringify({
                 message: text
             }));
             input.value = "";
         }
     }
+
 
 
     window.receiveMessage = function (sender, text) {

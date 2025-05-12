@@ -14,4 +14,7 @@ public class ChatRoomSummaryDTO {
     private String opponentProfileUrl;
     private String lastMessage;
     private LocalDateTime lastMessageTime;
+    private String chatType; // "private" or "group"
+    private int unreadCount;
+    private boolean pinned;
 }
