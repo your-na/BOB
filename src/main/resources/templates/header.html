@@ -116,6 +116,26 @@
             </div>
         </div>
     </form>
+
+    <!-- ✅ 여기에 아래 모달 HTML 삽입 -->
+    <div id="inviteDecisionModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeInviteModal()">&times;</span>
+            <h3>팀 초대</h3>
+            <p id="invite-text">[닉네임]님이 '[팀명]' 팀에 초대했습니다.</p>
+
+            <!-- 공모전 공고 보기 버튼 추가 -->
+            <button id="view-contest-btn" class="view-contest-btn">
+                📄 공모전 공고 보기
+            </button>
+
+            <div class="modal-buttons">
+                <button id="accept-btn">수락</button>
+                <button id="reject-btn">거절</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const notificationIcon = document.getElementById("notification-icon");
@@ -160,14 +180,15 @@
                         const projectId = this.getAttribute("data-project-id");
                         const userId = this.getAttribute("data-user-id");
 
-                        if (!notificationId || notificationId === "undefined") {
-                            console.error("알림 ID가 유효하지 않습니다!");
+                        markAsRead(notificationId); // 알림 읽음 처리
+
+                        // 초대 알림이면 모달 열기
+                        if (notification.type === 'INVITE') {
+                            openInviteModal(notificationId, notification.teamName, notification.teamId);
                             return;
                         }
 
-                        markAsRead(notificationId); // 알림 읽음 처리
-
-                        // 프로젝트 ID가 있으면 팀 신청 수락/거절 페이지로 이동
+                        // 기본 동작 (링크 또는 프로젝트 수락 페이지로 이동)
                         if (projectId && projectId !== "undefined") {
                             window.location.href = `/teamrequest?projectId=${projectId}&userId=${userId}`;
                         } else if (notification.link && notification.link !== "undefined") {
@@ -283,6 +304,66 @@
         function openChatWindow() {
             window.open("/chatting", "ChatWindow", "width=400,height=600,resizable=yes");
         }
+
+        //팀 초대
+        // 모달 관련 변수
+        let currentInviteId = null;
+        let currentTeamId = null;
+
+        // 모달 열기 함수
+        function openInviteModal(inviteId, teamName, teamId) {
+            currentInviteId = inviteId;
+            currentTeamId = teamId;
+
+            document.getElementById('invite-text').textContent =
+                `'${teamName}' 팀에 초대되었습니다. 수락하시겠습니까?`;
+            document.getElementById('inviteDecisionModal').style.display = 'flex';
+        }
+
+        // 모달 닫기
+        function closeInviteModal() {
+            document.getElementById('inviteDecisionModal').style.display = 'none';
+        }
+
+        // 수락 버튼
+        document.getElementById('accept-btn').addEventListener('click', () => {
+            fetch(`/team/invite/accept`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken()
+                },
+                body: JSON.stringify({ inviteId: currentInviteId, teamId: currentTeamId })
+            }).then(res => {
+                if (res.ok) {
+                    alert('초대를 수락했습니다.');
+                    closeInviteModal();
+                    location.reload();
+                } else {
+                    alert('수락 실패');
+                }
+            });
+        });
+
+        // 거절 버튼
+        document.getElementById('reject-btn').addEventListener('click', () => {
+            fetch(`/team/invite/reject`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken()
+                },
+                body: JSON.stringify({ inviteId: currentInviteId, teamId: currentTeamId })
+            }).then(res => {
+                if (res.ok) {
+                    alert('초대를 거절했습니다.');
+                    closeInviteModal();
+                } else {
+                    alert('거절 실패');
+                }
+            });
+        });
+
     </script>
 </header>
 </div>

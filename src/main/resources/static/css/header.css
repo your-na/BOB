@@ -338,3 +338,98 @@ body {
     color: red;
     cursor: pointer;
 }
+
+/*모달*/
+/* 배경 오버레이 */
+#inviteModal {
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none; /* 기본은 숨김 */
+    align-items: center;
+    justify-content: center;
+}
+
+/* 모달 박스 */
+#inviteModal .modal-content {
+    background-color: white;
+    padding: 30px 40px;
+    border-radius: 10px;
+    width: 350px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    animation: slideDown 0.3s ease-out;
+}
+
+/* 간단한 등장 애니메이션 */
+@keyframes slideDown {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* 닫기 버튼 (우측 상단) */
+#inviteModal .close-btn {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #999;
+}
+
+/* 텍스트 */
+#inviteModal p {
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+
+/* 버튼 공통 */
+.invite-action-btn {
+    padding: 10px 20px;
+    margin: 0 10px;
+    font-size: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+}
+
+/* 수락 버튼 */
+.invite-accept {
+    background-color: #00b800;
+    color: white;
+}
+
+/* 거절 버튼 */
+.invite-decline {
+    background-color: white;
+    border: 2px solid #00b800;
+    color: #00b800;
+}
+
+/* 버튼 hover 효과 */
+.invite-accept:hover {
+    background-color: #009a00;
+}
+
+.invite-decline:hover {
+    background-color: #f0f0f0;
+}
+
+#view-contest-btn {
+    background-color: white;
+    color: #333;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+#view-contest-btn:hover {
+    font-weight: bold;
+}
