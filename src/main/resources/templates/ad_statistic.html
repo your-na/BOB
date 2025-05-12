@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>웹 통계</title>
+    <link rel="stylesheet" href="/css/ad_statistic.css">
+</head>
+<body>
+<div class="stats-container">
+    <div class="summary-boxes">
+        <div class="summary-box">전체 회원 수<br><strong>1,000명</strong></div>
+        <div class="summary-box">일반 회원 수<br><strong>700명</strong></div>
+        <div class="summary-box">기업 회원 수<br><strong>300명</strong></div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">구직 성공률 <span class="sub">최근 1년</span></div>
+        <canvas id="jobSuccessChart"></canvas>
+        <p class="change-info">⬅️ 작년 대비 성공률 3% 증가</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">회원 활동 분석 <span class="sub">최근 30일 기준 활동률</span></div>
+        <div class="double-chart">
+            <div>
+                <canvas id="generalMemberChart"></canvas>
+                <p class="chart-label">일반 회원</p>
+            </div>
+            <div>
+                <canvas id="companyMemberChart"></canvas>
+                <p class="chart-label">기업 회원</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/chart.min.js"></script>
+<script src="/js/ad_statistic.js"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+body {
+    font-family: 'Pretendard', sans-serif;
+    background-color: #f9f9f9;
+    padding: 30px;
+}
+
+.stats-container {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.summary-boxes {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    justify-content: center;
+}
+
+.summary-box {
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    background: #f1fff2;
+    padding: 15px 20px;
+    text-align: center;
+    font-size: 13px;
+    color: #19cb13;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+}
+
+.summary-box strong {
+    font-size: 18px;
+    display: block;
+    margin-top: 5px;
+    color: black;
+}
+
+.card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 1px 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    padding: 20px;
+}
+
+.card-header {
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+}
+
+.card-header .sub {
+    font-size: 12px;
+    color: gray;
+    margin-left: 10px;
+}
+
+.change-info {
+    font-size: 12px;
+    color: black;
+    margin-top: 10px;
+    text-align: left;
+}
+
+.double-chart {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.chart-label {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+canvas {
+    width: 100% !important;
+    max-width: 250px;
+    height: auto !important;
+}

@@ -22,7 +22,7 @@
         <li class="tab-item active" data-target="job-history">구직 내역</li>
         <li class="tab-item" data-target="project-history">프로젝트 참여 내역</li>
         <li class="tab-item" data-target="contest-history">공모전 참여 내역</li>
-        <li class="tab-item" data-target="career-history">이력 내역</li>
+        <li class="tab-item" data-target="career-history">자격증</li>
     </ul>
 </nav>
 
@@ -35,10 +35,60 @@
     <button class="external-btn">외부문서 불러오기</button>
 </div>
 
-<!-- ✅ 구직 내역 (비워둠) -->
+<!-- ✅ 구직 내역 -->
 <div class="history-section" id="job-history" style="display: block;">
-    <p>구직 내역 구현 예정...</p>
+    <table class="history-table">
+        <thead>
+        <tr>
+            <th>No.</th>
+            <th>상태</th>
+            <th colspan="2">근무 기간</th>
+            <th>근무지</th>
+            <th>직무</th>
+            <th>관리</th>
+        </tr>
+        <tr>
+            <th></th>
+            <th></th>
+            <th>시작일자</th>
+            <th>종료일자</th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>1</td>
+            <td>퇴직</td>
+            <td>2021.01.04</td>
+            <td>2024.01.09</td>
+            <td>밥 소프트웨어 회사</td>
+            <td>백엔드</td>
+            <td><button class="delete-btn">삭제</button></td>
+        </tr>
+
+        <!-- ✅ 빈 행 (추가용) -->
+        <tr class="new-entry-row" style="display: none;">
+            <td>-</td>
+            <td>
+                <select class="status-select">
+                    <option value="재직">재직</option>
+                    <option value="퇴직">퇴직</option>
+                </select>
+            </td>
+            <td><input type="date" class="start-date"></td>
+            <td><input type="date" class="end-date"></td>
+            <td><input type="text" class="workplace" placeholder="회사명 입력"></td>
+            <td><input type="text" class="job-title" placeholder="직무 입력"></td>
+            <td><button class="delete-btn">삭제</button></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <button class="add-project-btn">+ 구직 경력 추가 하기</button>
 </div>
+
 
 <!-- ✅ 프로젝트 참여 내역 -->
 <div class="history-section" id="project-history" style="display: none;">
@@ -174,10 +224,40 @@
     <button class="add-project-btn">+ 공모전 내역 추가 하기</button>
 </div>
 
-<!-- ✅ 이력 내역 (비워둠) -->
+<!-- ✅ 자격증 내역 -->
 <div class="history-section" id="career-history" style="display: none;">
-    <p>이력 내역 구현 예정...</p>
+    <table class="history-table">
+        <thead>
+        <tr>
+            <th>No.</th>
+            <th>자격증명</th>
+            <th>발급 기관</th>
+            <th>취득일자</th>
+            <th>관리</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>1</td>
+            <td>정보처리기사</td>
+            <td>한국산업인력공단</td>
+            <td>2023-05-12</td>
+            <td><button class="delete-btn">삭제</button></td>
+        </tr>
+        <!-- 새로 추가될 행 (처음에는 숨김 처리) -->
+        <tr class="new-entry-row" style="display: none;">
+            <td>-</td>
+            <td><input type="text" class="cert-name" placeholder="자격증명 입력"></td>
+            <td><input type="text" class="cert-org" placeholder="발급기관 입력"></td>
+            <td><input type="date" class="cert-date"></td>
+            <td><button class="delete-btn">삭제</button></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <button class="add-project-btn">+ 자격증 내역 추가 하기</button>
 </div>
+
 
 <script src="/js/history.js"></script>
 </body>

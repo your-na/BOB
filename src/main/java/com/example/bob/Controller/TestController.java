@@ -62,5 +62,8 @@ public class TestController {
     @GetMapping("/contest9")
     public String contest9form() {return "contest9";}
 
+    //웹 통계(관리자)
+    @GetMapping("/statistic")
+    public String staticform() {return "ad_statistic";}
 
 }
