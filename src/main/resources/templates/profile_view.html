@@ -23,12 +23,12 @@
             <button class="message-btn">메시지 보내기</button>
         </div>
 
-
         <!-- 탭 메뉴 -->
         <div class="tabs">
-            <button class="tab active" onclick="showTab('info')">회원 정보</button>
-            <button class="tab" onclick="showTab('history')">공모전/프로젝트 참가내역</button>
+            <button class="tab active" onclick="showTab('info', event)">회원 정보</button>
+            <button class="tab" onclick="showTab('history', event)">공모전/프로젝트 참가내역</button>
         </div>
+
 
         <!-- 회원 정보 탭 -->
         <div class="tab-content" id="info">
@@ -71,12 +71,15 @@
 </form>
 
 <script>
-    function showTab(tabId) {
+    function showTab(tabId, event) {
+        if (event) event.preventDefault(); // ✅ 폼 제출 방지
+
         document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
         document.querySelector(`.tab[onclick*="${tabId}"]`).classList.add('active');
         document.getElementById(tabId).style.display = 'block';
     }
+
 </script>
 </body>
 </html>

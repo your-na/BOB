@@ -136,6 +136,23 @@
         </div>
     </div>
 
+
+    <!-- ✅ 채용 축하 모달 -->
+    <div id="hireModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeHireModal()">&times;</span>
+            <h2>🎉 채용 축하드립니다!</h2>
+            <p id="hire-company" style="font-weight: bold; font-size: 18px;"></p>
+            <p id="hire-message">기업의 채용 메시지가 여기에 들어갑니다.</p>
+
+            <div class="modal-buttons">
+                <button onclick="closeHireModal()">확인</button>
+                <a id="hire-detail-btn" href="#" target="_blank" class="view-contest-btn">자세히 보기</a>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const notificationIcon = document.getElementById("notification-icon");
@@ -145,12 +162,10 @@
             const notificationBadge = document.getElementById("notification-badge");
             const clearAllButton = document.getElementById("clear-all");
 
-            // 알림 목록 불러오기
             fetchNotifications();
 
-            // 알림 목록 렌더링
             function renderNotifications(notifications) {
-                notificationList.innerHTML = ""; // 기존 목록 초기화
+                notificationList.innerHTML = "";
 
                 if (!Array.isArray(notifications)) {
                     console.error("알림 목록 데이터가 배열이 아닙니다:", notifications);
@@ -160,7 +175,7 @@
 
                 if (notifications.length === 0) {
                     notificationList.innerHTML = "<li class='notification-item'>알림이 없습니다.</li>";
-                    notificationBadge.style.display = "none"; // 알림 배지 숨기기
+                    notificationBadge.style.display = "none";
                     return;
                 }
 
@@ -169,26 +184,27 @@
                     item.classList.add("notification-item");
                     item.textContent = notification.message;
 
-                    // 알림 ID 및 프로젝트 ID를 data 속성에 저장
                     item.setAttribute("data-id", notification.id);
                     item.setAttribute("data-project-id", notification.projectId || "");
                     item.setAttribute("data-user-id", notification.userId || "");
 
-                    // 알림 클릭 시 읽음 상태로 업데이트하고 페이지 이동
                     item.onclick = function () {
                         const notificationId = this.getAttribute("data-id");
                         const projectId = this.getAttribute("data-project-id");
                         const userId = this.getAttribute("data-user-id");
 
-                        markAsRead(notificationId); // 알림 읽음 처리
+                        markAsRead(notificationId);
 
-                        // 초대 알림이면 모달 열기
                         if (notification.type === 'INVITE') {
                             openInviteModal(notificationId, notification.teamName, notification.teamId);
                             return;
                         }
 
-                        // 기본 동작 (링크 또는 프로젝트 수락 페이지로 이동)
+                        if (notification.type === 'HIRE') {
+                            openHireModal(notification.companyName, notification.message, notification.detailLink);
+                            return;
+                        }
+
                         if (projectId && projectId !== "undefined") {
                             window.location.href = `/teamrequest?projectId=${projectId}&userId=${userId}`;
                         } else if (notification.link && notification.link !== "undefined") {
@@ -201,116 +217,99 @@
                     notificationList.appendChild(item);
                 });
 
-                notificationBadge.style.display = "flex"; // 알림 배지 보이기
-                notificationBadge.textContent = notifications.length; // 알림 개수 표시
+                notificationBadge.style.display = "flex";
+                notificationBadge.textContent = notifications.length;
             }
 
-            // 알림 수 및 목록을 가져오는 함수
             function fetchNotifications() {
-                // 알림 수 가져오기
                 fetch("/api/notifications/count")
                     .then(response => response.json())
                     .then(data => {
                         const notificationCount = data.notificationCount;
 
                         if (notificationCount > 0) {
-                            notificationBadge.style.display = "flex"; // 배지 보이기
-                            notificationBadge.textContent = notificationCount; // 알림 수 표시
+                            notificationBadge.style.display = "flex";
+                            notificationBadge.textContent = notificationCount;
                         } else {
-                            notificationBadge.style.display = "none"; // 알림 수가 없으면 배지 숨기기
+                            notificationBadge.style.display = "none";
                         }
                     })
                     .catch(error => {
                         console.error("알림 수 가져오기 실패", error);
                     });
 
-                // 알림 목록 가져오기
-                fetch("/api/notifications/list?page=0&size=10") // 페이지네이션을 위한 쿼리 파라미터 추가
+                fetch("/api/notifications/list?page=0&size=10")
                     .then(response => response.json())
                     .then(notifications => {
-                        renderNotifications(notifications); // 알림 목록 렌더링
+                        renderNotifications(notifications);
                     })
                     .catch(error => {
                         console.error("알림 목록 가져오기 실패", error);
                     });
             }
 
-            // 알림을 읽음 상태로 처리하는 함수
             function markAsRead(notificationId) {
                 fetch(`/api/notifications/mark-as-read/${notificationId}`, {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": getCsrfToken() // CSRF 토큰 추가
+                        "X-CSRF-TOKEN": getCsrfToken()
                     }
                 })
                     .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`서버 오류: ${response.status}`);
-                        }
+                        if (!response.ok) throw new Error(`서버 오류: ${response.status}`);
                         return response.json();
                     })
-                    .then(data => {
-                        fetchNotifications(); // 알림 리스트 다시 렌더링
-                    })
+                    .then(() => fetchNotifications())
                     .catch(error => console.error("알림 상태 업데이트 실패", error));
             }
 
-            // CSRF 토큰을 가져오는 함수
             function getCsrfToken() {
                 const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute("content");
-                return csrfToken ? csrfToken : ''; // CSRF 토큰이 없을 경우 빈 문자열 반환
+                return csrfToken || '';
             }
 
-            // 알림 아이콘 클릭 시 알림창 표시/숨김
             notificationIcon.addEventListener("click", function () {
                 notificationBox.style.display = (notificationBox.style.display === "none" || notificationBox.style.display === "") ? "flex" : "none";
             });
 
-            // 알림창 닫기 버튼
             closeNotification.addEventListener("click", function () {
                 notificationBox.style.display = "none";
             });
 
-            // "모두 삭제" 버튼
             clearAllButton.addEventListener("click", function () {
                 fetch("/api/notifications/delete-all", {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": getCsrfToken() // CSRF 토큰 추가
+                        "X-CSRF-TOKEN": getCsrfToken()
                     },
-                    credentials: "include"  // 쿠키와 세션을 포함하여 요청
+                    credentials: "include"
                 })
                     .then(response => {
                         if (!response.ok) {
-                            // 응답이 성공적이지 않으면 오류 메시지를 처리
                             return response.text().then(errorMessage => {
                                 throw new Error(`알림 삭제 실패: ${errorMessage}`);
                             });
                         }
-                        return response.text(); // 성공적으로 삭제되면 서버 응답을 반환
+                        return response.text();
                     })
-                    .then(data => {
+                    .then(() => {
                         alert("모든 알림이 삭제되었습니다.");
-                        notificationList.innerHTML = "<li class='notification-item'>알림이 없습니다.</li>"; // UI 업데이트
-                        notificationBadge.style.display = "none"; // 배지 숨기기
-                    })
-
+                        notificationList.innerHTML = "<li class='notification-item'>알림이 없습니다.</li>";
+                        notificationBadge.style.display = "none";
+                    });
             });
-
         });
 
         function openChatWindow() {
             window.open("/chatting", "ChatWindow", "width=400,height=600,resizable=yes");
         }
 
-        //팀 초대
-        // 모달 관련 변수
+        // 팀 초대 관련
         let currentInviteId = null;
         let currentTeamId = null;
 
-        // 모달 열기 함수
         function openInviteModal(inviteId, teamName, teamId) {
             currentInviteId = inviteId;
             currentTeamId = teamId;
@@ -320,12 +319,10 @@
             document.getElementById('inviteDecisionModal').style.display = 'flex';
         }
 
-        // 모달 닫기
         function closeInviteModal() {
             document.getElementById('inviteDecisionModal').style.display = 'none';
         }
 
-        // 수락 버튼
         document.getElementById('accept-btn').addEventListener('click', () => {
             fetch(`/team/invite/accept`, {
                 method: 'POST',
@@ -345,7 +342,6 @@
             });
         });
 
-        // 거절 버튼
         document.getElementById('reject-btn').addEventListener('click', () => {
             fetch(`/team/invite/reject`, {
                 method: 'POST',
@@ -363,6 +359,18 @@
                 }
             });
         });
+
+        // ✅ 채용 축하 모달 관련
+        function openHireModal(companyName, message, detailLink) {
+            document.getElementById('hire-company').textContent = `지원하신 ${companyName}에 최종 채용되셨습니다!`;
+            document.getElementById('hire-message').textContent = message || '채용을 축하드립니다!';
+            document.getElementById('hire-detail-btn').href = detailLink || '#';
+            document.getElementById('hireModal').style.display = 'flex';
+        }
+
+        function closeHireModal() {
+            document.getElementById('hireModal').style.display = 'none';
+        }
 
     </script>
 </header>
