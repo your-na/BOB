@@ -12,11 +12,19 @@
   <meta name="current-profile-url" th:content="@{${user.profileImageUrl}}" />
 
   <!-- 채팅 상대방 정보 -->
-  <meta name="opponent-nick" th:content="${opponent != null ? opponent.userNick : '상대'}" />
-  <meta name="opponent-profile-url"
-        th:content="@{${opponent != null ? opponent.profileImageUrl : '/images/user.png'}}" />
+  <meta name="opponent-nick" th:if="${chatType == 'private'}" th:content="${opponent.userNick}" />
+  <meta name="opponent-profile-url" th:if="${chatType == 'private'}" th:content="@{${opponent.profileImageUrl}}" />
 
   <meta name="chat-type" th:content="${chatType}" />
+  <meta name="room-name" th:if="${chatType == 'group'}" th:content="${groupRoom.roomName}" />
+
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    const userMap = /*[[${userMapJson}]]*/ {};
+    console.log("✅ userMap 로드됨:", userMap);
+    /*]]>*/
+  </script>
+
 </head>
 <body>
 <div class="chat-container"> <!-- ✅ 전체 감싸는 컨테이너 -->

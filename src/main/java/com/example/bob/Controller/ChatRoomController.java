@@ -1,6 +1,7 @@
 package com.example.bob.Controller;
 
 import com.example.bob.DTO.ChatRoomSummaryDTO;
+import com.example.bob.Entity.GroupChatRoom;
 import com.example.bob.Entity.PrivateChatRoom;
 import com.example.bob.Entity.UserEntity;
 import com.example.bob.Repository.PrivateChatRoomRepository;
@@ -33,6 +34,7 @@ public class ChatRoomController {
 
     @GetMapping("/chatroom")
     public String chatRoomPage(@RequestParam Long roomId,
+                               @RequestParam(required = false, defaultValue = "private") String type,
                                @AuthenticationPrincipal UserDetailsImpl userDetails,
                                Model model) {
         UserEntity currentUser = userDetails.getUserEntity();
@@ -40,18 +42,30 @@ public class ChatRoomController {
         // 로그인한 사용자 정보를 모델에 담음
         model.addAttribute("user", currentUser);
 
-        chatMessageService.markMessagesAsRead(roomId, currentUser.getId());
+        if ("group".equals(type)) {
+            // 그룹 채팅 처리
+            GroupChatRoom room = chatRoomService.findGroupRoomById(roomId);
+            List<UserEntity> members = chatRoomService.getGroupMembers(roomId);
 
-        PrivateChatRoom room = chatRoomService.findById(roomId);
+            model.addAttribute("opponent", null); // 그룹은 상대가 없음
+            model.addAttribute("chatType", "group");
+            model.addAttribute("groupRoom", room);
+            model.addAttribute("groupMembers", members);
 
-        UserEntity opponent = room.getUserA().getId().equals(currentUser.getId())
-                ? room.getUserB()
-                : room.getUserA();
+            return "chat_room";
+        } else {
+            // 기존의 1:1 채팅 처리
+            chatMessageService.markMessagesAsRead(roomId, currentUser.getId());
+            PrivateChatRoom room = chatRoomService.findById(roomId);
 
-        model.addAttribute("opponent", opponent); // 이 줄이 없으면 오류 발생합니다
-        model.addAttribute("chatType", "private");
+            UserEntity opponent = room.getUserA().getId().equals(currentUser.getId())
+                    ? room.getUserB()
+                    : room.getUserA();
 
-        return "chat_room";
+            model.addAttribute("opponent", opponent);
+            model.addAttribute("chatType", "private");
+            return "chat_room";
+        }
     }
 
 

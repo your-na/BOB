@@ -13,8 +13,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const topicPrefix = chatType === "group" ? "/topic/grouproom." : "/topic/room.";
     const sendPrefix = chatType === "group" ? "/app/groupchat.send/" : "/app/chat.send/";
 
+    const opponentNick = chatType === "group"
+        ? document.querySelector("meta[name='room-name']")?.content || "그룹채팅"
+        : document.querySelector("meta[name='opponent-nick']")?.content || "상대";
 
-    const opponentNick = document.querySelector("meta[name='opponent-nick']")?.content || "상대";
     let rawOpponentUrl = document.querySelector("meta[name='opponent-profile-url']")?.content || "/images/user.png";
 
     if (!rawOpponentUrl.startsWith("/")) {
@@ -48,10 +50,10 @@ document.addEventListener("DOMContentLoaded", function () {
             const payload = JSON.parse(msg.body);
             const isMine = parseInt(payload.senderId) === currentUserId;
             const type = isMine ? "user" : "partner";
-            appendMessage(type, payload.senderName, payload.message);
+            const sender = chatType === "group" ? payload.senderId : payload.senderName;
+            appendMessage(type, sender, payload.message);
         });
     });
-
 
     sendBtn.addEventListener("click", sendMessage);
     input.addEventListener("keydown", function (e) {
@@ -59,13 +61,11 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // 메세지 추가 함수
-    function appendMessage(type, sender, text) {
+    function appendMessage(type, senderIdOrName, text) {
         const messageRow = document.createElement("div");
         messageRow.className = `message-row ${type}`;
-
         const messageContent = document.createElement("div");
         messageContent.className = "message-content";
-
         const messageBubble = document.createElement("div");
         messageBubble.className = `message ${type}`;
         messageBubble.textContent = text;
@@ -74,18 +74,26 @@ document.addEventListener("DOMContentLoaded", function () {
             messageContent.appendChild(messageBubble);
             messageRow.appendChild(messageContent);
         } else {
-            const profileImg = document.createElement("img");
+            let profileImg = document.createElement("img");
             profileImg.className = "profile-image";
-            profileImg.src = encodeURI(opponentProfileUrl);
-            profileImg.alt = "프로필";
 
-            const nicknameSpan = document.createElement("span");
+            let nicknameSpan = document.createElement("span");
             nicknameSpan.className = "nickname";
-            nicknameSpan.textContent = opponentNick;
 
+            if (chatType === "group") {
+                const key = String(senderIdOrName);
+                const senderInfo = userMap?.[key] || { nick: `유저#${key}`, image: "/images/user.png" };
+                profileImg.src = senderInfo.image;
+                nicknameSpan.textContent = senderInfo.nick;
+            } else {
+                // 단일 채팅은 senderIdOrName이 nickname 자체임
+                profileImg.src = opponentProfileUrl;
+                nicknameSpan.textContent = senderIdOrName;
+            }
+
+            profileImg.alt = "프로필";
             messageContent.appendChild(nicknameSpan);
             messageContent.appendChild(messageBubble);
-
             messageRow.appendChild(profileImg);
             messageRow.appendChild(messageContent);
         }
@@ -94,27 +102,43 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelector(".chat-box").scrollTop = chatBox.scrollHeight;
     }
 
+    // ✅ 메시지 불러오기 부분 수정
     function loadMessages(roomId) {
-        fetch(`/chat/messages?roomId=${roomId}`)
+        const endpoint = chatType === "group"
+            ? `/group/messages?roomId=${roomId}`
+            : `/chat/messages?roomId=${roomId}`;
+
+        fetch(endpoint)
             .then(response => response.json())
             .then(messages => {
+                console.log("📨 메시지 리스트:", messages);
                 messages.forEach(msg => {
                     const isMine = parseInt(msg.senderId) === currentUserId;
                     const type = isMine ? "user" : "partner";
-                    appendMessage(type, msg.senderName, msg.message);
+                    const sender = chatType === "group" ? msg.senderId : msg.senderName;
+                    appendMessage(type, msg.senderId, msg.message);
                 });
             });
     }
 
     function sendMessage() {
         const text = input.value.trim();
-        if (text !== "") {
-            stompClient.send(`${sendPrefix}${roomId}`, {}, JSON.stringify({
-                message: text
-            }));
-            input.value = "";
+        if (text === "") return;
+
+        const payload = {
+            message: text
+        };
+
+        // ✅ 그룹 채팅일 경우에만 sender 정보 추가
+        if (chatType === "group") {
+            payload.senderId = currentUserId;
+            payload.senderName = currentUserNick;
         }
+
+        stompClient.send(`${sendPrefix}${roomId}`, {}, JSON.stringify(payload));
+        input.value = "";
     }
+
 
 
 

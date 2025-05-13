@@ -4,6 +4,8 @@ import com.example.bob.Entity.GroupChatParticipant;
 import com.example.bob.Entity.GroupChatRoom;
 import com.example.bob.Entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,4 +23,10 @@ public interface GroupChatParticipantRepository extends JpaRepository<GroupChatP
 
     // 사용자 ID 기준 조회 (단체 채팅 목록용)
     List<GroupChatParticipant> findByUser_Id(Long userId);
+
+    List<GroupChatParticipant> findByGroupChatRoom_Id(Long roomId);
+
+    @Query("SELECT gp.user FROM GroupChatParticipant gp WHERE gp.groupChatRoom.id = :roomId")
+    List<UserEntity> findUsersByRoomId(@Param("roomId") Long roomId);
+
 }

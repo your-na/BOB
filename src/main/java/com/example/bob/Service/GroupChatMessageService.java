@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -62,4 +64,28 @@ public class GroupChatMessageService {
         System.out.println("📘 읽음 처리 완료 (" + target.size() + "건)");
     }
 
+    public Map<String, Map<String, String>> getUserInfoMap(Long roomId) {
+        List<UserEntity> participants = participantRepository.findUsersByRoomId(roomId);
+        List<GroupChatMessage> messages = messageRepository.findWithSenderByRoomId(roomId);
+
+        Map<String, UserEntity> uniqueUsers = new HashMap<>();
+        for (UserEntity user : participants) {
+            uniqueUsers.put(String.valueOf(user.getId()), user);
+        }
+        for (GroupChatMessage msg : messages) {
+            UserEntity sender = msg.getSender();
+            uniqueUsers.put(String.valueOf(sender.getId()), sender);
+        }
+
+        Map<String, Map<String, String>> userMap = new HashMap<>();
+        for (Map.Entry<String, UserEntity> entry : uniqueUsers.entrySet()) {
+            UserEntity user = entry.getValue();
+            Map<String, String> info = new HashMap<>();
+            info.put("nick", user.getUserNick());
+            info.put("image", user.getProfileImageUrl());
+            userMap.put(entry.getKey(), info);
+        }
+
+        return userMap;
+    }
 }

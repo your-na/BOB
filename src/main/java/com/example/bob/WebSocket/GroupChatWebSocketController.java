@@ -2,6 +2,7 @@ package com.example.bob.WebSocket;
 
 import com.example.bob.DTO.ChatMessageDTO;
 import com.example.bob.Entity.UserEntity;
+import com.example.bob.Repository.UserRepository;
 import com.example.bob.Service.GroupChatMessageService;
 import com.example.bob.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -18,18 +19,21 @@ public class GroupChatWebSocketController {
 
     private final GroupChatMessageService groupChatMessageService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final UserRepository userRepository;
 
     @MessageMapping("/groupchat.send/{roomId}")
     public void sendGroupMessage(@DestinationVariable Long roomId,
-                                 @Payload ChatMessageDTO messageDTO,
-                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                 @Payload ChatMessageDTO messageDTO) {
 
-        UserEntity sender = userDetails.getUserEntity();
+        // 👇 senderId를 기반으로 유저 조회
+        Long senderId = messageDTO.getSenderId();
+        UserEntity sender = userRepository.findById(senderId)
+                .orElseThrow(() -> new IllegalArgumentException("보낸 유저 없음"));
 
-        // 1. 저장
+        // 저장
         groupChatMessageService.saveMessage(roomId, sender, messageDTO.getMessage());
 
-        // 2. 전송 (senderName, senderId 포함해서 전송)
+        // 브로드캐스트
         ChatMessageDTO outbound = ChatMessageDTO.builder()
                 .roomId(roomId)
                 .senderId(sender.getId())
@@ -40,4 +44,5 @@ public class GroupChatWebSocketController {
 
         messagingTemplate.convertAndSend("/topic/grouproom." + roomId, outbound);
     }
+
 }

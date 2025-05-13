@@ -231,6 +231,13 @@ function confirmInvite() {
         if (selectedUsers.length < 2) return alert("그룹 채팅은 두 명 이상 선택해야 합니다.");
         const roomName = prompt("그룹 채팅방 이름을 입력하세요", "새 그룹채팅");
         if (!roomName) return;
+
+        const myId = parseInt(document.querySelector("meta[name='current-user-id']").content);
+        const userIdsForGroup = [...selectedUsers];
+        if (!userIdsForGroup.includes(myId)) {
+            userIdsForGroup.push(myId);
+        }
+
         fetch("/api/group-chat", {
             method: "POST",
             headers: {

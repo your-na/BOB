@@ -22,7 +22,11 @@ public class GroupChatService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Long createRoom(String roomName, List<Long> userIds) {
+    public Long createRoom(String roomName, List<Long> userIds, Long creatorId) {
+        if (!userIds.contains(creatorId)) {
+            userIds.add(0, creatorId); // 맨 앞에 추가하여 방장으로 지정
+        }
+
         GroupChatRoom room = GroupChatRoom.builder()
                 .roomName(roomName)
                 .createdAt(LocalDateTime.now())
@@ -45,4 +49,5 @@ public class GroupChatService {
 
         return room.getId();
     }
+
 }

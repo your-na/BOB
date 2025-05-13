@@ -23,6 +23,7 @@ public class ChatRoomService {
     private final GroupChatParticipantRepository groupChatParticipantRepository;
     private final GroupChatMessageRepository groupChatMessageRepository;
     private final GroupMessageReadStatusRepository groupMessageReadStatusRepository;
+    private final GroupChatRoomRepository groupChatRoomRepository;
 
 
     public Long getOrCreateRoom(String userNickA, String userNickB) {
@@ -145,5 +146,18 @@ public class ChatRoomService {
                         .thenComparing(ChatRoomSummaryDTO::getLastMessageTime).reversed())
                 .toList();
     }
+
+    public GroupChatRoom findGroupRoomById(Long roomId) {
+        return groupChatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("그룹 채팅방이 존재하지 않습니다."));
+    }
+
+    public List<UserEntity> getGroupMembers(Long roomId) {
+        return groupChatParticipantRepository.findByGroupChatRoom_Id(roomId)
+                .stream()
+                .map(GroupChatParticipant::getUser)
+                .toList();
+    }
+
 
 }
