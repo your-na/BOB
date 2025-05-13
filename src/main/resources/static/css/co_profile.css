@@ -1,0 +1,128 @@
+#header {
+    margin-top: 100px;
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+#header a {
+    text-decoration: none;
+    color: black;
+    margin-right: 20px;
+    font-size: 18px;
+}
+
+#header a.active {
+    font-weight: bold;
+    color: green;
+    border-bottom: 3px solid green;
+}
+
+.container {
+    margin-left: 15%;
+    width: 60%;
+    background-color: white;
+    border: none;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.profile label {
+    display: block;
+    margin-top: 20px;
+    font-weight: bold;
+    width: 100%;
+}
+
+.profile input,
+.profile textarea {
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.profile textarea {
+    height: 100px;
+    resize: none;
+}
+
+.profile-pic {
+    position: relative;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.profile-pic img {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 3px solid #ddd;
+    object-fit: cover;
+}
+
+.edit-icon {
+    position: absolute;
+    bottom: -2px;
+    right: 7px;
+    background-color: #6D7485;
+    border-radius: 50%;
+    padding: 8px;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 20px;
+    height: 20px;
+}
+
+.edit-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.actions {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.actions button {
+    padding: 7px 20px;
+    border: none;
+    border-radius: 15px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 0 15px;
+}
+
+.actions .save {
+    background-color: white;
+    border: 2px solid green;
+    color: green;
+}
+
+.actions .cancel {
+    background-color: white;
+    border: 2px solid grey;
+    color: grey;
+}
+
+.actions button:hover {
+    opacity: 0.9;
+}

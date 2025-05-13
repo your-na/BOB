@@ -66,7 +66,11 @@ public class TestController {
     @GetMapping("/statistic")
     public String staticform() {return "ad_statistic";}
 
-    //공모전 수상 팝업 알림 눌렀을때 뜨는 창
+    //공모전 수상 팝업 알림 눌렀을때 뜨는 창(추후 수정)
     @GetMapping("/contestaward")
     public String awardform() {return "contest_award";}
+
+    //기업 내 정보
+    @GetMapping("/coprofile")
+    public String profiform() {return "co_profile";}
 }
