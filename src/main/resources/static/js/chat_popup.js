@@ -341,4 +341,26 @@ document.getElementById("renameConfirmBtn").addEventListener("click", () => {
         .catch(err => alert("오류: " + err.message));
 });
 
+function renderUserList(users) {
+    lastSearchResults = users;
+    const list = document.getElementById("userList");
+    list.innerHTML = "";
+
+    users.forEach(user => {
+        const isChecked = selectedUsers.includes(user.id);
+        const item = document.createElement("div");
+        item.className = "user-item";
+
+        // 1:1 모드에서는 1명 이상 선택 방지
+        const disabled = isGroupMode ? "" : (selectedUsers.length >= 1 && !isChecked ? "disabled" : "");
+
+        item.innerHTML = `
+            <img src="${user.avatar || "/images/user.png"}" alt="avatar" class="user-avatar">
+            <span>${user.nickname}</span>
+            <input type="checkbox" value="${user.id}" ${isChecked ? "checked" : ""} ${disabled} onchange="toggleUserSelect(this)">
+        `;
+        list.appendChild(item);
+    });
+}
+
 let lastSearchResults = [];

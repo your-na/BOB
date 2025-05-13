@@ -1,0 +1,102 @@
+body {
+    font-family: 'Pretendard', sans-serif;
+    background: #fff;
+    margin: 0;
+}
+
+.award-popup {
+    max-width: 800px;
+    margin: 50px auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 24px;
+    background: white;
+}
+
+.award-banner {
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+    color: #643A00;
+    margin-bottom: 20px;
+}
+
+.award-banner span {
+    display: inline-block;
+    background: #FFD700;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 16px;
+}
+
+.award-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* ✅ 세로 가운데 정렬 */
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.award-content {
+    flex: 1;
+    text-align: left;
+}
+
+.award-content h2 {
+    color: #16a34a;
+    margin-bottom: 10px;
+}
+
+.award-content p {
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 4px 0;
+}
+
+.award-content .desc {
+    margin-top: 12px;
+    color: #444;
+}
+
+.award-image-box {
+    text-align: right;
+}
+
+.award-image-box img {
+    width: 180px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-bottom: 6px;
+}
+
+.detail-link {
+    display: inline-block;
+    color: #555;
+    font-size: 13px;
+    text-decoration: none;
+    margin-top: 4px;
+}
+
+.detail-link:hover {
+    text-decoration: underline;
+}
+
+/* ✅ 확인 버튼을 가운데 정렬 */
+.btn-wrap.center {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.btn-wrap.center button {
+    background: #16a34a;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-wrap.center button:hover {
+    background: #128137;
+}
