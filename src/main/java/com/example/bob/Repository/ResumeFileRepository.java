@@ -1,13 +1,15 @@
 package com.example.bob.Repository;
 
 import com.example.bob.Entity.ResumeFileEntity;
+import com.example.bob.Entity.ResumeSectionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-/**
- * 파일 및 사진 첨부 데이터를 저장/조회하기 위한 리포지토리.
- * ResumeFileEntity를 관리합니다.
- */
+import java.util.List;
+
 @Repository
 public interface ResumeFileRepository extends JpaRepository<ResumeFileEntity, Long> {
+
+    // 📌 특정 섹션에 업로드된 파일 목록 조회
+    List<ResumeFileEntity> findByResumeSection(ResumeSectionEntity section);
 }

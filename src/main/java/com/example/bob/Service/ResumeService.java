@@ -6,6 +6,10 @@ import com.example.bob.DTO.ResumeSectionSubmitDTO;
 import com.example.bob.DTO.ResumeSubmitRequestDTO;
 import com.example.bob.DTO.UserProjectResponseDTO;
 import com.example.bob.DTO.EducationDTO;
+import com.example.bob.DTO.ResumeDetailDTO;
+import com.example.bob.DTO.ResumeDetailSectionDTO;
+import com.example.bob.DTO.ResumeDragItemDTO;
+
 
 
 import com.example.bob.Entity.CoResumeEntity;
@@ -240,5 +244,91 @@ public class ResumeService {
 
         jobApplicationRepository.save(application);
     }
+
+
+    // ✅ 이력서 상세 조회: 공고 + 사용자 기준으로 가장 마지막 제출 이력서 반환
+    public ResumeDetailDTO getResumeForJobPost(Long jobPostId, UserEntity user) {
+
+        // 1️⃣ 지원 내역 중 가장 최근 이력서 조회
+        JobApplicationEntity application = jobApplicationRepository
+                .findTopByUserAndJobPost_IdOrderByAppliedAtDesc(user, jobPostId)
+                .orElseThrow(() -> new RuntimeException("해당 공고에 제출한 이력서가 없습니다."));
+
+        ResumeEntity resume = application.getResume();
+
+        // 2️⃣ 상위 DTO 생성
+        ResumeDetailDTO dto = new ResumeDetailDTO();
+        dto.setTitle(resume.getCoResume().getTitle());
+
+        // 3️⃣ 희망직무 태그
+        dto.setJobTags(
+                resume.getCoResume().getJobTags().stream()
+                        .map(CoResumeTagEntity::getTag)
+                        .collect(Collectors.toList())
+        );
+
+        // 4️⃣ 섹션 리스트 구성
+        List<ResumeDetailSectionDTO> sections = new ArrayList<>();
+
+        for (ResumeSectionEntity section : resume.getSections()) {
+            ResumeDetailSectionDTO s = new ResumeDetailSectionDTO();
+
+            s.setId(section.getId());
+            s.setTitle(section.getCoSection().getTitle());
+            s.setComment(section.getCoSection().getComment());
+            s.setType(section.getCoSection().getType());
+            s.setConditions(section.getCoSection().getConditions());
+            s.setTags(section.getCoSection().getSectionTags().stream()
+                    .map(CoResumeTagEntity::getTag)
+                    .collect(Collectors.toList()));
+
+            // ✅ 사용자 입력 내용
+            s.setContent(section.getContent());
+            s.setSelectedTags(section.getSelectedTags());
+
+            // ✅ 학력
+            List<ResumeEducationEntity> eduEntities = resumeEducationRepository.findByResumeSection(section);
+            List<EducationDTO> eduDTOs = eduEntities.stream().map(e -> {
+                EducationDTO edto = new EducationDTO();
+                edto.setSchoolName(e.getSchoolName());
+                edto.setMajorName(e.getMajorName());
+                edto.setStatus(e.getStatus());
+                edto.setStartYear(e.getStartYear());
+                edto.setStartMonth(e.getStartMonth());
+                edto.setEndYear(e.getEndYear());
+                edto.setEndMonth(e.getEndMonth());
+                return edto;
+            }).collect(Collectors.toList());
+            s.setEducations(eduDTOs);
+
+            // ✅ 첨부 파일
+            List<ResumeFileEntity> fileEntities = resumeFileRepository.findByResumeSection(section);
+            if (!fileEntities.isEmpty()) {
+                s.setFileName(fileEntities.get(0).getFileName()); // 가장 첫 번째 파일만 사용
+            }
+
+            // ✅ 드래그 항목
+            List<ResumeDragItemEntity> dragEntities = resumeDragItemRepository.findBySection(section);
+            List<ResumeDragItemDTO> dragDTOs = dragEntities.stream().map(d -> {
+                return new ResumeDragItemDTO(
+                        section.getCoSection().getId(),
+                        d.getItemType(),
+                        d.getReferenceId(),
+                        d.getDisplayText(),
+                        d.getFilePath()
+                );
+            }).collect(Collectors.toList());
+            s.setDragItems(dragDTOs);
+
+            sections.add(s);
+        }
+
+        // 5️⃣ 섹션 DTO 넣기
+        dto.setSections(sections);
+
+        return dto;
+    }
+
+
 
 }
