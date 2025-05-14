@@ -58,21 +58,22 @@
         </div>
       </div>
 
-      <!-- ✅ 사진 첨부 미리보기 -->
-      <div th:if="${section.fileName != null and section.type.equals('사진형')}">
-        <div class="image-preview">
-          <img th:src="@{'/uploads/' + ${section.fileName}}" alt="첨부 이미지">
+      <!-- ✅ 사진 첨부 미리보기 (여러 이미지 출력) -->
+      <div th:if="${section.fileNames != null and #lists.size(section.fileNames) > 0 and '사진형'.equals(section.type)}">
+        <div class="image-preview" th:each="imgName : ${section.fileNames}">
+          <img th:src="@{'/uploads/' + ${imgName}}" alt="첨부 이미지">
         </div>
       </div>
 
-      <!-- ✅ 파일 다운로드 -->
-      <div th:if="${section.fileName != null and section.type.equals('파일형')}" class="attachments">
-        <div class="file-download">
-          <a th:href="@{'/uploads/' + ${section.fileName}}" download>
-            📄 <span th:text="${section.fileName}">파일명</span> 다운로드
+      <!-- ✅ 파일 다운로드 링크 (여러 개 출력) -->
+      <div th:if="${section.fileNames != null and #lists.size(section.fileNames) > 0 and '파일형'.equals(section.type)}" class="attachments">
+        <div class="file-download" th:each="fileName : ${section.fileNames}">
+          <a th:href="@{'/uploads/' + ${fileName}}" download>
+            📄 <span th:text="${fileName}">파일명</span> 다운로드
           </a>
         </div>
       </div>
+
 
       <!-- ✅ 드래그 항목 -->
       <div th:if="${section.dragItems != null and #lists.size(section.dragItems) > 0}">

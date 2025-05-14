@@ -301,11 +301,15 @@ public class ResumeService {
             }).collect(Collectors.toList());
             s.setEducations(eduDTOs);
 
-            // ✅ 첨부 파일
+            // ✅ 첨부 파일 리스트 처리
             List<ResumeFileEntity> fileEntities = resumeFileRepository.findByResumeSection(section);
             if (!fileEntities.isEmpty()) {
-                s.setFileName(fileEntities.get(0).getFileName()); // 가장 첫 번째 파일만 사용
+                List<String> filenames = fileEntities.stream()
+                        .map(ResumeFileEntity::getFileName)
+                        .collect(Collectors.toList());
+                s.setFileNames(filenames); // ✅ 리스트로 저장
             }
+
 
             // ✅ 드래그 항목
             List<ResumeDragItemEntity> dragEntities = resumeDragItemRepository.findBySection(section);

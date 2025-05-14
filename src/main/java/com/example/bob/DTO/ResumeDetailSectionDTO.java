@@ -15,7 +15,7 @@ public class ResumeDetailSectionDTO {
     private List<String> conditions;
     private List<String> tags;
     private List<EducationDTO> educations;               // 학력 리스트
-    private String fileName;                             // 첨부 파일명
+    private List<String> fileNames;                         // 첨부 파일명
     private List<ResumeDragItemDTO> dragItems;           // 드래그 항목들
 
     // Getter / Setter
@@ -46,8 +46,12 @@ public class ResumeDetailSectionDTO {
     public List<EducationDTO> getEducations() { return educations; }
     public void setEducations(List<EducationDTO> educations) { this.educations = educations; }
 
-    public String getFileName() { return fileName; }
-    public void setFileName(String fileName) { this.fileName = fileName; }
+    public List<String> getFileNames() {
+        return fileNames;
+    }
+    public void setFileNames(List<String> fileNames) {
+        this.fileNames = fileNames;
+    }
 
     public List<ResumeDragItemDTO> getDragItems() { return dragItems; }
     public void setDragItems(List<ResumeDragItemDTO> dragItems) { this.dragItems = dragItems; }
