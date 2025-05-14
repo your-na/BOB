@@ -30,6 +30,8 @@ public class CoResumeEntity {
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CoResumeTagEntity> jobTags = new ArrayList<>();
 
+    
+
 
     /**
      * 연관관계 편의 메서드

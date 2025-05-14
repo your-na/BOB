@@ -25,4 +25,6 @@
             private String endDate;
             private List<Long> resumeIds;
             private String companyName;
+            private String surew;
+
         }

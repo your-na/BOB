@@ -92,6 +92,7 @@ public class ProfileController {
                                 @RequestParam String email,
                                 @RequestParam String bio,
                                 @RequestParam("language") List<String> languages,
+                                @RequestParam("region") String region,
                                 @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
                                 @AuthenticationPrincipal CustomUserDetails userDetails,
                                 RedirectAttributes redirectAttributes) {
@@ -107,6 +108,7 @@ public class ProfileController {
         userUpdateDTO.setUserEmail(email);
         userUpdateDTO.setUserBio(bio);
         userUpdateDTO.setMainLanguage(String.join(",", languages));
+        userUpdateDTO.setRegion(region);
 
         if (profileImage != null && !profileImage.isEmpty()) {
             try {
@@ -136,6 +138,8 @@ public class ProfileController {
         redirectAttributes.addFlashAttribute("userEmail", userUpdateDTO.getUserEmail());
         redirectAttributes.addFlashAttribute("userBio", userUpdateDTO.getUserBio());
         redirectAttributes.addFlashAttribute("mainLanguage", userUpdateDTO.getMainLanguage());
+        redirectAttributes.addFlashAttribute("region", userUpdateDTO.getRegion()); // ✅ 추가
+
 
         return "redirect:/profile";
     }

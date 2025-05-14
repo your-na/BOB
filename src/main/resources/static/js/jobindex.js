@@ -85,6 +85,19 @@ document.addEventListener("DOMContentLoaded", function () {
                     console.log('등록된 이력서 양식이 없습니다.');
                 }
             }
+            // ✅ 여기 아래에 제출서류 표시 추가
+            const documentBlocks = document.querySelectorAll(".job-info-block");
+            documentBlocks.forEach(block => {
+                const h3 = block.querySelector("h3");
+                if (h3 && h3.textContent.includes("제출서류")) {
+                    block.innerHTML = `
+            <h3>제출서류</h3>
+            <p>${data.surew || '제출 서류 정보 없음'}</p>
+            <p class="notice-red">* 필수 제출 안내 확인</p>
+        `;
+                    console.log('제출서류 출력 완료:', data.surew);
+                }
+            });
         })
         .catch(err => {
             console.error('API 호출 오류:', err);
@@ -94,7 +107,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function openResumeModal(title, resumeId) {
         const modal = document.getElementById('resumeModal');
         const modalTitle = document.getElementById('modal-title');
-        const confirmBtn = document.querySelector(".modal-buttons button:first-child");
+        const confirmBtn = document.getElementById("confirm-btn"); // id로 수정
         const jobPostId = new URLSearchParams(window.location.search).get("id");
 
         if (modal && modalTitle && confirmBtn) {
@@ -104,6 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
             confirmBtn.dataset.jobPostId = jobPostId;
         }
     }
+
 
     // 모달 닫기
     function closeResumeModal() {
@@ -115,20 +129,26 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // 모달 닫기 버튼
-    const closeBtn = document.querySelector(".modal-buttons button:last-child");
-    if (closeBtn) {
-        closeBtn.addEventListener("click", closeResumeModal);
+    const cancelBtn = document.getElementById("cancel-btn");
+    if (cancelBtn) {
+        cancelBtn.addEventListener("click", function () {
+            const modal = document.getElementById('resumeModal');
+            if (modal) {
+                modal.style.display = 'none';
+                console.log('모달 닫기 - 아니오 버튼');
+            }
+        });
     }
 
+
     // 예 버튼 클릭 시 이력서 작성 페이지 이동
-    const yesBtn = document.querySelector(".modal-buttons button:first-child");
-    if (yesBtn) {
-        yesBtn.addEventListener("click", function () {
+    const confirmBtn = document.getElementById("confirm-btn");
+    if (confirmBtn) {
+        confirmBtn.addEventListener("click", function () {
             const resumeId = this.dataset.resumeId;
             const jobPostId = this.dataset.jobPostId;
             if (resumeId && jobPostId) {
-                const url = `/resume/write?id=${resumeId}&jobPostId=${jobPostId}`;
-                window.location.href = url;
+                window.location.href = `/resume/write?id=${resumeId}&jobPostId=${jobPostId}`;
             } else {
                 console.error("이동할 수 없습니다. resumeId 또는 jobPostId가 없습니다.");
             }

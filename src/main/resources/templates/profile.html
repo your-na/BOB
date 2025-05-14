@@ -44,7 +44,7 @@
 
             <!-- ✅ 거주지 드롭다운 추가 -->
             <select id="region" name="region">
-                <option value="">-- 선택하세요 --</option>
+                <option value="" th:selected="${user.region == null or user.region == ''}">-- 선택하세요 --</option>
                 <option value="서울특별시" th:selected="${user.region == '서울특별시'}">서울특별시</option>
                 <option value="부산광역시" th:selected="${user.region == '부산광역시'}">부산광역시</option>
                 <option value="대구광역시" th:selected="${user.region == '대구광역시'}">대구광역시</option>

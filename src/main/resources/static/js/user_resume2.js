@@ -897,7 +897,8 @@ window.addEventListener('DOMContentLoaded', () => {
             document.getElementById("birthday").textContent = user.birthday || "";
             document.getElementById("phone").textContent = user.userPhone || "";
             document.getElementById("email").textContent = user.userEmail || "";
-            document.getElementById("bio").textContent = user.bio || "";
+            document.getElementById("region").textContent = user.region || "";
+
         })
         .catch(err => console.error("내 정보 불러오기 실패:", err));
 

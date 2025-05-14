@@ -27,6 +27,8 @@ public class UserDTO {
     private LocalDateTime accountCreatedAt; // 계정 생성 날짜
     private String profileImageUrl;
     private String bio;
+    private String region;
+
 
     // UserDTO(Long, String) 생성자 명시적으로 추가
     public UserDTO(Long userId, String userName) {
@@ -72,6 +74,7 @@ public class UserDTO {
                 .sex(userEntity.getSex())
                 .mainLanguage(userEntity.getMainLanguage())
                 .birthday(userEntity.getBirthday())
+                .region(userEntity.getRegion())
                 .userNick(userEntity.getUserNick())
                 .profileImageUrl(userEntity.getProfileImageUrl() != null ? userEntity.getProfileImageUrl() : "/images/user.png")
                 .bio(userEntity.getUserBio() != null ? userEntity.getUserBio() : "소개를 작성해보세요.")

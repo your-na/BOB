@@ -171,6 +171,7 @@ document.addEventListener("DOMContentLoaded", function () {
             time: document.querySelector("input[name='time']").value,
             startDate: document.querySelector("#startDate").value,
             endDate: document.querySelector("#endDate").value,
+            surew: document.querySelector("input[name='surew']").value,
             employmentTypes: [],
             resumeIds: []
         };
