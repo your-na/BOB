@@ -73,4 +73,12 @@ public class TestController {
     //기업 내 정보
     @GetMapping("/coprofile")
     public String profiform() {return "co_profile";}
+
+    //기업 포폴모음방
+    @GetMapping("/coportfoliozip")
+    public String portfolioform() {return "co_portfoliozip";}
+
+    //기업 포폴 모음방 상세보기
+    @GetMapping("/coportfolio")
+    public String coportfolioform() {return "co_portfolio_detail";}
 }
