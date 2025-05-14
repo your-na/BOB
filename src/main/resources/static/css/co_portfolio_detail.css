@@ -1,0 +1,90 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+h2 {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+h3.title {
+    margin-top: 25px;
+    font-size: 18px;
+    color: #444;
+    font-weight: bold;
+}
+
+.bob-pick-info .badge {
+    display: inline-block;
+    border: 1px solid green;
+    color: green;
+    font-weight: bold;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 30px;
+    background-color: #f6fff6;
+}
+
+.team-info {
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.team-info ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 5px 0 0 0;
+}
+
+.team-info li {
+    margin-left: 10px;
+}
+
+.description {
+    margin: 30px 0;
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+}
+
+.preview-box {
+    background-color: #f2f2f2;
+    height: 280px;
+    text-align: center;
+    padding-top: 120px;
+    color: #111;
+    font-size: 14px;
+    line-height: 1.5;
+    border-radius: 4px;
+}
+
+.preview-box .small-text {
+    font-size: 12px;
+    color: #777;
+}
+
+.action {
+    margin-top: 25px;
+    text-align: right;
+}
+
+.action button {
+    background-color: white;
+    color: green;
+    border: 2px solid green;
+    border-radius: 12px;
+    padding: 6px 15px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.action button:hover {
+    background-color: #f1fff1;
+}

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>포트폴리오 모음방</title>
+    <link rel="stylesheet" href="/css/co_portfoliozip.css">
+    <link rel="stylesheet" th:href="@{/css/header2.css}">
+</head>
+<body>
+
+<!-- 헤더 -->
+<div th:insert="~{header2 :: header}"></div>
+
+<div class="container">
+    <div class="header-row">
+        <h2>포트폴리오 모음방</h2>
+        <div class="bob-pick-info">
+            <span class="badge bob-tooltip">BOB PICK</span>
+            <div class="tooltip-box">BOB에서 추천하는 포트폴리오</div>
+        </div>
+    </div>
+
+    <!-- 필터 체크박스 -->
+    <div class="filter-row">
+        <label><input type="checkbox" id="bobPickOnly"> BOB PICK만 보기</label>
+    </div>
+
+
+    <table class="portfolio-table">
+        <thead>
+        <tr>
+            <th>포트폴리오</th>
+            <th>제공일</th>
+            <th>대표자</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><span class="badge">BOB PICK</span> <a class="go" href="/coportfolio">A공모전 대상 수상팀</a></td>
+            <td>2024-12-26</td>
+            <td>진유서</td>
+        </tr>
+        <tr>
+            <td>개별적으로 만든 쇼핑 웹사이트</td>
+            <td>2024-12-26</td>
+            <td>나유정</td>
+        </tr>
+        <tr>
+            <td><span class="badge">BOB PICK</span> B공모전 우수상 수상팀</td>
+            <td>2024-12-26</td>
+            <td>0</td>
+        </tr>
+        <tr>
+            <td>미니 프로젝트에서 팀원들과 만든 게임</td>
+            <td>2024-12-26</td>
+            <td>0</td>
+        </tr>
+        <tr>
+            <td>예전에 타 공모전에서 수상했던 사이트입니다.</td>
+            <td>2024-12-26</td>
+            <td>0</td>
+        </tr>
+        <tr>
+            <td><span class="badge">BOB PICK</span> A공모전 우수상 수상팀</td>
+            <td>2024-12-26</td>
+            <td>0</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 페이지네이션 -->
+    <div class="pagination">
+        <button disabled>&lt;</button>
+        <button class="active">1</button>
+        <button>2</button>
+        <button>3</button>
+        <button>4</button>
+        <button>5</button>
+        <button>6</button>
+        <button>7</button>
+        <button>&gt;</button>
+    </div>
+</div>
+
+<script src="/js/co_portfoliozip.js"></script>
+</body>
+</html>
