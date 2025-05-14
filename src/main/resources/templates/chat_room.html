@@ -20,10 +20,21 @@
 </head>
 <body>
 <div class="chat-container"> <!-- ✅ 전체 감싸는 컨테이너 -->
+  <!-- chat-header 내부 오른쪽에 메뉴 버튼 추가 -->
   <div class="chat-header">
     <button class="back-button" onclick="goBack()"><</button>
     <span id="chat-partner-name"></span>
+    <div class="chat-menu-wrapper">
+      <button class="chat-menu-btn" onclick="toggleChatMenu()">☰</button>
+      <!-- 우측 상단 드롭다운 메뉴 -->
+      <ul class="chat-dropdown-menu" id="chatDropdownMenu">
+        <li onclick="inviteUsers()">대화상대 초대하기</li>
+        <li onclick="openParticipantList()">대화상대 목록</li>
+        <li onclick="openLeaveModal()">대화방 나가기</li>
+      </ul>
+    </div>
   </div>
+
 
   <div class="chat-box">
     <!-- 채팅 내용 -->
@@ -50,6 +61,41 @@
   </div>
 </div>
 
+<div id="inviteModal" class="invite-modal" style="display: none;">
+  <div class="invite-header">
+    <span>대화상대 선택</span>
+    <button onclick="closeInviteModal()">✕</button>
+  </div>
+
+  <div class="search-section">
+    <input type="text" id="searchInput" placeholder="닉네임 또는 아이디 검색" oninput="searchUsers()">
+  </div>
+  <div id="selectedUserList" style="display: flex; flex-wrap: wrap; gap: 5px; padding: 8px 12px;"></div>
+  <div class="user-list" id="userList">
+    <!-- JS로 사용자 목록 렌더링 -->
+  </div>
+
+  <div class="modal-actions">
+    <button class="confirm-btn" onclick="confirmInvite()">확인</button>
+    <button class="cancel-btn" onclick="closeInviteModal()">취소</button>
+  </div>
+</div>
+
+<!-- 나가기 확인 모달 -->
+<div id="leaveModal" class="modal" style="display: none;">
+  <div class="modal-content leave-content">
+    <span class="close-btn" onclick="closeLeaveModal()">×</span>
+    <div class="modal-header">
+      <img id="leaveProfileImage" src="/images/user.png" alt="상대 프로필">
+      <div class="leave-nickname" id="leaveNickname">상대닉네임</div>
+    </div>
+    <p class="leave-text">채널 채팅방을 나가시겠어요?</p>
+    <div class="modal-buttons">
+      <button class="leave-confirm" onclick="confirmLeave()">나가기</button>
+      <button onclick="closeLeaveModal()">취소</button>
+    </div>
+  </div>
+</div>
 
 <script src="/js/chat_room.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>

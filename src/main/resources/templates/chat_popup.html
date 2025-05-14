@@ -72,6 +72,22 @@
     </div>
 </div>
 
+<!-- 나가기 확인 모달 -->
+<div id="leaveModal" class="modal" style="display: none;">
+    <div class="modal-content leave-content">
+        <span class="close-btn" onclick="closeLeaveModal()">×</span>
+        <div class="modal-header">
+            <img id="leaveProfileImage" src="/images/user.png" alt="상대 프로필">
+            <div class="leave-nickname" id="leaveNickname">상대닉네임</div>
+        </div>
+        <p class="leave-text">채널 채팅방을 나가시겠어요?</p>
+        <div class="modal-buttons">
+            <button class="leave-confirm" onclick="confirmLeave()">나가기</button>
+            <button onclick="closeLeaveModal()">취소</button>
+        </div>
+    </div>
+</div>
+
 <script src="/js/chat_popup.js"></script>
 </body>
 </html>
