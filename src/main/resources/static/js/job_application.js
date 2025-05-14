@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="right">
                 <button class="open-menu-btn" onclick="toggleMenu(this)">⋯</button>
                 <ul class="dropdown-menu">
-                    <li onclick="viewDetail(${item.id || index + 1})">지원내역</li>
+                   <li onclick="viewDetail(${item.jobPostId})">지원내역</li>
                     <li onclick="cancelApply(${item.id || index + 1})">지원취소</li>
                     <li onclick="hideItem(${item.id || index + 1})">숨기기</li>
                 </ul>
@@ -104,9 +104,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    window.viewDetail = function (id) {
-        alert(`📄 ${id}번 항목 상세보기`);
+    window.viewDetail = function (jobPostId) {
+        if (!jobPostId) return;
+        location.href = `/resume/detail?jobPostId=${jobPostId}`;
     };
+
 
     window.cancelApply = function (id) {
         alert(`❌ ${id}번 항목 지원취소`);

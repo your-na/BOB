@@ -29,6 +29,7 @@ public class JobApplicationService {
             dto.setJobTitle(application.getJobPost().getTitle());
             dto.setCompanyIntro(application.getJobPost().getCompany().getCoBio());
             dto.setStatus(application.getStatus().name()); // Enum to String
+            dto.setJobPostId(application.getJobPost().getId());
             return dto;
         }).collect(Collectors.toList());
     }
