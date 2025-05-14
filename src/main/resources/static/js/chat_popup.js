@@ -76,29 +76,70 @@ function renderChatRooms(rooms) {
 }
 
 // ✅ 메뉴 항목 처리
+let leaveTarget = { roomId: null, nick: "", profileUrl: "" };
+
 function handleChatOption(option) {
     const chatId = document.getElementById("chatContextMenu").dataset.chatId;
+
     switch (option) {
         case "open":
             openChatWindow(chatId);
             break;
+
         case "rename":
             const chatRoomElement = document.querySelector(`[data-chat-id="${chatId}"]`);
             const currentName = chatRoomElement?.querySelector(".info strong")?.childNodes[0]?.textContent || "";
             openRenameModal(chatId, currentName);
             break;
+
         case "pin":
-            fetch(`/api/chat/room/${chatId}/pin`, {
-                method: "POST"
-            }).then(() => {
+            fetch(`/api/chat/room/${chatId}/pin`, { method: "POST" }).then(() => {
                 alert("채팅방 고정 상태가 변경되었습니다.");
                 location.reload();
             });
             break;
+
         case "leave":
-            alert(`채팅방(${chatId}) 나가기`);
+            const element = document.querySelector(`[data-chat-id="${chatId}"]`);
+            const img = element.querySelector(".profile").style.backgroundImage;
+            const nick = element.querySelector(".info strong").childNodes[0].textContent;
+
+            leaveTarget = {
+                roomId: chatId,
+                nick: nick,
+                profileUrl: img.slice(5, -2) // 'url("...")' → remove wrapping
+            };
+
+            document.getElementById("leaveNickname").textContent = nick;
+            document.getElementById("leaveProfileImage").src = leaveTarget.profileUrl;
+            document.getElementById("leaveModal").style.display = "flex";
             break;
     }
+}
+
+function closeLeaveModal() {
+    document.getElementById("leaveModal").style.display = "none";
+}
+
+function confirmLeave() {
+    fetch(`/api/chat/room/${leaveTarget.roomId}/leave`, {
+        method: "POST",
+        headers: {
+            [csrfHeader]: csrfToken
+        }
+    })
+        .then(res => {
+            if (!res.ok) throw new Error("나가기 실패");
+            return res.text();
+        })
+        .then(() => {
+            alert("채팅방을 나갔습니다.");
+            closeLeaveModal();
+            location.reload();
+        })
+        .catch(err => {
+            alert("오류: " + err.message);
+        });
 }
 
 function toggleAddMenu() {

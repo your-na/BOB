@@ -166,3 +166,46 @@ function handleFileSelect(event, type) {
 
     document.getElementById('attachMenu').style.display = 'none';
 }
+
+function toggleChatMenu() {
+    const menu = document.getElementById("chatDropdownMenu");
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+// 바깥 클릭 시 메뉴 닫기
+document.addEventListener("click", function (event) {
+    const menu = document.getElementById("chatDropdownMenu");
+    const button = document.querySelector(".chat-menu-btn");
+
+    if (!menu.contains(event.target) && !button.contains(event.target)) {
+        menu.style.display = "none";
+    }
+});
+
+// ✅ 초대 모달 열기 함수
+function inviteUsers() {
+    document.getElementById("inviteModal").style.display = "block";
+}
+
+// ✅ 초대 모달 닫기
+function closeInviteModal() {
+    document.getElementById("inviteModal").style.display = "none";
+}
+
+// ✅ 나가기 모달 열기 함수
+function openLeaveModal() {
+    const opponentNick = document.querySelector("meta[name='opponent-nick']")?.content || "상대";
+    let profileUrl = document.querySelector("meta[name='opponent-profile-url']")?.content || "/images/user.png";
+    if (!profileUrl.startsWith("/")) profileUrl = "/" + profileUrl;
+
+    document.getElementById("leaveNickname").textContent = opponentNick;
+    document.getElementById("leaveProfileImage").src = profileUrl;
+
+    document.getElementById("leaveModal").style.display = "flex";
+}
+
+// ✅ 나가기 모달 닫기
+function closeLeaveModal() {
+    document.getElementById("leaveModal").style.display = "none";
+}
+

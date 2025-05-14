@@ -72,6 +72,9 @@
     background-color: #ccc;
     border-radius: 50%;
     margin-right: 10px;
+    background-size: cover;       /* ✅ 비율 맞춰 채움 */
+    background-position: center;  /* ✅ 중앙 정렬 */
+    background-repeat: no-repeat; /* ✅ 반복 방지 */
 }
 
 .info strong {
@@ -226,6 +229,7 @@
 
 .rename-content {
     width: 300px;
+    height: 100px;
     margin: 100px auto;
     background: white;
     padding: 25px;
@@ -284,3 +288,49 @@
     max-width: 160px;
     display: inline-block;
 }
+
+/* 채팅방 나가기 모달 */
+.leave-content {
+    width: 300px;
+    margin: 100px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    position: relative;
+    text-align: center;
+}
+
+.leave-content .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+#leaveProfileImage {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.leave-nickname {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.leave-text {
+    font-size: 14px;
+    margin: 12px 0;
+    color: #333;
+}
+
+.leave-confirm {
+    background-color: #16a34a;
+    color: white;
+}
+
+.leave-confirm:hover {
+    background-color: #128a36;
+}
+
