@@ -308,10 +308,11 @@ public class ResumeService {
                         .map(ResumeFileEntity::getFileName)
                         .collect(Collectors.toList());
 
-                // 🔍 콘솔에 출력 (서버 로그)
-                System.out.println("📎 섹션 ID " + section.getId() + " 파일 리스트: " + filenames);
+                // ✅ 확인용 콘솔 로그
+                System.out.println("📎 섹션 ID " + section.getId() + " / 타입: " + section.getCoSection().getType());
+                System.out.println("📄 파일 첨부 리스트: " + filenames);
 
-                s.setFileNames(filenames); // ✅ 리스트로 저장
+                s.setFileNames(filenames);
             }
 
 
