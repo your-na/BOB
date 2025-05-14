@@ -21,21 +21,26 @@
     <!-- 프로필 정보 -->
     <div class="profile-row">
       <div class="photo-wrapper">
-        <img src="/images/haerin.jpg" alt="프로필 사진">
+        <img th:src="@{'/uploads/' + ${resume.profileImageUrl}}" alt="프로필 사진">
       </div>
       <div class="profile-info">
         <div class="name-skill">
-          <strong>진유서</strong> <span class="skill">HTML/CSS</span>
+          <strong th:text="${resume.userName}">사용자 이름</strong>
+          <span class="skill" th:text="${resume.mainLanguage}">기술</span>
         </div>
         <div class="info-table">
-          <div><strong>성별</strong> 여</div>
-          <div><strong>생년월일</strong> 2004-10-20 (만 20세)</div>
-          <div><strong>전화번호</strong> 010-1020-1020</div>
-          <div><strong>이메일</strong> jeanzforfree@gmail.com</div>
-          <div><strong>주소</strong> 경기도 고양시</div>
+          <div><strong>성별</strong> <span th:text="${resume.sex}">성별</span></div>
+          <div><strong>생년월일</strong>
+            <span th:text="${resume.birthday}">YYYY-MM-DD</span>
+            (<span th:text="${resume.age}">나이</span>)
+          </div>
+          <div><strong>전화번호</strong> <span th:text="${resume.userPhone}">전화번호</span></div>
+          <div><strong>이메일</strong> <span th:text="${resume.userEmail}">이메일</span></div>
+          <div><strong>주소</strong> <span th:text="${resume.region}">주소</span></div>
         </div>
       </div>
     </div>
+
 
     <!-- 본문 영역 -->
     <div th:each="section : ${resume.sections}" class="info-section">

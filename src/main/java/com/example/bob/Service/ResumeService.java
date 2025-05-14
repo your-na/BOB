@@ -46,6 +46,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.time.Period;
+
 
 
 @Service
@@ -338,6 +341,29 @@ public class ResumeService {
 
         // 5️⃣ 섹션 DTO 넣기
         dto.setSections(sections);
+
+        // ✅ 나이 계산 추가
+        if (user.getBirthday() != null && !user.getBirthday().isEmpty()) {
+            try {
+                int age = Period.between(LocalDate.parse(user.getBirthday()), LocalDate.now()).getYears();
+                dto.setAge(age); // 👉 DTO에 age 필드 필요
+            } catch (Exception e) {
+                dto.setAge(0); // 파싱 실패 시 예외 처리
+            }
+        }
+
+
+        // 6️⃣ 사용자 정보 추가
+        dto.setUserName(user.getUserName());
+        dto.setUserNick(user.getUserNick());
+        dto.setUserEmail(user.getUserEmail());
+        dto.setUserPhone(user.getUserPhone());
+        dto.setSex(user.getSex());
+        dto.setBirthday(user.getBirthday());
+        dto.setRegion(user.getRegion());
+        dto.setMainLanguage(user.getMainLanguage());
+        dto.setProfileImageUrl(user.getProfileImageUrl());
+
 
         return dto;
     }
