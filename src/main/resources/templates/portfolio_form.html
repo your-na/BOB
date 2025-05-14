@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>포트폴리오 게시하기</title>
+    <link rel="stylesheet" href="/css/portfolio_form.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+
+<!-- 헤더 -->
+<div th:insert="~{header :: header}"></div>
+
+<div class="form-container">
+    <h2>포트폴리오 게시하기</h2>
+
+    <form action="/coportfolio/submit" method="post">
+        <!-- 제목 -->
+        <div class="form-group">
+            <label for="title">제목</label>
+            <input type="text" id="title" name="title" placeholder="예: A공모전 대상 수상팀" required>
+        </div>
+
+        <!-- 팀장 -->
+        <div class="form-group">
+            <label for="leader">팀장</label>
+            <input type="text" id="leader" name="leader" placeholder="팀장 이름" required>
+        </div>
+
+        <!-- 팀원 -->
+        <div class="form-group">
+            <label for="members">팀원</label>
+            <textarea id="members" name="members" rows="3" placeholder="팀원 이름을 줄바꿈으로 입력해주세요" required></textarea>
+        </div>
+
+        <!-- 설명 -->
+        <div class="form-group">
+            <label for="description">설명</label>
+            <textarea id="description" name="description" rows="4" placeholder="포트폴리오에 대한 설명을 입력해주세요" required></textarea>
+        </div>
+
+        <!-- 미리보기 주소 (iframe 등 삽입할 링크) -->
+        <div class="form-group">
+            <label for="previewUrl">미리보기 주소</label>
+            <input type="url" id="previewUrl" name="previewUrl" placeholder="예: https://your-site.com/portfolio-preview" required>
+        </div>
+
+        <!-- 버튼 -->
+        <div class="form-actions">
+            <button type="submit" class="submit-btn">게시하기</button>
+            <button type="button" class="cancel-btn" onclick="window.history.back()">취소</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

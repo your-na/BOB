@@ -46,10 +46,6 @@ public class TestController {
     @GetMapping("/corecruit")
     public String recruitform() {return "co_recruit";}
 
-    //프로필보기
-    @GetMapping("/profileview")
-    public String profileform() {return "profile_view";}
-
     //신청한 구직 내역
     @GetMapping("/jobapplication")
     public String jobappform() {return "job_application";}
@@ -81,4 +77,12 @@ public class TestController {
     //기업 포폴 모음방 상세보기
     @GetMapping("/coportfolio")
     public String coportfolioform() {return "co_portfolio_detail";}
+
+    //포폴 모음방
+    @GetMapping("/portfoliozip")
+    public String portfoliozipform() {return "portfoliozip";}
+
+    //포폴모음방 게시하기
+    @GetMapping("portfolioform")
+    public String pofolform() {return "portfolio_form";}
 }

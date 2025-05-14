@@ -238,4 +238,12 @@ public class UserController {
     @GetMapping("/contest_detail")
     public String contest_detailform() {return "contest_detail";}
 
+    @GetMapping("/profileview")
+    public String viewProfile(@RequestParam String userNick, Model model) {
+        UserEntity user = userRepository.findByUserNick(userNick)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+        model.addAttribute("profileUser", user);
+        return "profile_view";
+    }
+
 }

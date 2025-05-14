@@ -54,6 +54,8 @@
 
 .meta1 {
     display: inline-block;
+    text-decoration: none;
+    color: #666;
 }
 
 .meta2 {

@@ -1,0 +1,138 @@
+.container {
+    max-width: 800px;
+    margin-top: 8%;
+    margin-left: 20%;
+}
+
+/* 제목 + 툴팁을 가로 정렬 */
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.portfolio-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+.portfolio-table th,
+.portfolio-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+    font-size: 15px;
+}
+
+.badge {
+    display: inline-block;
+    border: 1px solid green;
+    color: green;
+    font-weight: bold;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 30px;
+    margin-right: 8px;
+    background-color: #f6fff6;
+    vertical-align: middle;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.pagination button {
+    border: none;
+    background: #f0f0f0;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.pagination button.active {
+    background: green;
+    color: white;
+    font-weight: bold;
+}
+
+.pagination button:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+}
+
+/* 툴팁 로고 오른쪽에 위치 */
+.bob-pick-info {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bob-tooltip {
+    position: relative;
+}
+
+.tooltip-box {
+    display: none;
+    position: absolute;
+    top: 28px;
+    right: 0;
+    background: #fff;
+    border: 1px solid #999;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #333;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+}
+
+/* 마우스 올릴 때만 툴팁 보이기 */
+.bob-tooltip:hover + .tooltip-box {
+    display: block;
+}
+
+.filter-row {
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.go {
+    text-decoration: none;
+    color: #333;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* 포트폴리오 게시하기 버튼 */
+.post-btn {
+    padding: 8px 16px;
+    background-color: #19CB13;
+    color: white;
+    border: 1px solid grey;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.post-btn:hover {
+    background-color: #149b0f;
+}
