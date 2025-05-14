@@ -307,8 +307,13 @@ public class ResumeService {
                 List<String> filenames = fileEntities.stream()
                         .map(ResumeFileEntity::getFileName)
                         .collect(Collectors.toList());
+
+                // 🔍 콘솔에 출력 (서버 로그)
+                System.out.println("📎 섹션 ID " + section.getId() + " 파일 리스트: " + filenames);
+
                 s.setFileNames(filenames); // ✅ 리스트로 저장
             }
+
 
 
             // ✅ 드래그 항목

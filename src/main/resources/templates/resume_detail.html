@@ -41,7 +41,8 @@
     <div th:each="section : ${resume.sections}" class="info-section">
       <strong th:text="${section.title}">섹션 제목</strong>
 
-      <!-- ✅ 설명 content: 항상 있을 수 있음 -->
+
+      <!-- ✅ 설명 -->
       <div th:if="${section.content != null and section.content != ''}">
         <textarea readonly th:text="${section.content}">설명</textarea>
       </div>
@@ -58,15 +59,17 @@
         </div>
       </div>
 
-      <!-- ✅ 사진 첨부 미리보기 (여러 이미지 출력) -->
-      <div th:if="${section.fileNames != null and #lists.size(section.fileNames) > 0 and '사진형'.equals(section.type)}">
+      <!-- ✅ 사진 첨부 미리보기 -->
+      <span th:each="name : ${section.fileNames}" th:text="${name}" style="display:none;"></span>
+      <div th:if="${not #lists.isEmpty(section.fileNames) and '사진형' == section.type?.trim()}">
         <div class="image-preview" th:each="imgName : ${section.fileNames}">
           <img th:src="@{'/uploads/' + ${imgName}}" alt="첨부 이미지">
         </div>
       </div>
 
-      <!-- ✅ 파일 다운로드 링크 (여러 개 출력) -->
-      <div th:if="${section.fileNames != null and #lists.size(section.fileNames) > 0 and '파일형'.equals(section.type)}" class="attachments">
+      <!-- ✅ 파일 다운로드 링크 -->
+      <span th:each="name : ${section.fileNames}" th:text="${name}" style="display:none;"></span>
+      <div th:if="${not #lists.isEmpty(section.fileNames) and '파일형' == section.type?.trim()}" class="attachments">
         <div class="file-download" th:each="fileName : ${section.fileNames}">
           <a th:href="@{'/uploads/' + ${fileName}}" download>
             📄 <span th:text="${fileName}">파일명</span> 다운로드
