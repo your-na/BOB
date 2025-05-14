@@ -57,4 +57,9 @@ public class UserDetailsImpl implements CustomUserDetails {
     public UserEntity getUserEntity() {
         return userEntity;
     }
+
+    public UserEntity getUser() {
+        return this.userEntity;
+    }
+
 }

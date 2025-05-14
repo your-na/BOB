@@ -15,10 +15,11 @@
     <!-- 좌측 회원 기본 정보 -->
     <div class="profile-left">
         <div class="profile-header">
+            <!-- 프로필 영역 -->
             <div class="profile-info">
-                <img src="/images/profile.png" alt="프로필 사진" class="profile-img">
-                <h2 class="nickname">닉네임</h2>
-                <p class="bio">안녕하세요~ 이런 소개글</p>
+                <img th:src="@{${profileUser.profileImageUrl}}" alt="프로필 사진" class="profile-img">
+                <h2 class="nickname" th:text="${profileUser.userNick}">닉네임</h2>
+                <p class="bio" th:text="${profileUser.userBio}">안녕하세요~ 이런 소개글</p>
             </div>
             <button class="message-btn">메시지 보내기</button>
         </div>
@@ -34,10 +35,14 @@
         <div class="tab-content" id="info">
             <h4>회원의 주언어</h4>
             <div class="languages">
-                <label><input type="checkbox" disabled checked> JAVA</label>
-                <label><input type="checkbox" disabled> Python</label>
-                <label><input type="checkbox" disabled checked> Springboot</label>
-                <label><input type="checkbox" disabled checked> React</label>
+                <label><input type="checkbox" name="language" value="java" disabled th:checked="${profileUser.mainLanguage.contains('java')}"> JAVA</label>
+                <label><input type="checkbox" name="language" value="clanguage" disabled th:checked="${profileUser.mainLanguage.contains('clanguage')}"> C언어</label>
+                <label><input type="checkbox" name="language" value="jsp" disabled th:checked="${profileUser.mainLanguage.contains('jsp')}"> JSP</label>
+                <label><input type="checkbox" name="language" value="springboot" disabled th:checked="${profileUser.mainLanguage.contains('springboot')}"> Springboot</label>
+                <label><input type="checkbox" name="language" value="react" disabled th:checked="${profileUser.mainLanguage.contains('react')}"> React</label>
+                <label><input type="checkbox" name="language" value="javascript" disabled th:checked="${profileUser.mainLanguage.contains('javascript')}"> JavaScript</label>
+                <label><input type="checkbox" name="language" value="html" disabled th:checked="${profileUser.mainLanguage.contains('html')}"> HTML/CSS</label>
+                <label><input type="checkbox" name="language" value="others" disabled th:checked="${profileUser.mainLanguage.contains('others')}"> 기타</label>
             </div>
 
             <h4>회원이 쓴 게시글</h4>

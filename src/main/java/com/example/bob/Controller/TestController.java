@@ -46,10 +46,6 @@ public class TestController {
     @GetMapping("/corecruit")
     public String recruitform() {return "co_recruit";}
 
-    //프로필보기
-    @GetMapping("/profileview")
-    public String profileform() {return "profile_view";}
-
     //신청한 구직 내역
     @GetMapping("/jobapplication")
     public String jobappform() {return "job_application";}

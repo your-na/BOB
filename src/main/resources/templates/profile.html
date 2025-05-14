@@ -43,6 +43,7 @@
             <input type="email" id="email" name="email" th:value="${user.userEmail}" readonly>
 
             <!-- ✅ 거주지 드롭다운 추가 -->
+            <label for="region">거주지</label>
             <select id="region" name="region">
                 <option value="" th:selected="${user.region == null or user.region == ''}">-- 선택하세요 --</option>
                 <option value="서울특별시" th:selected="${user.region == '서울특별시'}">서울특별시</option>
