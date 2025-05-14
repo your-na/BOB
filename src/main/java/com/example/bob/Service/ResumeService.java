@@ -308,9 +308,6 @@ public class ResumeService {
                         .map(ResumeFileEntity::getFileName)
                         .collect(Collectors.toList());
 
-                // ✅ 확인용 콘솔 로그
-                System.out.println("📎 섹션 ID " + section.getId() + " / 타입: " + section.getCoSection().getType());
-                System.out.println("📄 파일 첨부 리스트: " + filenames);
 
                 s.setFileNames(filenames);
             }
@@ -328,9 +325,15 @@ public class ResumeService {
                         d.getFilePath()
                 );
             }).collect(Collectors.toList());
+
             s.setDragItems(dragDTOs);
 
+          // ✅ 드래그 항목이 있으면 content 제거
+            if (!dragDTOs.isEmpty()) {
+                s.setContent(null);
+            }
             sections.add(s);
+
         }
 
         // 5️⃣ 섹션 DTO 넣기

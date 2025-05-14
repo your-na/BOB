@@ -75,26 +75,35 @@
     width: 80px;
 }
 
-/* 본문 항목 구역 */
+/* 본문 섹션 구조 */
 .info-section {
     display: flex;
+    margin-bottom: 20px;
     align-items: flex-start;
-    margin-bottom: 25px;
 }
 
 .info-section strong {
     display: inline-block;
-    width: 100px;
+    width: 150px;
     font-weight: bold;
+    margin-top: 4px;
 }
 
-.info-section span {
+.info-section > div,
+.info-section > ul,
+.info-section > span,
+.info-section > textarea {
     flex: 1;
     font-size: 14px;
     line-height: 1.6;
 }
 
-/* 자기소개 박스 */
+/* ✅ 일반 텍스트는 깔끔한 p로 */
+.info-section p {
+    margin: 0;
+}
+
+/* ✅ 자기소개는 textarea 유지 (박스 스타일) */
 .info-section textarea {
     width: 100%;
     height: 100px;
@@ -105,24 +114,72 @@
     font-size: 14px;
 }
 
-/* 첨부자료 섹션 스타일 */
+/* ✅ 태그 스타일 */
+.tag {
+    display: inline-block;
+    padding: 4px 10px;
+    background-color: #f0f0f0;
+    border-radius: 999px;
+    font-size: 13px;
+    margin: 3px 5px 3px 0;
+    white-space: nowrap;   /* 줄바꿈 방지 */
+    max-width: 200px;       /* 최대 너비 제한 (원하는 경우) */
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+
+/* ✅ 학력 라인 간격 */
+.info-section span {
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* ✅ 드래그 리스트 */
+.info-section ul {
+    padding-left: 16px;
+    margin: 0;
+    display: block;         /* ✅ 가로 정렬 방지 */
+}
+
+.info-section li {
+    list-style-type: disc;
+    margin-bottom: 4px;
+    display: list-item;     /* ✅ 혹시라도 flex 등 오염 방지 */
+}
+
+
+/* ✅ 파일 다운로드 정리 */
 .attachments {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
+}
+
+.file-download a {
+    color: #0066cc;
+    text-decoration: none;
     font-size: 14px;
 }
 
-/* 이미지 미리보기 */
+.file-download a:hover {
+    text-decoration: underline;
+}
+
+/* ✅ 이미지 미리보기 */
+.image-preview {
+    margin-top: 4px;
+}
+
 .image-preview img {
-    max-width: 300px;
-    max-height: 200px;
+    max-width: 200px;
+    max-height: 160px;
     border: 1px solid #ccc;
     border-radius: 8px;
 }
 
-/* 파일 다운로드 링크 */
-.file-download a {
-    color: #0066cc;
-    text-decoration: underline;
+/* ✅ 섹션 간 구분선 */
+.info-section:not(:last-child) {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
 }

@@ -41,16 +41,27 @@
     <div th:each="section : ${resume.sections}" class="info-section">
       <strong th:text="${section.title}">섹션 제목</strong>
 
-
-      <!-- ✅ 설명 -->
-      <div th:if="${section.content != null and section.content != ''}">
-        <textarea readonly th:text="${section.content}">설명</textarea>
+      <!-- ✅ 드래그 항목이 있으면 content 출력 안 함 -->
+      <div th:if="${not #lists.isEmpty(section.dragItems)}">
+        <ul>
+          <li th:each="item : ${section.dragItems}" th:text="${item.displayText}">항목</li>
+        </ul>
       </div>
 
-      <!-- ✅ 선택형 태그 -->
-      <div th:if="${section.selectedTags != null and #lists.size(section.selectedTags) > 0}">
+      <!-- ✅ dragItems 없고, content 있을 때만 출력 -->
+      <div th:if="${#lists.isEmpty(section.dragItems) and section.content != null and section.content != ''}">
+        <textarea th:if="${section.title == '자기소개'}" readonly th:text="${section.content}">자기소개</textarea>
+        <p th:if="${section.title != '자기소개'}" th:text="${section.content}"></p>
+      </div>
+
+      <!-- ✅ 선택형 태그 (경력사항/포트폴리오 제외) -->
+      <div th:if="${section.selectedTags != null
+            and #lists.size(section.selectedTags) > 0
+            and section.title != '경력사항'
+            and section.title != '포트폴리오'}">
         <span th:each="tag : ${section.selectedTags}" class="tag" th:text="${tag}">태그</span>
       </div>
+
 
       <!-- ✅ 학력 리스트 -->
       <div th:if="${section.educations != null and #lists.size(section.educations) > 0}">
@@ -60,7 +71,6 @@
       </div>
 
       <!-- ✅ 사진 첨부 미리보기 -->
-      <span th:each="name : ${section.fileNames}" th:text="${name}" style="display:none;"></span>
       <div th:if="${not #lists.isEmpty(section.fileNames) and section.type?.trim() == '사진 첨부'}">
         <div class="image-preview" th:each="imgName : ${section.fileNames}">
           <img th:src="@{'/uploads/' + ${imgName}}" alt="첨부 이미지">
@@ -68,21 +78,12 @@
       </div>
 
       <!-- ✅ 파일 다운로드 링크 -->
-      <span th:each="name : ${section.fileNames}" th:text="${name}" style="display:none;"></span>
       <div th:if="${not #lists.isEmpty(section.fileNames) and section.type?.trim() == '파일 첨부'}" class="attachments">
         <div class="file-download" th:each="fileName : ${section.fileNames}">
           <a th:href="@{'/uploads/' + ${fileName}}" download>
             📄 <span th:text="${fileName}">파일명</span> 다운로드
           </a>
         </div>
-      </div>
-
-
-      <!-- ✅ 드래그 항목 -->
-      <div th:if="${section.dragItems != null and #lists.size(section.dragItems) > 0}">
-        <ul>
-          <li th:each="item : ${section.dragItems}" th:text="${item.displayText}">항목</li>
-        </ul>
       </div>
     </div>
 
