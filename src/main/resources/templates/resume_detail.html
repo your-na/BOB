@@ -11,74 +11,84 @@
 <div th:insert="~{header :: header}"></div>
 
 <form>
-<div class="resume-detail-container">
+  <div class="resume-detail-container">
 
-  <!-- 수정/삭제 버튼 -->
-  <div class="resume-buttons">
-    <button class="delete-btn">지원 취소하기</button>
-  </div>
-
-  <!-- 프로필 정보 -->
-  <div class="profile-row">
-    <div class="photo-wrapper">
-      <img src="/images/haerin.jpg" alt="프로필 사진">
+    <!-- 수정/삭제 버튼 -->
+    <div class="resume-buttons">
+      <button class="delete-btn">지원 취소하기</button>
     </div>
-    <div class="profile-info">
-      <div class="name-skill">
-        <strong>진유서</strong> <span class="skill">HTML/CSS</span>
+
+    <!-- 프로필 정보 -->
+    <div class="profile-row">
+      <div class="photo-wrapper">
+        <img src="/images/haerin.jpg" alt="프로필 사진">
       </div>
-      <div class="info-table">
-        <div><strong>성별</strong> 여</div>
-        <div><strong>생년월일</strong> 2004-10-20 (만 20세)</div>
-        <div><strong>전화번호</strong> 010-1020-1020</div>
-        <div><strong>이메일</strong> jeanzforfree@gmail.com</div>
-        <div><strong>주소</strong> 경기도 고양시</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 본문 영역 -->
-  <div class="info-section"><strong>학력사항</strong>
-    <span>2004 03 ~ 2008 02 00대학교 00과 졸업<br>2008 03 ~ 2010 02 00대학교 00과 졸업</span>
-  </div>
-
-  <div class="info-section"><strong>희망직무</strong>
-    <span>프론트</span>
-  </div>
-
-  <div class="info-section"><strong>경력사항</strong>
-    <span>수상<br>2024.10.20 <strong>ANUY</strong> 공모전 수상</span>
-  </div>
-
-  <div class="info-section"><strong>포트폴리오</strong>
-    <span>(포트폴리오)</span>
-  </div>
-
-  <div class="info-section"><strong>자기소개</strong>
-    <textarea readonly>준비된 인재 진유서</textarea>
-  </div>
-
-  <!-- 첨부 이미지/파일 -->
-  <div class="info-section">
-    <strong>사진형</strong>
-    <div class="attachments">
-      <!-- 이미지 미리보기 -->
-      <div class="image-preview">
-        <img src="/uploads/sample-image.png" alt="첨부 이미지">
+      <div class="profile-info">
+        <div class="name-skill">
+          <strong>진유서</strong> <span class="skill">HTML/CSS</span>
+        </div>
+        <div class="info-table">
+          <div><strong>성별</strong> 여</div>
+          <div><strong>생년월일</strong> 2004-10-20 (만 20세)</div>
+          <div><strong>전화번호</strong> 010-1020-1020</div>
+          <div><strong>이메일</strong> jeanzforfree@gmail.com</div>
+          <div><strong>주소</strong> 경기도 고양시</div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="info-section">
-    <strong>파일형</strong>
-    <div class="attachments">
-      <!-- 파일 다운로드 링크 -->
-      <div class="file-download">
-        <a href="/uploads/sample-file.pdf" download>📄 sample-file.pdf 다운로드</a>
+    <!-- 본문 영역 -->
+    <div th:each="section : ${resume.sections}" class="info-section">
+      <strong th:text="${section.title}">섹션 제목</strong>
+
+
+      <!-- ✅ 설명 -->
+      <div th:if="${section.content != null and section.content != ''}">
+        <textarea readonly th:text="${section.content}">설명</textarea>
+      </div>
+
+      <!-- ✅ 선택형 태그 -->
+      <div th:if="${section.selectedTags != null and #lists.size(section.selectedTags) > 0}">
+        <span th:each="tag : ${section.selectedTags}" class="tag" th:text="${tag}">태그</span>
+      </div>
+
+      <!-- ✅ 학력 리스트 -->
+      <div th:if="${section.educations != null and #lists.size(section.educations) > 0}">
+        <div th:each="edu : ${section.educations}">
+          <span th:text="|${edu.startYear}.${edu.startMonth} ~ ${edu.endYear}.${edu.endMonth} ${edu.schoolName} ${edu.majorName} ${edu.status}|"></span><br>
+        </div>
+      </div>
+
+      <!-- ✅ 사진 첨부 미리보기 -->
+      <span th:each="name : ${section.fileNames}" th:text="${name}" style="display:none;"></span>
+      <div th:if="${not #lists.isEmpty(section.fileNames) and '사진형' == section.type?.trim()}">
+        <div class="image-preview" th:each="imgName : ${section.fileNames}">
+          <img th:src="@{'/uploads/' + ${imgName}}" alt="첨부 이미지">
+        </div>
+      </div>
+
+      <!-- ✅ 파일 다운로드 링크 -->
+      <span th:each="name : ${section.fileNames}" th:text="${name}" style="display:none;"></span>
+      <div th:if="${not #lists.isEmpty(section.fileNames) and '파일형' == section.type?.trim()}" class="attachments">
+        <div class="file-download" th:each="fileName : ${section.fileNames}">
+          <a th:href="@{'/uploads/' + ${fileName}}" download>
+            📄 <span th:text="${fileName}">파일명</span> 다운로드
+          </a>
+        </div>
+      </div>
+
+
+      <!-- ✅ 드래그 항목 -->
+      <div th:if="${section.dragItems != null and #lists.size(section.dragItems) > 0}">
+        <ul>
+          <li th:each="item : ${section.dragItems}" th:text="${item.displayText}">항목</li>
+        </ul>
       </div>
     </div>
+
   </div>
-</div>
 </form>
+
+<script src="/js/resume_detail.js"></script>
 </body>
 </html>

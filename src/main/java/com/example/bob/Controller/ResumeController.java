@@ -11,6 +11,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import com.example.bob.DTO.UserProjectResponseDTO;
 import com.example.bob.DTO.ResumeSubmitRequestDTO;
+import com.example.bob.DTO.ResumeDetailDTO;
+
 
 
 import org.springframework.http.HttpStatus;
@@ -92,6 +94,21 @@ public class ResumeController {
             return ResponseEntity.status(500).body("파일 업로드 실패: " + e.getMessage());
         }
     }
+
+    // ✅ 특정 공고에 제출한 이력서 상세 조회 API
+    @GetMapping("/detail")
+    public ResponseEntity<ResumeDetailDTO> getResumeDetail(@RequestParam("jobPostId") Long jobPostId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetailsImpl userDetails) {
+            UserEntity user = userDetails.getUserEntity();
+            ResumeDetailDTO resume = resumeService.getResumeForJobPost(jobPostId, user);
+            return ResponseEntity.ok(resume);
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
 
 
 
