@@ -158,7 +158,7 @@ document.addEventListener("click", function (event) {
 function openChatWindow(roomId, type = "private") {
     if (!roomId) return;
     const url = type === "group"
-        ? `/chat/chatroom?roomId=${roomId}&type=group`
+        ? `/chat/group-chatroom?roomId=${roomId}&type=group`
         : `/chat/chatroom?roomId=${roomId}`;
     window.open(url, "_blank", "width=500,height=700,resizable=yes");
 }
@@ -293,7 +293,7 @@ function confirmInvite() {
             .then(res => res.json())
             .then(data => {
                 const roomId = data.roomId;
-                window.open(`/chat/chatroom?roomId=${roomId}&type=group`, "_blank", "width=500,height=700");
+                window.open(`/chat/group-chatroom?roomId=${roomId}&type=group`, "_blank", "width=500,height=700");
             })
             .catch(err => {
                 alert("그룹 채팅방 생성 실패");

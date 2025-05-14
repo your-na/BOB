@@ -80,11 +80,20 @@ public class GroupChatMessageService {
         Map<String, Map<String, String>> userMap = new HashMap<>();
         for (Map.Entry<String, UserEntity> entry : uniqueUsers.entrySet()) {
             UserEntity user = entry.getValue();
+
+            // ✅ 로그 추가 시작
+            System.out.println("🧪 유저 ID: " + entry.getKey());
+            System.out.println("🧪 닉네임: " + user.getUserNick());
+            System.out.println("🧪 프로필 이미지: " + user.getProfileImageUrl());
+            // ✅ 로그 추가 끝
+
             Map<String, String> info = new HashMap<>();
             info.put("nick", user.getUserNick());
             info.put("image", user.getProfileImageUrl());
+
             userMap.put(entry.getKey(), info);
         }
+
 
         return userMap;
     }

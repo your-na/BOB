@@ -1,3 +1,12 @@
+Object.defineProperty(window, 'userMap', {
+    set(value) {
+        console.trace("❗ userMap 덮어쓰기 발생!", value);
+        Object.defineProperty(window, 'userMap', { value, writable: true, configurable: true });
+    },
+    configurable: true
+});
+
+
 function goBack() {
     window.location.href = "/chatting"; // 또는 location.href = "/chatlist"; 처럼 경로 지정도 가능
 }
@@ -81,10 +90,24 @@ document.addEventListener("DOMContentLoaded", function () {
             nicknameSpan.className = "nickname";
 
             if (chatType === "group") {
+                console.log("🔥 디버깅: 단체 채팅 메시지 렌더링");
+                console.log("→ senderIdOrName:", senderIdOrName);
                 const key = String(senderIdOrName);
+                console.log("→ key (문자열화):", key);
+                console.log("→ userMap[key]:", userMap?.[key]);
                 const senderInfo = userMap?.[key] || { nick: `유저#${key}`, image: "/images/user.png" };
-                profileImg.src = senderInfo.image;
+                console.log("→ senderInfo.nick:", senderInfo.nick);
+
+                let imgUrl = senderInfo.image || "/images/user.png";
+                if (!imgUrl.startsWith("/")) {
+                    imgUrl = "/" + imgUrl;
+                }
+
+                profileImg.src = imgUrl;
                 nicknameSpan.textContent = senderInfo.nick;
+
+
+
             } else {
                 // 단일 채팅은 senderIdOrName이 nickname 자체임
                 profileImg.src = opponentProfileUrl;
@@ -116,7 +139,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     const isMine = parseInt(msg.senderId) === currentUserId;
                     const type = isMine ? "user" : "partner";
                     const sender = chatType === "group" ? msg.senderId : msg.senderName;
-                    appendMessage(type, msg.senderId, msg.message);
+                    appendMessage(type, sender, msg.message);
                 });
             });
     }

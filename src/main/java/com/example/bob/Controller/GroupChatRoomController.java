@@ -39,9 +39,14 @@ public class GroupChatRoomController {
 
         Map<String, Map<String, String>> userMap = groupChatMessageService.getUserInfoMap(roomId);
 
+        System.out.println("📦 userMap size = " + userMap.size());
+        userMap.forEach((id, info) -> {
+            System.out.println("👤 id: " + id + " → nick: " + info.get("nick"));
+        });
+
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            String userMapJson = objectMapper.writeValueAsString(userMap);
+            ObjectMapper mapper = new ObjectMapper();
+            String userMapJson = mapper.writeValueAsString(userMap);
             model.addAttribute("userMapJson", userMapJson);
         } catch (JsonProcessingException e) {
             model.addAttribute("userMapJson", "{}");

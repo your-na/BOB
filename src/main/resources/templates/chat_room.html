@@ -20,10 +20,12 @@
 
   <script th:inline="javascript">
     /*<![CDATA[*/
-    const userMap = /*[[${userMapJson}]]*/ {};
-    console.log("✅ userMap 로드됨:", userMap);
+    const userMapJson = /*[[${userMapJson}]]*/ {};
+    const userMap = typeof userMapJson === "string" ? JSON.parse(userMapJson) : userMapJson;
+    console.log("✅ userMap (최종 파싱):", userMap);
     /*]]>*/
   </script>
+
 
 </head>
 <body>
