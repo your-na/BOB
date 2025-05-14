@@ -71,3 +71,148 @@ body {
     color: green;
     font-weight: bold;
 }
+
+.popup-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.open-todo-btn {
+    background-color: #19cb13;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.add-btn:hover {
+    background-color: #15b211;
+}
+
+.completed-section {
+    margin-top: 20px;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+}
+
+.completed-header {
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.completed-list {
+    list-style: none;
+    padding: 0;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.completed-list .task-item {
+    background-color: #f3f3f3;
+    text-decoration: line-through;
+    color: #999;
+}
+
+.space-select {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+/* 모달 전체 배경 */
+.todo-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.4);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* 모달 박스 */
+.todo-modal .modal-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.todo-modal h3 {
+    margin-top: 0;
+    font-size: 20px;
+    text-align: center;
+}
+
+.todo-modal input[type="text"],
+.todo-modal input[type="date"],
+.todo-modal select {
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+}
+
+.todo-modal .modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.todo-modal .modal-buttons button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.todo-modal .modal-buttons button:first-child {
+    background-color: #19CB13;
+    color: white;
+}
+
+.todo-modal .modal-buttons button:last-child {
+    background-color: #eee;
+}
+
+.todo-modal .close-btn {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.date-inputs {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.date-inputs input {
+    width: 20%;
+    height: 15px;
+    font-size: 12px;
+    padding: 5px;
+}

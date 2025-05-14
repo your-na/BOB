@@ -2,33 +2,74 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>내 할 일</title>
     <link rel="stylesheet" href="/css/task_popup.css">
 </head>
 <body>
-
 <div class="popup-container">
-    <form style="display: flex; flex-direction: column; height: 100%;">
-        <div class="popup-header">
-            <h2>내 할 일</h2>
+    <div class="popup-header">
+        <h2>내 할 일</h2>
+        <div class="popup-actions">
             <select id="task-filter">
                 <option value="전체">전체</option>
                 <option value="개인">개인</option>
                 <option value="프로젝트">프로젝트</option>
             </select>
+            <select id="date-filter">
+                <option value="전체">전체 기간</option>
+                <option value="오늘">오늘</option>
+                <option value="이번주">이번 주</option>
+            </select>
+            <!-- 할 일 등록 버튼 -->
+            <button id="openTodoModal" class="open-todo-btn">+ 할 일 등록</button>
+
             <button class="close-btn" onclick="window.close()">✖</button>
         </div>
+    </div>
 
-        <!-- ✅ 여기에 스크롤 생기게 함 -->
-        <ul id="task-list" class="popup-todo-list" style="flex-grow: 1; overflow-y: auto; max-height: 100%; margin-top: 20px;">
-            <!-- JS로 <li class="task-item">들이 들어옴 -->
+    <!-- ✅ 여기에 스크롤 생기게 함 -->
+    <ul id="task-list" class="popup-todo-list" style="flex-grow: 1; overflow-y: auto; max-height: 100%; margin-top: 20px;">
+        <!-- JS로 <li class="task-item">들이 들어옴 -->
+    </ul>
+
+    <!-- 완료된 할 일 -->
+    <div class="completed-section">
+        <div class="completed-header" onclick="toggleCompleted()">
+            완료된 항목 ▾
+        </div>
+        <ul id="completed-list" class="completed-list" style="display: none;">
+            <!-- JS로 완료 항목 렌더링 -->
         </ul>
-    </form>
+    </div>
 </div>
 
-<!-- ✅ JS는 백엔드 연동 포함한 전체 JS 코드 불러와야 함 -->
-<script src="/js/task_popup.js"></script>
+<!-- 할 일 등록 모달 -->
+<div id="todoModal" class="todo-modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeTodoModal()">&times;</span>
+        <h3>할 일 생성하기</h3>
 
+        <input id="todoTitle" type="text" placeholder="할 일을 입력하세요">
+
+        <label>DATE</label>
+        <div class="date-inputs">
+            <input id="startDate" type="date"> ~
+            <input id="endDate" type="date">
+        </div>
+
+        <label>스페이스</label>
+        <select id="todoSpace">
+            <option value="개인">개인</option>
+            <option value="프로젝트">프로젝트</option>
+        </select>
+
+        <div class="modal-buttons">
+            <button onclick="createTodo()">생성</button>
+            <button onclick="closeTodoModal()">취소</button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/task_popup.js"></script>
 </body>
 </html>

@@ -9,6 +9,12 @@ function getCookie(name) {
 document.addEventListener("DOMContentLoaded", function () {
     var filter = document.getElementById("task-filter");
 
+    // ✅ 이 부분 추가!
+    const openModalBtn = document.getElementById("openTodoModal");
+    if (openModalBtn) {
+        openModalBtn.addEventListener("click", openTodoModal);
+    }
+
     filter.addEventListener("change", function () {
         var category = filter.value;
         var tasks = document.querySelectorAll(".task-item");
@@ -201,3 +207,65 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const openBtn = document.getElementById("openTodoModal");
+    const modal = document.getElementById("todoModal");
+
+    if (openBtn && modal) {
+        openBtn.addEventListener("click", function () {
+            modal.style.display = "flex";
+        });
+    }
+
+    window.closeTodoModal = function () {
+        modal.style.display = "none";
+    };
+});
+
+function openTodoModal() {
+    document.getElementById("todoModal").style.display = "flex";
+}
+
+function closeTodoModal() {
+    document.getElementById("todoModal").style.display = "none";
+}
+
+function createTodo() {
+    const title = document.getElementById("todoTitle").value.trim();
+    const start = document.getElementById("startDate").value;
+    const end = document.getElementById("endDate").value;
+    const space = document.getElementById("todoSpace").value;
+
+    if (!title || !start || !end) {
+        alert("모든 항목을 입력하세요.");
+        return;
+    }
+
+    fetch("http://localhost:8888/api/todos", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
+        },
+        credentials: "include",
+        body: JSON.stringify({
+            title: title,
+            startDate: start,
+            endDate: end,
+            workspace: space
+        })
+    })
+        .then(res => {
+            if (res.ok) {
+                alert("할 일이 성공적으로 등록되었습니다.");
+                closeTodoModal();
+                loadPopupTodos();
+            } else {
+                alert("등록 실패");
+            }
+        })
+        .catch(err => {
+            alert("에러 발생: " + err);
+        });
+}
