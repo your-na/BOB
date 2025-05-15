@@ -1,8 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
     const deleteBtn = document.querySelector(".delete-btn");
-    const jobPostId = new URLSearchParams(window.location.search).get("jobPostId"); // URL에서 jobPostId 추출
+    const jobPostId = new URLSearchParams(window.location.search).get("jobPostId");
 
-    if (deleteBtn && jobPostId) {
+    // ✅ CSRF 토큰과 헤더 이름 가져오기
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+    if (deleteBtn && jobPostId && csrfToken && csrfHeader) {
         deleteBtn.addEventListener("click", (e) => {
             e.preventDefault();
 
@@ -11,11 +15,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
             fetch(`/api/user/resumes/cancel?jobPostId=${jobPostId}`, {
                 method: "DELETE",
+                credentials: "include",
+                headers: {
+                    [csrfHeader]: csrfToken
+                }
             })
                 .then((res) => {
                     if (res.ok) {
                         alert("✅ 지원이 취소되었습니다.");
-                        location.href = "/job-application"; // 지원 목록 페이지로 이동
+                        location.href = "/jobapplication";
                     } else {
                         return res.text().then((msg) => {
                             alert("❌ 취소 실패: " + msg);

@@ -2,6 +2,8 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
   <title>이력서 상세보기</title>
   <link rel="stylesheet" href="/css/resume_detail.css">
   <link rel="stylesheet" th:href="@{/css/header.css}">
@@ -15,7 +17,7 @@
 
     <!-- 수정/삭제 버튼 -->
     <div class="resume-buttons">
-      <button class="delet  e-btn">지원 취소하기</button>
+      <button class="delete-btn">지원 취소하기</button>
     </div>
 
     <!-- 프로필 정보 -->
