@@ -4,9 +4,14 @@ import com.example.bob.DTO.CoJobPostRequestDTO;
 import com.example.bob.Entity.CoJobPostEntity;
 import com.example.bob.Entity.CoResumeEntity;
 import com.example.bob.Entity.CompanyEntity;
+import com.example.bob.Entity.JobApplicationStatus;
+
 import com.example.bob.Repository.CoJobPostRepository;
 import com.example.bob.Repository.CoResumeRepository;
 import com.example.bob.Repository.CompanyRepository;
+import com.example.bob.Repository.JobApplicationRepository;
+
+
 import com.example.bob.security.CustomUserDetails;
 import com.example.bob.security.CompanyDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +42,9 @@ public class CoJobPostService {
 
     @Autowired
     private CompanyRepository companyRepository;
+
+    @Autowired
+    private JobApplicationRepository jobApplicationRepository;
 
     // 구인글 등록
     public Long saveJobPost(CoJobPostRequestDTO dto) {
@@ -90,6 +98,7 @@ public class CoJobPostService {
 
     }
 
+
     // 구인글 목록 조회 (모집 중인 공고만 반환)
     public List<CoJobPostResponseDTO> getAllJobPosts() {
         LocalDate today = LocalDate.now();
@@ -110,23 +119,28 @@ public class CoJobPostService {
 
                     coJobPostRepository.save(post); // 변경 저장
                 })
-
                 .filter(post -> post.getStatus() == JobStatus.OPEN)
                 .map(post -> {
                     String coNick = post.getCompany() != null ? post.getCompany().getCoNick() : "알 수 없음";
+
+                    // ✅ 지원자 수 가져오기
+                    int applicantCount = jobApplicationRepository.countByJobPost_Id(post.getId());
+
                     return new CoJobPostResponseDTO(
                             post.getId(),
                             post.getTitle(),
                             post.getPhone(),
                             post.getCareer(),
                             coNick,
-                            post.getStartDate(),     // ✅ 추가
-                            post.getEndDate(),       // ✅ 추가
-                            post.getStatus()         // ✅ 추가
+                            post.getStartDate(),
+                            post.getEndDate(),
+                            post.getStatus(),
+                            applicantCount // ✅ 전달
                     );
                 })
                 .collect(Collectors.toList());
     }
+
 
 
 
@@ -175,31 +189,29 @@ public class CoJobPostService {
         CompanyEntity company = companyRepository.findByCoIdLogin(currentUsername)
                 .orElseThrow(() -> new RuntimeException("로그인된 기업 정보를 찾을 수 없습니다."));
 
-        // 📅 오늘 날짜 기준으로 상태 계산
         LocalDate today = LocalDate.now();
 
-        // 📦 이 기업이 작성한 모든 공고 가져오기
-        return coJobPostRepository.findByCompany_CompanyId(company.getCompanyId()).stream()  // ✅ 수정된 부분
+        return coJobPostRepository.findByCompany_CompanyId(company.getCompanyId()).stream()
                 .peek(post -> {
-                    // 📅 공고의 시작일과 마감일을 LocalDate로 파싱
                     LocalDate start = LocalDate.parse(post.getStartDate());
                     LocalDate end = LocalDate.parse(post.getEndDate());
 
-                    // ✅ 상태 자동 계산 및 저장
                     if (today.isAfter(end)) {
-                        post.setStatus(JobStatus.CLOSED);      // 마감
+                        post.setStatus(JobStatus.CLOSED);
                     } else if (today.isBefore(start)) {
-                        post.setStatus(JobStatus.WAITING);     // 모집 전
+                        post.setStatus(JobStatus.WAITING);
                     } else {
-                        post.setStatus(JobStatus.OPEN);        // 모집 중
+                        post.setStatus(JobStatus.OPEN);
                     }
 
-                    // 📝 상태 업데이트 DB 저장
                     coJobPostRepository.save(post);
                 })
-                // 📤 DTO로 변환 (프론트에 필요한 정보만 추출)
                 .map(post -> {
                     String coNick = post.getCompany() != null ? post.getCompany().getCoNick() : "알 수 없음";
+
+                    // ✅ 지원자 수 계산
+                    int applicantCount = jobApplicationRepository.countByJobPost_IdAndStatus(post.getId(), JobApplicationStatus.SUBMITTED);
+
                     return new CoJobPostResponseDTO(
                             post.getId(),
                             post.getTitle(),
@@ -208,11 +220,13 @@ public class CoJobPostService {
                             coNick,
                             post.getStartDate(),
                             post.getEndDate(),
-                            post.getStatus()
+                            post.getStatus(),
+                            applicantCount // ✅ 추가
                     );
                 })
                 .collect(Collectors.toList());
     }
+
 
 
 

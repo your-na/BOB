@@ -16,4 +16,5 @@
         private String startDate;
         private String endDate;
         private JobStatus status;
+        private int applicantCount;
     }

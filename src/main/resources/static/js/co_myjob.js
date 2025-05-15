@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <div class="job-extra">
             <div class="d-day">D-${dDay}</div>
-            <div class="applicants">지원자 수: 알 수 없음</div>
+            <div class="applicants">지원자 수: ${post.applicantCount}명</div>
         </div>
     </div>
 `;

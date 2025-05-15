@@ -34,6 +34,15 @@ public interface JobApplicationRepository extends JpaRepository<JobApplicationEn
             JobApplicationStatus status
     );
 
+    // ✅ 공고 ID 기준으로 지원자 수 세기
+    int countByJobPost_Id(Long jobPostId);
+
+    // ✅ 공고 ID와 상태로 지원자 수 카운트 💼
+    int countByJobPost_IdAndStatus(Long jobPostId, JobApplicationStatus status);
+
+
+
+
 
 
 
