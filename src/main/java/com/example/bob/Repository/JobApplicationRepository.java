@@ -19,5 +19,8 @@ public interface JobApplicationRepository extends JpaRepository<JobApplicationEn
     // 마지막으로 제출한 지원 내역 1건만 가져오기 (appliedAt 기준 내림차순 정렬)
     Optional<JobApplicationEntity> findTopByUserAndJobPost_IdOrderByAppliedAtDesc(UserEntity user, Long jobPostId);
 
+    // ✅ 중복 지원 여부 확인용 메서드 추가
+    boolean existsByUserAndJobPost_Id(UserEntity user, Long jobPostId);
+
 
 }

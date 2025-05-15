@@ -68,11 +68,18 @@ public class ResumeController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserDetailsImpl userDetails) {
             UserEntity user = userDetails.getUserEntity();
-            resumeService.submitUserResume(request, user);
-            return ResponseEntity.ok("이력서가 성공적으로 제출되었습니다.");
+            try {
+                resumeService.submitUserResume(request, user);
+                return ResponseEntity.ok("이력서가 성공적으로 제출되었습니다.");
+            } catch (IllegalStateException e) {
+                return ResponseEntity.badRequest().body(e.getMessage()); // 중복 지원 예외 메시지
+            } catch (Exception e) {
+                return ResponseEntity.status(500).body("이력서 제출 중 오류가 발생했습니다.");
+            }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자만 제출할 수 있습니다.");
     }
+
 
     // ✅ 사용자가 넣은 파일
     @PostMapping("/upload")  // 🔥 경로는 /api/user/resumes/upload

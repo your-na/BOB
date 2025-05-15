@@ -350,6 +350,12 @@ confirmBtn.addEventListener("click", () => {
             });
         })
         .then(res => {
+            if (res.status === 400) {
+                return res.text().then(msg => {
+                    alert(msg); // 👉 서버에서 보낸 안내 메시지 보여주기
+                    throw new Error(msg); // 👉 이후 then 체인 중단
+                });
+            }
             if (!res.ok) throw new Error("제출 실패");
             return res.text();
         })
@@ -357,11 +363,13 @@ confirmBtn.addEventListener("click", () => {
             alert("제출이 완료되었습니다!");
             window.location.href = `/jobindex?id=${jobPostId}`;  // ✅ 공고 상세보기 페이지로 이동
         })
-
         .catch(err => {
             console.error("제출 오류:", err);
-            alert("제출에 실패했습니다.");
+            if (!err.message.includes("이미 이 공고에")) {
+                alert("제출에 실패했습니다.");
+            }
         });
+
 
 });
 
