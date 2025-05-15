@@ -48,6 +48,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Optional;
+
 
 
 
@@ -140,10 +142,12 @@ public class ResumeService {
     public void submitUserResume(ResumeSubmitRequestDTO request, UserEntity user) {
 
         // 🔒 중복 지원 체크
-        boolean alreadyApplied = jobApplicationRepository.existsByUserAndJobPost_Id(user, request.getJobPostId());
+        boolean alreadyApplied = jobApplicationRepository
+                .existsByUserAndJobPost_IdAndStatus(user, request.getJobPostId(), JobApplicationStatus.SUBMITTED);
         if (alreadyApplied) {
             throw new IllegalStateException("이미 이 공고에 지원한 이력이 있습니다.");
         }
+
         // 1️⃣ 기업 이력서(CoResumeEntity) 조회
         CoResumeEntity coResume = coResumeRepository.findById(request.getCoResumeId())
                 .orElseThrow(() -> new RuntimeException("해당 기업 이력서 양식을 찾을 수 없습니다."));
@@ -151,11 +155,6 @@ public class ResumeService {
         // 🔄 지원할 공고(CoJobPostEntity) 조회
         CoJobPostEntity jobPost = coJobPostRepository.findById(request.getJobPostId())
                 .orElseThrow(() -> new RuntimeException("공고가 존재하지 않습니다."));
-
-        // 🔁 중복 지원 방지: 이미 해당 공고에 지원했는지 확인
-        if (jobApplicationRepository.existsByUserAndJobPost_Id(user, request.getJobPostId())) {
-            throw new IllegalStateException("이미 이 공고에 지원하셨어요! 😊");
-        }
 
 
         // 2️⃣ 사용자 이력서(ResumeEntity) 생성
@@ -379,6 +378,25 @@ public class ResumeService {
 
         return dto;
     }
+
+    // ✅ 가장 최근 지원 내역만 취소 처리
+    @Transactional
+    public boolean cancelJobApplication(Long jobPostId, UserEntity user) {
+        // 가장 최근 SUBMITTED 상태 지원 내역만 조회
+        Optional<JobApplicationEntity> optionalApp =
+                jobApplicationRepository.findTopByUserAndJobPost_IdAndStatusOrderByAppliedAtDesc(
+                        user, jobPostId, JobApplicationStatus.SUBMITTED);
+
+        if (optionalApp.isPresent()) {
+            JobApplicationEntity app = optionalApp.get();
+            app.setStatus(JobApplicationStatus.CANCELED); // 상태 변경
+            return true;
+        }
+
+        return false; // 지원 내역 없거나 이미 취소된 경우
+    }
+
+
 
 
 

@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <button class="open-menu-btn" onclick="toggleMenu(this)">⋯</button>
                 <ul class="dropdown-menu">
                    <li onclick="viewDetail(${item.jobPostId})">지원내역</li>
-                    <li onclick="cancelApply(${item.id || index + 1})">지원취소</li>
+                   <li onclick="cancelApply(${item.jobPostId})">지원취소</li>
                     <li onclick="hideItem(${item.id || index + 1})">숨기기</li>
                 </ul>
             </div>
@@ -110,9 +110,37 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
 
-    window.cancelApply = function (id) {
-        alert(`❌ ${id}번 항목 지원취소`);
+    window.cancelApply = function (jobPostId) {
+        if (!confirm("정말 지원을 취소하시겠습니까?")) return;
+
+        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+        fetch(`/api/user/resumes/cancel?jobPostId=${jobPostId}`, {
+            method: "DELETE",
+            credentials: "include", // 🔐 로그인 인증 유지
+            headers: {
+                [csrfHeader]: csrfToken
+            }
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert("✅ 지원이 취소되었습니다.");
+                    fetchApplications(); // 목록 새로고침
+                } else {
+                    return res.text().then(msg => {
+                        alert("❌ 취소 실패: " + msg);
+                    });
+                }
+            })
+            .catch(err => {
+                alert("⚠️ 서버 오류가 발생했습니다.");
+                console.error(err);
+            });
     };
+
+
+
 
     fetchApplications();
 });

@@ -52,7 +52,7 @@ public class SecurityConfig {
                         .frameOptions(frameOptions -> frameOptions.sameOrigin()) // ✅ iframe 허용 설정
                 )
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/", "/main", "/css/**", "/js/**", "/images/**", "/static/**", "/project", "/project/api","/contest", "/app/**", "/topic/**", "/user/me").permitAll()
+                        .requestMatchers("/", "/main", "/css/**", "/js/**", "/images/**", "/static/**", "/project", "/project/api","/contest", "/app/**", "/topic/**", "/user/me","/api/user/resumes/cancel","/api/user/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/login", "/sign").anonymous()
                         .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject", "/api/todos", "/api/resumes", "/api/chat/**", "chat/group-chatroom", "/chatting", "/chat/**", "/api/users/search", "/contest/team/**", "/contest/recruit", "/ws-chat/**"

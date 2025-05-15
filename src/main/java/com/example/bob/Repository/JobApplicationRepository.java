@@ -3,6 +3,8 @@ package com.example.bob.Repository;
 import com.example.bob.Entity.JobApplicationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.bob.Entity.UserEntity;
+import com.example.bob.Entity.JobApplicationStatus;
+
 
 
 import java.util.List;
@@ -21,6 +23,18 @@ public interface JobApplicationRepository extends JpaRepository<JobApplicationEn
 
     // ✅ 중복 지원 여부 확인용 메서드 추가
     boolean existsByUserAndJobPost_Id(UserEntity user, Long jobPostId);
+
+    // ✅ 중복 지원 여부 확인 (SUBMITTED 상태만)
+    boolean existsByUserAndJobPost_IdAndStatus(UserEntity user, Long jobPostId, JobApplicationStatus status);
+
+    // ✅ 가장 최근 SUBMITTED 상태 지원 내역 1건 조회
+    Optional<JobApplicationEntity> findTopByUserAndJobPost_IdAndStatusOrderByAppliedAtDesc(
+            UserEntity user,
+            Long jobPostId,
+            JobApplicationStatus status
+    );
+
+
 
 
 }

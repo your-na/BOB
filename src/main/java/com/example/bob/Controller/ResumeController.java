@@ -116,6 +116,23 @@ public class ResumeController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
+    // ❌ 이력서 지원 취소
+    @DeleteMapping("/cancel")
+    public ResponseEntity<String> cancelResume(@RequestParam("jobPostId") Long jobPostId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof UserDetailsImpl userDetails) {
+            UserEntity user = userDetails.getUserEntity();
+            boolean canceled = resumeService.cancelJobApplication(jobPostId, user);
+            if (canceled) {
+                return ResponseEntity.ok("지원이 성공적으로 취소되었습니다.");
+            } else {
+                return ResponseEntity.badRequest().body("지원 내역이 없거나 이미 취소된 상태입니다.");
+            }
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자만 취소할 수 있습니다.");
+    }
+
+
 
 
 
