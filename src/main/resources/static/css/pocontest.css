@@ -1,0 +1,252 @@
+.title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 170px;
+}
+
+.title {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.deadline {
+    color: red;
+    font-weight: bold;
+    margin-left: -20px;
+    font-size: 20px;
+}
+
+.status {
+    display: flex;
+    font-size: 17px;
+    margin-right: 20px;
+    font-weight: bold;
+    color : grey;
+}
+
+.team {
+    display: flex;
+    align-items: center;
+    margin-left: 10px; /* "모집현황:"과 아이콘 사이 간격 조절 */
+}
+
+#yes, #no {
+    display: flex;
+    align-items: center;
+}
+
+#yes img {
+    width: 20px;
+    height: 23px;
+}
+#no img {
+    margin-left: 5px; /* 아이콘 간격 조절 */
+    width: 25px;
+    height: 25px;
+}
+
+.meta {
+    font-size: 14px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.meta1 {
+    display: inline-block;
+    text-decoration: none;
+    color: #666;
+}
+
+.meta2 {
+    display: inline-block;
+    margin-left: 20px; /* 간격 조정 */
+}
+
+.goal {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: white;
+    height: 30px;
+}
+.content {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: white;
+    height: 170px;
+}
+
+.apply-btn {
+    display: block;
+    margin: 15px auto;
+    padding: 10px;
+    background: #5aec5e;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.apply-btn:hover {
+    background: #45a049;
+}
+
+.interaction {
+    display: flex;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.interaction img {
+    width: 18px;
+    height: 18px;
+}
+
+#scrap{
+    margin-left: 15px;
+}
+.comment-box {
+    margin-top: 30px;
+    padding: 8px;
+    width: 90%;
+    height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #f9f9f9;
+}
+
+.comment-box:focus {
+    border-color: #00c800;
+}
+.postbutton {
+    margin-left: 30px;
+    width: 60px;
+    height: 30px;
+    border: none;
+    background: #2fd12f;
+    color: white;
+    border-radius: 10px;
+}
+
+.postdetail {
+    height: 23px;
+}
+
+/* 드롭다운 메뉴 */
+.dropdownmenu {
+    display: none; /* 기본적으로 숨김 */
+    position: absolute;
+    top: 200px; /* 점 세 개 아래에 약간의 간격 추가 */
+    right: 20px; /* 우측 정렬 */
+    background-color: white;
+    border: 1px solid #eaeaea;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10; /* 더 높은 z-index 값으로 설정 */
+    padding: 10px;
+    display: flex;
+    flex-direction: column; /* 버튼을 세로로 정렬 */
+    gap: 10px; /* 버튼 사이의 간격 */
+}
+
+.dropdownmenu a {
+    display: block;
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    text-align: left;
+    cursor: pointer;
+    white-space: normal; /* 글씨가 가로로 이어지게 설정 */
+}
+
+.dropdownmenu a:hover {
+    color: #0e8a0e;
+    font-weight: bold;
+}
+.dropdownmenu button:hover {
+    background-color: #f1f1f1;
+}
+
+.form-group {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+}
+/* 팀 신청 중인 경우 버튼 색상 변경 */
+.apply-btn-applied {
+    background-color: orange;  /* 주황색 */
+    color: white;
+    cursor: not-allowed;  /* 클릭 방지 */
+}
+
+.action-button {
+    text-decoration: none;
+    color: grey;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.modal-box {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    width: 320px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.modal-sub {
+    color: #d10000;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.modal-sub .dot {
+    margin-right: 5px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal-btn {
+    width: 45%;
+    padding: 8px 0;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    background: white;
+    cursor: pointer;
+}
+
+.modal-btn.confirm {
+    color: white;
+    background: #222;
+    border: none;
+}
+
+.modal-btn.cancel:hover {
+    background: #f5f5f5;
+}

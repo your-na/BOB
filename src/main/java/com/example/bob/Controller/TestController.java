@@ -85,4 +85,12 @@ public class TestController {
     //포폴모음방 게시하기
     @GetMapping("portfolioform")
     public String pofolform() {return "portfolio_form";}
+
+    //공모전 상세보기
+    @GetMapping("pocontest")
+    public String pocontestform() {return "pocontest";}
+
+    //공모전 상세보기
+    @GetMapping("success2")
+    public String success2form() {return "success2";}
 }
