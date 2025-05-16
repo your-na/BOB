@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>신청 완료</title>
+  <link rel="stylesheet" href="/css/success2.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<div class="container">
+  <div class="success">
+    <div class="success-icon">
+      <img src="/images/check.png" alt="Check Icon">
+    </div>
+    <h2>신청이 완료되었습니다!</h2>
+    <p class="subtitle">귀하의 지원서가 성공적으로 제출되었습니다.</p>
+  </div>
+  <table class="info-table">
+    <tr>
+      <th>공모전명</th>
+      <td th:text="${project.title}">프로젝트명</td>
+    </tr>
+    <tr>
+      <th>공모전 담당자</th>
+      <td th:text="${project.createdBy}">담당자</td>
+    </tr>
+  </table>
+
+  <div class="next-steps">
+    <h3>이후</h3>
+    <ul>
+      <li>• 작성자에게 신청 알림을 보냈습니다.</li>
+      <li>• 생성된 팀 스페이스는 일정 플로어를 통해 확인 가능합니다.</li>
+    </ul>
+  </div>
+
+  <div class="buttons">
+    <!-- 확인 버튼: main으로 이동 -->
+    <a href="/main" style="text-decoration: none;">
+      <button type="button" class="btn green">확인</button>
+    </a>
+
+    <!-- 게시글 상세보기로 이동 -->
+    <a th:href="@{'/pocontest/' + ${contest.id}}" style="text-decoration: none;">
+      <button class="btn gray">해당 글로 돌아가기</button>
+    </a>
+  </div>
+</div>
+</body>
+</html>

@@ -180,5 +180,4 @@ public class ContestController {
         model.addAttribute("contests", adminContests);
         return "ad_notcomcontest"; // 외부 공모전 목록 HTML
     }
-
 }
