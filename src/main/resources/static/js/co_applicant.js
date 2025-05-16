@@ -23,15 +23,13 @@ document.addEventListener("DOMContentLoaded", function () {
             data.forEach(applicant => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                    <td>${applicant.userName}</td>
-                    <td>${applicant.appliedAt}</td>
-                    <td>
-                       <button class="view-resume-btn" onclick="viewResume(${applicant.resumeId})"
-                     이력서 열기
-                      </button>
+    <td>${applicant.userName}</td>
+    <td>${applicant.appliedAt}</td>
+    <td>
+        <button class="view-resume-btn" onclick="viewResume(${applicant.resumeId})">이력서 열기</button>
+    </td>
+`;
 
-                    </td>
-                `;
                 tbody.appendChild(row);
             });
         })
