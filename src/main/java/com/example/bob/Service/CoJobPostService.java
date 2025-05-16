@@ -21,6 +21,8 @@ import com.example.bob.DTO.CoJobPostResponseDTO;
 import com.example.bob.DTO.CoJobPostDetailDTO;
 import com.example.bob.Entity.JobStatus;
 import com.example.bob.DTO.ResumeTitleDto;
+import com.example.bob.DTO.ApplicantDTO;
+
 
 
 
@@ -226,10 +228,6 @@ public class CoJobPostService {
                 })
                 .collect(Collectors.toList());
     }
-
-
-
-
 
 
 

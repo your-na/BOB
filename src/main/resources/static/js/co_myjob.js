@@ -1,7 +1,7 @@
 // 🧭 공고 카드를 클릭하면 상세 페이지로 이동 (HTML에서도 호출 가능하도록 전역에 선언)
 function goToJobDetail(id) {
     // 💡 공고 상세보기 페이지로 이동하면서 ID를 쿼리로 전달
-    window.location.href = `/applicant`;
+    window.location.href = `/applicant?jobPostId=${id}`;
 }
 document.addEventListener("DOMContentLoaded", () => {
     const toggle = document.querySelector(".dropdown-toggle");

@@ -162,6 +162,7 @@ public class ResumeService {
         resume.setCoResume(coResume);
         resume.setUser(user);
         resume.setSubmittedAt(new Date());
+        resume.setJobPost(jobPost);
 
         // 3️⃣ 섹션 생성
         List<ResumeSectionEntity> sectionEntities = new ArrayList<>();
@@ -395,6 +396,49 @@ public class ResumeService {
 
         return false; // 지원 내역 없거나 이미 취소된 경우
     }
+
+    // ✅ 기업용: 특정 공고에 제출된 가장 최근 이력서 조회
+    public ResumeDetailDTO getResumeForCompany(Long jobPostId) {
+        // 1️⃣ 공고에 제출된 이력서 중 가장 최근 지원 내역
+        JobApplicationEntity application = jobApplicationRepository
+                .findTopByJobPost_IdAndStatusOrderByAppliedAtDesc(
+                        jobPostId, JobApplicationStatus.SUBMITTED)
+                .orElseThrow(() -> new RuntimeException("해당 공고에 제출된 이력서가 없습니다."));
+
+        // 2️⃣ 사용자 기준으로 기존 getResumeForJobPost 재사용
+        return getResumeForJobPost(jobPostId, application.getUser());
+    }
+
+    // ✅ 기업 사용자가 이력서 ID만으로 상세 이력서를 조회할 수 있게 함
+    public ResumeDetailDTO getResumeForCompanyWithResumeId(Long resumeId) {
+
+        // 1️⃣ 이력서 ID로 이력서 조회
+        ResumeEntity resume = resumeRepository.findById(resumeId)
+                .orElseThrow(() -> new RuntimeException("해당 이력서가 없습니다."));
+
+        // 2️⃣ 이력서 작성자
+        UserEntity user = resume.getUser();
+
+        // 3️⃣ 공고 정보 조회 (jobPost가 null이면 JobApplication에서 찾음)
+        CoJobPostEntity jobPost = resume.getJobPost();
+        if (jobPost == null) {
+            JobApplicationEntity application = jobApplicationRepository
+                    .findTopByResumeOrderByAppliedAtDesc(resume)
+                    .orElseThrow(() -> new RuntimeException("이력서에 연결된 지원 정보가 없습니다."));
+
+            jobPost = application.getJobPost();
+
+            // 🔄 연결 정보 보완 (선택: DB 반영)
+            resume.setJobPost(jobPost);
+            resumeRepository.save(resume);
+        }
+
+        // 4️⃣ 기존 메서드 재활용
+        return getResumeForJobPost(jobPost.getId(), user);
+    }
+
+
+
 
 
 

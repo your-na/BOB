@@ -102,19 +102,31 @@ public class ResumeController {
         }
     }
 
-    // ✅ 특정 공고에 제출한 이력서 상세 조회 API
+    // ✅ 특정 공고에 제출한 이력서 상세 조회 API (User + Company 모두 허용)
     @GetMapping("/detail")
     public ResponseEntity<ResumeDetailDTO> getResumeDetail(@RequestParam("jobPostId") Long jobPostId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetailsImpl userDetails) {
-            UserEntity user = userDetails.getUserEntity();
-            ResumeDetailDTO resume = resumeService.getResumeForJobPost(jobPostId, user);
-            return ResponseEntity.ok(resume);
+        if (authentication != null) {
+            Object principal = authentication.getPrincipal();
+
+            // 👤 일반 사용자일 경우
+            if (principal instanceof UserDetailsImpl userDetails) {
+                UserEntity user = userDetails.getUserEntity();
+                ResumeDetailDTO resume = resumeService.getResumeForJobPost(jobPostId, user);
+                return ResponseEntity.ok(resume);
+            }
+
+            // 🏢 기업 사용자일 경우
+            if (principal instanceof com.example.bob.security.CompanyDetailsImpl) {
+                ResumeDetailDTO resume = resumeService.getResumeForCompany(jobPostId);
+                return ResponseEntity.ok(resume);
+            }
         }
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+
 
     // ❌ 이력서 지원 취소
     @DeleteMapping("/cancel")

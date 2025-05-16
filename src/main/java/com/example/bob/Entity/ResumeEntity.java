@@ -28,6 +28,12 @@ public class ResumeEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date submittedAt;
 
+    // 어떤 공고(CoJobPostEntity)에 지원한 이력서인지
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "job_post_id")
+    private CoJobPostEntity jobPost;
+
+
     // 편의 메서드
     public void addSection(ResumeSectionEntity section) {
         sections.add(section);
@@ -48,4 +54,13 @@ public class ResumeEntity {
 
     public Date getSubmittedAt() { return submittedAt; }
     public void setSubmittedAt(Date submittedAt) { this.submittedAt = submittedAt; }
+
+    public CoJobPostEntity getJobPost() {
+        return jobPost;
+    }
+
+    public void setJobPost(CoJobPostEntity jobPost) {
+        this.jobPost = jobPost;
+    }
+
 }

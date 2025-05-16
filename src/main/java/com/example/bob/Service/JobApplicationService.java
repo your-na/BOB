@@ -5,6 +5,9 @@ import com.example.bob.Entity.JobApplicationEntity;
 import com.example.bob.Repository.JobApplicationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.example.bob.DTO.ApplicantDTO;
+import com.example.bob.Entity.JobApplicationStatus;
+
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -33,4 +36,25 @@ public class JobApplicationService {
             return dto;
         }).collect(Collectors.toList());
     }
+
+    // ✅ 특정 공고에 지원한 지원자 목록 조회 (공고 ID 기준)
+    public List<ApplicantDTO> getApplicantsByJobPost(Long jobPostId) {
+        return jobApplicationRepository
+                .findByJobPost_IdAndStatus(jobPostId, JobApplicationStatus.SUBMITTED).stream()
+
+                // 🔄 DTO로 변환
+                .map(app -> {
+                    String userName = app.getUser().getUserName(); // 🙋‍♂️ 지원자 이름
+                    String appliedAt = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(app.getAppliedAt()); // ⏰ 날짜
+                    Long resumeId = app.getResume().getId(); // 📄 이력서 ID
+
+                    return new ApplicantDTO(userName, appliedAt, resumeId);
+                })
+
+                // 📤 리스트로 반환
+                .collect(Collectors.toList());
+    }
+
+
+
 }
