@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDateTime;
 import com.example.bob.Entity.UserEntity;
+import com.example.bob.Entity.NotificationType;
+
 
 
 
@@ -29,6 +31,11 @@ public class NotificationEntity {
     private CompanyEntity company; // 기업 사용자의 알림
 
     private LocalDateTime timestamp;  // 알림 시간
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private NotificationType type;  // 알림 유형
+
 
     @ManyToOne
     @JoinColumn(name = "contest_team_id")

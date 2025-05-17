@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.bob.Entity.NotificationType;
+
 
 
 @Service
@@ -105,6 +107,7 @@ public class NotificationService {
         notification.setProject(project);  // 해당 프로젝트 설정
         notification.setTimestamp(LocalDateTime.now());  // 알림 시간
         notification.setIsRead(false);  // 읽지 않은 상태로 설정
+        notification.setType(NotificationType.PROJECT_INVITE);
         notificationRepository.save(notification);  // 알림 저장
     }
 

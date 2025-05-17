@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.example.bob.DTO.UserProjectResponseDTO;
+import com.example.bob.Entity.NotificationType;
 
 
 
@@ -514,6 +515,8 @@ public class ProjectService {
         notification.setProject(project);  // 해당 프로젝트
         notification.setTimestamp(LocalDateTime.now());
         notification.setIsRead(false);  // 알림은 처음에는 읽지 않은 상태
+
+        notification.setType(NotificationType.PROJECT_INVITE);
 
         // 알림 저장
         notificationRepository.save(notification);
