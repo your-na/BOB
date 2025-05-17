@@ -22,6 +22,7 @@ public class ResumeDetailDTO {
     private String profileImageUrl;
 
 
+
     // Getter / Setter
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }

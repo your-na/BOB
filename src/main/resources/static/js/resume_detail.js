@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const deleteBtn = document.querySelector(".delete-btn");
-    const jobPostId = new URLSearchParams(window.location.search).get("jobPostId");
+    const jobPostId = document.getElementById("jobPostId")?.value;
+
 
     // ✅ CSRF 토큰과 헤더 이름 가져오기
     const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
@@ -36,4 +37,58 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
         });
     }
+
+    // ✅ 합격 처리 버튼과 모달 로직
+    const passBtn = document.querySelector(".pass-btn");
+    const passModal = document.getElementById("passModal");
+    const closeModalBtn = document.querySelector(".close");
+    const submitPassBtn = document.getElementById("submitPassBtn");
+
+    if (passBtn && passModal) {
+        passBtn.addEventListener("click", () => {
+            passModal.style.display = "block";
+        });
+
+        closeModalBtn?.addEventListener("click", () => {
+            passModal.style.display = "none";
+        });
+
+        submitPassBtn?.addEventListener("click", () => {
+            const message = document.getElementById("passMessage").value.trim();
+            if (!message) {
+                alert("메시지를 입력해 주세요.");
+                return;
+            }
+
+            if (!jobPostId || !csrfToken || !csrfHeader) {
+                alert("필수 정보가 누락되었습니다.");
+                return;
+            }
+
+            fetch(`/api/job/pass`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify({
+                    jobPostId: jobPostId,
+                    message: message
+                })
+            })
+                .then(res => {
+                    if (res.ok) {
+                        alert("✅ 합격 처리가 완료되었습니다.");
+                        passModal.style.display = "none";
+                    } else {
+                        return res.text().then(msg => alert("❌ 실패: " + msg));
+                    }
+                })
+                .catch(err => {
+                    alert("⚠️ 서버 오류");
+                    console.error(err);
+                });
+        });
+    }
+
 });

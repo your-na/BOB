@@ -31,7 +31,7 @@ public class ResumeViewController {
 
     // ✅ 특정 공고에 제출한 이력서 상세 조회 (HTML 렌더링용)
     @GetMapping("/resume/detail")
-    public String showResumeDetail(@RequestParam("jobPostId") Long jobPostId,
+    public String showResumeDetail(@RequestParam(value = "jobPostId", required = false) Long jobPostId,
                                    @RequestParam(value = "resumeId", required = false) Long resumeId,
                                    Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -51,6 +51,7 @@ public class ResumeViewController {
             if (principal instanceof CompanyDetailsImpl && resumeId != null) {
                 ResumeDetailDTO resume = resumeService.getResumeForCompanyWithResumeId(resumeId);
                 model.addAttribute("resume", resume);
+                model.addAttribute("jobPostId", jobPostId); // ✅ 이 줄 추가
                 return "resume_detail";
             }
         }
@@ -59,6 +60,7 @@ public class ResumeViewController {
         if (resumeId != null) {
             ResumeDetailDTO resume = resumeService.getResumeForCompanyWithResumeId(resumeId);
             model.addAttribute("resume", resume);
+            model.addAttribute("jobPostId", jobPostId);
             return "resume_detail";
         }
 
