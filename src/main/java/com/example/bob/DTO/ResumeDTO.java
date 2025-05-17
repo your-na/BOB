@@ -114,4 +114,15 @@ public class ResumeDTO {
     public void setProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
     }
+
+    public String getUserPhone() {
+        return phone;
+    }
+    public String getUserEmail() {
+        return email;
+    }
+    public String getRegion() {
+        return address;
+    }
+
 }

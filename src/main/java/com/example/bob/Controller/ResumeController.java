@@ -1,18 +1,14 @@
 package com.example.bob.Controller;
 
+import ch.qos.logback.core.model.Model;
+import com.example.bob.DTO.*;
 import com.example.bob.Service.ResumeService;
-import com.example.bob.DTO.ResumeDTO;
-import com.example.bob.DTO.UserDTO;
 import com.example.bob.Entity.UserEntity;
 import com.example.bob.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import com.example.bob.DTO.UserProjectResponseDTO;
-import com.example.bob.DTO.ResumeSubmitRequestDTO;
-import com.example.bob.DTO.ResumeDetailDTO;
-
 
 
 import org.springframework.http.HttpStatus;
@@ -22,7 +18,6 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.util.UUID;
-
 
 
 @RestController
@@ -143,12 +138,6 @@ public class ResumeController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자만 취소할 수 있습니다.");
     }
-
-
-
-
-
-
 
 
 }

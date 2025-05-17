@@ -69,4 +69,46 @@ public class ResumeSectionDTO {
     public void setConditions(List<String> conditions) {
         this.conditions = conditions;
     }
+
+    private String content;
+    private List<String> selectedTags;
+    private List<EducationDTO> educations;
+    private List<String> fileNames;
+    private List<ResumeDragItemDTO> dragItems;
+
+    public String getContent() {
+        return content;
+    }
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public List<String> getSelectedTags() {
+        return selectedTags;
+    }
+    public void setSelectedTags(List<String> selectedTags) {
+        this.selectedTags = selectedTags;
+    }
+
+    public List<EducationDTO> getEducations() {
+        return educations;
+    }
+    public void setEducations(List<EducationDTO> educations) {
+        this.educations = educations;
+    }
+
+    public List<String> getFileNames() {
+        return fileNames;
+    }
+    public void setFileNames(List<String> fileNames) {
+        this.fileNames = fileNames;
+    }
+
+    public List<ResumeDragItemDTO> getDragItems() {
+        return dragItems;
+    }
+    public void setDragItems(List<ResumeDragItemDTO> dragItems) {
+        this.dragItems = dragItems;
+    }
+
 }

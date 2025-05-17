@@ -1,5 +1,6 @@
 package com.example.bob.Controller;
 
+import com.example.bob.DTO.ResumeDTO;
 import com.example.bob.DTO.ResumeDetailDTO;
 import com.example.bob.Entity.UserEntity;
 import com.example.bob.Service.ResumeService;
@@ -68,5 +69,13 @@ public class ResumeViewController {
     }
 
 
+    @GetMapping("/showresume")
+    public String showResume(Model model) {
+        ResumeDTO resume = resumeService.getPreviewResume();
+
+        model.addAttribute("resume", resume);
+
+        return "showresume";
+    }
 
 }
