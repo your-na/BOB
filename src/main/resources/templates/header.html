@@ -7,7 +7,9 @@
     <title>BOB 사이트</title>
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <!-- CSRF 토큰을 위한 meta 태그 추가 (중복 제거) -->
-    <meta name="_csrf" content="${_csrf.token}" />
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
 </head>
 <body>
 <!-- header -->
@@ -154,6 +156,12 @@
 
 
     <script>
+        function getCsrf() {
+            const token = document.querySelector('meta[name="_csrf"]')?.getAttribute("content");
+            const header = document.querySelector('meta[name="_csrf_header"]')?.getAttribute("content");
+            return { header, token };
+        }
+
         document.addEventListener("DOMContentLoaded", function () {
             const notificationIcon = document.getElementById("notification-icon");
             const notificationBox = document.getElementById("notification-box");
@@ -188,30 +196,52 @@
                     item.setAttribute("data-project-id", notification.projectId || "");
                     item.setAttribute("data-user-id", notification.userId || "");
 
-                    item.onclick = function () {
+                    const currentNotification = { ...notification };
+
+                    item.onclick = function (event) {
                         const notificationId = this.getAttribute("data-id");
                         const projectId = this.getAttribute("data-project-id");
                         const userId = this.getAttribute("data-user-id");
 
                         markAsRead(notificationId);
 
-                        if (notification.type === 'INVITE') {
-                            openInviteModal(notificationId, notification.teamName, notification.teamId);
+                        console.log("클릭된 알림:", currentNotification);
+                        console.log("타입:", currentNotification.type);
+
+                        if (currentNotification.type === 'CONTEST_INVITE') {
+                            event.preventDefault();
+                            event.stopPropagation();
+
+                            const teamId = currentNotification.teamId;
+                            const teamName = currentNotification.teamName;
+
+                            fetch(`/contest/team/api/team/member-id?teamId=${teamId}`)
+                                .then(res => res.json())
+                                .then(data => {
+                                    const inviteId = data.inviteId;
+                                    openInviteModal(inviteId, teamName, teamId);
+                                })
+                                .catch(err => {
+                                    console.error("초대 정보 조회 실패:", err);
+                                    alert("초대 정보를 불러올 수 없습니다.");
+                                });
+
                             return;
                         }
 
                         if (notification.type === 'HIRE') {
-                            openHireModal(notification.companyName, notification.message, notification.detailLink);
+                            openHireModal(currentNotification.companyName, currentNotification.message, currentNotification.detailLink);
                             return;
                         }
 
                         if (projectId && projectId !== "undefined") {
                             window.location.href = `/teamrequest?projectId=${projectId}&userId=${userId}`;
                         } else if (notification.link && notification.link !== "undefined") {
-                            window.location.href = notification.link;
+                            window.location.href = currentNotification.link;
                         } else {
                             console.error("알림 링크가 설정되지 않았습니다.");
                         }
+
                     };
 
                     notificationList.appendChild(item);
@@ -249,24 +279,24 @@
             }
 
             function markAsRead(notificationId) {
+                const { header: csrfHeader, token: csrfToken } = getCsrf();
+
                 fetch(`/api/notifications/mark-as-read/${notificationId}`, {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": getCsrfToken()
-                    }
+                        [csrfHeader]: csrfToken
+                    },
+                    credentials: "include"
                 })
                     .then(response => {
                         if (!response.ok) throw new Error(`서버 오류: ${response.status}`);
-                        return response.json();
+                        return response.text();
                     })
-                    .then(() => fetchNotifications())
+                    .then(text => {
+                        fetchNotifications();
+                    })
                     .catch(error => console.error("알림 상태 업데이트 실패", error));
-            }
-
-            function getCsrfToken() {
-                const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute("content");
-                return csrfToken || '';
             }
 
             notificationIcon.addEventListener("click", function () {
@@ -278,11 +308,13 @@
             });
 
             clearAllButton.addEventListener("click", function () {
+                const { header: csrfHeader, token: csrfToken } = getCsrf();
+
                 fetch("/api/notifications/delete-all", {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": getCsrfToken()
+                        [csrfHeader]: csrfToken
                     },
                     credentials: "include"
                 })
@@ -324,13 +356,14 @@
         }
 
         document.getElementById('accept-btn').addEventListener('click', () => {
-            fetch(`/team/invite/accept`, {
+            const { header: csrfHeader, token: csrfToken } = getCsrf();
+
+            fetch(`/contest/team/invite/respond?teamId=${currentTeamId}&accept=true`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': getCsrfToken()
+                    [csrfHeader]: csrfToken
                 },
-                body: JSON.stringify({ inviteId: currentInviteId, teamId: currentTeamId })
+                credentials: "include"
             }).then(res => {
                 if (res.ok) {
                     alert('초대를 수락했습니다.');
@@ -343,13 +376,14 @@
         });
 
         document.getElementById('reject-btn').addEventListener('click', () => {
-            fetch(`/team/invite/reject`, {
+            const { header: csrfHeader, token: csrfToken } = getCsrf();
+
+            fetch(`/contest/team/invite/respond?teamId=${currentTeamId}&accept=false`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': getCsrfToken()
+                    [csrfHeader]: csrfToken
                 },
-                body: JSON.stringify({ inviteId: currentInviteId, teamId: currentTeamId })
+                credentials: "include"
             }).then(res => {
                 if (res.ok) {
                     alert('초대를 거절했습니다.');

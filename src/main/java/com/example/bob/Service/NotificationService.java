@@ -69,7 +69,7 @@ public class NotificationService {
                         );
                     }
 
-                    return new NotificationDTO(
+                    NotificationDTO dto = new NotificationDTO(
                             notification.getId(),
                             notification.getMessage(),
                             notification.isRead(),
@@ -79,6 +79,19 @@ public class NotificationService {
                             projectDTO,
                             notification.getLink()
                     );
+
+                    if (notification.getType() == NotificationType.CONTEST_INVITE && notification.getContestTeam() != null) {
+                        dto.setType("CONTEST_INVITE");
+                        dto.setLink(null);
+                        dto.setTeamId(notification.getContestTeam().getId());
+                        dto.setTeamName(notification.getContestTeam().getTeamName());
+                        dto.setContestId(notification.getContestTeam().getContest().getId());
+                    } else {
+                        dto.setType(notification.getType().name()); // PROJECT_INVITE 등 다른 타입
+                    }
+
+                    return dto;
+
                 })
                 .collect(Collectors.toList());
     }

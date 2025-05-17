@@ -57,6 +57,10 @@ public class NotificationController {
             data.put("isRead", dto.isRead());
             data.put("timestamp", dto.getTimestamp());
             data.put("link", dto.getLink());
+            data.put("type", dto.getType());
+            data.put("teamId", dto.getTeamId());
+            data.put("teamName", dto.getTeamName());
+            data.put("contestId", dto.getContestId());
             responseList.add(data);
         }
 
