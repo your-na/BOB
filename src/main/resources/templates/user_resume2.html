@@ -17,9 +17,21 @@
   <div class="modal-content">
     <p class="modal-title"><strong>제출하시겠습니까?</strong></p>
     <p class="modal-desc">제출 후 구직-신청한 구직 내역에서 확인하실 수 있습니다.</p>
+
     <div class="modal-btns">
       <button class="modal-confirm">네</button>
       <button class="modal-cancel">아니오</button>
+      <button onclick="togglePreview()" class="preview-button">이력서 미리보기</button>
+    </div>
+
+    <!-- ✅ 이력서 미리보기 iframe -->
+    <div id="resume-preview-container" style="display: none; margin-top: 20px;">
+      <iframe id="resumePreviewFrame"
+              src="/showresume"
+              width="100%"
+              height="500"
+              style="border: 1px solid #ccc; border-radius: 10px;">
+      </iframe>
     </div>
   </div>
 </div>
