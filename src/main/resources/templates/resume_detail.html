@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
   <meta name="_csrf" th:content="${_csrf.token}" />
@@ -17,8 +17,18 @@
 
     <!-- 수정/삭제 버튼 -->
     <div class="resume-buttons">
-      <button class="delete-btn">지원 취소하기</button>
+      <!-- 일반 사용자에게만 보이게 -->
+      <div sec:authorize="!hasAuthority('COMPANY')">
+        <button class="delete-btn">지원 취소하기</button>
+      </div>
+
+      <!-- 기업 사용자에게만 보이게 -->
+      <div sec:authorize="hasAuthority('COMPANY')">
+        <button class="pass-btn">✅ 합격 처리</button>
+      </div>
     </div>
+
+
 
     <!-- 프로필 정보 -->
     <div class="profile-row">
