@@ -78,6 +78,8 @@ public class ContestTeamService {
         notification.setIsRead(false);
         notification.setTimestamp(LocalDateTime.now());
 
+        notification.setType(NotificationType.CONTEST_INVITE);
+
         notificationRepository.save(notification);
     }
 
@@ -180,6 +182,9 @@ public class ContestTeamService {
                 .collect(Collectors.toList());
     }
 
-
+    public Long getInviteId(Long teamId, UserEntity user) {
+        return contestTeamMemberRepository.findInviteIdByTeamIdAndUserId(teamId, user.getUserId())
+                .orElseThrow(() -> new RuntimeException("초대 정보를 찾을 수 없습니다."));
+    }
 
 }

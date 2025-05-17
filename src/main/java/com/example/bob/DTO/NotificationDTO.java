@@ -1,11 +1,13 @@
 package com.example.bob.DTO;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotificationDTO {
 
     private Long id;  // 알림 ID
@@ -16,6 +18,13 @@ public class NotificationDTO {
     private UserDTO sender;  // 알림을 보낸 사용자 (UserDTO로 정의)
     private ProjectDTO project;  // 알림과 관련된 프로젝트 (ProjectDTO로 정의)
     private String link;  // 알림과 연결된 링크
+
+    private String type;
+
+    private Long teamId;
+    private String teamName;
+    private Long contestId;
+
 
     // 생성자
     public NotificationDTO(Long id, String message, boolean isRead, LocalDateTime timestamp,

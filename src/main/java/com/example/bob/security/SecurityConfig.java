@@ -18,7 +18,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
-// ✅ 아래 import 추가
 import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 
 @Configuration
@@ -44,8 +43,8 @@ public class SecurityConfig {
                         .ignoringRequestMatchers(
                                 "/login", "/signup", "/co_signup", "/profile/update", "/logout",
                                 "/teamrequest", "/teamrequest/accept", "/teamrequest/reject",
-                                "/file/project/submit", "/api/todos/**", "/api/notifications/delete-all","/ws-chat", "/api/user/resumes/upload",
-                                "/api/user/resumes/submit"
+                                "/file/project/submit", "/api/todos/**", "/api/notifications/delete-all", "/api/notifications/mark-as-read/**","/ws-chat", "/api/user/resumes/upload",
+                                "/api/user/resumes/submit", "/contest/team/invite/respond"
                         )
                 )
                 .headers(headers -> headers

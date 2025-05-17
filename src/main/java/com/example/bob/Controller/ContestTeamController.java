@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/contest/team")
@@ -38,6 +40,17 @@ public class ContestTeamController {
             return ResponseEntity.ok("혼자 참가 완료");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("혼자 참가 중 오류: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/api/team/member-id")
+    public ResponseEntity<?> getInviteInfo(@RequestParam Long teamId,
+                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            Long inviteId = contestTeamService.getInviteId(teamId, userDetails.getUserEntity());
+            return ResponseEntity.ok(Map.of("inviteId", inviteId));
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body("초대 정보를 찾을 수 없습니다.");
         }
     }
 
