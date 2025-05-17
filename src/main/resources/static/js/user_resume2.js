@@ -1083,3 +1083,17 @@ window.addEventListener('DOMContentLoaded', () => {
         .catch(err => console.error('양식 불러오기 실패:', err));
 
 });
+
+document.querySelector(".modal-cancel").onclick = () => {
+    document.getElementById("submitModal").style.display = "none";
+};
+
+document.querySelector(".modal-confirm").onclick = () => {
+    alert("이력서가 제출되었습니다!");
+    document.getElementById("submitModal").style.display = "none";
+};
+
+function togglePreview() {
+    const container = document.getElementById("resume-preview-container");
+    container.style.display = (container.style.display === "none") ? "block" : "none";
+}

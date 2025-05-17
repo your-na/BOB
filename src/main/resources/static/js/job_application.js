@@ -13,9 +13,8 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        // ✅ 추가: 탭별 상태 필터링
         const filtered = data.filter(item => {
-            const status = item.status?.toUpperCase();  // 소문자 대비 + null 방지
+            const status = item.status?.toUpperCase();
             switch (type) {
                 case "online": return status === "SUBMITTED";
                 case "other": return status === "ACCEPTED";
@@ -25,14 +24,11 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-
-        // ✅ 필터링 후도 없을 경우 안내
         if (filtered.length === 0) {
             listContainer.innerHTML = "<p style='padding: 20px; color: #888;'>해당 내역이 없습니다.</p>";
             return;
         }
 
-        // ✅ 기존 루프를 filtered로 교체
         filtered.forEach((item, index) => {
             const card = document.createElement("div");
             card.className = "application-card";
@@ -49,7 +45,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 <ul class="dropdown-menu">
                    <li onclick="viewDetail(${item.jobPostId})">지원내역</li>
                    <li onclick="cancelApply(${item.jobPostId})">지원취소</li>
-                    <li onclick="hideItem(${item.id || index + 1})">숨기기</li>
+                   <li onclick="hideItem(${item.id || index + 1})">숨기기</li>
+                   <li onclick="previewResume(${item.resumeId || item.id})">이력서 보기</li>
                 </ul>
             </div>
         `;
@@ -57,12 +54,11 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-
     function fetchApplications() {
         fetch(`/api/applications/me`)
             .then(res => res.json())
             .then(data => {
-                console.log("✅ 받아온 지원 데이터:", data); // 이 줄 추가
+                console.log("✅ 받아온 지원 데이터:", data);
                 window.__applicationData = data;
                 renderList("online", data);
             })
@@ -71,7 +67,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 listContainer.innerHTML = "<p style='color: red;'>데이터를 불러올 수 없습니다.</p>";
             });
     }
-
 
     tabs.forEach(tab => {
         tab.addEventListener("click", () => {
@@ -109,7 +104,6 @@ document.addEventListener("DOMContentLoaded", function () {
         location.href = `/resume/detail?jobPostId=${jobPostId}`;
     };
 
-
     window.cancelApply = function (jobPostId) {
         if (!confirm("정말 지원을 취소하시겠습니까?")) return;
 
@@ -118,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         fetch(`/api/user/resumes/cancel?jobPostId=${jobPostId}`, {
             method: "DELETE",
-            credentials: "include", // 🔐 로그인 인증 유지
+            credentials: "include",
             headers: {
                 [csrfHeader]: csrfToken
             }
@@ -126,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(res => {
                 if (res.ok) {
                     alert("✅ 지원이 취소되었습니다.");
-                    fetchApplications(); // 목록 새로고침
+                    fetchApplications();
                 } else {
                     return res.text().then(msg => {
                         alert("❌ 취소 실패: " + msg);
@@ -139,8 +133,11 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     };
 
-
-
+    // ✅ "이력서 보기" 기능
+    window.previewResume = function (resumeId) {
+        const url = resumeId ? `/showresume?id=${resumeId}` : `/showresume`;
+        window.open(url, "_blank");
+    };
 
     fetchApplications();
 });

@@ -1,0 +1,94 @@
+.resume-wrapper {
+    max-width: 700px;
+    margin: 50px auto;
+    padding: 30px;
+    border: 1px solid #ccc;
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #fff;
+}
+
+/* 제목 스타일 조정 */
+.resume-wrapper h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 30px;
+}
+
+.resume-wrapper h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.resume-wrapper h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+/* 본문 글씨와 조화되도록 */
+.resume-section p,
+.resume-section li {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #666;
+}
+
+.resume-section ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.resume-section ul li::before {
+    content: "-";
+    margin-right: 8px;
+    color: #666;
+}
+
+.resume-section {
+    margin-bottom: 25px;
+}
+
+.profile-box {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start; /* ✅ 세로 기준 상단 정렬로 수정 */
+}
+
+.profile-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.info-text h3 {
+    margin: 0;
+}
+
+.position {
+    color: #00b800;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* 전체 텍스트 기본 색상 회색으로 */
+.resume-wrapper {
+    color: #666666; /* 본문 내용용 연한 회색 */
+}
+
+/* 강조해야 할 제목은 진하게 유지 */
+.resume-wrapper h1,
+.resume-wrapper h2,
+.resume-wrapper h3,
+.resume-wrapper strong {
+    color: #000000; /* 제목은 검정 */
+    font-weight: bold;
+}
+
+/* 포지션(HTML/CSS) 초록 강조 유지 */
+.position {
+    color: #00b800;
+    font-weight: bold;
+}
+

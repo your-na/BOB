@@ -452,4 +452,17 @@ textarea {
     font-size: 14px;              /* 글자 크기 설정 */
 }
 
-
+.preview-button {
+    background: white;
+    border: 2px solid #00b800;
+    color: #00b800;
+    font-weight: bold;
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+.preview-button:hover {
+    background: #00b800;
+    color: white;
+}

@@ -90,7 +90,11 @@ public class TestController {
     @GetMapping("pocontest")
     public String pocontestform() {return "pocontest";}
 
-    //공모전 상세보기
+    //공모전 신청 완료 화면
     @GetMapping("success2")
     public String success2form() {return "success2";}
+
+    //이력서 제출 전 미리보기
+    @GetMapping("showresume")
+    public String showresumeform() {return "showresume";}
 }
