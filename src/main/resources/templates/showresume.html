@@ -8,67 +8,74 @@
 <body>
 
 <div class="resume-wrapper">
+  <!-- ✅ 포트폴리오 게시 미리보기 모달 -->
+  <div id="portfolioModal" class="modal">
+    <div class="modal-content resume-wrapper">
+      <h1 th:text="${resume != null ? resume.title + ' 이력서' : '이력서'}">이력서</h1>
 
-  <h1>@@@ 이력서</h1>
+      <!-- 프로필 정보 -->
+      <section class="resume-section">
+        <h2>내 정보</h2>
+        <div class="profile-box">
+          <img id="profileImage" class="profile-img" th:src="@{'/uploads/' + ${resume.profileImageUrl}}" alt="프로필 사진">
+          <div class="info-text">
+            <p><strong id="userName">이름</strong></p>
+            <p class="skill" id="mainLanguage">기술스택</p>
+            <p><strong>성별:</strong> <span id="sex">-</span></p>
+            <p><strong>생년월일:</strong> <span id="birthday">-</span></p>
+            <p><strong>연락처:</strong> <span id="phone">-</span></p>
+            <p><strong>이메일:</strong> <span id="email">-</span></p>
+            <p><strong>지역:</strong> <span id="region">-</span></p>
+          </div>
+        </div>
+      </section>
 
-  <!-- 내 정보 -->
-  <section class="resume-section">
-    <h2>내 정보</h2>
-    <div class="profile-box">
-      <img class="profile-img" src="/images/sample-profile.jpg" alt="프로필 사진">
-      <div class="info-text">
-        <h3>진유서</h3>
-        <p class="position">HTML/CSS</p>
-        <p>성별: F</p>
-        <p>생년월일: 2004-10-20 (만 20세)</p>
-        <p>전화번호: 010-1020-1020</p>
-        <p>이메일: jeanzforfree@mail.com</p>
-        <p>주소: 경기도</p>
+      <!-- 각 섹션 반복 -->
+      <div th:each="section : ${resume.sections}" class="resume-section">
+        <h2 th:text="${section.title}">섹션 제목</h2>
+
+        <!-- dragItems가 있는 경우 -->
+        <ul th:if="${not #lists.isEmpty(section.dragItems)}">
+          <li th:each="item : ${section.dragItems}" th:text="${item.displayText}">드래그 항목</li>
+        </ul>
+
+        <!-- content만 있는 경우 -->
+        <div th:if="${#lists.isEmpty(section.dragItems) and section.content != null and section.content != ''}">
+          <textarea th:if="${section.title == '자기소개'}" readonly th:text="${section.content}">자기소개</textarea>
+          <p th:if="${section.title != '자기소개'}" th:text="${section.content}"></p>
+        </div>
+
+        <!-- 선택형 태그 -->
+        <div th:if="${section.selectedTags != null and #lists.size(section.selectedTags) > 0}">
+          <span class="tag" th:each="tag : ${section.selectedTags}" th:text="${tag}">태그</span>
+        </div>
+
+        <!-- 학력사항 -->
+        <div th:if="${section.educations != null and #lists.size(section.educations) > 0}">
+          <div th:each="edu : ${section.educations}">
+            <span th:text="|${edu.startYear}.${edu.startMonth} ~ ${edu.endYear}.${edu.endMonth} ${edu.schoolName} ${edu.majorName} ${edu.status}|"></span><br>
+          </div>
+        </div>
+
+        <!-- 사진 첨부 -->
+        <div th:if="${not #lists.isEmpty(section.fileNames) and section.type == '사진 첨부'}">
+          <div class="image-preview" th:each="img : ${section.fileNames}">
+            <img th:src="@{'/uploads/' + ${img}}" alt="첨부 이미지">
+          </div>
+        </div>
+
+        <!-- 파일 첨부 -->
+        <div th:if="${not #lists.isEmpty(section.fileNames) and section.type == '파일 첨부'}" class="attachments">
+          <div class="file-download" th:each="file : ${section.fileNames}">
+            <a th:href="@{'/uploads/' + ${file}}" download>📄 <span th:text="${file}">파일명</span> 다운로드</a>
+          </div>
+        </div>
       </div>
     </div>
-  </section>
-
-  <!-- 학력사항 -->
-  <section class="resume-section">
-    <h2>학력사항</h2>
-    <ul>
-      <li>@@고등학교 졸업 2020.03 ~ 2023.02</li>
-      <li>@@대학교 @@과 재학 2023.03 ~</li>
-    </ul>
-  </section>
-
-  <!-- 희망직무 -->
-  <section class="resume-section">
-    <h2>희망직무</h2>
-    <ul>
-      <li>인턴</li>
-    </ul>
-  </section>
-
-  <!-- 경력사항 -->
-  <section class="resume-section">
-    <h2>경력사항</h2>
-    <ul>
-      <li>@@회사 인턴 6개월 2024.03 ~ 2024.09</li>
-    </ul>
-  </section>
-
-  <!-- 포트폴리오 -->
-  <section class="resume-section">
-    <h2>포트폴리오</h2>
-    <ul>
-      <li>@@공모전 수상</li>
-      <li>@@프로젝트</li>
-    </ul>
-  </section>
-
-  <!-- 자기소개 -->
-  <section class="resume-section">
-    <h2>자기소개</h2>
-    <p>수호캐릭터 쿠스쿠스와 캐릭체인지를 하면 밸러밸런스~</p>
-  </section>
+  </div>
 
 </div>
 
+<script src="/js/showresume.js"></script>
 </body>
 </html>

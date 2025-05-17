@@ -1,10 +1,20 @@
 package com.example.bob.Controller;
 
+import com.example.bob.DTO.ResumeDTO;
+import com.example.bob.DTO.ResumeSectionDTO;
+import com.example.bob.Service.ResumeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
 
 @Controller
 public class TestController {
+
+    @Autowired
+    private ResumeService resumeService;
 
     //기업측 이력서 양식 제작
     @GetMapping("/coresume")
@@ -83,7 +93,7 @@ public class TestController {
     public String portfoliozipform() {return "portfoliozip";}
 
     //포폴모음방 게시하기
-    @GetMapping("portfolioform")
+    @GetMapping("/portfolioform")
     public String pofolform() {return "portfolio_form";}
 
     //공모전 상세보기
@@ -94,7 +104,7 @@ public class TestController {
     @GetMapping("success2")
     public String success2form() {return "success2";}
 
-    //이력서 제출 전 미리보기
-    @GetMapping("showresume")
-    public String showresumeform() {return "showresume";}
+
+
+
 }

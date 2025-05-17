@@ -437,6 +437,39 @@ public class ResumeService {
         return getResumeForJobPost(jobPost.getId(), user);
     }
 
+    public ResumeDTO getPreviewResume() {
+        ResumeDTO dto = new ResumeDTO();
+        dto.setTitle("미리보기 이력서");
+        dto.setUserName("진유서");
+        dto.setUserNick("진진자라");
+        dto.setMainLanguage("HTML/CSS");
+        dto.setBirthday("2004-10-20");
+        dto.setSex("여");
+        dto.setPhone("010-1020-1020");
+        dto.setEmail("jeanzforfree@gmail.com");
+        dto.setAddress("경기도 고양시");
+        dto.setProfileImageUrl("sample-profile.jpg");
+
+        // 학력 섹션 예시
+        ResumeSectionDTO section1 = new ResumeSectionDTO();
+        section1.setTitle("학력사항");
+        section1.setType(null);
+
+        // 포트폴리오 섹션 예시
+        ResumeSectionDTO section2 = new ResumeSectionDTO();
+        section2.setTitle("포트폴리오");
+        section2.setType("A공모전 대상 수상");
+
+        // 자기소개 섹션 예시
+        ResumeSectionDTO section3 = new ResumeSectionDTO();
+        section3.setTitle("자기소개");
+        section3.setComment("수호캐릭터 쿠스쿠스와 캐릭체인지를 하면 밸러밸런스~");
+
+        dto.setSections(List.of(section1, section2, section3));
+        dto.setJobTags(List.of("프론트엔드", "HTML"));
+
+        return dto;
+    }
 
 
 
