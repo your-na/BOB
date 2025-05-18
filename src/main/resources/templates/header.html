@@ -143,7 +143,7 @@
     <div id="hireModal" class="modal" style="display: none;">
         <div class="modal-content">
             <span class="close-btn" onclick="closeHireModal()">&times;</span>
-            <h2>🎉 서류 합격 축하드립니다!</h2>
+            <h2>🎉 합격 축하드립니다!</h2>
             <p id="hire-company" style="font-weight: bold; font-size: 18px;"></p>
             <p id="hire-message">기업의 채용 메시지가 여기에 들어갑니다.</p>
 
@@ -190,7 +190,13 @@
                 notifications.forEach(notification => {
                     let item = document.createElement("li");
                     item.classList.add("notification-item");
-                    item.textContent = notification.message;
+                    // ✅ 채용 알림이면 기업명 기반 동적 메시지, 아니면 원래 메시지
+                    if (notification.type === 'HIRE_NOTICE' && notification.companyName) {
+                        item.textContent = `📩 ${notification.companyName}에서 채용 알림이 도착했어요!`;
+                    } else {
+                        item.textContent = notification.message;
+                    }
+
 
                     item.setAttribute("data-id", notification.id);
                     item.setAttribute("data-project-id", notification.projectId || "");
@@ -229,10 +235,11 @@
                             return;
                         }
 
-                        if (notification.type === 'HIRE') {
-                            openHireModal(currentNotification.companyName, currentNotification.message, currentNotification.detailLink);
+                        if (notification.type === 'HIRE_NOTICE') {
+                            openHireModal(currentNotification.companyName, currentNotification.message, currentNotification.link);
                             return;
                         }
+
 
                         if (projectId && userId && projectId !== "undefined" && userId !== "undefined") {
                             window.location.href = `/teamrequest/${projectId}/${userId}`; // ✅ 올바른 URL 패턴!
@@ -397,7 +404,7 @@
 
         // ✅ 채용 축하 모달 관련
         function openHireModal(companyName, message, detailLink) {
-            document.getElementById('hire-company').textContent = `지원하신 ${companyName}에 최종 채용되셨습니다!`;
+            document.getElementById('hire-company').textContent = `지원하신 ${companyName}에 1차 합격 되셨습니다!`;
             document.getElementById('hire-message').textContent = message || '채용을 축하드립니다!';
             document.getElementById('hire-detail-btn').href = detailLink || '#';
             document.getElementById('hireModal').style.display = 'flex';
