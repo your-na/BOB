@@ -235,10 +235,11 @@
                             return;
                         }
 
-                        if (notification.type === 'HIRE_NOTICE') {
-                            openHireModal(currentNotification.companyName, currentNotification.message, currentNotification.link);
+                        if (currentNotification.type === 'HIRE_NOTICE') {
+                            openHireModal(currentNotification.companyName, currentNotification.message, currentNotification.jobPostId);
                             return;
                         }
+
 
 
                         if (projectId && userId && projectId !== "undefined" && userId !== "undefined") {
@@ -403,12 +404,13 @@
         });
 
         // ✅ 채용 축하 모달 관련
-        function openHireModal(companyName, message, detailLink) {
+        function openHireModal(companyName, message, jobPostId) {
             document.getElementById('hire-company').textContent = `지원하신 ${companyName}에 1차 합격 되셨습니다!`;
             document.getElementById('hire-message').textContent = message || '채용을 축하드립니다!';
-            document.getElementById('hire-detail-btn').href = detailLink || '#';
+            document.getElementById('hire-detail-btn').href = jobPostId ? `/jobindex?id=${jobPostId}` : '#';
             document.getElementById('hireModal').style.display = 'flex';
         }
+
 
         function closeHireModal() {
             document.getElementById('hireModal').style.display = 'none';
