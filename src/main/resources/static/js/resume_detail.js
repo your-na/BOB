@@ -38,57 +38,91 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ✅ 합격 처리 버튼과 모달 로직
+    // ✅ 합격 처리 버튼과 모달 로직 (전체 로그 포함 버전)
     const passBtn = document.querySelector(".pass-btn");
     const passModal = document.getElementById("passModal");
     const closeModalBtn = document.querySelector(".close");
     const submitPassBtn = document.getElementById("submitPassBtn");
+    const resumeId = document.getElementById("resumeId")?.value;
 
     if (passBtn && passModal) {
         passBtn.addEventListener("click", () => {
+            console.log("[클릭] 합격 버튼 클릭됨");
             passModal.style.display = "block";
         });
 
         closeModalBtn?.addEventListener("click", () => {
-            passModal.style.display = "none";
+            console.log("[클릭] 모달 닫기 버튼");
+            if (passModal) {
+                passModal.style.display = "none";
+            }
         });
 
         submitPassBtn?.addEventListener("click", () => {
             const message = document.getElementById("passMessage").value.trim();
+
+            console.log("📦 전송 데이터:", {
+                jobPostId,
+                resumeId,
+                message,
+                csrfToken,
+                csrfHeader
+            });
+
             if (!message) {
                 alert("메시지를 입력해 주세요.");
                 return;
             }
 
-            if (!jobPostId || !csrfToken || !csrfHeader) {
-                alert("필수 정보가 누락되었습니다.");
+            if (!jobPostId || !resumeId || !csrfToken || !csrfHeader) {
+                alert("❌ 필수 정보 누락");
                 return;
             }
 
-            fetch(`/api/job/pass`, {
+            fetch(`/api/applications/job/pass`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     [csrfHeader]: csrfToken
                 },
                 body: JSON.stringify({
-                    jobPostId: jobPostId,
-                    message: message
+                    jobPostId,
+                    resumeId,
+                    message
                 })
             })
                 .then(res => {
+                    console.log("📡 서버 응답 도착 - status:", res.status);
+                    const contentType = res.headers.get("content-type");
+                    console.log("📎 Content-Type:", contentType);
+
                     if (res.ok) {
-                        alert("✅ 합격 처리가 완료되었습니다.");
-                        passModal.style.display = "none";
+                        if (contentType && contentType.includes("application/json")) {
+                            return res.json().then(data => {
+                                console.log("✅ JSON 응답:", data);
+                                alert("✅ " + data.message);
+                                if (passModal) passModal.style.display = "none";
+                            });
+                        } else {
+                            return res.text().then(msg => {
+                                console.log("✅ TEXT 응답:", msg);
+                                alert("✅ " + msg);
+                                if (passModal) passModal.style.display = "none";
+                            });
+                        }
                     } else {
-                        return res.text().then(msg => alert("❌ 실패: " + msg));
+                        return res.text().then(msg => {
+                            console.error("❌ 실패 응답 내용:", msg);
+                            alert("❌ 실패: " + msg);
+                        });
                     }
                 })
                 .catch(err => {
-                    alert("⚠️ 서버 오류");
-                    console.error(err);
+                    console.error("⚠️ 예외 발생 (네트워크 또는 파싱 오류):", err);
+                    alert("⚠️ 서버 오류가 발생했습니다.");
                 });
         });
     }
+
 
 });

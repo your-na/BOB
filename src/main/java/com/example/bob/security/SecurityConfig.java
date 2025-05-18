@@ -44,7 +44,7 @@ public class SecurityConfig {
                                 "/login", "/signup", "/co_signup", "/profile/update", "/logout",
                                 "/teamrequest", "/teamrequest/accept", "/teamrequest/reject",
                                 "/file/project/submit", "/api/todos/**", "/api/notifications/delete-all", "/api/notifications/mark-as-read/**","/ws-chat", "/api/user/resumes/upload",
-                                "/api/user/resumes/submit", "/contest/team/invite/respond"
+                                "/api/user/resumes/submit", "/contest/team/invite/respond","/api/applications/job/pass"
                         )
                 )
                 .headers(headers -> headers
@@ -62,6 +62,7 @@ public class SecurityConfig {
                         .requestMatchers("/comhome", "/comhome/**", "/comcontest").hasAuthority("COMPANY")
                         .requestMatchers("/admin/**", "/sidebar", "/ad_contest", "/adcomcont", "/adcomcont").hasAuthority("ADMIN")
                         .requestMatchers("/contest/create", "/contest/submit").hasAnyAuthority("ADMIN", "COMPANY")
+                        .requestMatchers("/api/applications/job/pass").hasAuthority("COMPANY")// ✅ 기업 사용자만 접근 가능
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

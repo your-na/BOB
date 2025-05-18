@@ -40,6 +40,19 @@ public class ResumeEntity {
         section.setResume(this);
     }
 
+    @Column(name = "is_passed")
+    private Boolean passed = false;
+
+    public Boolean isPassed() {
+        return passed;
+    }
+
+    public void setPassed(Boolean passed) {
+        this.passed = passed;
+    }
+
+
+
     // Getter / Setter
     public Long getId() { return id; }
 

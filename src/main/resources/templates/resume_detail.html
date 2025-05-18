@@ -5,6 +5,7 @@
   <meta name="_csrf" th:content="${_csrf.token}" />
   <meta name="_csrf_header" th:content="${_csrf.headerName}" />
   <input type="hidden" id="jobPostId" th:value="${jobPostId}" />
+  <input type="hidden" id="resumeId" th:value="${resume.id}" />
   <title>이력서 상세보기</title>
   <link rel="stylesheet" href="/css/resume_detail.css">
   <link rel="stylesheet" th:href="@{/css/header.css}">
@@ -46,7 +47,7 @@
         <p>지원자에게 전달할 메시지를 입력해 주세요.</p>
         <textarea id="passMessage" placeholder="예: 귀하의 지원을 축하드립니다!"></textarea>
         <div class="modal-actions">
-          <button onclick="submitPass()">확인</button>
+          <button id="submitPassBtn" type="button">확인</button> <!-- 🔥 핵심 수정 -->
           <button onclick="closePassModal()">취소</button>
         </div>
       </div>

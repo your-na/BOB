@@ -20,10 +20,18 @@ public class NotificationDTO {
     private String link;  // 알림과 연결된 링크
 
     private String type;
-
+     //공모전
     private Long teamId;
     private String teamName;
     private Long contestId;
+
+    // ✅ 채용 알림용 필드
+    private Long jobPostId;
+    private String companyName;
+
+    // ✅ 프로젝트 알림용 필드
+    private Long projectId;
+    private String projectTitle;
 
 
     // 생성자

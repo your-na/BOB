@@ -30,6 +30,11 @@ public class NotificationEntity {
     @JoinColumn(name = "company_id")
     private CompanyEntity company; // 기업 사용자의 알림
 
+    @ManyToOne
+    @JoinColumn(name = "job_post_id")
+    private CoJobPostEntity jobPost;  // 💼 기업 채용 공고 연결
+
+
     private LocalDateTime timestamp;  // 알림 시간
 
     @Enumerated(EnumType.STRING)

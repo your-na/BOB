@@ -58,14 +58,28 @@ public class NotificationController {
             data.put("timestamp", dto.getTimestamp());
             data.put("link", dto.getLink());
             data.put("type", dto.getType());
+
+            // ✅ 공모전
             data.put("teamId", dto.getTeamId());
             data.put("teamName", dto.getTeamName());
             data.put("contestId", dto.getContestId());
+
+            // ✅ 채용
+            data.put("jobPostId", dto.getJobPostId());
+            data.put("companyName", dto.getCompanyName());
+
+            // ✅ 프로젝트
+            if (dto.getProject() != null) {
+                data.put("projectId", dto.getProject().getId());
+                data.put("projectTitle", dto.getProject().getTitle());
+            }
+
             responseList.add(data);
         }
 
         return responseList;
     }
+
 
     // 알림 읽음 상태로 변경
     @PatchMapping("/mark-as-read/{id}")

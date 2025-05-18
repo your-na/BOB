@@ -273,6 +273,7 @@ public class ResumeService {
 
         // 2️⃣ 상위 DTO 생성
         ResumeDetailDTO dto = new ResumeDetailDTO();
+        dto.setId(resume.getId());
         dto.setTitle(resume.getCoResume().getTitle());
 
         // 3️⃣ 희망직무 태그

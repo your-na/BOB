@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.bob.Entity.NotificationType;
+import com.example.bob.Entity.CoJobPostEntity;
+
 
 
 
@@ -41,7 +43,6 @@ public class NotificationService {
         return notificationRepository.countByCompanyAndIsRead(company , false); // 기업이 읽지 않은 알림 수
     }
 
-    // 알림 목록을 가져오는 메서드 (프로젝트/공모전 팀 알림 모두 지원)
     public List<NotificationDTO> getNotifications(UserEntity userEntity, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<NotificationEntity> notificationsPage = notificationRepository.findByUser(userEntity, pageable);
@@ -69,32 +70,63 @@ public class NotificationService {
                         );
                     }
 
+                    UserDTO senderDTO = null;
+                    if (notification.getSender() != null) {
+                        senderDTO = new UserDTO(notification.getSender().getUserId(), notification.getSender().getUserName());
+                    }
+
                     NotificationDTO dto = new NotificationDTO(
                             notification.getId(),
                             notification.getMessage(),
                             notification.isRead(),
                             notification.getTimestamp(),
                             new UserDTO(notification.getUser().getUserId(), notification.getUser().getUserName()),
-                            new UserDTO(notification.getSender().getUserId(), notification.getSender().getUserName()),
+                            senderDTO,
                             projectDTO,
                             notification.getLink()
                     );
 
-                    if (notification.getType() == NotificationType.CONTEST_INVITE && notification.getContestTeam() != null) {
+                    // ✅ HIRE_NOTICE 처리
+                    if (notification.getType() == NotificationType.HIRE_NOTICE && notification.getJobPost() != null) {
+                        dto.setType("HIRE_NOTICE");
+                        dto.setJobPostId(notification.getJobPost().getId());
+                        if (notification.getCompany() != null) {
+                            dto.setCompanyName(notification.getCompany().getCoNick());
+                        }
+                        dto.setLink("/job/detail/" + notification.getJobPost().getId());
+                    }
+
+                    // ✅ PROJECT_INVITE 처리
+                    else if (notification.getType() == NotificationType.PROJECT_INVITE && notification.getProject() != null) {
+                        dto.setType("PROJECT_INVITE");
+                        dto.setProjectId(notification.getProject().getId());
+                        dto.setProjectTitle(notification.getProject().getTitle());
+                        if (notification.getSender() != null) {
+                            dto.setLink("/teamrequest/" + notification.getProject().getId() + "/" + notification.getSender().getUserId());
+                        } else {
+                            dto.setLink("/teamrequest/" + notification.getProject().getId());
+                        }
+                    }
+
+                    // ✅ CONTEST_INVITE 처리
+                    else if (notification.getType() == NotificationType.CONTEST_INVITE && notification.getContestTeam() != null) {
                         dto.setType("CONTEST_INVITE");
-                        dto.setLink(null);
                         dto.setTeamId(notification.getContestTeam().getId());
                         dto.setTeamName(notification.getContestTeam().getTeamName());
                         dto.setContestId(notification.getContestTeam().getContest().getId());
-                    } else {
-                        dto.setType(notification.getType().name()); // PROJECT_INVITE 등 다른 타입
+                        dto.setLink(null);
+                    }
+
+                    // ✅ 기타 타입
+                    else {
+                        dto.setType(notification.getType().name());
                     }
 
                     return dto;
-
                 })
                 .collect(Collectors.toList());
     }
+
 
 
     // 알림을 읽음 상태로 변경하는 메서드
@@ -128,5 +160,21 @@ public class NotificationService {
     @Transactional
     public void deleteAllNotificationsForUser(UserEntity userEntity) {
         notificationRepository.deleteByUser(userEntity);  // 사용자에 해당하는 모든 알림 삭제
+
+
     }
+
+    // ✅ 채용 합격 알림 생성 메서드
+    public void sendHireNotification(UserEntity receiver, CompanyEntity company, String message, CoJobPostEntity jobPost) {
+        NotificationEntity notification = new NotificationEntity();
+        notification.setUser(receiver);               // 👤 알림 받을 사용자
+        notification.setCompany(company);             // 🏢 기업
+        notification.setMessage(message);             // 💬 전달 메시지
+        notification.setTimestamp(LocalDateTime.now());
+        notification.setIsRead(false);                // 읽지 않음 상태
+        notification.setType(NotificationType.HIRE_NOTICE); // 📌 알림 유형
+        notification.setJobPost(jobPost);             // 💼 공고 연결
+        notificationRepository.save(notification);
+    }
+
 }

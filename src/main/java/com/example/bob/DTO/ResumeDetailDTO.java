@@ -20,6 +20,16 @@ public class ResumeDetailDTO {
     private String region;
     private String mainLanguage;
     private String profileImageUrl;
+    private Long id;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
 
 
 
