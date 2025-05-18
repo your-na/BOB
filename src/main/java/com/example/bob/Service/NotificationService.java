@@ -101,12 +101,19 @@ public class NotificationService {
                         dto.setType("PROJECT_INVITE");
                         dto.setProjectId(notification.getProject().getId());
                         dto.setProjectTitle(notification.getProject().getTitle());
+
                         if (notification.getSender() != null) {
-                            dto.setLink("/teamrequest/" + notification.getProject().getId() + "/" + notification.getSender().getUserId());
+                            dto.setSender(new UserDTO(
+                                    notification.getSender().getUserId(),
+                                    notification.getSender().getUserName()
+                            ));
+                            dto.setLink("/teamrequest?projectId=" + notification.getProject().getId()
+                                    + "&userId=" + notification.getSender().getUserId());
                         } else {
-                            dto.setLink("/teamrequest/" + notification.getProject().getId());
+                            dto.setLink("/teamrequest?projectId=" + notification.getProject().getId());
                         }
                     }
+
 
                     // ✅ CONTEST_INVITE 처리
                     else if (notification.getType() == NotificationType.CONTEST_INVITE && notification.getContestTeam() != null) {

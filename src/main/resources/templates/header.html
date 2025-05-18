@@ -234,9 +234,10 @@
                             return;
                         }
 
-                        if (projectId && projectId !== "undefined") {
-                            window.location.href = `/teamrequest?projectId=${projectId}&userId=${userId}`;
-                        } else if (notification.link && notification.link !== "undefined") {
+                        if (projectId && userId && projectId !== "undefined" && userId !== "undefined") {
+                            window.location.href = `/teamrequest/${projectId}/${userId}`; // ✅ 올바른 URL 패턴!
+                        }
+                        else if (notification.link && notification.link !== "undefined") {
                             window.location.href = currentNotification.link;
                         } else {
                             console.error("알림 링크가 설정되지 않았습니다.");

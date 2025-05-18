@@ -512,6 +512,27 @@ public class ProjectController {
         return "teamrequest"; // ✅ teamrequest.html 페이지 렌더링
     }
 
+    // ✅ 쿼리 파라미터 방식 URL도 지원
+    @GetMapping("/teamrequest")
+    public String showTeamRequestPageByQueryParam(@RequestParam Long projectId,
+                                                  @RequestParam Long userId,
+                                                  Model model) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("❌ 해당 사용자를 찾을 수 없습니다."));
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("❌ 해당 프로젝트를 찾을 수 없습니다."));
+
+        model.addAttribute("userNick", user.getUserNick());
+        model.addAttribute("projectTitle", project.getTitle());
+        model.addAttribute("projectId", projectId);
+        model.addAttribute("userId", userId);
+
+        return "teamrequest";
+    }
+
+
+
+
     @GetMapping("/history")
     public String showHistoryPage(@AuthenticationPrincipal UserDetailsImpl userDetails, Model model) {
         Long userId = userDetails.getUserEntity().getUserId(); // 로그인한 유저 ID
