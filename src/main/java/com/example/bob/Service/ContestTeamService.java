@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,18 +55,45 @@ public class ContestTeamService {
             UserEntity member = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("초대할 사용자를 찾을 수 없습니다: " + userId));
 
-            ContestTeamMemberEntity memberEntity = ContestTeamMemberEntity.builder()
+            // 기존 초대 이력 확인
+            Optional<ContestTeamMemberEntity> existing = contestTeamMemberRepository.findByTeamAndUser(team, member);
+
+            if (existing.isPresent()) {
+                ContestTeamMemberEntity existingMember = existing.get();
+
+                if (existingMember.isInvitePending()) {
+                    // 현재 초대 요청 중이면 중복 요청 방지
+                    continue;
+                }
+
+                if (!existingMember.isAccepted()) {
+                    // 거절되었던 초대: 다시 초대 처리
+                    existingMember.setInvitePending(true);
+                    existingMember.setAccepted(false);
+                    contestTeamMemberRepository.save(existingMember);
+
+                    sendInviteNotification(member, leader, team);
+                    continue;
+                }
+
+                // 이미 참여 중이면 무시
+                continue;
+            }
+
+            // 새 초대 생성
+            ContestTeamMemberEntity newMember = ContestTeamMemberEntity.builder()
                     .team(team)
-                    .user(member)
+                    .user(member) 
                     .role("MEMBER")
                     .isAccepted(false)
                     .isInvitePending(true)
                     .build();
-            contestTeamMemberRepository.save(memberEntity);
 
-            // ✅ 알림 전송
+            contestTeamMemberRepository.save(newMember);
+
             sendInviteNotification(member, leader, team);
         }
+
     }
 
 
