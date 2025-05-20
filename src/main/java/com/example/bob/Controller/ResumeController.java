@@ -152,6 +152,7 @@ public class ResumeController {
             dtoSection.setTitle(section.getTitle()); // ✅ request에서 받기
             dtoSection.setType(section.getType());   // ✅ request에서 받기
             dtoSection.setContent(section.getContent());
+            dtoSection.setSelectedTags(section.getSelectedTags());
             sections.add(dtoSection);
         }
 

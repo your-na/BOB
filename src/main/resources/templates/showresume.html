@@ -46,9 +46,10 @@
         </div>
 
         <!-- 선택형 태그 -->
-        <div th:if="${section.selectedTags != null and #lists.size(section.selectedTags) > 0}">
-          <span class="tag" th:each="tag : ${section.selectedTags}" th:text="${tag}">태그</span>
-        </div>
+        <ul th:if="${section.selectedTags != null and #lists.size(section.selectedTags) > 0}">
+          <li th:each="tag : ${section.selectedTags}" th:text="${tag}"></li>
+        </ul>
+
 
         <!-- 학력사항 -->
         <div th:if="${section.educations != null and #lists.size(section.educations) > 0}">
