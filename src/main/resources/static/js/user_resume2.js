@@ -1138,6 +1138,26 @@ function togglePreview() {
             selectedTags
         };
 
+        // ✅ 학력사항 처리 추가
+        const eduList = box.querySelector("#education-list");
+        if (eduList) {
+            const educations = [];
+            const items = eduList.querySelectorAll(".education-item");
+            items.forEach(item => {
+                educations.push({
+                    schoolName: item.querySelector("input[placeholder='학교명']").value,
+                    majorName: item.querySelector("input[placeholder='학과명']").value,
+                    status: item.querySelector(".edu-status").value,
+                    startYear: item.querySelector(".start-year").value,
+                    startMonth: item.querySelector(".start-month").value,
+                    endYear: item.querySelector(".end-year").value,
+                    endMonth: item.querySelector(".end-month").value
+                });
+            });
+
+            section.educations = educations;
+        }
+
         sections.push(section);
     });
 
