@@ -13,6 +13,7 @@ public class ResumeSectionSubmitDTO {
     private String content;             // 사용자가 입력한 텍스트 (서술형, 자기소개 등)
     private List<String> selectedTags;  // 사용자가 선택한 태그들 (선택형일 경우)
     private String uploadedFileName;    // 파일 또는 사진 첨부 섹션일 경우 업로드된 파일명.
+    private List<String> fileNames; // ✅ 여러 개의 파일 저장용
     private List<ResumeDragItemDTO> dragItems;
 
     /**

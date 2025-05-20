@@ -64,11 +64,15 @@
         </div>
 
         <!-- 사진 첨부 -->
-        <div th:if="${not #lists.isEmpty(section.fileNames) and section.type == '사진 첨부'}">
+        <div th:if="${section.fileNames != null and not #lists.isEmpty(section.fileNames) and section.type == '사진 첨부'}">
           <div class="image-preview" th:each="img : ${section.fileNames}">
-            <img th:src="@{'/uploads/' + ${img}}" alt="첨부 이미지">
+            <img th:src="@{|/uploads/${img}|}"
+                 th:alt="${img}"
+                 style="max-width: 100%; max-height: 300px; object-fit: contain; display: block; margin-top: 8px;">
           </div>
         </div>
+
+
 
         <!-- 파일 첨부 -->
         <div th:if="${not #lists.isEmpty(section.fileNames) and section.type == '파일 첨부'}" class="attachments">

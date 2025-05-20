@@ -149,12 +149,22 @@ public class ResumeController {
         List<ResumeSectionDTO> sections = new ArrayList<>();
         for (ResumeSectionSubmitDTO section : request.getSections()) {
             ResumeSectionDTO dtoSection = new ResumeSectionDTO();
-            dtoSection.setTitle(section.getTitle()); // ✅ request에서 받기
-            dtoSection.setType(section.getType());   // ✅ request에서 받기
+            dtoSection.setTitle(section.getTitle());
+            dtoSection.setType(section.getType());
             dtoSection.setContent(section.getContent());
             dtoSection.setEducations(section.getEducations());
             dtoSection.setSelectedTags(section.getSelectedTags());
-            dtoSection.setDragItems(section.getDragItems()); // ✅ 이 줄이 있어야 해요!
+            dtoSection.setDragItems(section.getDragItems());
+
+
+            // ✅ 핵심: uploadedFileName이 있고, 기존 fileNames가 null 또는 비어있으면 대체해줌
+            if ((section.getFileNames() == null || section.getFileNames().isEmpty()) &&
+                    section.getUploadedFileName() != null && !section.getUploadedFileName().isEmpty()) {
+                dtoSection.setFileNames(List.of(section.getUploadedFileName()));
+            } else {
+                dtoSection.setFileNames(section.getFileNames());
+            }
+
             sections.add(dtoSection);
         }
 

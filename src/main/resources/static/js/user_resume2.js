@@ -1175,6 +1175,14 @@ function togglePreview() {
             });
         }
 
+        // 📌 사진/파일 첨부 섹션의 업로드 파일명 수집
+        const fileInput = box.querySelector("input[type=file]");
+        if (fileInput && fileInput.files.length > 0) {
+            const fileName = fileInput.files[0].name;
+            section.fileNames = [fileName];  // ✅ 서버에서 fileNames로 받도록
+        }
+
+
         sections.push(section);
     });
 
