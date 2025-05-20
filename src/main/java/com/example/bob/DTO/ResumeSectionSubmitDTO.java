@@ -21,5 +21,12 @@ public class ResumeSectionSubmitDTO {
      */
     private List<EducationDTO> educations;
 
+    private String title;  // 섹션 제목 (예: 자기소개, 희망직무 등)
+    private String type;   // 섹션 유형 (예: 서술형, 선택형 등)
+
+
+
+
+
 
 }

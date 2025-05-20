@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.example.bob.security.CompanyDetailsImpl;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class ResumeViewController {
@@ -70,12 +71,15 @@ public class ResumeViewController {
 
 
     @GetMapping("/showresume")
-    public String showResume(Model model) {
-        ResumeDTO resume = resumeService.getPreviewResume();
-
+    public String showResume(HttpSession session, Model model) {
+        ResumeDTO resume = resumeService.getPreviewResume(session);
+        if (resume == null) {
+            return "redirect:/error";
+        }
         model.addAttribute("resume", resume);
-
         return "showresume";
     }
+
+
 
 }

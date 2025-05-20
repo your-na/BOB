@@ -1,6 +1,5 @@
 package com.example.bob.Controller;
 
-import ch.qos.logback.core.model.Model;
 import com.example.bob.DTO.*;
 import com.example.bob.Service.ResumeService;
 import com.example.bob.Entity.UserEntity;
@@ -18,6 +17,8 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.util.UUID;
+import jakarta.servlet.http.HttpSession;
+
 
 
 @RestController
@@ -138,6 +139,28 @@ public class ResumeController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자만 취소할 수 있습니다.");
     }
+
+    // ✅ 미리보기
+    @PostMapping("/preview")
+    public ResponseEntity<String> previewResume(@RequestBody ResumeSubmitRequestDTO request, HttpSession session) {
+        ResumeDTO dto = new ResumeDTO();
+        dto.setTitle("이력서 미리보기");
+
+        List<ResumeSectionDTO> sections = new ArrayList<>();
+        for (ResumeSectionSubmitDTO section : request.getSections()) {
+            ResumeSectionDTO dtoSection = new ResumeSectionDTO();
+            dtoSection.setTitle(section.getTitle()); // ✅ request에서 받기
+            dtoSection.setType(section.getType());   // ✅ request에서 받기
+            dtoSection.setContent(section.getContent());
+            sections.add(dtoSection);
+        }
+
+        dto.setSections(sections);
+        session.setAttribute("previewResume", dto);
+        return ResponseEntity.ok("미리보기 저장 완료");
+    }
+
+
 
 
 }
