@@ -498,6 +498,8 @@ function renderEducationSection(section, number) {
     sectionBox.appendChild(addBtn);
 
     sectionBox.dataset.coSectionId = section.id;
+    sectionBox.dataset.title = section.title;
+    sectionBox.dataset.type = section.type;
 
     return sectionBox;
 }
@@ -536,6 +538,8 @@ function renderJobSection(section, number) {
     sectionBox.appendChild(tagList);
 
     sectionBox.dataset.coSectionId = section.id;
+    sectionBox.dataset.title = section.title;
+    sectionBox.dataset.type = section.type;
 
     return sectionBox;
 }
@@ -574,6 +578,8 @@ function renderCareerSection(section, number) {
     sectionBox.appendChild(uploadBox);
 
     sectionBox.dataset.coSectionId = section.id;
+    sectionBox.dataset.title = section.title;
+    sectionBox.dataset.type = section.type;
 
     return sectionBox;
 }
@@ -611,6 +617,8 @@ function renderPortfolioSection(section, number) {
     sectionBox.appendChild(uploadBox);
 
     sectionBox.dataset.coSectionId = section.id;
+    sectionBox.dataset.title = section.title;
+    sectionBox.dataset.type = section.type;
 
     return sectionBox;
 }
@@ -664,6 +672,8 @@ function renderSelfIntroSection(section, number) {
     sectionBox.appendChild(charCount);
 
     sectionBox.dataset.coSectionId = section.id;
+    sectionBox.dataset.title = section.title;
+    sectionBox.dataset.type = section.type;
 
     return sectionBox;
 }
@@ -703,6 +713,8 @@ function renderSelectSection(section, number) {
     sectionBox.appendChild(tagList);
 
     sectionBox.dataset.coSectionId = section.id;
+    sectionBox.dataset.title = section.title;
+    sectionBox.dataset.type = section.type;
 
     return sectionBox;
 }
@@ -744,6 +756,8 @@ function renderDescriptiveSection(section, number) {
     sectionBox.appendChild(textarea);
 
     sectionBox.dataset.coSectionId = section.id;
+    sectionBox.dataset.title = section.title;
+    sectionBox.dataset.type = section.type;
 
     return sectionBox;
 }
@@ -813,6 +827,8 @@ function renderPhotoSection(section, number) {
     sectionBox.appendChild(wrapper);
 
     sectionBox.dataset.coSectionId = section.id;
+    sectionBox.dataset.title = section.title;
+    sectionBox.dataset.type = section.type;
 
     return sectionBox;
 }
@@ -871,6 +887,8 @@ function renderFileSection(section, number) {
     sectionBox.appendChild(uploadWrapper);
 
     sectionBox.dataset.coSectionId = section.id;
+    sectionBox.dataset.title = section.title;
+    sectionBox.dataset.type = section.type;
 
 
     return sectionBox;
@@ -1093,7 +1111,103 @@ document.querySelector(".modal-confirm").onclick = () => {
     document.getElementById("submitModal").style.display = "none";
 };
 
+// ✅ 미리보기 버튼 클릭 시 → 서버에 자기소개 저장 요청
 function togglePreview() {
-    const container = document.getElementById("resume-preview-container");
-    container.style.display = (container.style.display === "none") ? "block" : "none";
+    const urlParams = new URLSearchParams(window.location.search);
+    const coResumeId = urlParams.get("id");
+
+    const sectionBoxes = document.querySelectorAll(".section-box[data-co-section-id]");
+    const sections = [];
+
+    sectionBoxes.forEach(box => {
+        const coSectionId = Number(box.dataset.coSectionId);
+        const title = box.dataset.title || "제목 없음";     // ✅ title 속성
+        const type = box.dataset.type || "서술형";          // ✅ type 속성
+
+        const textarea = box.querySelector("textarea");
+        const content = textarea ? textarea.value.trim() : "";
+
+        const selectedTags = [...box.querySelectorAll("input[type=checkbox]:checked, input[type=radio]:checked")]
+            .map(input => input.parentElement.textContent.trim());
+
+        const section = {
+            coSectionId,
+            title,        // ✅ 추가
+            type,         // ✅ 추가
+            content,
+            selectedTags
+        };
+
+        // ✅ 학력사항 처리 추가
+        const eduList = box.querySelector("#education-list");
+        if (eduList) {
+            const educations = [];
+            const items = eduList.querySelectorAll(".education-item");
+            items.forEach(item => {
+                educations.push({
+                    schoolName: item.querySelector("input[placeholder='학교명']").value,
+                    majorName: item.querySelector("input[placeholder='학과명']").value,
+                    status: item.querySelector(".edu-status").value,
+                    startYear: item.querySelector(".start-year").value,
+                    startMonth: item.querySelector(".start-month").value,
+                    endYear: item.querySelector(".end-year").value,
+                    endMonth: item.querySelector(".end-month").value
+                });
+            });
+
+            section.educations = educations;
+        }
+
+        // ✅ 드래그 항목 처리 → 꼭 여기에 넣어야 합니다!
+        const draggedDivs = box.querySelectorAll(".uploaded-item");
+        if (draggedDivs.length > 0) {
+            section.dragItems = [...draggedDivs].map(div => {
+                const rawId = div.dataset.id;
+                const referenceId = rawId && !isNaN(Number(rawId)) ? Number(rawId) : null;
+
+                return {
+                    coSectionId,
+                    itemType: div.dataset.type || "PROJECT",
+                    referenceId: referenceId,
+                    displayText: div.textContent.trim(),
+                    filePath: div.dataset.file || null
+                };
+            });
+        }
+
+        // 📌 사진/파일 첨부 섹션의 업로드 파일명 수집
+        const fileInput = box.querySelector("input[type=file]");
+        if (fileInput && fileInput.files.length > 0) {
+            const fileName = fileInput.files[0].name;
+            section.fileNames = [fileName];  // ✅ 서버에서 fileNames로 받도록
+        }
+
+
+        sections.push(section);
+    });
+
+
+
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+    fetch("/api/user/resumes/preview", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            [csrfHeader]: csrfToken
+        },
+        body: JSON.stringify({ coResumeId: Number(coResumeId), sections }),
+        credentials: "include"
+    }).then(() => {
+        const container = document.getElementById("resume-preview-container");
+        container.style.display = "block";
+        document.getElementById("resumePreviewFrame").src = "/showresume";
+    });
 }
+
+
+
+
+
+
