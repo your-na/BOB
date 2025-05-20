@@ -154,6 +154,7 @@ public class ResumeController {
             dtoSection.setContent(section.getContent());
             dtoSection.setEducations(section.getEducations());
             dtoSection.setSelectedTags(section.getSelectedTags());
+            dtoSection.setDragItems(section.getDragItems()); // ✅ 이 줄이 있어야 해요!
             sections.add(dtoSection);
         }
 

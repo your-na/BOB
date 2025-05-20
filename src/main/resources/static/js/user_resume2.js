@@ -1158,8 +1158,27 @@ function togglePreview() {
             section.educations = educations;
         }
 
+        // ✅ 드래그 항목 처리 → 꼭 여기에 넣어야 합니다!
+        const draggedDivs = box.querySelectorAll(".uploaded-item");
+        if (draggedDivs.length > 0) {
+            section.dragItems = [...draggedDivs].map(div => {
+                const rawId = div.dataset.id;
+                const referenceId = rawId && !isNaN(Number(rawId)) ? Number(rawId) : null;
+
+                return {
+                    coSectionId,
+                    itemType: div.dataset.type || "PROJECT",
+                    referenceId: referenceId,
+                    displayText: div.textContent.trim(),
+                    filePath: div.dataset.file || null
+                };
+            });
+        }
+
         sections.push(section);
     });
+
+
 
     const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');

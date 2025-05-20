@@ -34,16 +34,21 @@
       <div th:each="section : ${resume.sections}" class="resume-section">
         <h2 th:text="${section.title}">섹션 제목</h2>
 
-        <!-- dragItems가 있는 경우 -->
-        <ul th:if="${not #lists.isEmpty(section.dragItems)}">
-          <li th:each="item : ${section.dragItems}" th:text="${item.displayText}">드래그 항목</li>
-        </ul>
-
-        <!-- content만 있는 경우 -->
-        <div th:if="${#lists.isEmpty(section.dragItems) and section.content != null and section.content != ''}">
+        <!-- content 먼저 표시 -->
+        <div th:if="${section.content != null and section.content != ''}">
           <textarea th:if="${section.title == '자기소개'}" readonly th:text="${section.content}">자기소개</textarea>
           <p th:if="${section.title != '자기소개'}" th:text="${section.content}"></p>
         </div>
+
+        <!-- dragItems 아래에 표시 -->
+        <ul th:if="${not #lists.isEmpty(section.dragItems)}">
+          <li th:each="item : ${section.dragItems}">
+            <span th:text="${item.displayText}">드래그 항목</span>
+            <a th:if="${item.filePath != null}" th:href="@{'/uploads/' + ${item.filePath}}" target="_blank">[파일 보기]</a>
+          </li>
+        </ul>
+
+
 
         <!-- 선택형 태그 -->
         <ul th:if="${section.selectedTags != null and #lists.size(section.selectedTags) > 0}">
