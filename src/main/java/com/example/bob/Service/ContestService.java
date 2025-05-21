@@ -4,8 +4,10 @@ import com.example.bob.DTO.ContestDTO;
 import com.example.bob.Entity.ContestEntity;
 import com.example.bob.Entity.ContestHistoryEntity;
 import com.example.bob.Entity.ContestTeamEntity;
+import com.example.bob.Entity.UserEntity;
 import com.example.bob.Repository.ContestHistoryRepository;
 import com.example.bob.Repository.ContestRepository;
+import com.example.bob.Repository.ContestTeamMemberRepository;
 import com.example.bob.Repository.ContestTeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -13,7 +15,10 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.access.AccessDeniedException;
+
 
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -22,7 +27,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -33,7 +40,7 @@ public class ContestService {
     private final ContestRepository contestRepository;
     private final ContestHistoryRepository contestHistoryRepository;
     private final ContestTeamRepository contestTeamRepository;
-
+    private final ContestTeamMemberRepository contestTeamMemberRepository;
 
     // 공모전 저장
     public ContestEntity save(ContestEntity contest) {
@@ -169,5 +176,42 @@ public class ContestService {
         contestTeamRepository.save(team);
     }
 
+    // ✅ 공모전 팀 홈 데이터 조회
+    public Map<String, Object> getContestTeamHomeData(Long teamId, UserEntity loginUser) {
+        ContestTeamEntity team = contestTeamRepository.findById(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("공모전 팀을 찾을 수 없습니다."));
+
+        ContestEntity contest = team.getContest();
+        String ownerNick = team.getCreatedBy();
+        String loginNick = loginUser.getUserNick();
+
+        List<String> teamMembers = team.getMembers().stream()
+                .map(m -> m.getUser().getUserNick())
+                .filter(nick -> !nick.equals(ownerNick))
+                .collect(Collectors.toList());
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("project", contest);         // 공모전 기본 정보 (제목 등 출력용)
+        result.put("team", team);               // 공모전 팀 정보 (공지사항, 팀명 등)
+        result.put("ownerNick", ownerNick);     // 팀장 닉네임
+        result.put("loginNick", loginNick);     // 현재 사용자 닉네임
+        result.put("teamMembers", teamMembers); // 팀원 목록
+
+        return result;
+    }
+
+    // ✅ 공모전 팀 공지사항 수정
+    @Transactional
+    public void updateTeamNotice(Long teamId, String content, UserEntity loginUser) {
+        ContestTeamEntity team = contestTeamRepository.findById(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("공모전 팀을 찾을 수 없습니다."));
+
+        if (!team.getCreatedBy().equals(loginUser.getUserNick())) {
+            throw new AccessDeniedException("공지 수정 권한이 없습니다.");
+        }
+
+        team.setNotice(content);
+        contestTeamRepository.save(team);
+    }
 
 }
