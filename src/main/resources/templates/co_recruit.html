@@ -24,23 +24,20 @@
       </ul>
     </div>
   </div>
-
   <!-- 구인 내역 목록 -->
   <div class="history-list">
-    <div class="history-card">
-      <h3>백엔드 개발자 모집</h3>
-      <p class="date">2025.04.20</p>
-      <p class="selected">채용된 인재: <strong>김지원</strong></p>
-      <a href="/resume/view/1" class="view-resume">이력서 보기</a>
-    </div>
-
-    <div class="history-card">
-      <h3>프론트 디자이너 채용</h3>
-      <p class="date">2025.03.11</p>
-      <p class="selected">채용된 인재: <strong>박유정</strong></p>
-      <a href="/resume/view/2" class="view-resume">이력서 보기</a>
+    <div class="history-card" th:each="item : ${acceptedApplications}">
+      <h3 th:text="${item.jobPost.title}">공고 제목</h3>
+      <p class="date" th:text="${#dates.format(item.acceptedAt, 'yyyy.MM.dd')}">날짜</p>
+      <p class="selected">
+        채용된 인재: <strong th:text="${item.user.userName}">이름</strong>
+      </p>
+      <a th:href="@{'/resume/detail?jobPostId=' + ${item.jobPost.id} + '&resumeId=' + ${item.resume.id}}"
+         class="view-resume">이력서 보기</a>
     </div>
   </div>
+
+
 </div>
 </body>
 </html>

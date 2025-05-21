@@ -35,6 +35,10 @@ public class JobApplicationEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date appliedAt;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date acceptedAt; // ✅ 합격 처리된 시간
+
+
     // 상태 (지원완료, 합격, 불합격, 숨김 등)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

@@ -16,6 +16,8 @@ import com.example.bob.Repository.ResumeRepository;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Date;
+
 
 @Service
 @RequiredArgsConstructor
@@ -89,6 +91,7 @@ public class JobApplicationService {
 
         // 🔄 상태 변경 → 합격
         application.setStatus(JobApplicationStatus.ACCEPTED);
+        application.setAcceptedAt(new Date());
         jobApplicationRepository.save(application);
         System.out.println("✅ 상태 저장 완료: ACCEPTED");
 

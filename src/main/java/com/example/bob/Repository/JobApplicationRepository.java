@@ -62,6 +62,11 @@
 """)
         List<JobApplicationEntity> findTop3RecentApplicants(@Param("companyId") Long companyId, Pageable pageable);
 
+        // ✅ 특정 기업의 합격된 지원자 목록 조회
+        @Query("SELECT j FROM JobApplicationEntity j WHERE j.jobPost.company.companyId = :companyId AND j.status = 'ACCEPTED'")
+        List<JobApplicationEntity> findAcceptedApplicationsByCompany(@Param("companyId") Long companyId);
+
+
 
 
 
