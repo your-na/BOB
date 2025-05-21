@@ -70,4 +70,10 @@ public class DashboardService {
         return coJobPostRepository.findTop3RecentPostsByCompany(companyId, pageable);
     }
 
+    // ✅ 특정 기업의 합격된 지원자 정보 반환
+    public List<JobApplicationEntity> getAcceptedApplicants(Long companyId) {
+        return jobApplicationRepository.findAcceptedApplicationsByCompany(companyId);
+    }
+
+
 }
