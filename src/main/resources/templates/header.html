@@ -162,151 +162,173 @@
             return { header, token };
         }
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const notificationIcon = document.getElementById("notification-icon");
-            const notificationBox = document.getElementById("notification-box");
-            const closeNotification = document.getElementById("close-notification");
-            const notificationList = document.getElementById("notification-list");
-            const notificationBadge = document.getElementById("notification-badge");
-            const clearAllButton = document.getElementById("clear-all");
+        function deleteNotification(notificationId) {
+            const { header: csrfHeader, token: csrfToken } = getCsrf();
 
-            fetchNotifications();
+            fetch(`/api/notifications/delete/${notificationId}`, {
+                method: 'DELETE',
+                headers: {
+                    [csrfHeader]: csrfToken
+                },
+                credentials: 'include'
+            }).then(() => {
+                fetchNotifications(); // 목록 새로고침
+            }).catch(err => {
+                console.error("알림 삭제 실패:", err);
+            });
+        }
 
-            function renderNotifications(notifications) {
-                notificationList.innerHTML = "";
+        function fetchNotifications() {
+            fetch("/api/notifications/count")
+                .then(response => response.json())
+                .then(data => {
+                    const notificationCount = data.notificationsCount;
 
-                if (!Array.isArray(notifications)) {
-                    console.error("알림 목록 데이터가 배열이 아닙니다:", notifications);
-                    notificationList.innerHTML = "<li class='notification-item'>알림 목록을 불러올 수 없습니다.</li>";
-                    return;
-                }
-
-                if (notifications.length === 0) {
-                    notificationList.innerHTML = "<li class='notification-item'>알림이 없습니다.</li>";
-                    notificationBadge.style.display = "none";
-                    return;
-                }
-
-                notifications.forEach(notification => {
-                    let item = document.createElement("li");
-                    item.classList.add("notification-item");
-                    // ✅ 채용 알림이면 기업명 기반 동적 메시지, 아니면 원래 메시지
-                    if (notification.type === 'HIRE_NOTICE' && notification.companyName) {
-                        item.textContent = `📩 ${notification.companyName}에서 채용 알림이 도착했어요!`;
+                    if (notificationCount > 0) {
+                        notificationBadge.style.display = "flex";
+                        notificationBadge.textContent = notificationCount;
                     } else {
-                        item.textContent = notification.message;
+                        notificationBadge.style.display = "none";
+                    }
+                })
+                .catch(error => {
+                    console.error("알림 수 가져오기 실패", error);
+                });
+
+            fetch("/api/notifications/list?page=0&size=10")
+                .then(response => response.json())
+                .then(notifications => {
+                    renderNotifications(notifications);
+                })
+                .catch(error => {
+                    console.error("알림 목록 가져오기 실패", error);
+                });
+        }
+
+        let notificationBadge;
+        let notificationList;
+        let notificationIcon;
+
+        function renderNotifications(notifications) {
+            notificationList.innerHTML = "";
+
+            if (!Array.isArray(notifications)) {
+                console.error("알림 목록 데이터가 배열이 아닙니다:", notifications);
+                notificationList.innerHTML = "<li class='notification-item'>알림 목록을 불러올 수 없습니다.</li>";
+                return;
+            }
+
+            if (notifications.length === 0) {
+                notificationList.innerHTML = "<li class='notification-item'>알림이 없습니다.</li>";
+                notificationBadge.style.display = "none";
+                return;
+            }
+
+            notifications.forEach(notification => {
+                let item = document.createElement("li");
+                item.classList.add("notification-item");
+                // ✅ 채용 알림이면 기업명 기반 동적 메시지, 아니면 원래 메시지
+                if (notification.type === 'HIRE_NOTICE' && notification.companyName) {
+                    item.textContent = `📩 ${notification.companyName}에서 채용 알림이 도착했어요!`;
+                } else {
+                    item.textContent = notification.message;
+                }
+
+
+                item.setAttribute("data-id", notification.id);
+                item.setAttribute("data-project-id", notification.projectId || "");
+                item.setAttribute("data-user-id", notification.userId || "");
+
+                const currentNotification = { ...notification };
+
+                item.onclick = function (event) {
+                    const notificationId = this.getAttribute("data-id");
+                    const projectId = this.getAttribute("data-project-id");
+                    const userId = this.getAttribute("data-user-id");
+                    const contestId = currentNotification.contestId;
+
+                    markAsRead(notificationId);
+
+                    console.log("클릭된 알림:", currentNotification);
+                    console.log("타입:", currentNotification.type);
+
+                    if (currentNotification.type === 'CONTEST_INVITE') {
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        const teamId = currentNotification.teamId;
+                        const teamName = currentNotification.teamName;
+
+                        fetch(`/contest/team/api/team/member-id?teamId=${teamId}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                const inviteId = data.inviteId;
+                                openInviteModal(inviteId, teamName, teamId, contestId);
+                            })
+                            .catch(err => {
+                                console.error("초대 정보 조회 실패:", err);
+                                alert("초대 정보를 불러올 수 없습니다.");
+                            });
+
+                        return;
+                    }
+
+                    if (currentNotification.type === 'HIRE_NOTICE') {
+                        openHireModal(currentNotification.companyName, currentNotification.message, currentNotification.jobPostId);
+                        return;
                     }
 
 
-                    item.setAttribute("data-id", notification.id);
-                    item.setAttribute("data-project-id", notification.projectId || "");
-                    item.setAttribute("data-user-id", notification.userId || "");
 
-                    const currentNotification = { ...notification };
+                    if (projectId && userId && projectId !== "undefined" && userId !== "undefined") {
+                        window.location.href = `/teamrequest/${projectId}/${userId}`; // ✅ 올바른 URL 패턴!
+                    }
+                    else if (notification.link && notification.link !== "undefined") {
+                        window.location.href = currentNotification.link;
+                    } else {
+                        console.error("알림 링크가 설정되지 않았습니다.");
+                    }
 
-                    item.onclick = function (event) {
-                        const notificationId = this.getAttribute("data-id");
-                        const projectId = this.getAttribute("data-project-id");
-                        const userId = this.getAttribute("data-user-id");
+                };
 
-                        markAsRead(notificationId);
+                notificationList.appendChild(item);
+            });
 
-                        console.log("클릭된 알림:", currentNotification);
-                        console.log("타입:", currentNotification.type);
+            notificationBadge.style.display = "flex";
+            notificationBadge.textContent = notifications.length;
+        }
 
-                        if (currentNotification.type === 'CONTEST_INVITE') {
-                            event.preventDefault();
-                            event.stopPropagation();
+        function markAsRead(notificationId) {
+            const { header: csrfHeader, token: csrfToken } = getCsrf();
 
-                            const teamId = currentNotification.teamId;
-                            const teamName = currentNotification.teamName;
-
-                            fetch(`/contest/team/api/team/member-id?teamId=${teamId}`)
-                                .then(res => res.json())
-                                .then(data => {
-                                    const inviteId = data.inviteId;
-                                    openInviteModal(inviteId, teamName, teamId);
-                                })
-                                .catch(err => {
-                                    console.error("초대 정보 조회 실패:", err);
-                                    alert("초대 정보를 불러올 수 없습니다.");
-                                });
-
-                            return;
-                        }
-
-                        if (currentNotification.type === 'HIRE_NOTICE') {
-                            openHireModal(currentNotification.companyName, currentNotification.message, currentNotification.jobPostId);
-                            return;
-                        }
-
-
-
-                        if (projectId && userId && projectId !== "undefined" && userId !== "undefined") {
-                            window.location.href = `/teamrequest/${projectId}/${userId}`; // ✅ 올바른 URL 패턴!
-                        }
-                        else if (notification.link && notification.link !== "undefined") {
-                            window.location.href = currentNotification.link;
-                        } else {
-                            console.error("알림 링크가 설정되지 않았습니다.");
-                        }
-
-                    };
-
-                    notificationList.appendChild(item);
-                });
-
-                notificationBadge.style.display = "flex";
-                notificationBadge.textContent = notifications.length;
-            }
-
-            function fetchNotifications() {
-                fetch("/api/notifications/count")
-                    .then(response => response.json())
-                    .then(data => {
-                        const notificationCount = data.notificationCount;
-
-                        if (notificationCount > 0) {
-                            notificationBadge.style.display = "flex";
-                            notificationBadge.textContent = notificationCount;
-                        } else {
-                            notificationBadge.style.display = "none";
-                        }
-                    })
-                    .catch(error => {
-                        console.error("알림 수 가져오기 실패", error);
-                    });
-
-                fetch("/api/notifications/list?page=0&size=10")
-                    .then(response => response.json())
-                    .then(notifications => {
-                        renderNotifications(notifications);
-                    })
-                    .catch(error => {
-                        console.error("알림 목록 가져오기 실패", error);
-                    });
-            }
-
-            function markAsRead(notificationId) {
-                const { header: csrfHeader, token: csrfToken } = getCsrf();
-
-                fetch(`/api/notifications/mark-as-read/${notificationId}`, {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                        [csrfHeader]: csrfToken
-                    },
-                    credentials: "include"
+            fetch(`/api/notifications/mark-as-read/${notificationId}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    [csrfHeader]: csrfToken
+                },
+                credentials: "include"
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error(`서버 오류: ${response.status}`);
+                    return response.text();
                 })
-                    .then(response => {
-                        if (!response.ok) throw new Error(`서버 오류: ${response.status}`);
-                        return response.text();
-                    })
-                    .then(text => {
-                        fetchNotifications();
-                    })
-                    .catch(error => console.error("알림 상태 업데이트 실패", error));
-            }
+                .then(text => {
+                    fetchNotifications();
+                })
+                .catch(error => console.error("알림 상태 업데이트 실패", error));
+        }
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            notificationIcon = document.getElementById("notification-icon");
+            const notificationBox = document.getElementById("notification-box");
+            const closeNotification = document.getElementById("close-notification");
+            notificationList = document.getElementById("notification-list");
+            notificationBadge = document.getElementById("notification-badge");
+            const clearAllButton = document.getElementById("clear-all");
+
+            fetchNotifications();
 
             notificationIcon.addEventListener("click", function () {
                 notificationBox.style.display = (notificationBox.style.display === "none" || notificationBox.style.display === "") ? "flex" : "none";
@@ -341,6 +363,46 @@
                         notificationBadge.style.display = "none";
                     });
             });
+
+            document.getElementById('accept-btn').addEventListener('click', () => {
+                const { header: csrfHeader, token: csrfToken } = getCsrf();
+
+                fetch(`/contest/team/invite/respond?teamId=${currentTeamId}&accept=true`, {
+                    method: 'POST',
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    },
+                    credentials: "include"
+                }).then(res => {
+                    if (res.ok) {
+                        alert('초대를 수락했습니다.');
+                        closeInviteModal();
+                        deleteNotification(currentInviteId);
+                    } else {
+                        alert('수락 실패');
+                    }
+                });
+            });
+
+            document.getElementById('reject-btn').addEventListener('click', () => {
+                const { header: csrfHeader, token: csrfToken } = getCsrf();
+
+                fetch(`/contest/team/invite/respond?teamId=${currentTeamId}&accept=false`, {
+                    method: 'POST',
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    },
+                    credentials: "include"
+                }).then(res => {
+                    if (res.ok) {
+                        alert('초대를 거절했습니다.');
+                        closeInviteModal();
+                        deleteNotification(currentInviteId);
+                    } else {
+                        alert('거절 실패');
+                    }
+                });
+            });
         });
 
         function openChatWindow() {
@@ -351,12 +413,18 @@
         let currentInviteId = null;
         let currentTeamId = null;
 
-        function openInviteModal(inviteId, teamName, teamId) {
+        function openInviteModal(inviteId, teamName, teamId, contestId) {
             currentInviteId = inviteId;
             currentTeamId = teamId;
 
             document.getElementById('invite-text').textContent =
                 `'${teamName}' 팀에 초대되었습니다. 수락하시겠습니까?`;
+
+            const viewBtn = document.getElementById('view-contest-btn');
+            viewBtn.onclick = function () {
+                window.location.href = `/contest/${contestId}`;
+            };
+
             document.getElementById('inviteDecisionModal').style.display = 'flex';
         }
 
@@ -364,44 +432,7 @@
             document.getElementById('inviteDecisionModal').style.display = 'none';
         }
 
-        document.getElementById('accept-btn').addEventListener('click', () => {
-            const { header: csrfHeader, token: csrfToken } = getCsrf();
 
-            fetch(`/contest/team/invite/respond?teamId=${currentTeamId}&accept=true`, {
-                method: 'POST',
-                headers: {
-                    [csrfHeader]: csrfToken
-                },
-                credentials: "include"
-            }).then(res => {
-                if (res.ok) {
-                    alert('초대를 수락했습니다.');
-                    closeInviteModal();
-                    location.reload();
-                } else {
-                    alert('수락 실패');
-                }
-            });
-        });
-
-        document.getElementById('reject-btn').addEventListener('click', () => {
-            const { header: csrfHeader, token: csrfToken } = getCsrf();
-
-            fetch(`/contest/team/invite/respond?teamId=${currentTeamId}&accept=false`, {
-                method: 'POST',
-                headers: {
-                    [csrfHeader]: csrfToken
-                },
-                credentials: "include"
-            }).then(res => {
-                if (res.ok) {
-                    alert('초대를 거절했습니다.');
-                    closeInviteModal();
-                } else {
-                    alert('거절 실패');
-                }
-            });
-        });
 
         // ✅ 채용 축하 모달 관련
         function openHireModal(companyName, message, jobPostId) {

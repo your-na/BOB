@@ -48,6 +48,8 @@ public class ProjectService {
     private final UserProjectRepository userProjectRepository; // UserProjectRepository 추가
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
+
     // 멤버 변수로 projectFilePath를 선언
     private final String projectFilePath = "C:/uploads/project/";
     private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
@@ -160,7 +162,7 @@ public class ProjectService {
         userProjectRepository.deleteByProject(project);
 
         // 2. 프로젝트와 관련된 모든 알림 삭제
-        notificationRepository.deleteByProject(project);
+        notificationService.hideProjectNotifications(project);
 
         // 프로젝트 삭제 전 히스토리 저장
         saveProjectHistory(project, "삭제됨");
@@ -409,7 +411,7 @@ public class ProjectService {
         projectRepository.save(project);
 
         // ✅ 알림 삭제 (receiver는 hostUser 자체로 넘겨야 함)
-        notificationRepository.deleteBySenderAndReceiverAndProjectTitle(
+        notificationRepository.hideBySenderAndReceiverAndProjectTitle(
                 applicant.getUserNick(),   // sender 닉네임
                 hostUser,                  // receiver (UserEntity 타입)
                 project.getTitle()         // 프로젝트 제목
@@ -441,7 +443,7 @@ public class ProjectService {
         userProjectRepository.save(userProject);
 
         // ✅ 알림 삭제 (receiver는 hostUser 자체로 넘겨야 함)
-        notificationRepository.deleteBySenderAndReceiverAndProjectTitle(
+        notificationRepository.hideBySenderAndReceiverAndProjectTitle(
                 applicant.getUserNick(),   // sender 닉네임
                 hostUser,                  // receiver (UserEntity)
                 project.getTitle()         // 프로젝트 제목
