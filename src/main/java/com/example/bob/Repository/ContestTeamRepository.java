@@ -12,4 +12,6 @@ public interface ContestTeamRepository extends JpaRepository<ContestTeamEntity, 
 
     List<ContestTeamEntity> findByContest(ContestEntity contest);
 
+    List<ContestTeamEntity> findByCreatedBy(String userNick);
+
 }

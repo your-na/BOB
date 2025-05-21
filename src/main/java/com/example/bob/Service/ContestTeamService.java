@@ -55,42 +55,45 @@ public class ContestTeamService {
             UserEntity member = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("초대할 사용자를 찾을 수 없습니다: " + userId));
 
-            // 기존 초대 이력 확인
+            // ✅ 이미 이 공모전에 참여 중이라면 초대 불가
+            boolean alreadyParticipatedInAnyTeam = contestTeamRepository.findByContest(contest).stream()
+                    .flatMap(t -> t.getMembers().stream())
+                    .anyMatch(m -> m.getUser().getUserId().equals(member.getUserId()));
+
+            if (alreadyParticipatedInAnyTeam) {
+                log.info("❌ 이미 공모전 관련 팀에 소속된 사용자: {}", member.getUserNick());
+                continue;
+            }
+
+
+            // ✅ 이하 기존 로직 유지
             Optional<ContestTeamMemberEntity> existing = contestTeamMemberRepository.findByTeamAndUser(team, member);
 
             if (existing.isPresent()) {
                 ContestTeamMemberEntity existingMember = existing.get();
 
-                if (existingMember.isInvitePending()) {
-                    // 현재 초대 요청 중이면 중복 요청 방지
-                    continue;
-                }
+                if (existingMember.isInvitePending()) continue;
 
                 if (!existingMember.isAccepted()) {
-                    // 거절되었던 초대: 다시 초대 처리
                     existingMember.setInvitePending(true);
                     existingMember.setAccepted(false);
                     contestTeamMemberRepository.save(existingMember);
-
                     sendInviteNotification(member, leader, team);
                     continue;
                 }
 
-                // 이미 참여 중이면 무시
-                continue;
+                continue; // 이미 참여 중
             }
 
-            // 새 초대 생성
+            // 새 초대
             ContestTeamMemberEntity newMember = ContestTeamMemberEntity.builder()
                     .team(team)
-                    .user(member) 
+                    .user(member)
                     .role("MEMBER")
                     .isAccepted(false)
                     .isInvitePending(true)
                     .build();
-
             contestTeamMemberRepository.save(newMember);
-
             sendInviteNotification(member, leader, team);
         }
 
@@ -150,16 +153,13 @@ public class ContestTeamService {
     }
 
     // ✅ 내가 팀원으로 참여 중인 공모전 목록 반환
-    public List<ContestEntity> getContestsJoinedByUser(UserEntity user) {
-        List<ContestTeamMemberEntity> members = contestTeamMemberRepository.findByUserAndIsAcceptedTrue(user);
-
-        return members.stream()
-                .filter(m -> !"LEADER".equals(m.getRole())) // 먼저 팀장이 아닌 것만 남김
-                .map(m -> m.getTeam().getContest())
+    public List<ContestTeamEntity> getContestsJoinedByUser(UserEntity user) {
+        return contestTeamMemberRepository.findByUserAndIsAcceptedTrue(user).stream()
+                .filter(m -> !"LEADER".equals(m.getRole()))
+                .map(ContestTeamMemberEntity::getTeam)
                 .distinct()
                 .collect(Collectors.toList());
     }
-
 
     public String getNotice(Long contestId) {
         ContestEntity contest = contestRepository.findById(contestId)
@@ -199,22 +199,23 @@ public class ContestTeamService {
                 .orElseThrow(() -> new RuntimeException("팀장을 포함한 팀을 찾을 수 없습니다."));
     }
 
-    public List<ContestEntity> getContestsLedByUser(UserEntity user) {
-        List<ContestTeamEntity> allTeams = contestTeamRepository.findAll();
-
-        return allTeams.stream()
-                .filter(team -> team.getMembers().stream()
-                        .anyMatch(member ->
-                                member.getUser().getUserId().equals(user.getUserId()) &&
-                                        "LEADER".equals(member.getRole())))
-                .map(ContestTeamEntity::getContest)
-                .distinct()
-                .collect(Collectors.toList());
+    public List<ContestTeamEntity> getContestsLedByUser(UserEntity user) {
+        return contestTeamRepository.findByCreatedBy(user.getUserNick());
     }
+
+
 
     public Long getInviteId(Long teamId, UserEntity user) {
         return contestTeamMemberRepository.findInviteIdByTeamIdAndUserId(teamId, user.getUserId())
                 .orElseThrow(() -> new RuntimeException("초대 정보를 찾을 수 없습니다."));
     }
+
+    public List<String> getAcceptedMemberNicks(ContestTeamEntity team) {
+        return contestTeamMemberRepository.findByTeamAndIsAcceptedTrue(team).stream()
+                .map(member -> member.getUser().getUserNick())
+                .filter(nick -> !nick.equals(team.getCreatedBy()))
+                .collect(Collectors.toList());
+    }
+
 
 }

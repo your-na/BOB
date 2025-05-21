@@ -24,6 +24,9 @@ public interface ContestTeamMemberRepository extends JpaRepository<ContestTeamMe
 
     Optional<ContestTeamMemberEntity> findByTeamAndUser(ContestTeamEntity team, UserEntity user);
 
+    List<ContestTeamMemberEntity> findByTeamAndIsAcceptedTrue(ContestTeamEntity team);
 
+    @Query("SELECT m FROM ContestTeamMemberEntity m WHERE m.user = :user AND m.team.contest = :contest AND m.isAccepted = true")
+    List<ContestTeamMemberEntity> findAcceptedMembershipsByUserAndContest(@Param("user") UserEntity user, @Param("contest") ContestEntity contest);
 
 }

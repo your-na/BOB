@@ -25,8 +25,7 @@
             <!-- 프로젝트 정보 -->
             <div class="project-info">
                 <h3><strong>홈</strong></h3>
-                <!-- 프로젝트 목표와 진행일정을 동적으로 출력 -->
-                <p th:text="'목표: ' + ${goal}"></p>
+
                 <p><span th:text="'진행일정: ' + ${project.startDate} + ' ~ ' + ${project.endDate}"></span></p>
             </div>
 
