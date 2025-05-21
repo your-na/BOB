@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(data => {
                 console.log("✅ 받아온 지원 데이터:", data);
                 window.__applicationData = data;
-                renderList("online", data);
+                renderList(currentTab, data);
             })
             .catch(err => {
                 console.error("지원 내역 불러오기 실패:", err);
@@ -74,13 +74,10 @@ document.addEventListener("DOMContentLoaded", function () {
             tab.classList.add("active");
 
             const type = tab.getAttribute("data-type");
-            if (type === "online") {
-                renderList("online", window.__applicationData || []);
-            } else {
-                listContainer.innerHTML = "<p style='padding: 20px; color: #888;'>해당 탭은 아직 미구현 상태입니다.</p>";
-            }
+            renderList(type, window.__applicationData || []);
         });
     });
+
 
     document.addEventListener("click", function (e) {
         if (!e.target.closest(".application-card")) {
