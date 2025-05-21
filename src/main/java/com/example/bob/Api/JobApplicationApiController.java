@@ -114,6 +114,7 @@
             System.out.println("📨 합격 알림 전송 시작...");
             try {
                 notificationService.sendHireNotification(applicant, company, passRequest.getMessage(), jobPost);
+                jobApplicationService.acceptApplicant(resume.getId(), jobPost.getId(), passRequest.getMessage());
                 System.out.println("✅ 알림 전송 완료");
             } catch (Exception e) {
                 System.out.println("❌ 알림 전송 중 오류 발생: " + e.getMessage());

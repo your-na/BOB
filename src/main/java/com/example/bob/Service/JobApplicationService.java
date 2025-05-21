@@ -64,6 +64,41 @@ public class JobApplicationService {
                 .collect(Collectors.toList());
     }
 
+    // ✅ 지원자 합격 처리 메서드
+    public void acceptApplicant(Long resumeId, Long jobPostId, String message) {
+        System.out.println("📥 [SERVICE] acceptApplicant 호출됨");
+
+        // 📄 이력서 조회
+        ResumeEntity resume = resumeRepository.findById(resumeId)
+                .orElseThrow(() -> {
+                    System.out.println("❌ 이력서 조회 실패 - resumeId: " + resumeId);
+                    return new RuntimeException("이력서를 찾을 수 없습니다.");
+                });
+
+        // 👤 지원자 정보 가져오기
+        UserEntity user = resume.getUser();
+
+        // 📦 지원 내역 조회 (가장 최근 이력서 기반)
+        JobApplicationEntity application = jobApplicationRepository
+                .findTopByResumeOrderByAppliedAtDesc(resume)
+                .orElseThrow(() -> {
+                    System.out.println("❌ 지원 내역 조회 실패 - resumeId: " + resumeId);
+                    return new RuntimeException("지원 내역이 존재하지 않습니다.");
+                });
+
+        // 🔄 상태 변경 → 합격
+        application.setStatus(JobApplicationStatus.ACCEPTED);
+        jobApplicationRepository.save(application);
+        System.out.println("✅ 상태 저장 완료: ACCEPTED");
+
+        // 📩 합격 알림 전송
+        notificationService.sendHireNotification(user, application.getJobPost().getCompany(), message, application.getJobPost());
+
+        System.out.println("✅ 합격 처리 완료");
+    }
+
+
+
     // ❎ 지원자 불합격 처리 메서드
     public void rejectApplicant(Long resumeId, Long jobPostId, String message) {
         System.out.println("📥 [SERVICE] rejectApplicant 호출됨");
