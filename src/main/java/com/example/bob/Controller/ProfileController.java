@@ -8,6 +8,9 @@ import com.example.bob.Service.UserService;
 import com.example.bob.security.CompanyDetailsImpl;
 import com.example.bob.security.CustomUserDetails;
 import com.example.bob.security.UserDetailsImpl;
+import com.example.bob.Service.DashboardService;
+import com.example.bob.Entity.CoJobPostEntity;
+
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -18,13 +21,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import com.example.bob.Service.DashboardService;
-import com.example.bob.Entity.CoJobPostEntity;
-
-
-
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -43,13 +39,9 @@ public class ProfileController {
     private final UserService userService;
     private final DashboardService dashboardService;
 
-
-
-
     public ProfileController(UserService userService, DashboardService dashboardService) {
         this.userService = userService;
         this.dashboardService = dashboardService;
-
     }
 
     @GetMapping("/main")
@@ -57,39 +49,32 @@ public class ProfileController {
         if (userDetails == null) {
             model.addAttribute("user", null);
             model.addAttribute("profileLink", "/login");
-            return "main"; // 비로그인 사용자는 main.html
+            return "main";
         }
 
-        // ✅ 기업 사용자일 경우
         if (userDetails.getUserType().equals("company")) {
             CompanyEntity company = ((CompanyDetailsImpl) userDetails).getCompanyEntity();
             model.addAttribute("user", company);
             model.addAttribute("profileLink", "/company/profile");
 
-            // ✅ 대시보드 데이터 모델에 추가
             Map<String, Object> dashboardInfo = dashboardService.getCompanyDashboardInfo(company.getCompanyId());
             model.addAttribute("postCount", dashboardInfo.get("postCount"));
             model.addAttribute("applicantCount", dashboardInfo.get("applicantCount"));
             model.addAttribute("resumeCount", dashboardInfo.get("resumeCount"));
             model.addAttribute("recentApplicants", dashboardInfo.get("recentApplicants"));
 
-            // ✅ 최근 공고 추가
             List<CoJobPostEntity> recentPosts = dashboardService.getRecentJobPosts(company.getCompanyId());
             model.addAttribute("recentPosts", recentPosts);
 
             return "main2";
         }
 
-
-        // 일반 사용자
         UserEntity user = ((UserDetailsImpl) userDetails).getUserEntity();
         model.addAttribute("user", user);
         model.addAttribute("profileLink", "/profile");
 
         return "main";
     }
-
-
 
     @GetMapping("/profile")
     public String profilePage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
@@ -99,17 +84,16 @@ public class ProfileController {
             UserEntity userEntity = user.getUserEntity();
             model.addAttribute("user", userEntity);
             model.addAttribute("profileImageUrl", userEntity.getProfileImageUrl());
-            return "profile"; // 일반 사용자용 profile.html
+            return "profile";
         } else if (userDetails instanceof CompanyDetailsImpl company) {
             CompanyEntity companyEntity = company.getCompanyEntity();
             model.addAttribute("company", companyEntity);
             model.addAttribute("profileImageUrl", companyEntity.getCoImageUrl());
-            return "company_profile"; // 기업 사용자용 별도 페이지가 있다면
+            return "company_profile";
         }
 
         return "redirect:/error";
     }
-
 
     @PostMapping("/profile/update")
     public String updateProfile(@RequestParam String nickname,
@@ -123,7 +107,7 @@ public class ProfileController {
 
         if (!(userDetails instanceof UserDetailsImpl user) || user.getUserEntity().getUserId() == null) {
             System.out.println("⚠ updateProfile: userId가 null 또는 인증 정보 없음.");
-            return "redirect:/login"; // 인증이 없으면 로그인 페이지로 이동
+            return "redirect:/login";
         }
 
         Long userId = user.getUserEntity().getUserId();
@@ -146,15 +130,12 @@ public class ProfileController {
             userUpdateDTO.setProfileImageUrl(user.getUserEntity().getProfileImageUrl());
         }
 
-        // 사용자 정보 업데이트
         UserDTO updatedUserDTO = userService.updateUserInfo(userUpdateDTO, profileImage, userId);
 
-        // SecurityContext 업데이트
         CustomUserDetails newAuth = new UserDetailsImpl(updatedUserDTO.toUserEntity());
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(newAuth, newAuth.getPassword(), newAuth.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
 
         String finalImageUrl = userUpdateDTO.getProfileImageUrl() + "?timestamp=" + System.currentTimeMillis();
         redirectAttributes.addFlashAttribute("profileImageUrl", finalImageUrl);
@@ -162,24 +143,19 @@ public class ProfileController {
         redirectAttributes.addFlashAttribute("userEmail", userUpdateDTO.getUserEmail());
         redirectAttributes.addFlashAttribute("userBio", userUpdateDTO.getUserBio());
         redirectAttributes.addFlashAttribute("mainLanguage", userUpdateDTO.getMainLanguage());
-        redirectAttributes.addFlashAttribute("region", userUpdateDTO.getRegion()); // ✅ 추가
-
+        redirectAttributes.addFlashAttribute("region", userUpdateDTO.getRegion());
 
         return "redirect:/profile";
     }
 
-    private final String uploadDir = "uploads/profileImages/";  // 파일이 저장된 경로
+    private final String uploadDir = "uploads/profileImages/";
 
     @GetMapping("/uploads/profileImages/{fileName}")
     public ResponseEntity<Resource> serveFile(@PathVariable String fileName) {
         try {
-            // URL 디코딩 처리
             String decodedFileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8.toString());
-
-            // 파일 경로 생성
             Path filePath = Paths.get(uploadDir, decodedFileName);
 
-            // 파일이 존재하는지 확인
             if (Files.exists(filePath)) {
                 Resource file = new UrlResource(filePath.toUri());
                 return ResponseEntity.ok().body(file);
@@ -190,9 +166,27 @@ public class ProfileController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     @GetMapping("/rating")
     public String ratingForm() {
-        return "rating"; // rating.html 반환
+        return "rating";
+    }
+
+    @GetMapping("/profile2")
+    public String showProfilePage(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) return "redirect:/login";
+
+        if (userDetails instanceof CompanyDetailsImpl companyDetails) {
+            CompanyEntity company = companyDetails.getCompanyEntity();
+            model.addAttribute("company", company); // 🔄 user → company 로 수정
+            model.addAttribute("profileImageUrl", company.getCoImageUrl());
+        } else if (userDetails instanceof UserDetailsImpl userDetailsImpl) {
+            UserEntity user = userDetailsImpl.getUserEntity();
+            model.addAttribute("user", user); // 일반 사용자용
+            model.addAttribute("profileImageUrl", user.getProfileImageUrl());
+        }
+
+        return "profile2";
     }
 
 }
