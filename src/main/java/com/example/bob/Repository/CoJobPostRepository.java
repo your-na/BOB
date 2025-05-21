@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Pageable;
+
 
 
 public interface CoJobPostRepository extends JpaRepository<CoJobPostEntity, Long> {
@@ -27,5 +29,9 @@ public interface CoJobPostRepository extends JpaRepository<CoJobPostEntity, Long
     // 기업이 작성한 공고들의 ID 목록 기반으로 지원자 수 계산
     @Query("SELECT COUNT(a) FROM JobApplicationEntity a WHERE a.jobPost.company.companyId = :companyId")
     int countApplicantsByCompanyId(@Param("companyId") Long companyId);
+
+    @Query("SELECT j FROM CoJobPostEntity j WHERE j.company.companyId = :companyId ORDER BY j.id DESC")
+    List<CoJobPostEntity> findTop3RecentPostsByCompany(@Param("companyId") Long companyId, Pageable pageable);
+
 
 }

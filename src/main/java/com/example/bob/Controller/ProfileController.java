@@ -21,6 +21,8 @@ import org.springframework.ui.Model;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import com.example.bob.Service.DashboardService;
+import com.example.bob.Entity.CoJobPostEntity;
+
 
 
 import org.springframework.web.bind.annotation.*;
@@ -70,6 +72,10 @@ public class ProfileController {
             model.addAttribute("applicantCount", dashboardInfo.get("applicantCount"));
             model.addAttribute("resumeCount", dashboardInfo.get("resumeCount"));
             model.addAttribute("recentApplicants", dashboardInfo.get("recentApplicants"));
+
+            // ✅ 최근 공고 추가
+            List<CoJobPostEntity> recentPosts = dashboardService.getRecentJobPosts(company.getCompanyId());
+            model.addAttribute("recentPosts", recentPosts);
 
             return "main2";
         }

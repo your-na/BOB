@@ -7,6 +7,9 @@ import com.example.bob.Repository.JobApplicationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import com.example.bob.Entity.CoJobPostEntity;
+
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +17,8 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
+import org.springframework.data.domain.Pageable;
+
 
 
 @Service
@@ -59,4 +64,10 @@ public class DashboardService {
 
         return result;
     }
+
+    public List<CoJobPostEntity> getRecentJobPosts(Long companyId) {
+        Pageable pageable = PageRequest.of(0, 3);
+        return coJobPostRepository.findTop3RecentPostsByCompany(companyId, pageable);
+    }
+
 }
