@@ -60,6 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(data => {
                 console.log("✅ 받아온 지원 데이터:", data);
                 window.__applicationData = data;
+                updateSummaryCounts(data); // ✅ 통계 업데이트
                 renderList(currentTab, data);
             })
             .catch(err => {
@@ -112,6 +113,50 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     };
 
+    function updateSummaryCounts(data) {
+        const statusCounts = {
+            total: 0,
+            submitted: 0,
+            accepted: 0,
+            rejected: 0,
+        };
+
+        const jobPostMap = new Map();
+
+        data.forEach(item => {
+            const status = item.status?.toUpperCase();
+            const jobPostId = item.jobPostId;
+
+            if (status === "HIDDEN") return; // 숨김은 제외
+
+            // 우선순위로 상태 저장
+            const prev = jobPostMap.get(jobPostId);
+            if (!prev) {
+                jobPostMap.set(jobPostId, status);
+            } else {
+                // 우선순위 적용
+                const priority = { ACCEPTED: 3, REJECTED: 2, CANCELED: 2, SUBMITTED: 1 };
+                if ((priority[status] || 0) > (priority[prev] || 0)) {
+                    jobPostMap.set(jobPostId, status);
+                }
+            }
+        });
+
+        // 최종 상태 기반으로 통계 계산
+        jobPostMap.forEach(status => {
+            statusCounts.total++;
+            if (status === "SUBMITTED") statusCounts.submitted++;
+            else if (status === "ACCEPTED") statusCounts.accepted++;
+            else if (status === "REJECTED" || status === "CANCELED") statusCounts.rejected++;
+        });
+
+        document.getElementById("total-count").textContent = statusCounts.total;
+        document.getElementById("submitted-count").textContent = statusCounts.submitted;
+        document.getElementById("accepted-count").textContent = statusCounts.accepted;
+        document.getElementById("rejected-count").textContent = statusCounts.rejected;
+    }
+
+    
 
     window.viewDetail = function (jobPostId) {
         if (!jobPostId) return;
