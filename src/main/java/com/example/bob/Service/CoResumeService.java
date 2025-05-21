@@ -8,7 +8,7 @@ import java.util.List;
 public interface CoResumeService {
 
     // ✅ 이력서 저장 기능
-    void saveResume(CoResumeRequestDTO requestDTO);
+    void saveResume(CoResumeRequestDTO requestDTO, Long companyId);
 
     // ✅ 목록 조회 메서드 추가
     List<CoResumeEntity> getAllResumes();

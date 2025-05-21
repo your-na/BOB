@@ -7,13 +7,14 @@ import com.example.bob.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import com.example.bob.Service.DashboardService;
+
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,6 +22,8 @@ public class CompanyController {
     private final CompanyService companyService;
     private final CompanyRepository companyRepository;
     private final UserService userService;
+    private final DashboardService dashboardService;
+
 
     @GetMapping("/co_signup")
     public String signupPage() {
@@ -44,6 +47,5 @@ public class CompanyController {
         }
         return "redirect:/login";
     }
-
 
 }

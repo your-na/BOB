@@ -30,7 +30,13 @@ public class CoResumeEntity {
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CoResumeTagEntity> jobTags = new ArrayList<>();
 
-    
+    // 📌 CoResumeEntity.java
+    @ManyToOne
+    @JoinColumn(name = "company_id") // foreign key
+    private CompanyEntity company;
+
+
+
 
 
     /**
@@ -59,6 +65,15 @@ public class CoResumeEntity {
     }
     public void setJobTags(List<CoResumeTagEntity> jobTags) {
         this.jobTags = jobTags;
+    }
+
+    // ✅ 회사 getter / setter
+    public CompanyEntity getCompany() {
+        return company;
+    }
+
+    public void setCompany(CompanyEntity company) {
+        this.company = company;
     }
 
 
