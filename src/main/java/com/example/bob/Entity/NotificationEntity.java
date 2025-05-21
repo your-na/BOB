@@ -55,6 +55,9 @@ public class NotificationEntity {
     @JoinColumn(name = "project_id")  // 관련된 프로젝트
     private ProjectEntity project;
 
+    private boolean isHidden = false; // 기본은 보이도록
+
+
     public NotificationEntity() {}
 
     public void setIsRead(boolean isRead) {

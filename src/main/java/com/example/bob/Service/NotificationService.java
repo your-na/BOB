@@ -35,7 +35,7 @@ public class NotificationService {
 
     // 알림 수를 계산하는 메서드
     public int getUserNotificationCount(UserEntity userEntity) {
-        return notificationRepository.countByUserAndIsRead(userEntity, false); // 사용자가 읽지 않은 알림 수
+        return notificationRepository.countByUserAndIsReadFalseAndIsHiddenFalse(userEntity); // 사용자가 읽지 않은 알림 수
     }
 
     // 기업 사용자 알림 수 조회
@@ -45,7 +45,7 @@ public class NotificationService {
 
     public List<NotificationDTO> getNotifications(UserEntity userEntity, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<NotificationEntity> notificationsPage = notificationRepository.findByUser(userEntity, pageable);
+        Page<NotificationEntity> notificationsPage = notificationRepository.findByUserAndIsHiddenFalse(userEntity, pageable);
 
         return notificationsPage.getContent().stream()
                 .map(notification -> {
@@ -166,9 +166,11 @@ public class NotificationService {
     // 모든 알림 삭제
     @Transactional
     public void deleteAllNotificationsForUser(UserEntity userEntity) {
-        notificationRepository.deleteByUser(userEntity);  // 사용자에 해당하는 모든 알림 삭제
-
-
+        List<NotificationEntity> list = notificationRepository.findByUserAndIsHiddenFalse(userEntity);
+        for (NotificationEntity n : list) {
+            n.setHidden(true);
+        }
+        notificationRepository.saveAll(list);
     }
 
     // ✅ 채용 합격 알림 생성 메서드
@@ -183,5 +185,29 @@ public class NotificationService {
         notification.setJobPost(jobPost);             // 💼 공고 연결
         notificationRepository.save(notification);
     }
+
+    @Transactional
+    public void deleteNotificationByTeamAndUser(Long teamId, UserEntity user) {
+        List<NotificationEntity> list = notificationRepository.findByContestTeamIdAndUserAndIsHiddenFalse(teamId, user);
+        for (NotificationEntity n : list) {
+            n.setHidden(true);
+        }
+        notificationRepository.saveAll(list);
+    }
+
+    @Transactional
+    public void hideNotification(Long id, UserEntity user) {
+        NotificationEntity notification = notificationRepository.findById(id).orElse(null);
+        if (notification != null && notification.getUser().getUserId().equals(user.getUserId())) {
+            notification.setHidden(true);
+            notificationRepository.save(notification);
+        }
+    }
+
+    @Transactional
+    public void hideProjectNotifications(ProjectEntity project) {
+        notificationRepository.hideByProject(project);
+    }
+
 
 }
