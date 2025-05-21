@@ -145,6 +145,8 @@ public class ContestTeamService {
         member.setInvitePending(false);
         member.setAccepted(accept);
         contestTeamMemberRepository.save(member);
+
+        notificationRepository.hideByContestTeamIdAndUser(teamId, user);
     }
 
     // ✅ 내가 팀원으로 참여 중인 공모전 목록 반환

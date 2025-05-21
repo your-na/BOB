@@ -27,12 +27,12 @@ public class NotificationController {
         if (userDetails == null) return Map.of("notificationsCount", 0);
 
         int count = 0;
-        if (userDetails.getUserType().equals("user")){
+        if (userDetails.getUserType().equals("user")) {
             UserEntity user = ((UserDetailsImpl) userDetails).getUserEntity();
             count = notificationService.getUserNotificationCount(user);
-        } else if (userDetails.getUserType().equals("company")){
+        } else if (userDetails.getUserType().equals("company")) {
             CompanyEntity company = ((CompanyDetailsImpl) userDetails).getCompanyEntity();
-            count= notificationService.getCompanyNotificationCount(company);
+            count = notificationService.getCompanyNotificationCount(company);
         }
 
         return Map.of("notificationsCount", count);
@@ -91,18 +91,33 @@ public class NotificationController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("알림을 찾을 수 없습니다.");
         }
     }
+
     @DeleteMapping("/delete-all")
-    public ResponseEntity<String> deleteAllUserNotifications(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<String> hideAllUserNotifications(@AuthenticationPrincipal CustomUserDetails userDetails) {
         if (!(userDetails instanceof UserDetailsImpl)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("일반 사용자만 가능합니다.");
         }
 
         UserEntity userEntity = ((UserDetailsImpl) userDetails).getUserEntity();
 
-        // 알림 삭제 서비스 호출
-        notificationService.deleteAllNotificationsForUser(userEntity);
+        notificationService.deleteAllNotificationsForUser(userEntity); // 내부는 숨김 처리
 
-        return ResponseEntity.ok("🔔 모든 알림이 삭제되었습니다.");
+        return ResponseEntity.ok("🔕 모든 알림을 숨겼습니다.");
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteNotification(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        UserEntity user = userDetails.getUserEntity();
+        notificationService.hideNotification(id, user);
+
+        return ResponseEntity.ok("알림이 삭제(숨김 처리)되었습니다.");
     }
 
 }

@@ -34,21 +34,27 @@
       <div th:each="section : ${resume.sections}" class="resume-section">
         <h2 th:text="${section.title}">섹션 제목</h2>
 
-        <!-- dragItems가 있는 경우 -->
-        <ul th:if="${not #lists.isEmpty(section.dragItems)}">
-          <li th:each="item : ${section.dragItems}" th:text="${item.displayText}">드래그 항목</li>
-        </ul>
-
-        <!-- content만 있는 경우 -->
-        <div th:if="${#lists.isEmpty(section.dragItems) and section.content != null and section.content != ''}">
+        <!-- content 먼저 표시 -->
+        <div th:if="${section.content != null and section.content != ''}">
           <textarea th:if="${section.title == '자기소개'}" readonly th:text="${section.content}">자기소개</textarea>
           <p th:if="${section.title != '자기소개'}" th:text="${section.content}"></p>
         </div>
 
+        <!-- dragItems 아래에 표시 -->
+        <ul th:if="${not #lists.isEmpty(section.dragItems)}">
+          <li th:each="item : ${section.dragItems}">
+            <span th:text="${item.displayText}">드래그 항목</span>
+            <a th:if="${item.filePath != null}" th:href="@{'/uploads/' + ${item.filePath}}" target="_blank">[파일 보기]</a>
+          </li>
+        </ul>
+
+
+
         <!-- 선택형 태그 -->
-        <div th:if="${section.selectedTags != null and #lists.size(section.selectedTags) > 0}">
-          <span class="tag" th:each="tag : ${section.selectedTags}" th:text="${tag}">태그</span>
-        </div>
+        <ul th:if="${section.selectedTags != null and #lists.size(section.selectedTags) > 0}">
+          <li th:each="tag : ${section.selectedTags}" th:text="${tag}"></li>
+        </ul>
+
 
         <!-- 학력사항 -->
         <div th:if="${section.educations != null and #lists.size(section.educations) > 0}">
@@ -58,11 +64,15 @@
         </div>
 
         <!-- 사진 첨부 -->
-        <div th:if="${not #lists.isEmpty(section.fileNames) and section.type == '사진 첨부'}">
+        <div th:if="${section.fileNames != null and not #lists.isEmpty(section.fileNames) and section.type == '사진 첨부'}">
           <div class="image-preview" th:each="img : ${section.fileNames}">
-            <img th:src="@{'/uploads/' + ${img}}" alt="첨부 이미지">
+            <img th:src="@{|/uploads/${img}|}"
+                 th:alt="${img}"
+                 style="max-width: 100%; max-height: 300px; object-fit: contain; display: block; margin-top: 8px;">
           </div>
         </div>
+
+
 
         <!-- 파일 첨부 -->
         <div th:if="${not #lists.isEmpty(section.fileNames) and section.type == '파일 첨부'}" class="attachments">

@@ -33,22 +33,32 @@ public interface NotificationRepository extends JpaRepository<NotificationEntity
 
     Page<NotificationEntity> findByCompany(CompanyEntity companyEntity, Pageable pageable);
 
+    void deleteByContestTeamIdAndUser(Long teamId, UserEntity user);
+
+    Page<NotificationEntity> findByUserAndIsHiddenFalse(UserEntity user, Pageable pageable);
+
+    int countByUserAndIsReadFalseAndIsHiddenFalse(UserEntity user);
+
+    List<NotificationEntity> findByUserAndIsHiddenFalse(UserEntity user);
+
+    List<NotificationEntity> findByContestTeamIdAndUserAndIsHiddenFalse(Long teamId, UserEntity user);
+
+
     // 프로젝트 관련된 알림 삭제
     @Modifying
-    @Query("DELETE FROM NotificationEntity n WHERE n.project = :project")
-    void deleteByProject(@Param("project") ProjectEntity project);
+    @Query("UPDATE NotificationEntity n SET n.isHidden = true WHERE n.project = :project")
+    void hideByProject(@Param("project") ProjectEntity project);
+
 
     // ✅ 수락/거절 시 알림 1건 삭제
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("DELETE FROM NotificationEntity n WHERE n.sender.userNick = :sender " +
-            "AND n.user = :receiver " +
-            "AND n.project.title = :projectTitle")
-    void deleteBySenderAndReceiverAndProjectTitle(@Param("sender") String sender,
-                                                  @Param("receiver") UserEntity receiver,
-                                                  @Param("projectTitle") String projectTitle);
-
-    // ✅ 사용자 알림 전체 삭제
     @Modifying
-    @Query("DELETE FROM NotificationEntity n WHERE n.user = :user")
-    void deleteByUser(@Param("user") UserEntity user);
+    @Query("UPDATE NotificationEntity n SET n.isHidden = true WHERE n.sender.userNick = :sender AND n.user = :receiver AND n.project.title = :projectTitle")
+    void hideBySenderAndReceiverAndProjectTitle(@Param("sender") String sender,
+                                                @Param("receiver") UserEntity receiver,
+                                                @Param("projectTitle") String projectTitle);
+
+    @Modifying
+    @Query("UPDATE NotificationEntity n SET n.isHidden = true WHERE n.contestTeam.id = :teamId AND n.user = :user")
+    void hideByContestTeamIdAndUser(@Param("teamId") Long teamId, @Param("user") UserEntity user);
+
 }
