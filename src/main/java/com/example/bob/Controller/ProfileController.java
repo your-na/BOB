@@ -4,10 +4,12 @@ import com.example.bob.DTO.UserDTO;
 import com.example.bob.DTO.UserUpdateDTO;
 import com.example.bob.Entity.CompanyEntity;
 import com.example.bob.Entity.UserEntity;
+import com.example.bob.Service.CoResumeService;
 import com.example.bob.Service.UserService;
 import com.example.bob.security.CompanyDetailsImpl;
 import com.example.bob.security.CustomUserDetails;
 import com.example.bob.security.UserDetailsImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -35,6 +37,9 @@ import java.util.List;
 @Controller
 public class ProfileController {
 
+    @Autowired
+    private CoResumeService coResumeService;
+
     private final UserService userService;
 
     public ProfileController(UserService userService) {
@@ -54,7 +59,12 @@ public class ProfileController {
             CompanyEntity company = ((CompanyDetailsImpl) userDetails).getCompanyEntity();
             model.addAttribute("user", company);
             model.addAttribute("profileLink", "/company/profile");
-            return "main2"; // ✅ 여기서 main2.html로 반환
+
+            // ✅ 기업이 만든 양식 개수 계산
+            int resumeFormCount = coResumeService.getResumeFormCountByCompany(company.getCompanyId());
+            model.addAttribute("resumeFormCount", resumeFormCount);
+
+            return "main2";
         }
 
         // 일반 사용자

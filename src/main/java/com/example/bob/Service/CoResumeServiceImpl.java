@@ -28,10 +28,16 @@ public class CoResumeServiceImpl implements CoResumeService {
     private final CoResumeSectionRepository coResumeSectionRepository;
     private static final Logger logger = LoggerFactory.getLogger(CoResumeEditController.class);
 
+
     @Autowired
     public CoResumeServiceImpl(CoResumeRepository coResumeRepository, CoResumeSectionRepository coResumeSectionRepository) {
         this.coResumeRepository = coResumeRepository;
         this.coResumeSectionRepository = coResumeSectionRepository;
+    }
+
+    @Override
+    public int getResumeFormCountByCompany(Long companyId) {
+        return coResumeRepository.countByCompany_CompanyId(companyId);
     }
 
     // ✅ 이력서 저장 (제작)

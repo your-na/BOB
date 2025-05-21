@@ -30,7 +30,19 @@ public class CoResumeEntity {
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CoResumeTagEntity> jobTags = new ArrayList<>();
 
-    
+
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private CompanyEntity company;
+
+    public CompanyEntity getCompany() {
+        return company;
+    }
+
+    public void setCompany(CompanyEntity company) {
+        this.company = company;
+    }
+
 
 
     /**
