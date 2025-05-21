@@ -39,8 +39,8 @@
             <!-- 공지사항 텍스트 영역 -->
             <div class="notice-section">
                 <textarea id="notice"
-                          th:text="${project.notice}"
-                          th:readonly="${owner.userNick != #authentication.principal.userEntity.userNick}">
+                          th:text="${team.notice}"
+                          th:readonly="${ownerNick != loginNick}">
                 </textarea>
             </div>
 
@@ -90,10 +90,11 @@
 
 <!-- ✅ 공지사항 자동 저장 및 버튼 이동 스크립트 -->
 <script th:inline="javascript">
-    /*<![CDATA[*/
-    let projectId = /*[[${project.id}]]*/ 0;
-    /*]]>*/
+    let teamId = /*[[${team.id}]]*/ 0;
+    let csrfToken = /*[['${_csrf.token}']]*/ '';
+    let csrfHeader = /*[['${_csrf.headerName}']]*/ '';
 </script>
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -134,20 +135,15 @@
         });
 
         function saveNotice() {
-            if (!textarea || textarea.readOnly) return;
-
-            fetch(`/api/project/${projectId}/notice`, {
+            fetch(`/api/contest/team/${teamId}/notice`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                     [csrfHeader]: csrfToken
                 },
                 body: JSON.stringify({ content: textarea.value })
-            }).then(() => {
-                console.log("✅ 공지사항 저장됨");
-            }).catch((error) => {
-                console.error("❌ 저장 실패:", error);
-            });
+            }).then(() => console.log("✅ 공지 저장됨"))
+                .catch(err => console.error("❌ 공지 저장 실패", err));
         }
     });
 </script>

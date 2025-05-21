@@ -3,6 +3,10 @@ package com.example.bob.Controller;
 import com.example.bob.DTO.ContestDTO;
 import com.example.bob.Entity.ContestEntity;
 import com.example.bob.Entity.ContestRecruitEntity;
+import com.example.bob.Entity.ContestTeamEntity;
+import com.example.bob.Entity.UserEntity;
+import com.example.bob.Repository.ContestTeamMemberRepository;
+import com.example.bob.Repository.ContestTeamRepository;
 import com.example.bob.Service.ContestRecruitService;
 import com.example.bob.Service.ContestService;
 import com.example.bob.security.CompanyDetailsImpl;
@@ -10,7 +14,9 @@ import com.example.bob.security.CustomUserDetails;
 import com.example.bob.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +28,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -29,6 +37,8 @@ public class ContestController {
 
     private final ContestService contestService;
     private final ContestRecruitService recruitService;
+    private final ContestTeamMemberRepository contestTeamMemberRepository;
+    private final ContestTeamRepository contestTeamRepository;
 
     // ✅ 사용자 유형에 따라 공모전 홈 리디렉션
     @GetMapping("/contest-redirect")
@@ -180,4 +190,47 @@ public class ContestController {
         model.addAttribute("contests", adminContests);
         return "ad_notcomcontest"; // 외부 공모전 목록 HTML
     }
+
+    @GetMapping("/contesthome/{teamId}")
+    public String getContestHome(@PathVariable Long teamId,
+                                 @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                 Model model) {
+        ContestTeamEntity team = contestTeamRepository.findById(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("공모전 팀을 찾을 수 없습니다."));
+
+        ContestEntity contest = team.getContest();
+        String loginNick = userDetails.getUserEntity().getUserNick();
+        String ownerNick = team.getCreatedBy();
+
+        List<String> teamMembers = team.getMembers().stream()
+                .map(m -> m.getUser().getUserNick())
+                .filter(nick -> !nick.equals(ownerNick))
+                .collect(Collectors.toList());
+
+        model.addAttribute("project", contest);      // 여전히 contest 전체 정보
+        model.addAttribute("team", team);            // 팀 정보 추가
+        model.addAttribute("ownerNick", ownerNick);  // 팀장 닉네임
+        model.addAttribute("loginNick", loginNick);  // 로그인 사용자 닉네임
+        model.addAttribute("teamMembers", teamMembers);
+
+        return "todo_home2";
+    }
+
+    @PatchMapping("/api/contest/team/{teamId}/notice")
+    public ResponseEntity<?> updateTeamNotice(@PathVariable Long teamId,
+                                              @RequestBody Map<String, String> payload,
+                                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        ContestTeamEntity team = contestTeamRepository.findById(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("공모전 팀을 찾을 수 없습니다."));
+
+        String loginNick = userDetails.getUserEntity().getUserNick();
+        if (!team.getCreatedBy().equals(loginNick)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("팀장만 수정할 수 있습니다.");
+        }
+
+        team.setNotice(payload.get("content"));
+        contestTeamRepository.save(team);
+        return ResponseEntity.ok().build();
+    }
+
 }
