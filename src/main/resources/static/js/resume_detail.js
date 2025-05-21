@@ -126,3 +126,77 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 });
+
+document.getElementById("treeViewBtn").addEventListener("click", () => {
+    const treeContainer = document.getElementById("treeViewContainer");
+    treeContainer.style.display = treeContainer.style.display === "none" ? "block" : "none";
+
+    const root = document.getElementById("treeRoot");
+    root.innerHTML = ""; // 기존 트리 초기화
+
+    fetchTreeDataAndRender(root);
+});
+
+// 실제 데이터 기반으로 트리 구조 생성
+function fetchTreeDataAndRender(root) {
+    const resumeId = document.getElementById("resumeId").value;
+
+    fetch(`/api/user/resumes/detail/${resumeId}`)
+        .then(res => res.json())
+        .then(resume => {
+            const titleNode = document.createElement("li");
+            titleNode.innerHTML = `📁 <strong>${resume.title || '이력서'}</strong>`;
+            root.appendChild(titleNode);
+
+            const descNode = document.createElement("div");
+            descNode.style.marginLeft = "20px";
+            descNode.textContent = resume.description || "항상 열심히 하는 사람입니다!";
+            titleNode.appendChild(descNode);
+
+            resume.sections.forEach(section => {
+                const sectionNode = document.createElement("li");
+                sectionNode.innerHTML = `▿ ${section.title}`;
+                const subList = document.createElement("ul");
+
+                if (section.dragItems && section.dragItems.length > 0) {
+                    section.dragItems.forEach(item => {
+                        const li = document.createElement("li");
+                        li.textContent = item.displayText;
+                        if (item.period) {
+                            li.innerHTML += `<span style="float:right;">${item.period}</span>`;
+                        }
+                        subList.appendChild(li);
+                    });
+                }
+
+                if (section.fileNames && section.type === "파일 첨부") {
+                    section.fileNames.forEach(file => {
+                        const li = document.createElement("li");
+                        li.textContent = file;
+                        li.innerHTML += `<button style="float:right;">파일 다운</button>`;
+                        subList.appendChild(li);
+                    });
+                }
+
+                if (section.fileNames && section.type === "사진 첨부") {
+                    section.fileNames.forEach(file => {
+                        const li = document.createElement("li");
+                        li.textContent = file;
+                        subList.appendChild(li);
+                    });
+                }
+
+                if (section.content && (!section.dragItems || section.dragItems.length === 0)) {
+                    const contentLi = document.createElement("li");
+                    contentLi.textContent = section.content;
+                    subList.appendChild(contentLi);
+                }
+
+                sectionNode.appendChild(subList);
+                root.appendChild(sectionNode);
+            });
+        })
+        .catch(err => {
+            console.error("트리 뷰 로딩 실패:", err);
+        });
+}

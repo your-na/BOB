@@ -26,6 +26,10 @@
 <form>
   <div class="resume-detail-container">
 
+    <!-- 트리뷰 버튼 -->
+    <button type="button" id="treeViewBtn">🌳 트리뷰로 보기</button>
+
+
     <!-- 수정/삭제 버튼 -->
     <div class="resume-buttons">
       <!-- 일반 사용자에게만 보이게 -->
@@ -35,6 +39,7 @@
 
       <!-- 기업 사용자에게만 보이게 -->
       <div sec:authorize="hasAuthority('COMPANY')">
+        <button type="button" class="nonpass-btn">❎ 불합격 처리</button>
         <button type="button" class="pass-btn">✅ 합격 처리</button>
       </div>
     </div>
@@ -78,6 +83,11 @@
       </div>
     </div>
 
+
+    <!-- 트리뷰 영역 -->
+    <div id="treeViewContainer" style="display: none;">
+      <ul id="treeRoot"></ul>
+    </div>
 
     <!-- 본문 영역 -->
     <div th:each="section : ${resume.sections}" class="info-section">
