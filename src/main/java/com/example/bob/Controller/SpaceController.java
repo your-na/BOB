@@ -1,10 +1,7 @@
 package com.example.bob.Controller;
 
-import com.example.bob.Entity.ContestEntity;
-import com.example.bob.Entity.UserEntity;
+import com.example.bob.Entity.*;
 import com.example.bob.DTO.ProjectDTO;
-import com.example.bob.Entity.ProjectEntity;
-import com.example.bob.Entity.UserProjectEntity;
 import com.example.bob.Service.ContestTeamService;
 import com.example.bob.Service.ProjectService;
 import com.example.bob.security.UserDetailsImpl;
@@ -39,10 +36,11 @@ public class SpaceController {
         List<ProjectDTO> joinedProjects = projectService.getJoinedProjects(userEntity);
 
         // ✅ 공모전 팀 - 팀장 목록
-        List<ContestEntity> leaderContests = contestTeamService.getContestsLedByUser(userEntity);
+        List<ContestTeamEntity> leaderContests = contestTeamService.getContestsLedByUser(userEntity);
 
         // ✅ 공모전 팀 - 참여자 목록
-        List<ContestEntity> joinedContests = contestTeamService.getContestsJoinedByUser(userEntity);
+        List<ContestTeamEntity> joinedContests = contestTeamService.getContestsJoinedByUser(userEntity);
+
 
         model.addAttribute("createdProjects", createdProjects);
         model.addAttribute("joinedProjects", joinedProjects);

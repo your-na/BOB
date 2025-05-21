@@ -32,8 +32,8 @@
     <!-- 팀장 공모전 -->
     <div>
         <h3>팀장 공모전</h3>
-        <li th:each="contest : ${leaderContests}"
-            th:if="${contest.status != '완료' and contest.status != '신청중' and contest.status != '거절됨'}">
+        <li th:each="team : ${leaderContests}"
+            th:if="${team != null and team.status != '완료' and team.status != '신청중' and team.status != '거절됨'}">
             <a th:href="@{/contesthome/{id}(id=${team.id})}"
                th:text="${team.contest.title}" class="protitle">공모전 제목</a>
         </li>
@@ -42,12 +42,13 @@
     <!-- 참여 공모전 -->
     <div>
         <h3>참여 공모전</h3>
-        <li th:each="contest : ${joinedContests}"
-            th:if="${contest.status != '완료' and contest.status != '신청중' and contest.status != '거절됨'}">
+        <li th:each="team : ${joinedContests}"
+            th:if="${team != null and team.status != '완료' and team.status != '신청중' and team.status != '거절됨'}">
             <a th:href="@{/contesthome/{id}(id=${team.id})}"
                th:text="${team.contest.title}" class="protitle">공모전 제목</a>
         </li>
     </div>
+
 </ul>
 
 <script>

@@ -202,19 +202,21 @@ public class ContestController {
         String loginNick = userDetails.getUserEntity().getUserNick();
         String ownerNick = team.getCreatedBy();
 
-        List<String> teamMembers = team.getMembers().stream()
+        // ✅ 수락된 멤버만
+        List<String> teamMembers = contestTeamMemberRepository.findByTeamAndIsAcceptedTrue(team).stream()
                 .map(m -> m.getUser().getUserNick())
-                .filter(nick -> !nick.equals(ownerNick))
+                .filter(nick -> !nick.equals(ownerNick)) // 팀장은 제외
                 .collect(Collectors.toList());
 
-        model.addAttribute("project", contest);      // 여전히 contest 전체 정보
-        model.addAttribute("team", team);            // 팀 정보 추가
-        model.addAttribute("ownerNick", ownerNick);  // 팀장 닉네임
-        model.addAttribute("loginNick", loginNick);  // 로그인 사용자 닉네임
+        model.addAttribute("project", contest);
+        model.addAttribute("team", team);
+        model.addAttribute("ownerNick", ownerNick);
+        model.addAttribute("loginNick", loginNick);
         model.addAttribute("teamMembers", teamMembers);
 
         return "todo_home2";
     }
+
 
     @PatchMapping("/api/contest/team/{teamId}/notice")
     public ResponseEntity<?> updateTeamNotice(@PathVariable Long teamId,
