@@ -4,6 +4,10 @@
     import org.springframework.data.jpa.repository.JpaRepository;
     import com.example.bob.Entity.UserEntity;
     import com.example.bob.Entity.JobApplicationStatus;
+    import org.springframework.data.domain.Pageable;
+    import org.springframework.data.jpa.repository.Query;
+    import org.springframework.data.repository.query.Param;
+
 
 
 
@@ -48,6 +52,16 @@
 
         // ✅ 이력서 기준으로 가장 최근 지원 내역 조회 (resumeId → 공고정보 복구용)
         Optional<JobApplicationEntity> findTopByResumeOrderByAppliedAtDesc(com.example.bob.Entity.ResumeEntity resume);
+
+        @Query("""
+    SELECT a 
+    FROM JobApplicationEntity a
+    WHERE a.jobPost.company.companyId = :companyId
+    AND a.status != 'HIDDEN'
+    ORDER BY a.appliedAt DESC
+""")
+        List<JobApplicationEntity> findTop3RecentApplicants(@Param("companyId") Long companyId, Pageable pageable);
+
 
 
 

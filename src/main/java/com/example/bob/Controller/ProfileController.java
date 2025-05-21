@@ -22,6 +22,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import com.example.bob.Service.DashboardService;
+
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class ProfileController {
@@ -41,9 +44,15 @@ public class ProfileController {
     private CoResumeService coResumeService;
 
     private final UserService userService;
+    private final DashboardService dashboardService;
 
-    public ProfileController(UserService userService) {
+
+
+
+    public ProfileController(UserService userService, DashboardService dashboardService) {
         this.userService = userService;
+        this.dashboardService = dashboardService;
+
     }
 
     @GetMapping("/main")
@@ -54,18 +63,28 @@ public class ProfileController {
             return "main"; // 비로그인 사용자는 main.html
         }
 
-        // 기업 사용자라면 main2.html로 분기
+        // ✅ 기업 사용자일 경우
         if (userDetails.getUserType().equals("company")) {
             CompanyEntity company = ((CompanyDetailsImpl) userDetails).getCompanyEntity();
             model.addAttribute("user", company);
             model.addAttribute("profileLink", "/company/profile");
 
+<<<<<<< HEAD
             // ✅ 기업이 만든 양식 개수 계산
             int resumeFormCount = coResumeService.getResumeFormCountByCompany(company.getCompanyId());
             model.addAttribute("resumeFormCount", resumeFormCount);
+=======
+            // ✅ 대시보드 데이터 모델에 추가
+            Map<String, Object> dashboardInfo = dashboardService.getCompanyDashboardInfo(company.getCompanyId());
+            model.addAttribute("postCount", dashboardInfo.get("postCount"));
+            model.addAttribute("applicantCount", dashboardInfo.get("applicantCount"));
+            model.addAttribute("resumeCount", dashboardInfo.get("resumeCount"));
+            model.addAttribute("recentApplicants", dashboardInfo.get("recentApplicants"));
+>>>>>>> develop
 
             return "main2";
         }
+
 
         // 일반 사용자
         UserEntity user = ((UserDetailsImpl) userDetails).getUserEntity();

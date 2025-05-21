@@ -20,4 +20,12 @@ public interface CoJobPostRepository extends JpaRepository<CoJobPostEntity, Long
 
     // ✅ 특정 이력서(CoResume)가 포함된 공고 조회
     List<CoJobPostEntity> findAllByResumesContaining(CoResumeEntity coResume);
+
+    // 기업이 작성한 공고 수
+    int countByCompany_CompanyId(Long companyId);
+
+    // 기업이 작성한 공고들의 ID 목록 기반으로 지원자 수 계산
+    @Query("SELECT COUNT(a) FROM JobApplicationEntity a WHERE a.jobPost.company.companyId = :companyId")
+    int countApplicantsByCompanyId(@Param("companyId") Long companyId);
+
 }

@@ -9,7 +9,12 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface CoResumeRepository extends JpaRepository<CoResumeEntity, Long> {
+<<<<<<< HEAD
     // 기본적인 save(), findAll(), findById() 전부 제공됨
     int countByCompany_CompanyId(Long companyId); // ✔️ 정상 작동
+=======
+
+    int countByCompany_CompanyId(Long companyId);
+>>>>>>> develop
 
 }

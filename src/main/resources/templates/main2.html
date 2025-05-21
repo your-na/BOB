@@ -21,24 +21,36 @@
 
 <section class="dashboard-section">
     <div class="dashboard-cards">
+
+        <!-- 🔹 공고 & 지원자 수 -->
         <div class="dashboard-card">
             <h3>공고 현황</h3>
-            <p>진행 중인 공고: <strong>5건</strong></p>
-            <p>지원자 수: <strong>18명</strong></p>
+            <p>진행 중인 공고: <strong th:text="${postCount + '건'}">0건</strong></p>
+            <p>지원자 수: <strong th:text="${applicantCount + '명'}">0명</strong></p>
         </div>
+
+        <!-- 🔹 이력서 양식 수 -->
         <div class="dashboard-card">
             <h3>이력서 양식</h3>
+<<<<<<< HEAD
             <p>등록한 양식: <strong th:text="${resumeFormCount} + '개'">0개</strong></p>
+=======
+            <p>등록한 양식: <strong th:text="${resumeCount + '개'}">0개</strong></p>
+>>>>>>> develop
             <a href="/coresumelist" class="dashboard-link">관리하기 →</a>
         </div>
+
+        <!-- 🔹 최근 지원자 목록 -->
         <div class="dashboard-card">
             <h3>최근 지원자</h3>
             <ul class="recent-users">
-                <li>김OO - 프론트엔드</li>
-                <li>이OO - UI디자이너</li>
-                <li>박OO - 백엔드</li>
+                <li th:each="a : ${recentApplicants}">
+                    <span th:text="${a.user.userName}">이름</span> -
+                    <span th:text="${a.user.mainLanguage}">언어</span>
+                </li>
             </ul>
         </div>
+
     </div>
 </section>
 

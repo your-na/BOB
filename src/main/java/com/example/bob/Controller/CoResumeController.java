@@ -14,6 +14,9 @@ import java.util.stream.Collectors;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
+import com.example.bob.security.CompanyDetailsImpl;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 
 @RestController
 @RequestMapping("/api/coresumes")
@@ -27,28 +30,25 @@ public class CoResumeController {
         this.coResumeService = coResumeService;
     }
 
-    // ✅ 이력서 저장
+    // ✅ 이력서 저장 (기업 정보 포함)
     @PostMapping
-    public ResponseEntity<Map<String, String>> saveResume(@RequestBody CoResumeRequestDTO requestDTO) {
-        // 조건 항목 로그 추가
-        requestDTO.getSections().forEach(section -> {
-        });
+    public ResponseEntity<Map<String, String>> saveResume(
+            @RequestBody CoResumeRequestDTO requestDTO,
+            @AuthenticationPrincipal CompanyDetailsImpl companyDetails) {
 
-        // 조건 항목들이 잘 전달되는지 확인 (디버그용)
-        requestDTO.getSections().forEach(section -> {
-            section.getConditions().forEach(condition -> {
-            });
-        });
+        // 1️⃣ 기업 ID 가져오기
+        Long companyId = companyDetails.getCompanyEntity().getCompanyId();
 
+        // 2️⃣ 이력서 저장 시 companyId 전달
+        coResumeService.saveResume(requestDTO, companyId);
 
-        // 이력서 저장
-        coResumeService.saveResume(requestDTO);
-
+        // 3️⃣ 응답 반환
         Map<String, String> result = new HashMap<>();
         result.put("message", "이력서 저장 성공");
 
         return ResponseEntity.ok(result);
     }
+
 
     // ✅ 이력서 목록 조회
     @GetMapping

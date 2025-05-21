@@ -8,6 +8,9 @@ import com.example.bob.Entity.CoResumeSectionEntity;
 import com.example.bob.Entity.CoResumeTagEntity;
 import com.example.bob.Repository.CoResumeRepository;
 import com.example.bob.Repository.CoResumeSectionRepository;
+import com.example.bob.Entity.CompanyEntity;
+import com.example.bob.Repository.CompanyRepository;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,27 +30,42 @@ public class CoResumeServiceImpl implements CoResumeService {
     private final CoResumeRepository coResumeRepository;
     private final CoResumeSectionRepository coResumeSectionRepository;
     private static final Logger logger = LoggerFactory.getLogger(CoResumeEditController.class);
+    private final CompanyRepository companyRepository;
+
+
+
 
 
     @Autowired
-    public CoResumeServiceImpl(CoResumeRepository coResumeRepository, CoResumeSectionRepository coResumeSectionRepository) {
+    public CoResumeServiceImpl(CoResumeRepository coResumeRepository,
+                               CoResumeSectionRepository coResumeSectionRepository,
+                               CompanyRepository companyRepository) {
         this.coResumeRepository = coResumeRepository;
         this.coResumeSectionRepository = coResumeSectionRepository;
+        this.companyRepository = companyRepository; // ✅ 주입 성공
     }
 
+<<<<<<< HEAD
     @Override
     public int getResumeFormCountByCompany(Long companyId) {
         return coResumeRepository.countByCompany_CompanyId(companyId);
     }
+=======
+>>>>>>> develop
 
     // ✅ 이력서 저장 (제작)
     @Override
-    public void saveResume(CoResumeRequestDTO requestDTO) {
+    public void saveResume(CoResumeRequestDTO requestDTO, Long companyId) {
         logger.info("이력서 저장 요청 - 제목: {}", requestDTO.getTitle());
 
         CoResumeEntity resume = new CoResumeEntity();
         resume.setTitle(requestDTO.getTitle());
         resume.setCreatedAt(requestDTO.getCreatedAt() != null ? requestDTO.getCreatedAt() : new Date());  // 🔥 추가
+        CompanyEntity company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회사 없음: " + companyId));
+        resume.setCompany(company);  // ✅ 여기에 회사 연결
+
+
 
 
         List<CoResumeTagEntity> tagEntities = new ArrayList<>();
