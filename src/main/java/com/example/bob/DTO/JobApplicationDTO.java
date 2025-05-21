@@ -16,4 +16,6 @@ public class JobApplicationDTO {
     private String companyIntro;    // 회사 소개글
     private String status;          // 상태
     private Long jobPostId;        // 공고 id
+    private Long applicationId;
+
 }

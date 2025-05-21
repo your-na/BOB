@@ -162,10 +162,17 @@
             }
         }
 
-
-
-
-
+        // 🙈 지원 내역 숨기기 API
+        @PatchMapping("/hide/{applicationId}")
+        public ResponseEntity<Map<String, String>> hideApplication(@PathVariable Long applicationId) {
+            try {
+                jobApplicationService.hideApplication(applicationId);  // 👉 서비스 메서드 호출
+                return ResponseEntity.ok(Map.of("message", "🙈 숨김 처리 완료"));
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(500).body(Map.of("message", "❌ 숨기기 실패: " + e.getMessage()));
+            }
+        }
 
 
     }

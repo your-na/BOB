@@ -42,6 +42,7 @@ public class JobApplicationService {
             dto.setCompanyIntro(application.getJobPost().getCompany().getCoBio());
             dto.setStatus(application.getStatus().name()); // Enum to String
             dto.setJobPostId(application.getJobPost().getId());
+            dto.setApplicationId(application.getId()); // 🙈 숨기기용 ID 추가
             return dto;
         }).collect(Collectors.toList());
     }
@@ -134,6 +135,25 @@ public class JobApplicationService {
 
         System.out.println("✅ 불합격 처리 완료");
     }
+
+    // 🙈 지원자 숨기기 처리 메서드
+    public void hideApplication(Long applicationId) {
+        System.out.println("📥 [SERVICE] hideApplication 호출됨");
+
+        // 지원 내역 조회
+        JobApplicationEntity application = jobApplicationRepository.findById(applicationId)
+                .orElseThrow(() -> {
+                    System.out.println("❌ 지원 내역 조회 실패 - applicationId: " + applicationId);
+                    return new RuntimeException("지원 내역을 찾을 수 없습니다.");
+                });
+
+        // 상태를 HIDDEN으로 변경
+        application.setStatus(JobApplicationStatus.HIDDEN);
+        jobApplicationRepository.save(application);
+
+        System.out.println("✅ 상태 저장 완료: HIDDEN");
+    }
+
 
 
 

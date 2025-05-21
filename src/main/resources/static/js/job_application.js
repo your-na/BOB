@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <ul class="dropdown-menu">
                    <li onclick="viewDetail(${item.jobPostId})">지원내역</li>
                    <li onclick="cancelApply(${item.jobPostId})">지원취소</li>
-                   <li onclick="hideItem(${item.id || index + 1})">숨기기</li>
+                   <li onclick="hideItem(${item.applicationId})">숨기기</li>
                    <li onclick="previewResume(${item.resumeId || item.id})">이력서 보기</li>
                 </ul>
             </div>
@@ -90,14 +90,31 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    window.hideItem = function (id) {
-        const data = window.__applicationData;
-        const item = data.find(i => i.id === id);
-        if (item) {
-            item.companyIntro += " (숨김)";
-            renderList(currentTab, data);
-        }
+    window.hideItem = function (applicationId) {
+        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+        fetch(`/api/applications/hide/${applicationId}`, {
+            method: "PATCH",
+            headers: {
+                [csrfHeader]: csrfToken
+            },
+            credentials: "include"
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert("🙈 지원 내역이 숨김 처리되었습니다.");
+                    fetchApplications(); // 목록 다시 불러오기
+                } else {
+                    return res.text().then(msg => alert("❌ 숨기기 실패: " + msg));
+                }
+            })
+            .catch(err => {
+                console.error("숨기기 실패:", err);
+                alert("⚠️ 서버 오류가 발생했습니다.");
+            });
     };
+
 
     window.viewDetail = function (jobPostId) {
         if (!jobPostId) return;
