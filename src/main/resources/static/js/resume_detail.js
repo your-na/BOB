@@ -1,11 +1,44 @@
 document.addEventListener("DOMContentLoaded", () => {
     const deleteBtn = document.querySelector(".delete-btn");
     const jobPostId = document.getElementById("jobPostId")?.value;
+    const resumeId = document.getElementById("resumeId")?.value;
 
 
     // ✅ CSRF 토큰과 헤더 이름 가져오기
     const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+    // ❎ 불합격 처리 버튼 클릭 시
+    const nonpassBtn = document.querySelector(".nonpass-btn");
+
+    if (nonpassBtn && resumeId && jobPostId && csrfToken && csrfHeader) {
+        nonpassBtn.addEventListener("click", () => {
+            const confirmed = confirm("정말 이 지원자를 불합격 처리하시겠습니까?");
+            if (!confirmed) return;
+
+            // 📡 서버로 불합격 처리 요청 전송 (메시지 없이)
+            fetch("/api/applications/job/reject", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify({
+                    resumeId,
+                    jobPostId
+                    // ❌ message 제거됨
+                })
+            })
+                .then(res => res.ok ? res.json() : res.text().then(msg => { throw new Error(msg); }))
+                .then(data => {
+                    alert("❎ " + data.message); // 서버 응답 메시지 출력
+                })
+                .catch(err => {
+                    console.error("❌ 에러 발생:", err);
+                    alert("⚠️ 불합격 처리에 실패했습니다.\n" + err.message);
+                });
+        });
+    }
 
     if (deleteBtn && jobPostId && csrfToken && csrfHeader) {
         deleteBtn.addEventListener("click", (e) => {
@@ -43,7 +76,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const passModal = document.getElementById("passModal");
     const closeModalBtn = document.querySelector(".close");
     const submitPassBtn = document.getElementById("submitPassBtn");
-    const resumeId = document.getElementById("resumeId")?.value;
 
     if (passBtn && passModal) {
         passBtn.addEventListener("click", () => {
@@ -199,4 +231,6 @@ function fetchTreeDataAndRender(root) {
         .catch(err => {
             console.error("트리 뷰 로딩 실패:", err);
         });
+
+
 }

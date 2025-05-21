@@ -130,6 +130,38 @@
             return ResponseEntity.ok(Map.of("message", "🎉 합격 알림이 전송되었습니다."));
         }
 
+        // ❎ 지원자 불합격 처리 API
+        @PostMapping(value = "/job/reject", produces = "application/json")
+        public ResponseEntity<Map<String, String>> rejectApplicant(
+                @AuthenticationPrincipal CompanyDetailsImpl companyDetails,
+                @RequestBody PassRequestDTO rejectRequest) {
+
+            System.out.println("📌 [API 호출] /job/reject");
+
+            // 🔒 기업 로그인 여부 확인
+            if (companyDetails == null) {
+                System.out.println("❌ 기업 로그인 필요");
+                return ResponseEntity.status(401).body(Map.of("message", "로그인이 필요합니다."));
+            }
+
+            try {
+                // 🛠 불합격 처리 로직 실행
+                jobApplicationService.rejectApplicant(
+                        rejectRequest.getResumeId(),
+                        rejectRequest.getJobPostId(),
+                        rejectRequest.getMessage()
+                );
+
+                // ✅ 성공 응답 반환
+                return ResponseEntity.ok(Map.of("message", "❎ 불합격 처리가 완료되었습니다."));
+            } catch (Exception e) {
+                // ⚠️ 예외 발생 시 로그 출력 + 실패 응답
+                e.printStackTrace();
+                return ResponseEntity.status(500).body(Map.of("message", "서버 오류: " + e.getMessage()));
+            }
+        }
+
+
 
 
 

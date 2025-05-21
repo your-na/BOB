@@ -186,6 +186,20 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
+    // ❎ 불합격 알림 전송 메서드
+    public void sendRejectNotification(UserEntity receiver, CompanyEntity company, CoJobPostEntity jobPost) {
+        NotificationEntity notification = new NotificationEntity();
+        notification.setUser(receiver);               // 👤 알림 받을 사용자
+        notification.setCompany(company);             // 🏢 보낸 기업
+        notification.setMessage("아쉽게도 이번에는 함께하지 못하게 되었습니다.");  // 💬 불합격 메시지 (고정)
+        notification.setTimestamp(LocalDateTime.now()); // 🕒 현재 시간
+        notification.setIsRead(false);                // 🔕 읽지 않음 상태
+        notification.setType(NotificationType.HIRE_NOTICE); // 📌 알림 타입 그대로 사용
+        notification.setJobPost(jobPost);             // 💼 관련 채용 공고
+        notificationRepository.save(notification);    // 💾 DB에 저장
+    }
+
+
     @Transactional
     public void deleteNotificationByTeamAndUser(Long teamId, UserEntity user) {
         List<NotificationEntity> list = notificationRepository.findByContestTeamIdAndUserAndIsHiddenFalse(teamId, user);

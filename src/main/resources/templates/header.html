@@ -154,6 +154,22 @@
         </div>
     </div>
 
+    <!-- ❎ 불합격 안내 모달 -->
+    <div id="rejectModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeRejectModal()">&times;</span>
+            <h2>❎ 불합격 안내</h2>
+            <p id="reject-company" style="font-weight: bold; font-size: 18px;"></p>
+            <p>안타깝지만 이번 채용에서는 함께하지 않게 되었습니다.</p>
+
+            <div class="modal-buttons">
+                <button onclick="closeRejectModal()">확인</button>
+                <a id="reject-detail-btn" href="#" target="_blank" class="view-contest-btn">공고 보기</a>
+            </div>
+        </div>
+    </div>
+
+
 
     <script>
         function getCsrf() {
@@ -274,9 +290,15 @@
                     }
 
                     if (currentNotification.type === 'HIRE_NOTICE') {
-                        openHireModal(currentNotification.companyName, currentNotification.message, currentNotification.jobPostId);
+                        // 💡 불합격 고정 메시지로 분기
+                        if (currentNotification.message === "아쉽게도 이번에는 함께하지 못하게 되었습니다.") {
+                            openRejectModal(currentNotification.companyName, currentNotification.jobPostId);
+                        } else {
+                            openHireModal(currentNotification.companyName, currentNotification.message, currentNotification.jobPostId);
+                        }
                         return;
                     }
+
 
 
 
@@ -447,9 +469,21 @@
             document.getElementById('hireModal').style.display = 'none';
         }
 
+        // ❎ 불합격 모달 열기
+        function openRejectModal(companyName, jobPostId) {
+            document.getElementById('reject-company').textContent = `${companyName}에서 불합격 안내가 도착했어요.`;
+            document.getElementById('reject-detail-btn').href = jobPostId ? `/jobindex?id=${jobPostId}` : '#';
+            document.getElementById('rejectModal').style.display = 'flex';
+        }
+
+        // ❎ 불합격 모달 닫기
+        function closeRejectModal() {
+            document.getElementById('rejectModal').style.display = 'none';
+        }
+
+
     </script>
 </header>
 </div>
-x
 </body>
 </html>

@@ -7,6 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.example.bob.DTO.ApplicantDTO;
 import com.example.bob.Entity.JobApplicationStatus;
+import com.example.bob.Entity.ResumeEntity;
+import com.example.bob.Entity.UserEntity;
+import com.example.bob.Repository.ResumeRepository;
+
 
 
 import java.text.SimpleDateFormat;
@@ -18,6 +22,11 @@ import java.util.stream.Collectors;
 public class JobApplicationService {
 
     private final JobApplicationRepository jobApplicationRepository;
+
+    private final ResumeRepository resumeRepository;
+
+    private final NotificationService notificationService;
+
 
     public List<JobApplicationDTO> getUserJobApplications(Long userId) {
         System.out.println("📥 [SERVICE] 호출된 사용자 ID: " + userId);
@@ -54,6 +63,43 @@ public class JobApplicationService {
                 // 📤 리스트로 반환
                 .collect(Collectors.toList());
     }
+
+    // ❎ 지원자 불합격 처리 메서드
+    public void rejectApplicant(Long resumeId, Long jobPostId, String message) {
+        System.out.println("📥 [SERVICE] rejectApplicant 호출됨");
+
+        // 📄 이력서 조회
+        ResumeEntity resume = resumeRepository.findById(resumeId)
+                .orElseThrow(() -> {
+                    System.out.println("❌ 이력서 조회 실패 - resumeId: " + resumeId);
+                    return new RuntimeException("이력서를 찾을 수 없습니다.");
+                });
+
+        // 👤 지원자 정보 가져오기
+        UserEntity user = resume.getUser();
+
+        // 📦 지원 내역 조회 (가장 최근 이력서 기반)
+        JobApplicationEntity application = jobApplicationRepository
+                .findTopByResumeOrderByAppliedAtDesc(resume)
+                .orElseThrow(() -> {
+                    System.out.println("❌ 지원 내역 조회 실패 - resumeId: " + resumeId);
+                    return new RuntimeException("지원 내역이 존재하지 않습니다.");
+                });
+
+        // 🔄 상태 변경 → 불합격
+        application.setStatus(JobApplicationStatus.REJECTED);
+        jobApplicationRepository.save(application);
+        System.out.println("✅ 상태 저장 완료: REJECTED");
+
+        // 📩 불합격 알림 전송
+        notificationService.sendRejectNotification(user, application.getJobPost().getCompany(), application.getJobPost());
+
+        // (선택) 알림 기능이 있다면 여기에 삽입 가능
+        // notificationService.sendRejectNotification(user, message);
+
+        System.out.println("✅ 불합격 처리 완료");
+    }
+
 
 
 
