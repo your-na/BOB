@@ -36,19 +36,29 @@ document.addEventListener("DOMContentLoaded", () => {
             const endDate = new Date(post.endDate);
             const today = new Date();
 
-            // 🔄 모집 상태에 따라 텍스트/클래스 설정
+// 날짜만 비교할 수 있도록 시간 제거
+            function toDateOnly(date) {
+                return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            }
+
+            const startDateOnly = toDateOnly(startDate);
+            const endDateOnly = toDateOnly(endDate);
+            const todayDateOnly = toDateOnly(today);
+
+         // 🔄 모집 상태에 따라 텍스트/클래스 설정
             let statusLabel = "";
             let statusClass = "";
-            if (today < startDate) {
+            if (todayDateOnly < startDateOnly) {
                 statusLabel = "모집전";
                 statusClass = "status-waiting";
-            } else if (today > endDate) {
+            } else if (todayDateOnly > endDateOnly) {
                 statusLabel = "마감";
                 statusClass = "status-closed";
             } else {
                 statusLabel = "모집중";
                 statusClass = "status-open";
             }
+
 
             // ⏳ 마감일까지 남은 일수 계산
             const dDay = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
