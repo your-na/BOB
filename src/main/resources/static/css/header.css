@@ -530,3 +530,84 @@ body {
 #reject-btn:hover {
     background-color: #f8f8f8;
 }
+
+/* ✅ 공통 모달 스타일 */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none; /* 기본은 숨김 */
+    align-items: center;
+    justify-content: center;
+}
+
+/* ✅ 모달 본문 박스 */
+.modal .modal-content {
+    background-color: white;
+    padding: 30px 40px;
+    border-radius: 10px;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    animation: slideDown 0.3s ease-out;
+    position: relative;
+}
+
+/* ✅ 닫기 버튼 (오른쪽 위) */
+.modal .close-btn {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #999;
+}
+
+/* ✅ 버튼 영역 */
+.modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* ✅ 공통 버튼 스타일 */
+.modal-buttons button,
+.modal-buttons a {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    color: #fff;
+    background-color: #00b800;
+    transition: background-color 0.2s;
+}
+
+.modal-buttons button:hover,
+.modal-buttons a:hover {
+    background-color: #009a00;
+}
+
+/* ✅ "자세히 보기", "공고 보기" 버튼에만 적용되는 스타일 */
+.view-contest-btn {
+    background-color: white;
+    color: #00b800;
+    border: 2px solid #00b800;
+}
+
+.view-contest-btn:hover {
+    background-color: #f8f8f8;
+    font-weight: bold;
+}
+
+/* ✅ 슬라이드 애니메이션 */
+@keyframes slideDown {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
