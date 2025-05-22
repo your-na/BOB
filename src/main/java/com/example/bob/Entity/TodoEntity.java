@@ -28,4 +28,7 @@ public class TodoEntity {
     @Column(nullable = false)
     private String type; // 프로젝트 유형 (예: "공모전", "프로젝트", "개인")
 
+    @Column(nullable = true)
+    private Long targetId;  // 프로젝트/공모전 구분용 ID (선택사항)
+
 }

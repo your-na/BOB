@@ -1,6 +1,7 @@
 package com.example.bob.Service;
 
 import com.example.bob.DTO.TodoRequestDto;
+import com.example.bob.Entity.ContestTeamEntity;
 import com.example.bob.Entity.TodoEntity;
 import com.example.bob.Repository.TodoRepository;
 import lombok.RequiredArgsConstructor;
@@ -120,4 +121,34 @@ public class    TodoService {
         return todoRepository.findByStartDateAndAssigneeContaining(date, userNick);
     }
 
+
+    //--------------------------------------------------------
+    // 공모전용!!!!!!!!!!!!!!!!!!!!!!!!
+
+    public TodoEntity saveForContest(TodoRequestDto dto, UserEntity user, boolean isHost, ContestTeamEntity team) {
+        String assigneeProcessed = resolveAssignee(
+                dto.getAssignee(),
+                dto.getWorkspace(),
+                user.getUserNick(),
+                isHost
+        );
+
+        TodoEntity todo = TodoEntity.builder()
+                .title(dto.getTitle())
+                .startDate(dto.getStartDate())
+                .endDate(dto.getEndDate())
+                .assignee(assigneeProcessed)
+                .workspace(team.getTeamName())  // 팀 이름을 workspace로 저장
+                .completed(false)
+                .type("공모전")
+                .targetId(team.getId())
+                .build();
+
+        return todoRepository.save(todo);
+    }
+
+    public List<TodoEntity> findByDateAndTeam(String date, Long teamId, UserEntity user) {
+        return todoRepository.findByStartDateAndTargetIdAndTypeAndAssigneeContaining(
+                date, teamId, "공모전", user.getUserNick());
+    }
 }

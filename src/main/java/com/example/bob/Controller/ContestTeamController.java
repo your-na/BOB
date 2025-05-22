@@ -1,12 +1,15 @@
 package com.example.bob.Controller;
 
 import com.example.bob.DTO.ContestTeamRequestDTO;
+import com.example.bob.Entity.ContestTeamEntity;
 import com.example.bob.Entity.UserEntity;
+import com.example.bob.Repository.ContestTeamRepository;
 import com.example.bob.Service.ContestTeamService;
 import com.example.bob.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -66,6 +69,5 @@ public class ContestTeamController {
             return ResponseEntity.badRequest().body("응답 처리 중 오류: " + e.getMessage());
         }
     }
-
 
 }

@@ -23,4 +23,8 @@ public interface TodoRepository extends JpaRepository<TodoEntity, Long> {
     List<TodoEntity> findByStartDateAndAssigneeContaining(
             @Param("startDate") String startDate,
             @Param("userNick") String userNick);
+
+
+    List<TodoEntity> findByStartDateAndTargetIdAndTypeAndAssigneeContaining(
+            String startDate, Long targetId, String type, String assignee);
 }

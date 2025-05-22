@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>프로젝트</title>
+  <link rel="stylesheet" th:href="@{/css/todo_plan.css}" />
+
+</head>
+<body>
+
+<div class="container">
+  <!-- 캘린더 모달 -->
+  <div class="modal">
+    <div class="calendar-container">
+      <div class="header">
+        <button class="back-btn">&lt;</button>
+        <h2 th:text="${projectTitle}">프로젝트 제목</h2>
+        <button class="close-btn">&times;</button>
+      </div>
+      <div class="calendar-header">
+        <button id="prev-month">&lt;</button>
+        <h3 id="current-month">2024년 12월</h3>
+        <button id="next-month">&gt;</button>
+      </div>
+      <table class="calendar">
+        <thead>
+        <tr>
+          <th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
+        </tr>
+        </thead>
+        <tbody id="calendar-body">
+        <!-- 캘린더 동적 생성 -->
+        </tbody>
+      </table>
+      <div class="task-header">
+        <h3 class="task-date-title">12월 19일 할 일</h3>
+        <button class="add-task-btn">할 일 등록</button>
+      </div>
+      <ul class="todo-list">
+        <!-- 할 일 리스트 동적으로 채워짐 -->
+      </ul>
+    </div>
+
+    <!-- 사이드바 -->
+    <div class="sidebar">
+      <button class="sidebar-btn">홈</button>
+      <button class="sidebar-btn active">할 일</button>
+      <button class="sidebar-btn">WBS</button>
+      <button class="sidebar-btn">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- 할 일 등록 폼 -->
+<div class="task-modal hidden">
+  <div class="task-modal-content">
+    <h3>할 일 생성하기</h3>
+
+    <input type="text" placeholder="할 일을 입력하세요" class="task-input" />
+
+    <div class="date-picker">
+      📅 DATE &nbsp;
+      <input type="date" class="start-date" /> ~
+      <input type="date" class="end-date" />
+    </div>
+
+    <div class="form-group">
+      <label>스페이스</label>
+      <select class="space-select">
+        <!-- 프로젝트 목록은 JS에서 채워짐 -->
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>담당자</label>
+      <select class="member-select">
+        <!-- JS에서 동적으로 채움 -->
+      </select>
+    </div>
+
+    <div class="task-btns">
+      <button class="submit-task-btn">생성</button>
+      <button class="cancel-task-btn">취소</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/todo_plan2.js"></script>
+</body>
+<script th:inline="javascript">
+  window.teamId = /*[[${teamId}]]*/ 0;
+  window.projectTitle = /*[['${projectTitle}']]*/ '';
+  window.csrfToken = /*[['${_csrf.token}']]*/ '';
+  window.csrfHeader = /*[['${_csrf.headerName}']]*/ '';
+</script>
+
+
+</html>

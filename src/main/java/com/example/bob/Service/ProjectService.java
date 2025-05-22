@@ -17,10 +17,8 @@ import com.example.bob.Repository.UserRepository;
 import com.example.bob.Entity.NotificationEntity;
 import com.example.bob.Repository.NotificationRepository;
 import org.springframework.web.multipart.MultipartFile;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import com.example.bob.DTO.UserProjectResponseDTO;
 import com.example.bob.Entity.NotificationType;
@@ -702,10 +700,9 @@ public class ProjectService {
                 .orElse("신청 메시지가 없습니다.");
     }
 
-
-
-
-
+    public Optional<ProjectEntity> findByTitle(String title) {
+        return projectRepository.findByTitle(title);
+    }
 
 }
 

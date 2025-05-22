@@ -2,6 +2,7 @@ package com.example.bob.Controller;
 
 import com.example.bob.Entity.*;
 import com.example.bob.DTO.ProjectDTO;
+import com.example.bob.Repository.ContestTeamRepository;
 import com.example.bob.Service.ContestTeamService;
 import com.example.bob.Service.ProjectService;
 import com.example.bob.security.UserDetailsImpl;
@@ -25,6 +26,8 @@ public class SpaceController {
     private ProjectService projectService;
     @Autowired
     private ContestTeamService contestTeamService;
+    @Autowired
+    private ContestTeamRepository contestTeamRepository;
 
     // 프로젝트 목록
     @GetMapping("/plan")
@@ -138,6 +141,28 @@ public class SpaceController {
         return "todo_plan"; // "todo_plan.html" 템플릿 반환
     }
 
+    @GetMapping("/todo_plan2/{teamId}")
+    public String showContestPlan(@PathVariable Long teamId, Model model) {
+        ContestTeamEntity team = contestTeamRepository.findById(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("공모전 팀을 찾을 수 없습니다."));
 
+        model.addAttribute("projectTitle", team.getTeamName());
+        model.addAttribute("teamId", team.getId());
+
+        model.addAttribute("team", team);
+
+        return "todo_plan2"; // 공모전 전용 할 일 HTML
+    }
+
+    @GetMapping("/todocrud/{teamId}")
+    public String showContestWBS(@PathVariable Long teamId, Model model) {
+        ContestTeamEntity team = contestTeamRepository.findById(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("공모전 팀을 찾을 수 없습니다."));
+
+        model.addAttribute("teamId", team.getId());
+        model.addAttribute("projectTitle", team.getTeamName());
+
+        return "todo_wbs2"; // 공모전 전용 WBS HTML
+    }
 
 }

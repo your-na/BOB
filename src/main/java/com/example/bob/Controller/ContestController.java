@@ -7,6 +7,7 @@ import com.example.bob.Entity.ContestTeamEntity;
 import com.example.bob.Entity.UserEntity;
 import com.example.bob.Repository.ContestTeamMemberRepository;
 import com.example.bob.Repository.ContestTeamRepository;
+import com.example.bob.Repository.UserRepository;
 import com.example.bob.Service.ContestRecruitService;
 import com.example.bob.Service.ContestService;
 import com.example.bob.security.CompanyDetailsImpl;
@@ -39,6 +40,7 @@ public class ContestController {
     private final ContestRecruitService recruitService;
     private final ContestTeamMemberRepository contestTeamMemberRepository;
     private final ContestTeamRepository contestTeamRepository;
+    private final UserRepository userRepository;
 
     // ✅ 사용자 유형에 따라 공모전 홈 리디렉션
     @GetMapping("/contest-redirect")
@@ -202,7 +204,9 @@ public class ContestController {
         String loginNick = userDetails.getUserEntity().getUserNick();
         String ownerNick = team.getCreatedBy();
 
-        // ✅ 수락된 멤버만
+        UserEntity owner = userRepository.findByUserNick(ownerNick)
+                .orElseThrow(() -> new RuntimeException("팀장 정보를 찾을 수 없습니다."));
+
         List<String> teamMembers = contestTeamMemberRepository.findByTeamAndIsAcceptedTrue(team).stream()
                 .map(m -> m.getUser().getUserNick())
                 .filter(nick -> !nick.equals(ownerNick)) // 팀장은 제외
@@ -211,6 +215,7 @@ public class ContestController {
         model.addAttribute("project", contest);
         model.addAttribute("team", team);
         model.addAttribute("ownerNick", ownerNick);
+        model.addAttribute("owner", owner);
         model.addAttribute("loginNick", loginNick);
         model.addAttribute("teamMembers", teamMembers);
 
