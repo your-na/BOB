@@ -148,7 +148,7 @@ public class    TodoService {
     }
 
     public List<TodoEntity> findByDateAndTeam(String date, Long teamId, UserEntity user) {
-        return todoRepository.findByStartDateAndTargetIdAndTypeAndAssigneeContaining(
-                date, teamId, "공모전", user.getUserNick());
+        return todoRepository.findTodosByDateRangeForTeam(date, teamId, user.getUserNick());
     }
+
 }

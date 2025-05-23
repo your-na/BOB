@@ -60,12 +60,28 @@ document.addEventListener("DOMContentLoaded", function () {
                         todoList.innerHTML = "";
                         taskTitle.textContent = `${month + 1}월 ${day}일 할 일`;
 
-                        if (data.length === 0) {
+                        // ✅ 날짜 포함 여부 판단 함수
+                        function isDateInRange(clickedDateStr, startDateStr, endDateStr) {
+                            const clicked = new Date(clickedDateStr);
+                            const start = new Date(startDateStr);
+                            const end = new Date(endDateStr);
+                            clicked.setHours(0, 0, 0, 0);
+                            start.setHours(0, 0, 0, 0);
+                            end.setHours(0, 0, 0, 0);
+                            return clicked >= start && clicked <= end;
+                        }
+
+                        // ✅ 해당 날짜에 포함되는 할 일만 필터링
+                        const filteredTodos = data.filter(todo =>
+                            isDateInRange(clickedDate, todo.startDate, todo.endDate)
+                        );
+
+                        if (filteredTodos.length === 0) {
                             todoList.innerHTML = "<li>할 일이 없습니다.</li>";
                             return;
                         }
 
-                        data.forEach(todo => {
+                        filteredTodos.forEach(todo => {
                             const li = document.createElement("li");
                             const checkbox = document.createElement("input");
                             checkbox.type = "checkbox";
@@ -115,6 +131,7 @@ document.addEventListener("DOMContentLoaded", function () {
         currentMonth.textContent = `${year}년 ${month + 1}월`;
     }
 
+
     function getDday(dateStr) {
         const today = new Date();
         const target = new Date(dateStr);
@@ -149,6 +166,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const endDate = endDateInput.value;
         const csrfToken = getCookie("XSRF-TOKEN");
 
+        const selectedOption = document.querySelector(".space-select").selectedOptions[0];
+        const selected = selectedOption.value;
+        const selectedGroupLabel = selectedOption.parentElement.label;
+
         if (!title || !date || !endDate) {
             alert("할 일 제목과 날짜를 모두 입력해주세요!");
             return;
@@ -159,11 +180,11 @@ document.addEventListener("DOMContentLoaded", () => {
             startDate: date,
             endDate: endDate,
             assignee: document.querySelector(".member-select").value,
-            workspace: document.querySelector(".space-select").value,
+            workspace: selected,
             type: selected === "개인" ? "개인" : (
-                selectedGroup.label === "공모전 팀" ? "공모전" : "프로젝트"
+                selectedGroupLabel === "공모전 팀" ? "공모전" : "프로젝트"
             ),
-            targetId: selectedGroup.label === "공모전 팀" ? window.teamId : null
+            targetId: selectedGroupLabel === "공모전 팀" ? window.teamId : null
         };
 
         fetch("/api/todos", {
@@ -212,7 +233,7 @@ function loadTeamSpaces() {
                 contestTeams.forEach(team => {
                     const option = document.createElement("option");
                     option.value = team.teamName;
-                    option.textContent = team.teamName;
+                    option.textContent = team.contestTitle;
                     group.appendChild(option);
                 });
                 spaceSelect.appendChild(group);

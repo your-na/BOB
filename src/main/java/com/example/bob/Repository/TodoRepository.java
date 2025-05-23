@@ -27,4 +27,10 @@ public interface TodoRepository extends JpaRepository<TodoEntity, Long> {
 
     List<TodoEntity> findByStartDateAndTargetIdAndTypeAndAssigneeContaining(
             String startDate, Long targetId, String type, String assignee);
+
+    @Query("SELECT t FROM TodoEntity t WHERE t.targetId = :teamId AND t.type = '공모전' AND t.assignee LIKE %:userNick% AND :clickedDate BETWEEN t.startDate AND t.endDate")
+    List<TodoEntity> findTodosByDateRangeForTeam(@Param("clickedDate") String clickedDate,
+                                                 @Param("teamId") Long teamId,
+                                                 @Param("userNick") String userNick);
+
 }
