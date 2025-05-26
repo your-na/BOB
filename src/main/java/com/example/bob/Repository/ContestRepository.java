@@ -18,4 +18,6 @@ public interface ContestRepository extends JpaRepository<ContestEntity, Long> {
     List<ContestEntity> findByCreatorTypeAndIsDeletedFalse(String creatorType);
 
 
+    List<ContestEntity> findTop4ByIsApprovedTrueOrderByCreatedAtDesc(); //메인쪽에 4개 뜨게 하려는거임
+
 }

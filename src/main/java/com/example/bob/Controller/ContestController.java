@@ -240,4 +240,11 @@ public class ContestController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/api/contest/latest")
+    @ResponseBody // ✅ 이거 추가!
+    public List<ContestDTO> getLatestContests() {
+        return contestService.getLatestContests();
+    }
+
+
 }
