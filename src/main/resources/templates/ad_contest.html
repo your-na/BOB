@@ -155,7 +155,7 @@
             <!-- Thymeleaf 반복문으로 프로젝트 데이터 출력 -->
             <tr th:each="contest : ${contests}">
                 <td>
-                    <a th:href="@{'/contest/' + ${contest.id}}" th:text="${contest.title}">공모전 제목</a>
+                    <a class="aa" th:href="@{'/contest/' + ${contest.id}}" th:text="${contest.title}">공모전 제목</a>
                 </td>
                 <td th:text="${contest.organizer}">주최 기관</td>
                 <td th:text="'D-' + ${contest.remainingDays}">D-5456</td>
