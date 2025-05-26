@@ -43,6 +43,14 @@ function setupDropBox(box) {
                 const item = document.createElement('div');
                 item.className = 'uploaded-item';
                 item.textContent = file.name;
+
+                // ✅ 삭제 버튼 추가
+                const deleteBtn = document.createElement('span');
+                deleteBtn.className = 'delete-icon';
+                deleteBtn.innerHTML = '삭제️';
+                deleteBtn.addEventListener('click', () => item.remove());
+                item.appendChild(deleteBtn);
+
                 box.appendChild(item);
             });
         }  else if (e.dataTransfer.types.includes("application/json")) {
@@ -58,6 +66,12 @@ function setupDropBox(box) {
             item.dataset.startDate = json.startDate || "";
             item.dataset.endDate = json.endDate || "";
 
+            // ✅ 삭제 버튼 추가
+            const deleteBtn = document.createElement('span');
+            deleteBtn.className = 'delete-icon';
+            deleteBtn.innerHTML = '삭제️';
+            deleteBtn.addEventListener('click', () => item.remove());
+            item.appendChild(deleteBtn);
 
             box.appendChild(item);
         } else {
@@ -65,6 +79,14 @@ function setupDropBox(box) {
             const item = document.createElement('div');
             item.className = 'uploaded-item';
             item.textContent = title;
+
+            // ✅ 삭제 버튼 추가
+            const deleteBtn = document.createElement('span');
+            deleteBtn.className = 'delete-icon';
+            deleteBtn.innerHTML = '삭제️';
+            deleteBtn.addEventListener('click', () => item.remove());
+            item.appendChild(deleteBtn);
+
             box.appendChild(item);
         }
     });
