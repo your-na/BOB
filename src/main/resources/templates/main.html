@@ -36,7 +36,7 @@
         <div class="content-section">
             <div class="content-section-header">
                 <h2>관심 분야 공모전</h2>
-                <p>더보기 ></p>
+                <p><a href="/contest" class="more">더보기 ></a></p>
             </div>
             <div class="card popular-competitions">
                 <div class="poster-grid" id="contest-poster-grid">
@@ -71,6 +71,11 @@
                 <button class="filter-btn active">공모전</button>
                 <button class="filter-btn" id="project-btn">프로젝트</button>
                 <button class="filter-btn">자유</button>
+            </div>
+
+            <!-- 공모전 목록 -->
+            <div id="contest-list" class="project-list">
+                <!-- 공모전 제목 목록이 여기에 렌더링됩니다. -->
             </div>
 
             <!-- 프로젝트 목록 -->
@@ -165,19 +170,53 @@
 
         buttons.forEach(button => {
             button.addEventListener('click', () => {
-                // 모든 버튼에서 active 클래스 제거
                 buttons.forEach(btn => btn.classList.remove('active'));
-                // 클릭한 버튼에 active 클래스 추가
                 button.classList.add('active');
 
-                // 필터된 버튼에 맞게 프로젝트 목록을 표시하는 로직 추가
+                const projectList = document.getElementById('project-list');
+                const contestList = document.getElementById('contest-list');
+
                 if (button.textContent === '프로젝트') {
-                    loadProjects(); // 프로젝트 목록을 동적으로 로드
+                    projectList.style.display = 'block';
+                    contestList.style.display = 'none';
+                    loadProjects(); // 기존 함수
+                } else if (button.textContent === '공모전') {
+                    projectList.style.display = 'none';
+                    contestList.style.display = 'block';
+                    loadContests(); // 👈 새로운 함수
+                } else {
+                    projectList.style.display = 'none';
+                    contestList.style.display = 'none';
                 }
             });
         });
 
-        // 프로젝트 목록을 동적으로 로드하는 함수
+        //공모전 리스트형식으루
+        function loadContests() {
+            fetch('/api/contest/latest')
+                .then(response => response.json())
+                .then(contests => {
+                    const contestListDiv = document.getElementById('contest-list');
+                    contestListDiv.innerHTML = ''; // 초기화
+
+                    const ul = document.createElement('ul');
+
+                    contests.forEach(contest => {
+                        const li = document.createElement('li');
+                        const a = document.createElement('a');
+                        a.href = `/pocontest/${contest.id}`;
+                        a.classList.add('project-title'); // 스타일 공유
+                        a.textContent = contest.title;
+
+                        li.appendChild(a);
+                        ul.appendChild(li);
+                    });
+
+                    contestListDiv.appendChild(ul);
+                })
+                .catch(error => console.error('공모전 불러오기 실패:', error));
+        }
+
         // 프로젝트 목록을 동적으로 로드하는 함수
         function loadProjects() {
             fetch('/project/api')  // 백엔드에서 JSON 형식의 프로젝트 목록을 가져오는 API
@@ -254,6 +293,8 @@
         });
 
         document.addEventListener("DOMContentLoaded", () => {
+            loadContests(); // 최초 공모전 목록 보여주기
+            
             fetch("/api/contest/latest")  // ✅ 백엔드에서 최신 4개 공모전 반환
                 .then(res => res.json())
                 .then(data => {
