@@ -15,7 +15,7 @@
 
 <!-- 제목과 모집현황 -->
 <div class="title-row">
-  <div class="title" th:text="${contest.title}">공모전 제목</div>
+  <div class="title" th:text="${recruit.title}">공모전 제목</div>
   <span class="deadline" th:text="'D-' + ${contest.dDay}">D-14</span>
   <div class="status">
     모집현황
@@ -27,7 +27,7 @@
   <div class="post-detail">
     <img class="postdetail" src="/images/postdetail.png" alt="점 세 개" onclick="toggleDropdown()" th:if="${isOwner}">
     <div class="dropdownmenu" id="dropdownMenu" style="display: none;" th:if="${isOwner}">
-      <a class="action-button" th:href="@{'/pocontest/' + ${contest.id} + '/edit'}">수정하기</a>
+      <a class="action-button" th:href="@{'/recruit/' + ${contest.id} + '/edit'}">수정하기</a>
       <a class="action-button" href="javascript:void(0);" onclick="deleteContest()">삭제하기</a>
     </div>
   </div>
@@ -37,8 +37,8 @@
 <!-- 작성자 및 작성일 -->
 <div class="meta">
   <a class="meta1"
-     th:href="@{'/profileview?userNick=' + ${contest.createdBy}}"
-     th:text="${contest.createdBy}">
+     th:href="@{'/profileview?userNick=' + ${recruit.writer.userNick}}"
+     th:text="${recruit.writer.userNick}">
     작성자
   </a>
   <span class="meta2" th:text="'작성일 : ' + ${today}">작성일</span>
@@ -54,18 +54,18 @@
 </div>
 
 <div class="form-group">
-  <label for="apply-dates">접수 일정</label>
+  <label for="apply-dates">모집 일정</label>
   <div class="date-inputs">
-    <span id="startdate" th:text="${contest.recruitmentStartDate}"></span>
+    <span id="startdate" th:text="${recruit.recruitmentStartDate}"></span>
     <span>~</span>
-    <span id="enddate" th:text="${contest.recruitmentEndDate}"></span>
+    <span id="enddate" th:text="${recruit.recruitmentEndDate}"></span>
   </div>
 </div>
 
 <!-- 설명 -->
 <div class="good">
   <p>내용</p>
-  <div class="content" th:text="${contest.description}">공모전 설명 내용</div>
+  <div class="content" th:text="${recruit.description}">공모전 설명 내용</div>
 </div>
 
 <!-- 공모전 신청 버튼 -->
@@ -129,7 +129,7 @@
     });
 
     window.deleteContest = function () {
-      let contestId = window.location.pathname.split("/")[2];
+      let recruitId = window.location.pathname.split("/")[2];
 
       if (!confirm("⚠️ 정말 삭제하시겠습니까? 삭제 후 복구할 수 없습니다!")) {
         return;
@@ -138,7 +138,7 @@
       let csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
       let csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-      fetch(`/pocontest/${contestId}`, {
+      fetch(`/recruit/${recruitId}`, {
         method: "DELETE",
         headers: {
           [csrfHeader]: csrfToken,

@@ -57,7 +57,7 @@ public class SecurityConfig {
                         .requestMatchers("/error", "/favicon.ico").permitAll()
                         .requestMatchers("/login", "/sign").anonymous()
                         .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject", "/api/todos", "/api/resumes", "/api/chat/**", "chat/group-chatroom", "/chatting", "/chat/**", "/api/users/search", "/contest/team/**","/contesthome/**", "/todocrud/**", "/api/contest/team/**", "/contest/recruit","/todo_plan/{teamId}", "/ws-chat/**"
-                        ,"/api/user/resumes/submit", "/api/user/resumes/upload", "/api/group-chat", "/group/**").authenticated()
+                        ,"/api/user/resumes/submit", "/api/user/resumes/upload", "/api/group-chat", "/group/**", "/recruit/{id}").authenticated()
                         .requestMatchers("/signup", "/co_signup", "/check-nickname", "/check-username", "/api/my-projects","/api/cojobs").permitAll()
                         .requestMatchers("/comhome", "/comhome/**", "/comcontest").hasAuthority("COMPANY")
                         .requestMatchers("/admin/**", "/sidebar", "/ad_contest", "/adcomcont", "/adcomcont").hasAuthority("ADMIN")

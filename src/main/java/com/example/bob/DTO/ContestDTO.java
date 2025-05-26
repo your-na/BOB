@@ -53,6 +53,12 @@ public class ContestDTO {
         this.isOnlyBOB = isOnlyBOB;
     }
 
+    public long getDDay() {
+        if (endDate == null) return 0;
+        return ChronoUnit.DAYS.between(LocalDate.now(), endDate);
+    }
+
+
     public ContestEntity toEntity() {
         return ContestEntity.builder()
                 .id(id)

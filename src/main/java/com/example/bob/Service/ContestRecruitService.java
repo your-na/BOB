@@ -63,4 +63,10 @@ public class ContestRecruitService {
         return contestRecruitRepository.findByContest_Id(contestId);
     }
 
+    @Transactional(readOnly = true)
+    public ContestRecruitEntity findById(Long id) {
+        return contestRecruitRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("모집글을 찾을 수 없습니다."));
+    }
+
 }

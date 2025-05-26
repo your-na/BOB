@@ -1,14 +1,9 @@
 package com.example.bob.Controller;
 
-import com.example.bob.DTO.ResumeDTO;
-import com.example.bob.DTO.ResumeSectionDTO;
 import com.example.bob.Service.ResumeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import java.util.List;
 
 @Controller
 public class TestController {
@@ -92,10 +87,6 @@ public class TestController {
     //포폴모음방 게시하기
     @GetMapping("/portfolioform")
     public String pofolform() {return "portfolio_form";}
-
-    //공모전 상세보기
-    @GetMapping("pocontest")
-    public String pocontestform() {return "pocontest";}
 
     //공모전 신청 완료 화면
     @GetMapping("success2")
