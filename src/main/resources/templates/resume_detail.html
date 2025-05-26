@@ -27,7 +27,7 @@
   <div class="resume-detail-container">
 
     <!-- 트리뷰 버튼 -->
-    <button type="button" id="treeViewBtn">🌳 트리뷰로 보기</button>
+    <!-- <button type="button" id="treeViewBtn">🌳 트리뷰로 보기</button>-->
 
 
     <!-- 수정/삭제 버튼 -->
@@ -93,12 +93,37 @@
     <div th:each="section : ${resume.sections}" class="info-section">
       <strong th:text="${section.title}">섹션 제목</strong>
 
+
+
       <!-- ✅ 드래그 항목이 있으면 content 출력 안 함 -->
       <div th:if="${not #lists.isEmpty(section.dragItems)}">
         <ul>
-          <li th:each="item : ${section.dragItems}" th:text="${item.displayText}">항목</li>
+          <li th:each="item : ${section.dragItems}" style="margin-bottom: 1em;">
+
+            <!-- ✅ 항목 전체 블록 정렬 -->
+            <div style="margin-left: 15px;">
+              <!-- 제목 -->
+              <div>
+                <strong th:text="${item.displayText}">항목</strong>
+              </div>
+
+              <!-- 날짜 -->
+              <div th:if="${item.startDate != null and item.endDate != null}" style="color: #444;">
+                <span th:text="|(${item.startDate} ~ ${item.endDate})|"></span>
+              </div>
+
+              <!-- 파일 링크 -->
+              <div th:if="${item.filePath != null}">
+                <a th:href="@{'/uploads/project/' + ${item.filePath}}" target="_blank">📁 파일 보기</a>
+              </div>
+            </div>
+
+          </li>
         </ul>
       </div>
+
+
+
 
       <!-- ✅ dragItems 없고, content 있을 때만 출력 -->
       <div th:if="${#lists.isEmpty(section.dragItems) and section.content != null and section.content != ''}">

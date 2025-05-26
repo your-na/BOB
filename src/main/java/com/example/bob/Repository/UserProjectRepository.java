@@ -39,6 +39,11 @@ public interface UserProjectRepository extends JpaRepository<UserProjectEntity, 
     // ✅ 특정 프로젝트 + 상태 조건으로 유저 프로젝트 조회
     List<UserProjectEntity> findByProjectAndStatusIn(ProjectEntity project, List<String> statusList);
 
+    // ✅ 특정 프로젝트 ID와 사용자 ID로 제출 정보 가져오기
+    Optional<UserProjectEntity> findByProject_IdAndUser_UserId(Long projectId, Long userId);
+
+
+
 
 
 

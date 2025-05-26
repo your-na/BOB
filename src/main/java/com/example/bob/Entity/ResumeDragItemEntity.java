@@ -1,6 +1,7 @@
 package com.example.bob.Entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 public class ResumeDragItemEntity {
@@ -30,6 +31,7 @@ public class ResumeDragItemEntity {
         this.referenceId = referenceId;
         this.displayText = displayText;
         this.filePath = filePath;
+
     }
 
     // Getter & Setter
@@ -77,3 +79,5 @@ public class ResumeDragItemEntity {
         this.filePath = filePath;
     }
 }
+
+

@@ -124,6 +124,13 @@ public class ResumeController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
+    // ✅ [✨여기에 추가!] 트리 뷰용: 이력서 ID로 상세 조회
+    @GetMapping("/detail/{resumeId}")
+    public ResponseEntity<ResumeDetailDTO> getResumeDetailByResumeId(@PathVariable Long resumeId) {
+        ResumeDetailDTO resume = resumeService.getResumeForCompanyWithResumeId(resumeId);
+        return ResponseEntity.ok(resume);
+    }
+
 
     // ❌ 이력서 지원 취소
     @DeleteMapping("/cancel")

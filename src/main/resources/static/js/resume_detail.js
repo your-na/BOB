@@ -189,17 +189,28 @@ function fetchTreeDataAndRender(root) {
                 const sectionNode = document.createElement("li");
                 sectionNode.innerHTML = `▿ ${section.title}`;
                 const subList = document.createElement("ul");
-
                 if (section.dragItems && section.dragItems.length > 0) {
                     section.dragItems.forEach(item => {
+                        console.log("📦 dragItem 확인:", item);
                         const li = document.createElement("li");
-                        li.textContent = item.displayText;
-                        if (item.period) {
-                            li.innerHTML += `<span style="float:right;">${item.period}</span>`;
+
+                        // 🔹 기본 텍스트
+                        li.innerHTML = `<strong>${item.displayText}</strong>`;
+
+                        // 🔹 기간이 있다면 추가
+                        if (item.startDate && item.endDate) {
+                            li.innerHTML += ` <span style="float:right;">(${item.startDate} ~ ${item.endDate})</span>`;
                         }
+
+                        // 🔹 파일이 있다면 링크 추가
+                        if (item.filePath) {
+                            li.innerHTML += `<br><a href="/uploads/project/${item.filePath}" target="_blank">📁 파일 보기</a>`;
+                        }
+
                         subList.appendChild(li);
                     });
                 }
+
 
                 if (section.fileNames && section.type === "파일 첨부") {
                     section.fileNames.forEach(file => {

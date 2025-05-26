@@ -24,6 +24,8 @@ import com.example.bob.Entity.ResumeDragItemEntity;
 import com.example.bob.Entity.JobApplicationEntity;
 import com.example.bob.Entity.JobApplicationStatus;
 import com.example.bob.Entity.CoJobPostEntity;
+import com.example.bob.Entity.ProjectHistoryEntity;
+
 
 import com.example.bob.Repository.CoResumeRepository;
 import com.example.bob.Repository.CoResumeSectionRepository;
@@ -86,6 +88,10 @@ public class ResumeService {
 
     @Autowired
     private JobApplicationRepository jobApplicationRepository;
+
+    @Autowired
+    private com.example.bob.Repository.ProjectHistoryRepository projectHistoryRepository;
+
 
 
     // 기업 양식을 기반으로 사용자용 이력서 초기 구조를 생성
@@ -263,6 +269,7 @@ public class ResumeService {
                     drag.setDisplayText(dragDTO.getDisplayText());
                     drag.setFilePath(dragDTO.getFilePath());
 
+
                     resumeDragItemRepository.save(drag);
                 });
             }
@@ -353,18 +360,47 @@ public class ResumeService {
             // ✅ 드래그 항목
             List<ResumeDragItemEntity> dragEntities = resumeDragItemRepository.findBySection(section);
             List<ResumeDragItemDTO> dragDTOs = dragEntities.stream().map(d -> {
-                return new ResumeDragItemDTO(
+                ResumeDragItemDTO itemDto = new ResumeDragItemDTO(
                         section.getCoSection().getId(),
                         d.getItemType(),
                         d.getReferenceId(),
                         d.getDisplayText(),
                         d.getFilePath()
                 );
+
+                // 🔥 프로젝트인 경우 날짜 가져오기
+                if ("PROJECT".equalsIgnoreCase(d.getItemType())) {
+                    // ✅ 프로젝트 ID로 히스토리 목록 조회 (최신 순)
+                    List<ProjectHistoryEntity> histories = projectHistoryRepository
+                            .findByProjectIdOrderByModifiedAtDesc(d.getReferenceId());
+
+                    if (!histories.isEmpty()) {
+                        ProjectHistoryEntity ph = histories.get(0); // 🔹 최신 히스토리 가져오기
+                        itemDto.setStartDate(ph.getStartDate().toString()); // 🔹 시작일 설정
+
+                        // ✅ 제출일 가져오기 (없으면 종료일 사용)
+                        userProjectRepository.findByProject_IdAndUser_UserId(ph.getProject().getId(), user.getUserId())
+                                .ifPresentOrElse(
+                                        up -> {
+                                            if (up.getSubmissionDate() != null) {
+                                                itemDto.setEndDate(up.getSubmissionDate().toString()); // 🔹 제출일 사용
+                                            } else {
+                                                itemDto.setEndDate(ph.getEndDate().toString()); // 🔹 백업으로 종료일 사용
+                                            }
+                                        },
+                                        () -> itemDto.setEndDate(ph.getEndDate().toString()) // 🔹 해당 유저 정보 없을 경우
+                                );
+                    }
+                }
+
+
+
+                return itemDto;
             }).collect(Collectors.toList());
 
             s.setDragItems(dragDTOs);
 
-          // ✅ 드래그 항목이 있으면 content 제거
+            // ✅ 드래그 항목이 있으면 content 제거
             if (!dragDTOs.isEmpty()) {
                 s.setContent(null);
             }
