@@ -52,11 +52,12 @@ public class ResumeController {
     public List<UserProjectResponseDTO> getMyCompletedProjects() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserDetailsImpl userDetails) {
-            UserEntity user = userDetails.getUserEntity();
-            return resumeService.getCompletedProjectsForResume(user);
+            Long userId = userDetails.getUserEntity().getUserId(); // ✅ ID 추출
+            return resumeService.getCompletedProjectsForUser(userId); // ✅ 새로 수정한 서비스 메서드 사용
         }
         return new ArrayList<>();
     }
+
 
     // ✅ 사용자가 작성한 이력서를 제출하는 API
     @PostMapping("/submit")

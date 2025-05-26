@@ -42,11 +42,19 @@
 
         <!-- dragItems 아래에 표시 -->
         <ul th:if="${not #lists.isEmpty(section.dragItems)}">
-          <li th:each="item : ${section.dragItems}">
-            <span th:text="${item.displayText}">드래그 항목</span>
-            <a th:if="${item.filePath != null}" th:href="@{'/uploads/' + ${item.filePath}}" target="_blank">[파일 보기]</a>
+          <li th:each="item : ${section.dragItems}" style="margin-bottom: 12px;">
+            <div>
+              <strong th:text="${item.displayText}">항목제목</strong>
+              <span th:if="${item.startDate != null and item.endDate != null}">
+  (<span th:text="${item.startDate}"></span> ~ <span th:text="${item.endDate}"></span>)
+</span>
+            </div>
+            <div th:if="${item.filePath != null}">
+              <a th:href="@{'/uploads/project/' + ${item.filePath}}" target="_blank">📁 파일 보기</a>
+            </div>
           </li>
         </ul>
+
 
 
 

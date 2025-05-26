@@ -55,6 +55,9 @@ function setupDropBox(box) {
             item.dataset.id = json.id;
             item.dataset.type = json.type;
             item.dataset.file = json.file;
+            item.dataset.startDate = json.startDate || "";
+            item.dataset.endDate = json.endDate || "";
+
 
             box.appendChild(item);
         } else {
@@ -957,11 +960,17 @@ window.addEventListener('DOMContentLoaded', () => {
                     const dragData = JSON.stringify({
                         id: project.id,
                         type: "PROJECT",
-                        file: project.filePath || "",
-                        title: project.title
+                        file: project.filePath?.replace(/^\/?download\//, ""),
+                        title: project.title,
+                        startDate: project.startDate || "",
+                        endDate: project.endDate || ""
                     });
+
+                    console.log("📦 dragData filePath:", project.filePath); // ✅ 추가
+                    console.log("📦 전체 dragData:", dragData);              // ✅ 추가
                     e.dataTransfer.setData("application/json", dragData);
                 });
+
 
 
                 container.appendChild(div);
@@ -1170,7 +1179,9 @@ function togglePreview() {
                     itemType: div.dataset.type || "PROJECT",
                     referenceId: referenceId,
                     displayText: div.textContent.trim(),
-                    filePath: div.dataset.file || null
+                    filePath: div.dataset.file || null,
+                    startDate: div.dataset.startDate || null,
+                    endDate: div.dataset.endDate || null
                 };
             });
         }

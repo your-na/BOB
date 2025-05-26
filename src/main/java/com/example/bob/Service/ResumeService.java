@@ -128,16 +128,35 @@ public class ResumeService {
     }
 
     // ✅ 사용자가 제출한 완료 프로젝트 목록 조회 (이력서 우측 탭에 사용됨)
-    public List<UserProjectResponseDTO> getCompletedProjectsForResume(UserEntity user) {
+    @Transactional(readOnly = true)
+    public List<UserProjectResponseDTO> getCompletedProjectsForUser(Long userId) {
         return userProjectRepository
-                .findByUser_UserIdAndStatusAndSubmittedFileNameIsNotNullAndVisibleTrue(user.getUserId(), "완료")
+                .findByUser_UserIdAndStatusAndSubmittedFileNameIsNotNullAndVisibleTrue(userId, "완료")
                 .stream()
-                .map(up -> new UserProjectResponseDTO(
-                        up.getProject().getTitle(),
-                        up.getSubmissionDate() != null ? up.getSubmissionDate().toString() : "제출일 없음"
-                ))
+                .map(up -> {
+                    Long projectId = up.getProject().getId(); // ✅ 프로젝트 ID 추출
+                    String title = up.getProject().getTitle();
+                    String submittedDate = up.getSubmissionDate() != null ? up.getSubmissionDate().toString() : "제출일 없음";
+                    String startDate = up.getProject().getStartDate() != null ? up.getProject().getStartDate().toString() : "시작일 없음";
+                    String endDate = up.getProject().getEndDate() != null ? up.getProject().getEndDate().toString() : "종료일 없음";
+                    String submittedFileName = up.getSubmittedFileName();
+                    String filePath = (submittedFileName != null && !submittedFileName.isEmpty())
+                            ? "/download/" + submittedFileName
+                            : null;
+
+                    return new UserProjectResponseDTO(
+                            projectId,
+                            title,
+                            submittedDate,
+                            startDate,
+                            endDate,
+                            submittedFileName,
+                            filePath
+                    );
+                })
                 .collect(Collectors.toList());
     }
+
 
     @Transactional
     public void submitUserResume(ResumeSubmitRequestDTO request, UserEntity user) {

@@ -10,6 +10,7 @@ public class ResumeDragItemDTO {
     private String displayText;   // 표시할 텍스트
     private String filePath;      // 파일 경로 (선택)
 
+
     public ResumeDragItemDTO() {}
 
     public ResumeDragItemDTO(Long coSectionId, String itemType, Long referenceId, String displayText, String filePath) {
@@ -59,4 +60,24 @@ public class ResumeDragItemDTO {
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
+
+    private String startDate;
+    private String endDate;
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
+
 }
