@@ -292,7 +292,8 @@ function confirmInvite() {
         })
             .then(res => res.json())
             .then(data => {
-                const roomId = data.roomId;
+                const roomId = typeof data === "object" ? data.roomId ?? data.id : data;
+
                 window.open(`/chat/group-chatroom?roomId=${roomId}&type=group`, "_blank", "width=500,height=700");
             })
             .catch(err => {

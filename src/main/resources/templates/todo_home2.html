@@ -9,6 +9,9 @@
     <!-- ✅ CSRF 토큰 메타태그 추가 -->
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <meta name="current-user" th:content="${loginNick}" />
+    <meta name="current-user-id" th:content="${user.id}" />
 </head>
 <body>
 
@@ -54,7 +57,7 @@
                                 <span class="member-name" th:text="${owner.userNick}"></span> <!-- 주최자 이름 -->
                                 <span class="crown">👑</span> <!-- 왕관 아이콘을 닉네임 뒤에 배치 -->
                             </div>
-                            <button class="chat-send">채팅 보내기 ></button>
+                            <button class="chat-send" th:attr="data-nick=${owner.userNick}">채팅 보내기 ></button>
                         </li>
                     </th:block>
 
@@ -63,9 +66,9 @@
                         <li class="member-item">
                             <div class="member-info">
                                 <!-- 팀원에게는 왕관 아이콘을 표시하지 않음 -->
-                                <span class="member-name" th:text="${member}"></span> <!-- 팀원 이름 -->
+                                <span class="member-name" th:text="${member.userNick}"></span> <!-- 팀원 이름 -->
                             </div>
-                            <button class="chat-send">채팅 보내기 ></button>
+                            <button class="chat-send" th:attr="data-nick=${member.userNick}">채팅 보내기 ></button>
                         </li>
                     </th:block>
                 </ul>
@@ -97,6 +100,7 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+
         // ✅ 페이지 이동: 왼쪽 < 버튼 → plan 페이지
         const backBtn = document.querySelector(".back-btn");
         if (backBtn) {
@@ -144,7 +148,64 @@
             }).then(() => console.log("✅ 공지 저장됨"))
                 .catch(err => console.error("❌ 공지 저장 실패", err));
         }
+
+        const currentUserNick = document.querySelector("meta[name='current-user']")?.content;
+
+        document.querySelectorAll(".chat-send").forEach(btn => {
+            btn.addEventListener("click", function () {
+                const targetNick = btn.dataset.nick;
+
+                if (!targetNick || targetNick === currentUserNick) {
+                    alert("본인에게는 메시지를 보낼 수 없습니다.");
+                    return;
+                }
+
+                fetch(`/chat/room?userA=${currentUserNick}&userB=${targetNick}`, {
+                    method: "GET",
+                    credentials: "include"
+                })
+                    .then(res => res.json())
+                    .then(roomId => {
+                        window.open(`/chat/chatroom?roomId=${roomId}`, "_blank", "width=500,height=700");
+                    })
+                    .catch(err => {
+                        alert("채팅방 생성 실패");
+                        console.error(err);
+                    });
+            });
+        });
     });
+
+    // 팀 채팅 버튼 처리
+    document.querySelector(".chat-btn").addEventListener("click", () => {
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+        fetch(`/api/chat/group/team/${teamId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                [csrfHeader]: csrfToken
+            }
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("팀 채팅방 생성 실패");
+                return res.json();  // 반환값이 Long
+            })
+            .then(data => {
+                if (!data || !data.roomId) {
+                    throw new Error("잘못된 응답");
+                }
+                const roomId = typeof data === "object" ? data.roomId ?? data.id : data;
+                window.open(`/chat/group-chatroom?roomId=${roomId}&type=group`, "_blank", "width=500,height=700");
+            })
+            .catch(err => {
+                alert("채팅 열기 실패");
+                console.error(err);
+            });
+    });
+
+
 </script>
 
 
