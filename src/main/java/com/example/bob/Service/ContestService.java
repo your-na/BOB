@@ -214,4 +214,11 @@ public class ContestService {
         contestTeamRepository.save(team);
     }
 
+    public List<ContestDTO> getLatestContests() {
+        List<ContestEntity> latest = contestRepository.findTop4ByIsApprovedTrueOrderByCreatedAtDesc();
+        return latest.stream()
+                .map(ContestDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
 }

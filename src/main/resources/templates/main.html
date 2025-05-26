@@ -39,11 +39,8 @@
                 <p>더보기 ></p>
             </div>
             <div class="card popular-competitions">
-                <div class="poster-grid">
-                    <img src="/images/banner.png" alt="인기 공모전 포스터 넣">
-                    <img src="/images/banner1.png" alt="인기 공모전 포스터 어">
-                    <img src="/images/banner1.png" alt="인기 공모전 포스터 야">
-                    <img src="/images/banner.png" alt="인기 공모전 포스터 함">
+                <div class="poster-grid" id="contest-poster-grid">
+                    <!-- 자바스크립트가 최신 공모전 4개를 렌더링할 예정 -->
                 </div>
             </div>
         </div>
@@ -256,9 +253,28 @@
                 });
         });
 
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch("/api/contest/latest")  // ✅ 백엔드에서 최신 4개 공모전 반환
+                .then(res => res.json())
+                .then(data => {
+                    const grid = document.getElementById("contest-poster-grid");
+                    grid.innerHTML = "";
 
+                    data.forEach(contest => {
+                        const img = document.createElement("img");
+                        img.src = contest.imageUrl || "/images/default-poster.png";  // 썸네일 없으면 기본 이미지
+                        img.alt = contest.title;
+                        img.className = "poster-img";
 
+                        img.addEventListener("click", () => {
+                            window.location.href = `/contest/${contest.id}`;
+                        });
 
+                        grid.appendChild(img);
+                    });
+                })
+                .catch(err => console.error("❌ 공모전 불러오기 실패", err));
+        });
 
 
     </script>
