@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
                    <li onclick="viewDetail(${item.jobPostId})">지원내역</li>
                    <li onclick="cancelApply(${item.jobPostId})">지원취소</li>
                    <li onclick="hideItem(${item.applicationId})">숨기기</li>
-                   <li onclick="previewResume(${item.resumeId || item.id})">이력서 보기</li>
+                  <!-- <li onclick="previewResume(${item.resumeId || item.id})">이력서 보기</li> -->
                 </ul>
             </div>
         `;
