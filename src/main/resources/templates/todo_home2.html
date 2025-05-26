@@ -66,9 +66,9 @@
                         <li class="member-item">
                             <div class="member-info">
                                 <!-- 팀원에게는 왕관 아이콘을 표시하지 않음 -->
-                                <span class="member-name" th:text="${member.userNick}"></span> <!-- 팀원 이름 -->
+                                <span class="member-name" th:text="${member}"></span> <!-- 팀원 이름 -->
                             </div>
-                            <button class="chat-send" th:attr="data-nick=${member.userNick}">채팅 보내기 ></button>
+                            <button class="chat-send" th:attr="data-nick=${member}">채팅 보내기 ></button>
                         </li>
                     </th:block>
                 </ul>

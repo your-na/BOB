@@ -218,6 +218,7 @@ public class ContestController {
         model.addAttribute("owner", owner);
         model.addAttribute("loginNick", loginNick);
         model.addAttribute("teamMembers", teamMembers);
+        model.addAttribute("user", userDetails.getUserEntity());
 
         return "todo_home2";
     }
