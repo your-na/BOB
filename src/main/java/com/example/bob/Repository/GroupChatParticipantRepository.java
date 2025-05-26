@@ -29,4 +29,5 @@ public interface GroupChatParticipantRepository extends JpaRepository<GroupChatP
     @Query("SELECT gp.user FROM GroupChatParticipant gp WHERE gp.groupChatRoom.id = :roomId")
     List<UserEntity> findUsersByRoomId(@Param("roomId") Long roomId);
 
+
 }

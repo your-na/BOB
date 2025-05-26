@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -25,4 +27,14 @@ public class GroupChatController {
 
         return ResponseEntity.ok(roomId);
     }
+
+    @PostMapping("/chat/group/team/{teamId}")
+    public ResponseEntity<?> openTeamGroupChat(@PathVariable Long teamId,
+                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Long userId = userDetails.getUserEntity().getId();
+
+        Long roomId = groupChatService.getOrCreateTeamChatRoom(teamId, userId); // 존재하면 가져오고 없으면 생성
+        return ResponseEntity.ok(Map.of("roomId", roomId));
+    }
+
 }

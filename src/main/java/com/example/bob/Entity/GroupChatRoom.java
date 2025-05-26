@@ -24,4 +24,7 @@ public class GroupChatRoom {
 
     @OneToMany(mappedBy = "groupChatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GroupChatParticipant> participants;
+
+    @Column(nullable = true)
+    private Long teamId; // 팀 채팅방 여부 식별용
 }
