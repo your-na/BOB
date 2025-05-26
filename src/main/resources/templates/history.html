@@ -121,7 +121,7 @@
             <td th:text="${userProject.project.title}">프로젝트 제목</td>  <!-- 프로젝트 제목 -->
             <td>
                 <a th:if="${userProject.submittedFileName}"
-                   th:href="@{'/download/' + ${userProject.submittedFileName}}"
+                   th:href="@{'/uploads/project/' + ${userProject.submittedFileName}}"
                    th:text="${userProject.submittedFileName}"
                    target="_blank">파일보기</a>
                 <span th:unless="${userProject.submittedFileName}">미제출</span>
