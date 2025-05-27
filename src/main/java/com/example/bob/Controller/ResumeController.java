@@ -82,7 +82,7 @@ public class ResumeController {
     @PostMapping("/upload")  // 🔥 경로는 /api/user/resumes/upload
     public ResponseEntity<String> uploadResumeFile(@RequestParam("file") MultipartFile file) {
         try {
-            String uploadDir = "C:/uploads/resume/";
+            String uploadDir = "uploads/resumeFiles/";
             File dir = new File(uploadDir);
             if (!dir.exists()) dir.mkdirs();
 

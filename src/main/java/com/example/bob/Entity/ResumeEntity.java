@@ -1,11 +1,16 @@
 package com.example.bob.Entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
 public class ResumeEntity {
 
     @Id

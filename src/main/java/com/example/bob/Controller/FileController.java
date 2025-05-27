@@ -35,11 +35,12 @@ import org.slf4j.LoggerFactory;
 @RequiredArgsConstructor
 public class FileController {
 
-    private final String projectFilePath = "C:/uploads/project/"; // 파일 저장 경로
+    private final String projectFilePath = "uploads/projectFiles";// 파일 저장 경로
     private final UserProjectRepository userProjectRepository;
     private final ProjectRepository projectRepository;
     private final ProjectService projectService; // ✅ ProjectService 추가
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
+
 
     // ✅ 프로젝트 파일 제출 (업로드)
     @PostMapping("/project/submit")
@@ -60,6 +61,9 @@ public class FileController {
 
             // 파일명 및 저장 경로 설정
             String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename(); // 중복 방지
+
+            // 디렉토리 존재 여부 확인 후 없으면 생성
+            Files.createDirectories(Paths.get(projectFilePath));
 
             // submitProjectFile 메서드를 호출하여 파일 제출 처리
             projectService.submitProjectFile(user, project, fileName, file); // 호출

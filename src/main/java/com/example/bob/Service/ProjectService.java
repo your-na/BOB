@@ -49,7 +49,7 @@ public class ProjectService {
     private final NotificationService notificationService;
 
     // 멤버 변수로 projectFilePath를 선언
-    private final String projectFilePath = "C:/uploads/project/";
+    private final String projectFilePath = "uploads/projectFiles/";
     private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
     @PersistenceContext
     private EntityManager entityManager;  // EntityManager 주입

@@ -204,7 +204,7 @@ function fetchTreeDataAndRender(root) {
 
                         // 🔹 파일이 있다면 링크 추가
                         if (item.filePath) {
-                            li.innerHTML += `<br><a href="/uploads/project/${item.filePath}" target="_blank">📁 파일 보기</a>`;
+                            li.innerHTML += `<br><a href="/uploads/projectFiles/${item.filePath}" target="_blank">📁 파일 보기</a>`;
                         }
 
                         subList.appendChild(li);
