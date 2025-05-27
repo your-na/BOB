@@ -1,3 +1,5 @@
+let currentUserNick = "";  // 🔑 전역으로 이동!
+
 // ✅ 쿠키에서 CSRF 토큰 꺼내는 함수
 function getCookie(name) {
     const value = document.cookie
@@ -7,6 +9,20 @@ function getCookie(name) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+
+    fetch("http://localhost:8888/api/user/me", {
+        credentials: "include"
+    })
+        .then(res => res.json())
+        .then(data => {
+            currentUserNick = data.userNick;
+            console.log("✅ 로그인된 사용자 닉네임:", currentUserNick);
+        })
+        .catch(err => {
+            console.error("❌ 사용자 정보 로딩 실패:", err);
+            alert("사용자 정보를 불러오지 못했습니다.");
+        });
+
     var filter = document.getElementById("task-filter");
 
     // ✅ 이 부분 추가!
@@ -31,6 +47,26 @@ document.addEventListener("DOMContentLoaded", function () {
     // ✅ 팝업 할 일 불러오기
     loadPopupTodos();
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    var filter = document.getElementById("task-filter");
+
+    const openModalBtn = document.getElementById("openTodoModal");
+    if (openModalBtn) {
+        openModalBtn.addEventListener("click", openTodoModal);
+    }
+
+    filter.addEventListener("change", function () {
+        // ...
+    });
+
+    // ✅ 팝업 할 일 불러오기
+    loadPopupTodos();
+
+    // ✅ 이 아래에 추가!!
+    loadMyProjectsForPopup();
+});
+
 
 // ✅ D-day 계산 함수 재사용
 function getDday(dateStr) {
@@ -253,7 +289,8 @@ function createTodo() {
             title: title,
             startDate: start,
             endDate: end,
-            workspace: space
+            workspace: space,
+            assignee: currentUserNick
         })
     })
         .then(res => {
@@ -269,3 +306,35 @@ function createTodo() {
             alert("에러 발생: " + err);
         });
 }
+function loadMyProjectsForPopup() {
+    const spaceSelect = document.getElementById("todoSpace");
+
+    fetch("http://localhost:8888/api/my-projects", {
+        credentials: "include"
+    })
+        .then(res => res.json())
+        .then(projects => {
+            const filtered = projects.filter(p => p.status !== "완료");
+
+            spaceSelect.innerHTML = "";
+
+            filtered.forEach(p => {
+                const opt = document.createElement("option");
+                opt.value = p.title;
+                opt.textContent = p.title;
+                spaceSelect.appendChild(opt);
+            });
+
+            const personal = document.createElement("option");
+            personal.value = "개인";
+            personal.textContent = "개인";
+            spaceSelect.appendChild(personal);
+
+            spaceSelect.dispatchEvent(new Event("change"));
+        })
+        .catch(err => {
+            console.error("❌ 프로젝트 불러오기 실패:", err);
+            alert("프로젝트 목록을 불러오는 중 오류가 발생했습니다.");
+        });
+}
+

@@ -184,6 +184,19 @@ public class UserController {
         return userDetails.getUserEntity().getUserNick();
     }
 
+    @GetMapping("/api/user/me")
+    @ResponseBody
+    public Map<String, String> getUserNickJson(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Map<String, String> response = new HashMap<>();
+        if (userDetails != null && userDetails.getUserEntity() != null) {
+            response.put("userNick", userDetails.getUserEntity().getUserNick());
+        } else {
+            response.put("userNick", "");
+        }
+        return response;
+    }
+
+
 
 
     @GetMapping("/bowon")

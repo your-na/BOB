@@ -64,6 +64,8 @@ public class TodoController {
             return todoService.saveForContest(dto, user, isHost, team);
         }
 
+
+
         boolean isHost = projectService.isUserHost(dto.getWorkspace(), user.getUserNick());
         return todoService.save(dto, user, isHost);
     }
