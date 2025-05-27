@@ -17,8 +17,8 @@
       <section class="resume-section">
         <h2>내 정보</h2>
         <div class="profile-box">
-          <img id="profileImage" class="profile-img" th:src="@{'/uploads/' + ${resume.profileImageUrl}}" alt="프로필 사진">
-          <div class="info-text">
+            <img id="profileImage" class="profile-img" th:src="@{'/uploads/' + ${resume.profileImageUrl}}" alt="프로필 사진">
+            <div class="info-text">
             <p><strong id="userName">이름</strong></p>
             <p class="skill" id="mainLanguage">기술스택</p>
             <p><strong>성별:</strong> <span id="sex">-</span></p>
@@ -32,7 +32,8 @@
 
       <!-- 각 섹션 반복 -->
       <div th:each="section : ${resume.sections}" class="resume-section">
-        <h2 th:text="${section.title}">섹션 제목</h2>
+
+          <h2 th:text="${section.title}">섹션 제목</h2>
 
         <!-- content 먼저 표시 -->
         <div th:if="${section.content != null and section.content != ''}">
@@ -85,7 +86,8 @@
         <!-- 파일 첨부 -->
         <div th:if="${not #lists.isEmpty(section.fileNames) and section.type == '파일 첨부'}" class="attachments">
           <div class="file-download" th:each="file : ${section.fileNames}">
-            <a th:href="@{'/uploads/' + ${file}}" download>📄 <span th:text="${file}">파일명</span> 다운로드</a>
+              <!-- ✅ 수정된 코드 -->
+              <a th:href="@{'/uploads/projectFiles/' + ${file}}" download>📄 <span th:text="${file}">파일명</span> 다운로드</a>
           </div>
         </div>
       </div>
