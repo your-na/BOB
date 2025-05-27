@@ -1149,6 +1149,7 @@ function togglePreview() {
 
     const sectionBoxes = document.querySelectorAll(".section-box[data-co-section-id]");
     const sections = [];
+    const uploadPromises = [];
 
     sectionBoxes.forEach(box => {
         const coSectionId = Number(box.dataset.coSectionId);
@@ -1208,36 +1209,44 @@ function togglePreview() {
             });
         }
 
-        // 📌 사진/파일 첨부 섹션의 업로드 파일명 수집
         const fileInput = box.querySelector("input[type=file]");
         if (fileInput && fileInput.files.length > 0) {
-            const fileName = fileInput.files[0].name;
-            section.fileNames = [fileName];  // ✅ 서버에서 fileNames로 받도록
+            const file = fileInput.files[0];
+
+            uploadPromises.push(
+                uploadFileToServer(file).then(fileName => {
+                    section.fileNames = [fileName];  // ✅ 서버 저장된 UUID 파일명
+                })
+            );
         }
+
 
 
         sections.push(section);
     });
+    // ✅ 모든 업로드 완료 후 preview 요청
+    Promise.all(uploadPromises).then(() => {
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-
-
-    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-
-    fetch("/api/user/resumes/preview", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            [csrfHeader]: csrfToken
-        },
-        body: JSON.stringify({ coResumeId: Number(coResumeId), sections }),
-        credentials: "include"
+        return fetch("/api/user/resumes/preview", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify({ coResumeId: Number(coResumeId), sections }),
+            credentials: "include"
+        });
     }).then(() => {
+        // ✅ 미리보기 iframe 표시
         const container = document.getElementById("resume-preview-container");
         container.style.display = "block";
         document.getElementById("resumePreviewFrame").src = "/showresume";
     });
 }
+
+
 
 
 
