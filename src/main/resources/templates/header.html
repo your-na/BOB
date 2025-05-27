@@ -78,7 +78,15 @@
             </a>
             <div class="nav-item1">
                 <a class="user-icon">
-                    <img src="/images/user.png" alt="Profile Image">
+                    <!-- 로그인 안 한 사용자만 아이콘 표시 -->
+                    <img src="/images/user.png" alt="Profile Image" sec:authorize="isAnonymous()" />
+
+                    <!-- 로그인한 사용자에게만 프로필과 닉네임 표시 -->
+                    <div class="user-profile" sec:authorize="isAuthenticated()">
+                        <img class="user-avatar" th:src="${#authentication.principal.userEntity.profileImageUrl}" alt="프로필 이미지">
+                        <span class="user-nick" th:text="${#authentication.principal.userEntity.userNick}">닉네임</span>
+                    </div>
+
                 </a>
                 <div class="all-dropdown-menu">
                     <div class="dropdown-section">

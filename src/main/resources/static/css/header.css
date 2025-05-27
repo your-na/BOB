@@ -3,6 +3,26 @@ body {
     font-family: 'Arial', sans-serif;
 }
 
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #ccc;
+}
+
+.user-nick {
+    font-size: 14px;
+    color: #333;
+    font-weight: bold;
+    white-space: nowrap;
+}
 
 .navigator {
         position: fixed; /* 상단에 고정 */
