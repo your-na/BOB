@@ -57,12 +57,18 @@ public class JobHistoryController {
 
     // ✅ 구직내역 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteJobHistory(@PathVariable Long id) {
-        try {
+    public ResponseEntity<String> deleteJobHistory(@PathVariable Long id,
+                                                   @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Long userId = userDetails.getUserEntity().getUserId();
+
+        return jobHistoryRepository.findById(id).map(job -> {
+            if (!job.getUserEntity().getUserId().equals(userId)) {
+                return ResponseEntity.status(403).body("접근 권한이 없습니다.");
+            }
+
             jobHistoryRepository.deleteById(id);
             return ResponseEntity.ok("삭제 성공");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("삭제 실패: " + e.getMessage());
-        }
+        }).orElse(ResponseEntity.notFound().build());
     }
+
 }

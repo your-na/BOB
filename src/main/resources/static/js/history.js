@@ -62,6 +62,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // ✅ 삭제 버튼
     document.addEventListener("click", function (event) {
         if (event.target.classList.contains("delete-btn")) {
+            const section = event.target.closest(".history-section");
+            if (section?.id === "job-history") return; // 구직 내역 삭제는 아래에서 처리됨
             const row = event.target.closest("tr");
             const id = event.target.getAttribute("data-id");
 
@@ -295,7 +297,7 @@ document.addEventListener("click", function (event) {
             return;
         }
 
-        if (!confirm("정말 삭제하시겠습니까?")) return;
+        if (!confirm("정말 구직 내역을 삭제하시겠습니까?")) return;
 
         fetch(`/api/job-history/${id}`, {
             method: "DELETE",
