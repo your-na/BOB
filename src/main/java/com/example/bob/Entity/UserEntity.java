@@ -65,6 +65,10 @@ public class UserEntity {
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserHistoryEntity> userHistories = new ArrayList<>();
 
+    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<JobHistoryEntity> jobHistories = new ArrayList<>();
+
+
     @Builder
     public static UserEntity toUserEntity(UserDTO userDTO) {
         UserEntity userEntity = new UserEntity();
