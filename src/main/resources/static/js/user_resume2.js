@@ -53,18 +53,33 @@ function setupDropBox(box) {
 
                 box.appendChild(item);
             });
-        }  else if (e.dataTransfer.types.includes("application/json")) {
+        } else if (e.dataTransfer.types.includes("application/json")) {
             const json = JSON.parse(e.dataTransfer.getData("application/json"));
             const item = document.createElement('div');
             item.className = 'uploaded-item';
-            item.textContent = json.title;
 
-            // ✅ 추가: 드래그 항목 속성 주입
+            // ✅ 기본 텍스트는 title
+            let displayText = json.title;
+
+            // ✅ 구직 이력일 경우에만 상태 및 날짜 추가
+            if (json.type === "JOB") {
+                const format = (d) => d ? d.replace(/-/g, ".") : "";
+                if (json.status === "재직") {
+                    displayText += ` (${json.status}: ${format(json.startDate)} ~)`;
+                } else if (json.status === "퇴직") {
+                    displayText += ` (${json.status}: ${format(json.startDate)} ~ ${format(json.endDate)})`;
+                }
+            }
+
+            item.textContent = displayText;
+
+            // ✅ 드래그 항목 속성 주입
             item.dataset.id = json.id;
             item.dataset.type = json.type;
             item.dataset.file = json.file;
             item.dataset.startDate = json.startDate || "";
             item.dataset.endDate = json.endDate || "";
+            item.dataset.status = json.status || "";
 
             // ✅ 삭제 버튼 추가
             const deleteBtn = document.createElement('span');
@@ -74,7 +89,8 @@ function setupDropBox(box) {
             item.appendChild(deleteBtn);
 
             box.appendChild(item);
-        } else {
+        }
+        else {
             const title = e.dataTransfer.getData('text/plain');
             const item = document.createElement('div');
             item.className = 'uploaded-item';
@@ -999,6 +1015,54 @@ window.addEventListener('DOMContentLoaded', () => {
             });
         })
         .catch(err => console.error("프로젝트 불러오기 실패:", err));
+
+    // ✅ 구직 내역 불러오기 (오른쪽 award 탭에 출력)
+    fetch("/api/job-history")
+        .then(res => res.json())
+        .then(histories => {
+            const container = document.querySelector(".tab-content[data-content='award']");
+            container.innerHTML = "";
+
+            if (!histories || histories.length === 0) return;
+
+            histories.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "award-item";
+
+                const start = item.startDate?.replace(/-/g, ".") || "";
+                const end = item.endDate?.replace(/-/g, ".") || "";
+
+                let periodText = "";
+                if (item.status === "재직") {
+                    periodText = `재직: ${start} ~`;
+                } else {
+                    periodText = `퇴직: ${start} ~ ${end}`;
+                }
+
+                // 🔧 화면에 표시될 내용
+                div.innerHTML = `${item.jobTitle || "직무 없음"}<br><small>${periodText}</small>`;
+
+                // 🔧 드래그 속성 추가
+                div.setAttribute("draggable", true);
+
+                // 🔧 드래그 시작 시 데이터 설정
+                div.addEventListener("dragstart", e => {
+                    const dragData = JSON.stringify({
+                        id: item.id,
+                        type: "JOB", // 드래그 타입 구분
+                        title: item.jobTitle || "직무 없음",
+                        startDate: item.startDate,
+                        endDate: item.endDate,
+                        status: item.status
+                    });
+                    e.dataTransfer.setData("application/json", dragData);
+                });
+
+                container.appendChild(div);
+            });
+        })
+        .catch(err => console.error("구직 내역 불러오기 실패:", err));
+
     // ✅ 📌 여기 공모전 fetch 넣기 – 프로젝트 fetch 밖으로!
     fetch("/api/user/resumes/contests")
         .then(res => res.json())
@@ -1245,11 +1309,3 @@ function togglePreview() {
         document.getElementById("resumePreviewFrame").src = "/showresume";
     });
 }
-
-
-
-
-
-
-
-

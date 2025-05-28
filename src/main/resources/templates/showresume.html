@@ -50,9 +50,9 @@
       (<span th:text="${item.startDate}"></span> ~ <span th:text="${item.endDate}"></span>)
     </span>
                 </div>
-                <div th:if="${item.filePath != null}">
-                    <a th:href="@{'/uploads/projectFiles/' + ${item.filePath}}" target="_blank">📁 파일 보기</a>
-                </div>
+                  <div th:if="${item.filePath != null and item.filePath != '' and item.itemType != null and item.itemType != 'JOB'}">
+                  <a th:href="@{'/uploads/projectFiles/' + ${item.filePath}}" target="_blank">📁 파일 보기</a>
+                  </div>
               </li>
             </ul>
 
