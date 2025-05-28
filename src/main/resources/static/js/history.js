@@ -59,8 +59,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
-
-
     // ✅ 삭제 버튼
     document.addEventListener("click", function (event) {
         if (event.target.classList.contains("delete-btn")) {
@@ -123,6 +121,14 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         if (!editableMap[sectionId] || !editableMap[sectionId].editableCols.includes(colIndex)) return;
+
+        // ✅ 종료일(3번째 셀)인데 상태가 '재직'이면 수정 금지
+        if (sectionId === "job-history" && colIndex === 3) {
+            const statusCell = row.querySelector("td:nth-child(2)");
+            const statusText = statusCell?.textContent.trim();
+            if (statusText === "재직") return;
+        }
+
 
         const isDate = editableMap[sectionId].dateCols.includes(colIndex);
         const isSelect = editableMap[sectionId].selectCols.includes(colIndex);
@@ -218,16 +224,27 @@ document.addEventListener("click", function (event) {
         newRow.style.display = "table-row";
         newRow.classList.remove("new-entry-row");
 
+        updateEndDateState(newRow); // 새로 만들자마자 상태 검사해서 종료일 비활성화
+
+
         const inputs = newRow.querySelectorAll("input, select");
 
         // ✅ 입력 후 자동 저장
         inputs.forEach(input => {
             input.addEventListener("change", function () {
+                if (input.classList.contains("status-select")) {
+                    updateEndDateState(newRow); // 상태 변경될 때마다 실행
+                }
                 const status = newRow.querySelector(".status-select").value;
                 const startDate = newRow.querySelector(".start-date").value;
-                const endDate = newRow.querySelector(".end-date").value;
                 const workplace = newRow.querySelector(".workplace").value;
                 const jobTitle = newRow.querySelector(".job-title").value;
+
+                let endDate = null;
+                if (status !== "재직") {
+                    endDate = newRow.querySelector(".end-date").value;
+                }
+
 
                 // 유효성 검사 (근무지, 직무는 있어야 저장)
                 if (!workplace || !jobTitle) return;
@@ -309,9 +326,13 @@ document.addEventListener("blur", function (event) {
         const cells = row.querySelectorAll("td");
         const status = cells[1].textContent.trim();
         const startDate = cells[2].textContent.trim();
-        const endDate = cells[3].textContent.trim();
         const workplace = cells[4].textContent.trim();
         const jobTitle = cells[5].textContent.trim();
+        let endDate = null;
+        if (status !== "재직") {
+            endDate = cells[3].textContent.trim();
+        }
+
 
         const data = {
             status,
@@ -334,3 +355,19 @@ document.addEventListener("blur", function (event) {
     }
 }, true); // useCapture: true
 
+// ✅ 상태에 따라 종료일 비활성화 함수
+function updateEndDateState(row) {
+    const statusSelect = row.querySelector(".status-select");
+    const endDateInput = row.querySelector(".end-date");
+
+    if (!statusSelect || !endDateInput) return;
+
+    if (statusSelect.value === "재직") {
+        endDateInput.value = "";
+        endDateInput.disabled = true;
+        endDateInput.placeholder = "재직 중";
+    } else {
+        endDateInput.disabled = false;
+        endDateInput.placeholder = "YYYY-MM-DD";
+    }
+}
