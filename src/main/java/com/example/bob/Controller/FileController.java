@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 @RequiredArgsConstructor
 public class FileController {
 
-    private final String projectFilePath = "uploads/projectFiles";// 파일 저장 경로
+    private final String projectFilePath = "uploads/projectFiles/";// 파일 저장 경로
     private final UserProjectRepository userProjectRepository;
     private final ProjectRepository projectRepository;
     private final ProjectService projectService; // ✅ ProjectService 추가
@@ -117,7 +117,7 @@ public class FileController {
     // 📌 공통 파일 다운로드 로직
     private ResponseEntity<Resource> downloadFile(String basePath, String fileName) {
         try {
-            Path filePath = Paths.get(basePath + fileName);
+            Path filePath = Paths.get(basePath, fileName);
             Resource resource = new UrlResource(filePath.toUri());
 
             if (!resource.exists()) {

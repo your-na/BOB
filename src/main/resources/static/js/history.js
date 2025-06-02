@@ -1,3 +1,28 @@
+
+// ✅ CSRF 관련 함수
+function getCsrfToken() {
+    const csrfMeta = document.querySelector('meta[name="_csrf"]');
+    return csrfMeta ? csrfMeta.getAttribute("content") : "";
+}
+
+function getCsrfHeader() {
+    const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+    return csrfHeaderMeta ? csrfHeaderMeta.getAttribute("content") : "X-CSRF-TOKEN";
+}
+
+// ✅ 파일 업로드 시 파일보기 링크 활성화
+document.addEventListener("change", function (event) {
+    if (event.target.classList.contains("file-upload")) {
+        const fileInput = event.target;
+        const fileView = fileInput.closest("td").querySelector(".file-view");
+
+        if (fileInput.files.length > 0 && fileView) {
+            fileView.style.display = "inline";
+            fileView.href = URL.createObjectURL(fileInput.files[0]);
+            fileView.textContent = "파일보기";
+        }
+    }
+});
 document.addEventListener("DOMContentLoaded", function () {
     const tabs = document.querySelectorAll(".tab-item");
     const sections = document.querySelectorAll(".history-section");
@@ -33,25 +58,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // ✅ 추가 버튼 기능
-    document.addEventListener("click", function (event) {
-        if (event.target.classList.contains("add-project-btn")) {
-            const section = event.target.closest(".history-section");
-            const tableBody = section.querySelector(".history-table tbody");
-            const templateRow = section.querySelector(".new-entry-row");
-
-            if (templateRow && tableBody) {
-                const newRow = templateRow.cloneNode(true);
-                newRow.style.display = "table-row";
-                newRow.classList.remove("new-entry-row");
-                tableBody.appendChild(newRow);
-            }
-        }
-    });
 
     // ✅ 삭제 버튼
     document.addEventListener("click", function (event) {
         if (event.target.classList.contains("delete-btn")) {
+            const section = event.target.closest(".history-section");
+            if (section?.id === "job-history") return; // 구직 내역 삭제는 아래에서 처리됨
             const row = event.target.closest("tr");
             const id = event.target.getAttribute("data-id");
 
@@ -84,30 +96,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // ✅ CSRF 관련 함수
-    function getCsrfToken() {
-        const csrfMeta = document.querySelector('meta[name="_csrf"]');
-        return csrfMeta ? csrfMeta.getAttribute("content") : "";
-    }
-
-    function getCsrfHeader() {
-        const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
-        return csrfHeaderMeta ? csrfHeaderMeta.getAttribute("content") : "X-CSRF-TOKEN";
-    }
-
-    // ✅ 파일 업로드 시 파일보기 링크 활성화
-    document.addEventListener("change", function (event) {
-        if (event.target.classList.contains("file-upload")) {
-            const fileInput = event.target;
-            const fileView = fileInput.closest("td").querySelector(".file-view");
-
-            if (fileInput.files.length > 0 && fileView) {
-                fileView.style.display = "inline";
-                fileView.href = URL.createObjectURL(fileInput.files[0]);
-                fileView.textContent = "파일보기";
-            }
-        }
-    });
 
     // ✅ 셀 더블클릭 시 수정 (자격증 + 구직 상태 드롭다운 포함)
     document.addEventListener("dblclick", function (event) {
@@ -135,6 +123,14 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         if (!editableMap[sectionId] || !editableMap[sectionId].editableCols.includes(colIndex)) return;
+
+        // ✅ 종료일(3번째 셀)인데 상태가 '재직'이면 수정 금지
+        if (sectionId === "job-history" && colIndex === 3) {
+            const statusCell = row.querySelector("td:nth-child(2)");
+            const statusText = statusCell?.textContent.trim();
+            if (statusText === "재직") return;
+        }
+
 
         const isDate = editableMap[sectionId].dateCols.includes(colIndex);
         const isSelect = editableMap[sectionId].selectCols.includes(colIndex);
@@ -178,4 +174,202 @@ document.addEventListener("DOMContentLoaded", function () {
         const section = document.getElementById(defaultSection);
         if (section) section.style.display = "block";
     }
+    loadJobHistories();
 });
+
+// ✅ 구직 내역 초기 로딩 (GET 요청)
+function loadJobHistories() {
+    const tbody = document.querySelector("#job-history .history-table tbody");
+
+    // ✅ 기존의 .new-entry-row 백업
+    const templateRow = tbody.querySelector(".new-entry-row");
+
+    // ✅ tbody 안을 비우되 템플릿은 살려둠
+    tbody.innerHTML = "";
+
+    // ✅ 템플릿 다시 추가
+    if (templateRow) {
+        tbody.appendChild(templateRow);
+        templateRow.style.display = "none"; // 템플릿은 안보이게 유지
+    }
+
+    fetch("/api/job-history", {
+        headers: { [getCsrfHeader()]: getCsrfToken() }
+    })
+        .then(response => response.json())
+        .then(data => {
+            data.forEach((item, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.status}</td>
+                    <td>${item.startDate || ""}</td>
+                    <td>${item.endDate || ""}</td>
+                    <td>${item.workplace || ""}</td>
+                    <td>${item.jobTitle || ""}</td>
+                    <td><button class="delete-btn" data-id="${item.id}">삭제</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+}
+
+
+// ✅ 새 경력 추가 시 서버로 POST 요청
+document.addEventListener("click", function (event) {
+    if (
+        event.target.classList.contains("add-project-btn") &&
+        event.target.closest("#job-history")
+    ) {
+        const section = event.target.closest(".history-section");
+        const newRow = section.querySelector(".new-entry-row").cloneNode(true);
+        newRow.style.display = "table-row";
+        newRow.classList.remove("new-entry-row");
+
+        updateEndDateState(newRow); // 새로 만들자마자 상태 검사해서 종료일 비활성화
+
+
+        const inputs = newRow.querySelectorAll("input, select");
+
+        // ✅ 입력 후 자동 저장
+        inputs.forEach(input => {
+            input.addEventListener("change", function () {
+                if (input.classList.contains("status-select")) {
+                    updateEndDateState(newRow); // 상태 변경될 때마다 실행
+                }
+                const status = newRow.querySelector(".status-select").value;
+                const startDate = newRow.querySelector(".start-date").value;
+                const workplace = newRow.querySelector(".workplace").value;
+                const jobTitle = newRow.querySelector(".job-title").value;
+
+                let endDate = null;
+                if (status !== "재직") {
+                    endDate = newRow.querySelector(".end-date").value;
+                }
+
+
+                // 유효성 검사 (근무지, 직무는 있어야 저장)
+                if (!workplace || !jobTitle) return;
+
+                const data = {
+                    status,
+                    startDate,
+                    endDate,
+                    workplace,
+                    jobTitle
+                };
+
+                fetch("/api/job-history", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        [getCsrfHeader()]: getCsrfToken()
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(response => response.json())
+                    .then(saved => {
+                        // 저장 성공 시 ID를 부여하고 삭제버튼에 data-id 설정
+                        const delBtn = newRow.querySelector(".delete-btn");
+                        delBtn.setAttribute("data-id", saved.id);
+                        alert("✅ 저장되었습니다!");
+
+                        loadJobHistories(); // ✅ 새로고침하여 저장한 데이터 포함해 전체 다시 불러오기
+                    })
+                    .catch(err => console.error("❌ 저장 실패:", err));
+            });
+        });
+
+        section.querySelector("tbody").appendChild(newRow);
+    }
+});
+
+// ✅ 구직내역 삭제 (구직 항목만)
+document.addEventListener("click", function (event) {
+    if (event.target.classList.contains("delete-btn") &&
+        event.target.closest("#job-history")) {
+
+        const row = event.target.closest("tr");
+        const id = event.target.getAttribute("data-id");
+
+        if (!id) {
+            row.remove(); // 저장 안 된 새 항목이라면 그냥 삭제
+            return;
+        }
+
+        if (!confirm("정말 구직 내역을 삭제하시겠습니까?")) return;
+
+        fetch(`/api/job-history/${id}`, {
+            method: "DELETE",
+            headers: { [getCsrfHeader()]: getCsrfToken() }
+        })
+            .then(response => {
+                if (response.ok) {
+                    row.remove();
+                    alert("✅ 삭제되었습니다!");
+                } else {
+                    alert("❌ 삭제 실패");
+                }
+            });
+    }
+});
+
+// ✅ 구직 내역 수정 시 자동 저장 (기존 row 더블클릭 수정 후 blur 시)
+document.addEventListener("blur", function (event) {
+    if (event.target.classList.contains("editable-input")) {
+        const input = event.target;
+        const td = input.closest("td");
+        const row = td.closest("tr");
+        const id = row.querySelector(".delete-btn")?.getAttribute("data-id");
+
+        if (!id) return;
+
+        // 현재 row에서 값 읽기
+        const cells = row.querySelectorAll("td");
+        const status = cells[1].textContent.trim();
+        const startDate = cells[2].textContent.trim();
+        const workplace = cells[4].textContent.trim();
+        const jobTitle = cells[5].textContent.trim();
+        let endDate = null;
+        if (status !== "재직") {
+            endDate = cells[3].textContent.trim();
+        }
+
+
+        const data = {
+            status,
+            startDate,
+            endDate,
+            workplace,
+            jobTitle
+        };
+
+        fetch(`/api/job-history/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                [getCsrfHeader()]: getCsrfToken()
+            },
+            body: JSON.stringify(data)
+        })
+            .then(res => res.ok && console.log("자동 저장 완료"))
+            .catch(err => console.error("자동 저장 실패", err));
+    }
+}, true); // useCapture: true
+
+// ✅ 상태에 따라 종료일 비활성화 함수
+function updateEndDateState(row) {
+    const statusSelect = row.querySelector(".status-select");
+    const endDateInput = row.querySelector(".end-date");
+
+    if (!statusSelect || !endDateInput) return;
+
+    if (statusSelect.value === "재직") {
+        endDateInput.value = "";
+        endDateInput.disabled = true;
+        endDateInput.placeholder = "재직 중";
+    } else {
+        endDateInput.disabled = false;
+        endDateInput.placeholder = "YYYY-MM-DD";
+    }
+}
