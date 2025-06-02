@@ -1,9 +1,6 @@
 package com.example.bob.Repository;
 
-import com.example.bob.Entity.CompanyEntity;
-import com.example.bob.Entity.NotificationEntity;
-import com.example.bob.Entity.UserEntity;
-import com.example.bob.Entity.ProjectEntity;
+import com.example.bob.Entity.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -60,5 +57,12 @@ public interface NotificationRepository extends JpaRepository<NotificationEntity
     @Modifying
     @Query("UPDATE NotificationEntity n SET n.isHidden = true WHERE n.contestTeam.id = :teamId AND n.user = :user")
     void hideByContestTeamIdAndUser(@Param("teamId") Long teamId, @Param("user") UserEntity user);
+
+    boolean existsByUserAndTypeAndRelatedContestAndSender(
+            UserEntity user,
+            NotificationType type,
+            ContestEntity relatedContest,
+            UserEntity sender
+    );
 
 }

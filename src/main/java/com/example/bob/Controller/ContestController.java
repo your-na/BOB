@@ -247,5 +247,14 @@ public class ContestController {
         return contestService.getLatestContests();
     }
 
+    @PostMapping("/api/contest/recruit/{recruitId}/apply")
+    public ResponseEntity<?> applyToRecruit(
+            @PathVariable Long recruitId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        contestService.sendApplicationNotification(recruitId, userDetails.getUser());
+        return ResponseEntity.ok().build();
+    }
+
 
 }

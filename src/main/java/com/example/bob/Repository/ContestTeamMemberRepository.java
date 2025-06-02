@@ -1,9 +1,6 @@
 package com.example.bob.Repository;
 
-import com.example.bob.Entity.ContestEntity;
-import com.example.bob.Entity.ContestTeamEntity;
-import com.example.bob.Entity.ContestTeamMemberEntity;
-import com.example.bob.Entity.UserEntity;
+import com.example.bob.Entity.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,5 +28,8 @@ public interface ContestTeamMemberRepository extends JpaRepository<ContestTeamMe
 
     @Query("SELECT m.user.userId FROM ContestTeamMemberEntity m WHERE m.team.id = :teamId AND m.isAccepted = true")
     List<Long> findAcceptedMemberIdsByTeamId(@Param("teamId") Long teamId);
+
+    @Query("SELECT m FROM ContestTeamMemberEntity m WHERE m.user = :user AND m.team.contest = :contest")
+    List<ContestTeamMemberEntity> findByUserAndTeam_Contest(@Param("user") UserEntity user, @Param("contest") ContestEntity contest);
 
 }
