@@ -5,7 +5,7 @@ import java.util.List;
 public class ResumeDragItemDTO {
 
     private Long coSectionId;     // 섹션 ID (프론트에서 전달)
-    private String itemType;      // "PROJECT", "CONTEST", "LICENSE", "JOB_HISTORY"
+    private String itemType;      // "PROJECT", "CONTEST", "LICENSE", "JOB"
     private Long referenceId;     // 참조 ID
     private String displayText;   // 표시할 텍스트
     private String filePath;      // 파일 경로 (선택)

@@ -63,7 +63,7 @@
     <!-- 프로필 정보 -->
     <div class="profile-row">
       <div class="photo-wrapper">
-        <img th:src="@{'/uploads/' + ${resume.profileImageUrl}}" alt="프로필 사진">
+        <img th:src="@{'/profileImages/' + ${resume.profileImageUrl}}" alt="프로필 사진">
       </div>
       <div class="profile-info">
         <div class="name-skill">
@@ -150,14 +150,14 @@
       <!-- ✅ 사진 첨부 미리보기 -->
       <div th:if="${not #lists.isEmpty(section.fileNames) and section.type?.trim() == '사진 첨부'}">
         <div class="image-preview" th:each="imgName : ${section.fileNames}">
-          <img th:src="@{'/uploads/' + ${imgName}}" alt="첨부 이미지">
+          <img th:src="@{'/uploads/resumeFiles/' + ${imgName}}" alt="첨부 이미지">
         </div>
       </div>
 
       <!-- ✅ 파일 다운로드 링크 -->
       <div th:if="${not #lists.isEmpty(section.fileNames) and section.type?.trim() == '파일 첨부'}" class="attachments">
         <div class="file-download" th:each="fileName : ${section.fileNames}">
-          <a th:href="@{'/uploads/' + ${fileName}}" download>
+          <a th:href="@{'/uploads/resumeFiles/' + ${fileName}}" download>
             📄 <span th:text="${fileName}">파일명</span> 다운로드
           </a>
         </div>

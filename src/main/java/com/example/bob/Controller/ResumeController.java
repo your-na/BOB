@@ -79,10 +79,11 @@ public class ResumeController {
 
 
     // ✅ 사용자가 넣은 파일
-    @PostMapping("/upload")  // 🔥 경로는 /api/user/resumes/upload
+    @PostMapping("/upload")
     public ResponseEntity<String> uploadResumeFile(@RequestParam("file") MultipartFile file) {
         try {
-            String uploadDir = "uploads/resumeFiles/";
+            // 절대 경로로 수정!
+            String uploadDir = System.getProperty("user.dir") + "/uploads/resumeFiles/";
             File dir = new File(uploadDir);
             if (!dir.exists()) dir.mkdirs();
 
@@ -95,9 +96,12 @@ public class ResumeController {
 
             return ResponseEntity.ok(uniqueName);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(500).body("파일 업로드 실패: " + e.getMessage());
         }
     }
+
+
 
     // ✅ 특정 공고에 제출한 이력서 상세 조회 API (User + Company 모두 허용)
     @GetMapping("/detail")

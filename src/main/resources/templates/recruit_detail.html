@@ -196,9 +196,13 @@
       document.getElementById("applyModal").style.display = "none";
     };
 
-    window.confirmApply = function () {
+    /*window.confirmApply = function () {
       const contestId = window.location.pathname.split("/")[2];
       window.location.href = `/contestapplication?contestId=${contestId}`;
+    };
+     */
+    window.confirmApply = function () {
+      window.location.href = "/success2";
     };
   });
 </script>
