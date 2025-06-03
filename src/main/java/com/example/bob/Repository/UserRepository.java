@@ -21,4 +21,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     List<UserEntity> findByUserNickContainingIgnoreCaseOrUserIdLoginContainingIgnoreCase(String userNick, String userIdLogin);
 
+    // 일반 회원 수 조회 (role 컬럼이 'USER'인 회원 수)
+    long countByRole(String role);
+
+
 }

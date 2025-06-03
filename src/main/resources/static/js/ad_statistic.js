@@ -1,3 +1,25 @@
+// 관리자 통계 API에서 회원 수 받아서 화면에 반영하는 함수
+function loadAdminStatistics() {
+    fetch('/api/admin/statistics')
+        .then(response => response.json())
+        .then(data => {
+            // 받아온 데이터로 회원 수 영역을 바꿈
+            document.getElementById('totalUsersCount').innerText = data.totalUsers.toLocaleString() + '명';
+            document.getElementById('generalUsersCount').innerText = data.generalMemberCount.toLocaleString() + '명';
+            document.getElementById('companyUsersCount').innerText = data.companyMemberCount.toLocaleString() + '명';
+        })
+        .catch(err => {
+            console.error('관리자 통계 불러오기 실패:', err);
+        });
+}
+
+// 페이지 로드되면 관리자 통계 데이터 가져오기 실행
+document.addEventListener('DOMContentLoaded', () => {
+    loadAdminStatistics();
+});
+
+
+
 // 구직 성공률 차트
 const jobSuccessChart = new Chart(document.getElementById("jobSuccessChart"), {
     type: 'doughnut',
@@ -74,5 +96,9 @@ new Chart(document.getElementById("companyMemberChart"), {
             tooltip: { enabled: false },
             legend: { display: false }
         }
+
+
     }
+
+
 });
