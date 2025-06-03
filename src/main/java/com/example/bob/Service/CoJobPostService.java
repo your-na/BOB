@@ -277,7 +277,7 @@ public class CoJobPostService {
             totalCanceled += canceled;
 
             // 📝 공고별 요약 추가
-            jobSummaries.add(new JobPostSummaryDTO(post.getTitle(), applicants, accepted));
+            jobSummaries.add(new JobPostSummaryDTO(post.getId(), post.getTitle(), applicants, accepted));
         }
 
         // 📦 DTO에 값 담아서 반환

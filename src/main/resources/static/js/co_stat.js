@@ -17,11 +17,23 @@ function fetchCompanyStats() {
             data.jobSummaries.forEach(item => {
                 const li = document.createElement('li');
                 li.innerHTML = `
-                    <span class="job-title">${item.title}</span>
-                    <span class="status">지원자 ${item.applicantCount}명 / 채용 ${item.acceptedCount}명</span>
-                `;
+    <span class="job-title clickable-title" data-job-id="${item.jobId}">
+        ${item.title}
+    </span>
+    <span class="status">지원자 ${item.applicantCount}명 / 채용 ${item.acceptedCount}명</span>
+`;
                 list.appendChild(li);
             });
+
+            // 🖱️ 제목 클릭 시 상세 페이지 이동
+            document.querySelectorAll('.clickable-title').forEach(el => {
+                el.addEventListener('click', function () {
+                    const jobPostId = this.getAttribute('data-job-id');
+                    // ✅ 뷰 페이지로 이동
+                    window.location.href = `/jobdetail?id=${jobPostId}`;
+                });
+            });
+
         })
         .catch(err => {
             console.error('📛 채용 통계 불러오기 실패:', err);
