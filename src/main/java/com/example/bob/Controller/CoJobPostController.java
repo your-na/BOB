@@ -65,13 +65,21 @@ public class CoJobPostController {
         return ResponseEntity.ok(myJobPosts);
     }
 
-    // 📊 [GET] 기업의 채용 통계 조회
+    // 📊 [GET] 기업의 채용 통계 조회 (month 필터 추가)
     @GetMapping("/statistics/company")
-    public ResponseEntity<CompanyJobStatDTO> getCompanyStatistics() {
-        // 👉 서비스에서 통계 가져오기
-        CompanyJobStatDTO statDTO = coJobPostService.getCompanyJobStatistics();
-        return ResponseEntity.ok(statDTO); // ✅ JSON 형태로 응답
+    public ResponseEntity<CompanyJobStatDTO> getCompanyStatistics(
+            @RequestParam(name = "month", required = false) Integer month) {
+
+        CompanyJobStatDTO statDTO = coJobPostService.getCompanyJobStatistics(month); // ✅ 파라미터 전달
+        return ResponseEntity.ok(statDTO);
     }
+
+    @GetMapping("/statistics/months")
+    public ResponseEntity<List<String>> getAvailableMonths() {
+        return ResponseEntity.ok(coJobPostService.getAvailableJobPostMonths());
+    }
+
+
 
 
 

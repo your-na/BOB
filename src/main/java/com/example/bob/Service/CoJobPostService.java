@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.time.LocalDate;
+import java.util.Comparator;
+
 
 
 
@@ -231,8 +233,8 @@ public class CoJobPostService {
                 .collect(Collectors.toList());
     }
 
-    // 📊 로그인한 기업의 채용 통계 계산
-    public CompanyJobStatDTO getCompanyJobStatistics() {
+    // 📊 로그인한 기업의 채용 통계 계산 (month: 1 ~ 12, 없으면 전체)
+    public CompanyJobStatDTO getCompanyJobStatistics(Integer month) {
         // 🔐 로그인된 기업 정보 가져오기
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         CompanyDetailsImpl companyDetails = (CompanyDetailsImpl) userDetails;
@@ -241,16 +243,18 @@ public class CoJobPostService {
         CompanyEntity company = companyRepository.findByCoIdLogin(currentUsername)
                 .orElseThrow(() -> new RuntimeException("기업 정보를 찾을 수 없습니다."));
 
-        // 📆 기준일: 1년 전부터
-        LocalDate oneYearAgo = LocalDate.now().minusYears(1);
+        // 🔍 기업 공고 전체 조회
+        List<CoJobPostEntity> jobPosts = coJobPostRepository.findByCompany_CompanyId(company.getCompanyId());
 
-        // 🔍 1년 내 기업 공고 전체 조회
-        List<CoJobPostEntity> jobPosts = coJobPostRepository.findByCompany_CompanyId(company.getCompanyId()).stream()
-                .filter(post -> {
-                    LocalDate postDate = LocalDate.parse(post.getStartDate());
-                    return postDate.isAfter(oneYearAgo);
-                })
-                .collect(Collectors.toList());
+        // ✅ month가 있으면 해당 월의 공고만 필터링
+        if (month != null) {
+            jobPosts = jobPosts.stream()
+                    .filter(post -> {
+                        LocalDate postDate = LocalDate.parse(post.getStartDate());
+                        return postDate.getMonthValue() == month;
+                    })
+                    .collect(Collectors.toList());
+        }
 
         // 📊 통계값 초기화
         int totalApplicants = 0;
@@ -264,23 +268,19 @@ public class CoJobPostService {
         for (CoJobPostEntity post : jobPosts) {
             Long jobId = post.getId();
 
-            // 각 상태별 지원자 수 계산
             int applicants = jobApplicationRepository.countDistinctApplicantsByJobPostId(jobId);
             int accepted = jobApplicationRepository.countByJobPost_IdAndStatus(jobId, JobApplicationStatus.ACCEPTED);
             int rejected = jobApplicationRepository.countByJobPost_IdAndStatus(jobId, JobApplicationStatus.REJECTED);
             int canceled = jobApplicationRepository.countByJobPost_IdAndStatus(jobId, JobApplicationStatus.CANCELED);
 
-            // 누적 합계
             totalApplicants += applicants;
             totalAccepted += accepted;
             totalRejected += rejected;
             totalCanceled += canceled;
 
-            // 📝 공고별 요약 추가
             jobSummaries.add(new JobPostSummaryDTO(post.getId(), post.getTitle(), applicants, accepted));
         }
 
-        // 📦 DTO에 값 담아서 반환
         CompanyJobStatDTO dto = new CompanyJobStatDTO();
         dto.setTotalJobCount(jobPosts.size());
         dto.setTotalApplicants(totalApplicants);
@@ -291,6 +291,31 @@ public class CoJobPostService {
 
         return dto;
     }
+
+    // 🔁 전체 조회용 기본 메서드도 유지
+    public CompanyJobStatDTO getCompanyJobStatistics() {
+        return getCompanyJobStatistics(null); // 👉 null 넘겨서 전체 월 기준으로 호출
+    }
+
+    public List<String> getAvailableJobPostMonths() {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        CompanyDetailsImpl companyDetails = (CompanyDetailsImpl) userDetails;
+        String currentUsername = companyDetails.getUsername();
+
+        CompanyEntity company = companyRepository.findByCoIdLogin(currentUsername)
+                .orElseThrow(() -> new RuntimeException("기업 정보를 찾을 수 없습니다."));
+
+        return coJobPostRepository.findByCompany_CompanyId(company.getCompanyId()).stream()
+                .map(post -> {
+                    LocalDate date = LocalDate.parse(post.getStartDate());
+                    return date.getYear() + "-" + String.format("%02d", date.getMonthValue()); // 예: "2025-06"
+                })
+                .distinct()
+                .sorted(Comparator.reverseOrder()) // 최신순 정렬
+                .collect(Collectors.toList());
+    }
+
+
 
 
 
