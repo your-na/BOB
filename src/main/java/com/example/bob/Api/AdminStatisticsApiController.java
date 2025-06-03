@@ -20,4 +20,12 @@ public class AdminStatisticsApiController {
         AdminStatisticsDTO stats = adminStatisticsService.getAdminStatistics();
         return ResponseEntity.ok(stats);
     }
+
+    // 최근 1년간 구직 성공률을 반환하는 API 메서드
+    @GetMapping("/job-success-rate")
+    public ResponseEntity<Double> getJobSuccessRate() {
+        double successRate = adminStatisticsService.getJobSuccessRateLastYear();
+        return ResponseEntity.ok(successRate);
+    }
+
 }

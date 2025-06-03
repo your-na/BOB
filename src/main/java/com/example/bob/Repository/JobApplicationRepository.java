@@ -7,6 +7,7 @@
     import org.springframework.data.domain.Pageable;
     import org.springframework.data.jpa.repository.Query;
     import org.springframework.data.repository.query.Param;
+    import java.util.Date;
 
 
 
@@ -70,6 +71,14 @@
         // ✅ 특정 기업의 합격된 지원자 목록 조회
         @Query("SELECT j FROM JobApplicationEntity j WHERE j.jobPost.company.companyId = :companyId AND j.status = 'ACCEPTED'")
         List<JobApplicationEntity> findAcceptedApplicationsByCompany(@Param("companyId") Long companyId);
+
+        // 최근 1년간 중복 제거한 지원자 수 조회
+        @Query("SELECT COUNT(DISTINCT ja.user.userId) FROM JobApplicationEntity ja WHERE ja.appliedAt >= :startDate")
+        long countDistinctApplicantsSince(@Param("startDate") Date startDate);
+
+        // 최근 1년간 중복 제거한 합격자 수 조회
+        @Query("SELECT COUNT(DISTINCT ja.user.userId) FROM JobApplicationEntity ja WHERE ja.status = 'ACCEPTED' AND ja.appliedAt >= :startDate")
+        long countDistinctAcceptedSince(@Param("startDate") Date startDate);
 
 
 
