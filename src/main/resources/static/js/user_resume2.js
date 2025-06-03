@@ -44,12 +44,15 @@ function setupDropBox(box) {
                 item.className = 'uploaded-item';
                 item.textContent = file.name;
 
-                // ✅ 삭제 버튼 추가
-                const deleteBtn = document.createElement('span');
-                deleteBtn.className = 'delete-icon';
-                deleteBtn.innerHTML = '삭제️';
-                deleteBtn.addEventListener('click', () => item.remove());
-                item.appendChild(deleteBtn);
+                // ✅ 삭제 버튼은 preview 모드가 아닐 때만 보이게
+                if (!box.classList.contains('preview-mode')) {
+                    const deleteBtn = document.createElement('span');
+                    deleteBtn.className = 'delete-icon';
+                    deleteBtn.innerHTML = '삭제️';
+                    deleteBtn.addEventListener('click', () => item.remove());
+                    item.appendChild(deleteBtn);
+                }
+
 
                 box.appendChild(item);
             });
@@ -329,7 +332,7 @@ confirmBtn.addEventListener("click", () => {
                     coSectionId: Number(coSectionId),
                     itemType: div.dataset.type || "PROJECT",
                     referenceId: referenceId,
-                    displayText: div.textContent.trim(),
+                    displayText: div.cloneNode(true).childNodes[0]?.textContent.trim(),
                     filePath: div.dataset.file || null
                 };
             });
@@ -1261,11 +1264,12 @@ function togglePreview() {
                 const rawId = div.dataset.id;
                 const referenceId = rawId && !isNaN(Number(rawId)) ? Number(rawId) : null;
 
+
                 return {
                     coSectionId,
                     itemType: div.dataset.type || "PROJECT",
                     referenceId: referenceId,
-                    displayText: div.textContent.trim(),
+                    displayText: div.cloneNode(true).childNodes[0]?.textContent.trim(),
                     filePath: div.dataset.file || null,
                     startDate: div.dataset.startDate || null,
                     endDate: div.dataset.endDate || null

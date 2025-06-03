@@ -45,10 +45,13 @@
             <ul th:if="${not #lists.isEmpty(section.dragItems)}">
               <li th:each="item : ${section.dragItems}" style="margin-bottom: 12px;">
                 <div>
-                  <strong th:text="${item.displayText}">항목제목</strong>
-                  <span th:if="${item.startDate != null and item.endDate != null}">
-      (<span th:text="${item.startDate}"></span> ~ <span th:text="${item.endDate}"></span>)
-    </span>
+                    <strong th:text="${item.displayText}">항목제목</strong>
+
+                    <!-- ✅ displayText에 '~' 문자가 포함되어 있으면 날짜 출력 생략 -->
+                    <span th:if="${item.startDate != null and item.endDate != null and !#strings.contains(item.displayText, '~')}">
+  (<span th:text="${item.startDate}"></span> ~ <span th:text="${item.endDate}"></span>)
+</span>
+
                 </div>
                   <div th:if="${item.filePath != null and item.filePath != '' and item.itemType != null and item.itemType != 'JOB'}">
                   <a th:href="@{'/uploads/projectFiles/' + ${item.filePath}}" target="_blank">📁 파일 보기</a>
