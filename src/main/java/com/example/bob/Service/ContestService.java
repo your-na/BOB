@@ -1,15 +1,10 @@
 package com.example.bob.Service;
 
 import com.example.bob.DTO.ContestDTO;
-import com.example.bob.Entity.ContestEntity;
-import com.example.bob.Entity.ContestHistoryEntity;
-import com.example.bob.Entity.ContestTeamEntity;
-import com.example.bob.Entity.UserEntity;
-import com.example.bob.Repository.ContestHistoryRepository;
-import com.example.bob.Repository.ContestRepository;
-import com.example.bob.Repository.ContestTeamMemberRepository;
-import com.example.bob.Repository.ContestTeamRepository;
+import com.example.bob.Entity.*;
+import com.example.bob.Repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -27,10 +22,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,6 +34,10 @@ public class ContestService {
     private final ContestHistoryRepository contestHistoryRepository;
     private final ContestTeamRepository contestTeamRepository;
     private final ContestTeamMemberRepository contestTeamMemberRepository;
+    private final ContestRecruitRepository contestRecruitRepository;
+
+    @Autowired
+    private final NotificationRepository notificationRepository;
 
     // 공모전 저장
     public ContestEntity save(ContestEntity contest) {
@@ -219,6 +216,53 @@ public class ContestService {
         return latest.stream()
                 .map(ContestDTO::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    public void sendApplicationNotification(Long recruitId, UserEntity applicant) {
+        ContestRecruitEntity recruit = contestRecruitRepository.findById(recruitId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 모집글이 존재하지 않습니다."));
+
+        UserEntity owner = recruit.getWriter();
+        ContestEntity contest = recruit.getContest();
+
+        String message = applicant.getUserNick() + "님이 \"" + contest.getTitle() + "\" 팀 모집글에 참가 신청을 보냈습니다.";
+
+        NotificationEntity notification = new NotificationEntity();
+        notification.setUser(owner);
+        notification.setSender(applicant);
+        notification.setMessage(message);
+        notification.setType(NotificationType.CONTEST_APPLICATION);
+        notification.setRelatedContest(contest);
+        notification.setTimestamp(LocalDateTime.now());
+        notification.setIsRead(false);
+
+        notificationRepository.save(notification);
+    }
+
+    public boolean hasUserAlreadyApplied(Long recruitId, Long userId) {
+        // 모집글을 가져온다
+        ContestRecruitEntity recruit = contestRecruitRepository.findById(recruitId)
+                .orElseThrow(() -> new IllegalArgumentException("모집글 없음"));
+
+        ContestEntity contest = recruit.getContest();
+        UserEntity user = new UserEntity();
+        user.setUserId(userId);
+
+        // 알림 기준: 이미 신청 알림을 보냈는지?
+        boolean alreadyNotified = notificationRepository.existsByUserAndTypeAndRelatedContestAndSender(
+                recruit.getWriter(),
+                NotificationType.CONTEST_APPLICATION,
+                contest,
+                user
+        );
+
+        // 팀 멤버 기준: 아직 초대 상태인지?
+        List<ContestTeamMemberEntity> memberList = contestTeamMemberRepository
+                .findByUserAndTeam_Contest(user, contest);
+        boolean stillPending = memberList.stream()
+                .anyMatch(m -> m.isInvitePending() && !m.isAccepted());
+
+        return alreadyNotified || stillPending;
     }
 
 }

@@ -8,6 +8,9 @@
     <!-- ✅ CSRF 토큰 설정 -->
     <meta name="_csrf" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
+
+    <meta name="team-id" th:content="${teamId}" />
+
 </head>
 <body>
 
@@ -17,7 +20,7 @@
             <div class="header">
                 <button class="back-btn">&lt;</button>
                 <!-- 프로젝트 제목을 동적으로 불러오기 -->
-                <h2 id="project-name" th:text="${project.title}">프로젝트 제목</h2>
+                <h2 id="project-name" th:text="${projectTitle}">프로젝트 제목</h2>
                 <button class="close-btn">&times;</button>
             </div>
 
@@ -29,7 +32,6 @@
                 <table id="crud-table">
                     <thead>
                     <tr id="month-row">
-                        <th rowspan="2" colspan="2" class="project-title" th:text="${project.goal}">프로젝트 목표</th>
                         <th colspan="5">1월</th>
                         <th colspan="5">2월</th>
                         <th colspan="5">3월</th>
@@ -50,7 +52,7 @@
 
 
 <script th:inline="javascript">
-    const projectId = /*[[${project.id}]]*/ 0;
+    const teamId = /*[[${team.id}]]*/ 0;
     const weeksPerMonth = 5;
     let monthCount = 3;
     let isMouseDown = false;
@@ -66,11 +68,11 @@
     document.addEventListener("DOMContentLoaded", () => {
         const backBtn = document.querySelector(".back-btn");
         const closeBtn = document.querySelector(".close-btn");
-        const projectId = /*[[${project.id}]]*/ 0;
+        const teamId = /*[[${teamId}]]*/ 0;
 
         if (backBtn) {
             backBtn.addEventListener("click", () => {
-                window.location.href = `http://localhost:8888/todohome/${projectId}`;
+                window.location.href = `http://localhost:8888/todohome/${teamId}`;
             });
         }
 
@@ -285,8 +287,8 @@
 
                     if (cell.classList.contains("active-cell")) {
                         wbsList.push({
-                            type: "project",
-                            targetId: projectId,
+                            type: "contest",
+                            targetId: teamId,
                             category: currentCategory,
                             task: currentTask,
                             month: month,
@@ -324,8 +326,8 @@
     }
 
     function loadWbsFromServer() {
-        fetch(`/api/wbs?type=project&id=${projectId}`)
-            .then(res => res.json())
+        fetch(`/api/wbs?type=contest&id=${teamId}`)
+                .then(res => res.json())
             .then(data => {
                 // ✅ max month 계산
                 const maxMonth = Math.max(...data.map(item => item.month));

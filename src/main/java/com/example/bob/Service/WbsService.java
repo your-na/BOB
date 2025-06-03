@@ -30,5 +30,4 @@ public class WbsService {
     public void deleteWbsList(String type, Long targetId) {
         wbsRepository.deleteByTypeAndTargetId(type, targetId);
     }
-
 }

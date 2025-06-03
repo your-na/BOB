@@ -1,7 +1,9 @@
 package com.example.bob.Controller;
 
+import com.example.bob.Entity.ContestTeamEntity;
 import com.example.bob.Entity.ProjectEntity;
 import com.example.bob.Entity.WbsEntity;
+import com.example.bob.Repository.ContestTeamRepository;
 import com.example.bob.Service.ProjectService;
 import com.example.bob.Service.WbsService;
 import lombok.RequiredArgsConstructor;
@@ -16,15 +18,9 @@ import java.util.List;
 public class WbsController {
 
     private final WbsService wbsService;
-    private final ProjectService projectService;  // ✅ 추가됨
+    private final ProjectService projectService;
+    private final ContestTeamRepository contestTeamRepository;
 
-    // ✅ WBS 페이지 이동
-    @GetMapping("/todocrud/{projectId}")
-    public String showWbsPage(@PathVariable Long projectId, Model model) {
-        ProjectEntity project = projectService.getProjectById(projectId); // ✅ 가져오기
-        model.addAttribute("project", project); // ✅ 모델에 추가
-        return "todo_crud";
-    }
 
     // ✅ 특정 프로젝트/공모전 WBS 조회
     @ResponseBody
@@ -45,5 +41,24 @@ public class WbsController {
             wbsService.deleteWbsList(type, targetId);
             wbsService.saveWbsList(wbsList);
         }
+    }
+
+    // ✅ 프로젝트용 WBS 화면
+    @GetMapping("/todocrud/project/{projectId}")
+    public String showProjectWbsPage(@PathVariable Long projectId, Model model) {
+        ProjectEntity project = projectService.getProjectById(projectId);
+        model.addAttribute("project", project);
+        return "todo_crud"; // 프로젝트 WBS 페이지
+    }
+
+    // ✅ 공모전용 WBS 화면
+    @GetMapping("/todocrud/contest/{teamId}")
+    public String showContestWbsPage(@PathVariable Long teamId, Model model) {
+        ContestTeamEntity team = contestTeamRepository.findById(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("공모전 팀을 찾을 수 없습니다."));
+        model.addAttribute("teamId", team.getId());
+        model.addAttribute("projectTitle", team.getTeamName());
+        model.addAttribute("team", team);
+        return "todo_wbs2"; // 공모전 WBS 페이지
     }
 }

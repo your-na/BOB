@@ -38,7 +38,7 @@ public class NotificationEntity {
     private LocalDateTime timestamp;  // 알림 시간
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private NotificationType type;  // 알림 유형
 
 
@@ -67,6 +67,10 @@ public class NotificationEntity {
     public boolean isRead() {
         return isRead;
     }
+
+    @ManyToOne
+    @JoinColumn(name = "related_contest_id", nullable = true)
+    private ContestEntity relatedContest;
 
     // 🔹 알림 클릭 시 이동할 링크 자동 생성
     public String getLink() {

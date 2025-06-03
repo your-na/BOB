@@ -88,11 +88,4 @@ public class TestController {
     @GetMapping("/portfolioform")
     public String pofolform() {return "portfolio_form";}
 
-    //공모전 신청 완료 화면
-    @GetMapping("success2")
-    public String success2form() {return "success2";}
-
-
-
-
 }
