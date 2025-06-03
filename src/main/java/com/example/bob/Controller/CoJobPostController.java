@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.bob.DTO.CoJobPostResponseDTO;
+import com.example.bob.DTO.CompanyJobStatDTO;
+import com.example.bob.DTO.JobPostSummaryDTO;
 
 import java.util.List;
 
@@ -62,6 +64,15 @@ public class CoJobPostController {
         // 📤 클라이언트에 200 OK 상태로 응답 반환
         return ResponseEntity.ok(myJobPosts);
     }
+
+    // 📊 [GET] 기업의 채용 통계 조회
+    @GetMapping("/statistics/company")
+    public ResponseEntity<CompanyJobStatDTO> getCompanyStatistics() {
+        // 👉 서비스에서 통계 가져오기
+        CompanyJobStatDTO statDTO = coJobPostService.getCompanyJobStatistics();
+        return ResponseEntity.ok(statDTO); // ✅ JSON 형태로 응답
+    }
+
 
 
 

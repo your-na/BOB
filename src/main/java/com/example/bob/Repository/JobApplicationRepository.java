@@ -41,6 +41,11 @@
         // ✅ 공고 ID 기준으로 지원자 수 세기
         int countByJobPost_Id(Long jobPostId);
 
+        // ✅ 공고별로 유저 기준 중복 없이 지원자 수 세기
+        @Query("SELECT COUNT(DISTINCT a.user.userId) FROM JobApplicationEntity a WHERE a.jobPost.id = :jobPostId")
+        int countDistinctApplicantsByJobPostId(@Param("jobPostId") Long jobPostId);
+
+
         // ✅ 공고 ID와 상태로 지원자 수 카운트 💼
         int countByJobPost_IdAndStatus(Long jobPostId, JobApplicationStatus status);
 

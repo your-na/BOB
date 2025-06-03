@@ -22,11 +22,13 @@ import com.example.bob.DTO.CoJobPostDetailDTO;
 import com.example.bob.Entity.JobStatus;
 import com.example.bob.DTO.ResumeTitleDto;
 import com.example.bob.DTO.ApplicantDTO;
+import com.example.bob.DTO.CompanyJobStatDTO;
+import com.example.bob.DTO.JobPostSummaryDTO;
 
 
 
 
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.time.LocalDate;
@@ -228,6 +230,68 @@ public class CoJobPostService {
                 })
                 .collect(Collectors.toList());
     }
+
+    // 📊 로그인한 기업의 채용 통계 계산
+    public CompanyJobStatDTO getCompanyJobStatistics() {
+        // 🔐 로그인된 기업 정보 가져오기
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        CompanyDetailsImpl companyDetails = (CompanyDetailsImpl) userDetails;
+        String currentUsername = companyDetails.getUsername();
+
+        CompanyEntity company = companyRepository.findByCoIdLogin(currentUsername)
+                .orElseThrow(() -> new RuntimeException("기업 정보를 찾을 수 없습니다."));
+
+        // 📆 기준일: 1년 전부터
+        LocalDate oneYearAgo = LocalDate.now().minusYears(1);
+
+        // 🔍 1년 내 기업 공고 전체 조회
+        List<CoJobPostEntity> jobPosts = coJobPostRepository.findByCompany_CompanyId(company.getCompanyId()).stream()
+                .filter(post -> {
+                    LocalDate postDate = LocalDate.parse(post.getStartDate());
+                    return postDate.isAfter(oneYearAgo);
+                })
+                .collect(Collectors.toList());
+
+        // 📊 통계값 초기화
+        int totalApplicants = 0;
+        int totalAccepted = 0;
+        int totalRejected = 0;
+        int totalCanceled = 0;
+
+        List<JobPostSummaryDTO> jobSummaries = new ArrayList<>();
+
+        // 🔄 공고별 통계 계산
+        for (CoJobPostEntity post : jobPosts) {
+            Long jobId = post.getId();
+
+            // 각 상태별 지원자 수 계산
+            int applicants = jobApplicationRepository.countDistinctApplicantsByJobPostId(jobId);
+            int accepted = jobApplicationRepository.countByJobPost_IdAndStatus(jobId, JobApplicationStatus.ACCEPTED);
+            int rejected = jobApplicationRepository.countByJobPost_IdAndStatus(jobId, JobApplicationStatus.REJECTED);
+            int canceled = jobApplicationRepository.countByJobPost_IdAndStatus(jobId, JobApplicationStatus.CANCELED);
+
+            // 누적 합계
+            totalApplicants += applicants;
+            totalAccepted += accepted;
+            totalRejected += rejected;
+            totalCanceled += canceled;
+
+            // 📝 공고별 요약 추가
+            jobSummaries.add(new JobPostSummaryDTO(post.getTitle(), applicants, accepted));
+        }
+
+        // 📦 DTO에 값 담아서 반환
+        CompanyJobStatDTO dto = new CompanyJobStatDTO();
+        dto.setTotalJobCount(jobPosts.size());
+        dto.setTotalApplicants(totalApplicants);
+        dto.setTotalAccepted(totalAccepted);
+        dto.setTotalRejected(totalRejected);
+        dto.setTotalCanceled(totalCanceled);
+        dto.setJobSummaries(jobSummaries);
+
+        return dto;
+    }
+
 
 
 
