@@ -25,7 +25,7 @@
                     <div class="all-dropdown-menu">
                         <div class="dropdown-section">
                             <ul>
-                                <li><a href="contest">전체 공모전</a></li>
+                                <li><a th:href="@{/contest}">전체 공모전</a></li>
                                 <li><a th:href="@{/contestact}">공모전 활동</a></li>
                                 <li><a th:href="@{/likedcontest}">찜한 공모전</a></li>
                             </ul>
@@ -38,8 +38,8 @@
                         <div class="dropdown-section">
                             <ul>
                                 <li><a th:href="@{/project}">프로젝트</a></li>
-                                <li><a href="newproject">프로젝트 생성</a></li>
-                                <li><a href="myproject">MY 프로젝트</a></li>
+                                <li><a th:href="@{/newproject}">프로젝트 생성</a></li>
+                                <li><a th:href="@{/myproject}">MY 프로젝트</a></li>
                                 <li><a href="#">찜한 프로젝트</a></li>
                             </ul>
                         </div>
@@ -50,9 +50,9 @@
                     <div class="all-dropdown-menu">
                         <div class="dropdown-section">
                             <ul>
-                                <li><a href="/job">구인 공고</a></li>
-                                <li><a href="/portfoliozip">포트폴리오 모음방</a></li>
-                                <li><a href="/jobapplication">신청한 구직 내역</a></li>
+                                <li><a th:href="@{/job}">구인 공고</a></li>
+                                <li><a th:href="@{/portfoliozip}">포트폴리오 모음방</a></li>
+                                <li><a th:href="@{/jobapplication}">신청한 구직 내역</a></li>
                                 <li><a href="#">찜한 공고</a></li>
                             </ul>
                         </div>

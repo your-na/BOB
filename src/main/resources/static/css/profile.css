@@ -1,23 +1,18 @@
-body {
-    margin: 0 10%;
-    font-family: 'Arial', sans-serif;
-}
-
-#header {
+#profile-tabs {
     margin-top: 100px;
     display: flex;
     align-items: center;
     padding: 10px 20px;
 }
 
-#header a {
+#profile-tabs a {
     text-decoration: none;
     color: black;
     margin-right: 20px;
     font-size: 18px;
 }
 
-#header a.active {
+#profile-tabs a.active {
     font-weight: bold;
     color: green;
     border-bottom: 3px solid green;

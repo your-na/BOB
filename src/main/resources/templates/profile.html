@@ -12,7 +12,8 @@
 <body>
 <!-- header -->
 <div th:insert="~{header :: header}"></div>
-<div id="header">
+
+<div id="profile-tabs">
     <a href="/profile/" class="active">내 정보</a>
     <a href="#">내 평점</a>
 </div>
@@ -85,6 +86,12 @@
         <div class="checkbox-group">
             <label><input type="radio" name="sex" value="M" th:checked="${user.sex == 'M'}" readonly> 남성</label>
             <label><input type="radio" name="sex" value="F" th:checked="${user.sex == 'F'}" readonly> 여성</label>
+        </div>
+
+        <label for="public" id="public">공모전 및 프로젝트 참여 내역</label>
+        <div class="checkbox-group">
+            <label><input type="radio" name="public" value="M" checked> 공개</label>
+            <label><input type="radio" name="public" value="F"> 비공개</label>
         </div>
 
         <div class="actions">
