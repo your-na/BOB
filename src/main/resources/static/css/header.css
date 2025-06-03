@@ -10,8 +10,8 @@ body {
 }
 
 .user-avatar {
-    width: 32px;
-    height: 32px;
+    width: 32px !important;
+    height: 32px !important;
     border-radius: 50%;
     object-fit: cover;
     border: 1px solid #ccc;
@@ -108,8 +108,8 @@ body {
 
 .search-bar {
     margin-top: 3px; /* 요소를 아래로 10px 이동 */
-    width: 100%;
-    padding: 8px 20px;
+    width: 100% !important;
+    padding: 8px 20px !important;
     border-radius: 10px;
     border: 1px solid #ccc;
     font-size: 12px;
