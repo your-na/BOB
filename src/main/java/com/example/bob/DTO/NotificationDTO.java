@@ -20,10 +20,14 @@ public class NotificationDTO {
     private String link;  // 알림과 연결된 링크
 
     private String type;
-     //공모전
+    // 공모전
     private Long teamId;
     private String teamName;
     private Long contestId;
+
+    // ✅ 공모전 신청 알림용 필드
+    private String senderNick;
+    private Long applicationId;
 
     // ✅ 채용 알림용 필드
     private Long jobPostId;
@@ -32,6 +36,7 @@ public class NotificationDTO {
     // ✅ 프로젝트 알림용 필드
     private Long projectId;
     private String projectTitle;
+
 
 
     // 생성자
@@ -50,3 +55,4 @@ public class NotificationDTO {
     // 기본 생성자 (Lombok이 제공하는 기본 생성자)
     public NotificationDTO() {}
 }
+
