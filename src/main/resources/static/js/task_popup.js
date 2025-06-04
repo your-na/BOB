@@ -47,6 +47,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ✅ 팝업 할 일 불러오기
     loadPopupTodos();
+
+    //캘린더
+    const calendarBtn = document.getElementById("openCalendarModal");
+    if (calendarBtn) {
+        calendarBtn.addEventListener("click", () => {
+            document.getElementById("calendarModal").style.display = "flex";
+            renderCalendar();
+        });
+    }
+
 });
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -158,7 +168,22 @@ function loadPopupTodos() {
                 li.appendChild(checkbox);  // 체크박스는 보이지만 클릭 불가
                 li.appendChild(tag);
                 li.appendChild(title);
-                li.appendChild(dday);
+                // 날짜 정보 영역 생성
+                const dateInfo = document.createElement("div");
+                dateInfo.classList.add("dates");
+
+                const startDate = todo.startDate;
+                const endDate = todo.endDate;
+                const ddayValue = getDday(todo.endDate);
+                const ddayClass = getDdayClass(todo.endDate);
+
+                dateInfo.innerHTML = `
+    <span class="date-range">${startDate} ~ ${endDate}</span>
+    <span class="due-date ${ddayClass}">${ddayValue}</span>
+`;
+
+                li.appendChild(dateInfo);
+
 
                 popupList.appendChild(li);
             });
@@ -355,3 +380,124 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
+function getDdayClass(dateStr) {
+    const today = new Date();
+    const target = new Date(dateStr);
+    const diff = target - today;
+
+    const ONE_DAY = 1000 * 60 * 60 * 24;
+    if (Math.abs(diff) < ONE_DAY) return "today";
+    if (diff < 0) return "overdue";
+    return "upcoming";
+}
+
+function closeCalendarModal() {
+    document.getElementById("calendarModal").style.display = "none";
+}
+
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+let allTodos = [];
+
+// 📌 캘린더 모달 열기
+document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById("openCalendarModal");
+    if (btn) {
+        btn.addEventListener("click", () => {
+            document.getElementById("calendarModal").style.display = "flex";
+            loadTodosAndRenderCalendar(currentYear, currentMonth);
+        });
+    }
+
+    document.getElementById("prevMonth").addEventListener("click", () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        renderCalendar(currentYear, currentMonth);
+    });
+
+    document.getElementById("nextMonth").addEventListener("click", () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        renderCalendar(currentYear, currentMonth);
+    });
+});
+
+function closeCalendarModal() {
+    document.getElementById("calendarModal").style.display = "none";
+}
+
+// 🧠 모든 할 일 불러오고 렌더
+function loadTodosAndRenderCalendar(year, month) {
+    fetch("http://localhost:8888/api/todos/popup", {
+        credentials: "include"
+    })
+        .then(res => res.json())
+        .then(data => {
+            allTodos = data;
+            renderCalendar(year, month);
+        });
+}
+
+// 📆 달력 렌더링
+function renderCalendar(year, month) {
+    const title = document.getElementById("calendarTitle");
+    const body = document.getElementById("calendarBody");
+    const todayStr = new Date().toISOString().split("T")[0];
+
+    const monthStart = new Date(year, month, 1);
+    const monthEnd = new Date(year, month + 1, 0);
+    const startDay = monthStart.getDay();
+    const daysInMonth = monthEnd.getDate();
+
+    title.textContent = `${year}년 ${month + 1}월`;
+    body.innerHTML = "";
+
+    let row = document.createElement("tr");
+
+    for (let i = 0; i < startDay; i++) {
+        row.appendChild(document.createElement("td"));
+    }
+
+    for (let date = 1; date <= daysInMonth; date++) {
+        const cell = document.createElement("td");
+        const dateObj = new Date(year, month, date);
+        const dateStr = dateObj.toISOString().split("T")[0];
+
+        cell.textContent = date;
+
+        if (dateStr === todayStr) {
+            cell.style.backgroundColor = "#d2f2ff";
+            cell.style.borderRadius = "50%";
+        }
+
+        const tasksOnDay = allTodos.filter(todo => todo.startDate === dateStr);
+        if (tasksOnDay.length > 0) {
+            const dot = document.createElement("div");
+            dot.style.width = "6px";
+            dot.style.height = "6px";
+            dot.style.margin = "2px auto 0";
+            dot.style.backgroundColor = "red";
+            dot.style.borderRadius = "50%";
+            cell.appendChild(dot);
+
+            cell.style.cursor = "pointer";
+            cell.addEventListener("click", () => {
+                const taskTitles = tasksOnDay.map(t => `- ${t.title}`).join("\n");
+                alert(`${dateStr} 할 일:\n${taskTitles}`);
+            });
+        }
+
+        row.appendChild(cell);
+
+        if ((startDay + date) % 7 === 0 || date === daysInMonth) {
+            body.appendChild(row);
+            row = document.createElement("tr");
+        }
+    }
+}
