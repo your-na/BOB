@@ -1,31 +1,21 @@
-package com.example.bob.DTO;
+    package com.example.bob.DTO;
 
-public class CompanyUpdateDTO {
-    // 수정 가능 항목 추가 (이름은 불가능하지 않나?)
-    private String coEmail;
-    private String coPhone;
-    private String coBio;
-    private String coImageUrl;
+    import lombok.*;
 
-    public String getCoEmail() { return coEmail; }
-    public void setCoEmail(String coEmail) { this.coEmail = coEmail; }
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @ToString
+    public class CompanyUpdateDTO {
 
-    public String getCoPhone() { return coPhone; }
-    public void setCoPhone(String coPhone) { this.coPhone = coPhone; }
+        // 수정 가능 항목들
+        private String coName;        // 기업명 (예: 삼성전자)
+        private String coNick;        // 담당자명 (예: 홍길동)
+        private String coEmail;       // 이메일 (예: hello@company.com)
+        private String coPhone;       // 전화번호 (예: 010-1234-5678)
+        private String coBio;         // 기업 소개글
+        private String coImageUrl;    // 프로필 이미지 URL
 
-    public String getCoBio() { return coBio; }
-    public void setCoBio(String coBio) { this.coBio = coBio; }
-
-    public String getCoImageUrl() { return coImageUrl; }
-    public void setCoImageUrl(String coImageUrl) { this.coImageUrl = coImageUrl; }
-
-    @Override
-    public String toString() {
-        return "CompanyUpdateDTO{" +
-                "coEmail='" + coEmail + '\'' +
-                ", coPhone='" + coPhone + '\'' +
-                ", coBio='" + coBio + '\'' +
-                ", coImageUrl='" + coImageUrl + '\'' +
-                '}';
     }
-}

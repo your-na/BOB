@@ -10,6 +10,7 @@
   <link rel="stylesheet" th:href="@{/css/header2.css}">
 </head>
 <body>
+
 <!-- header -->
 <div th:insert="~{header2 :: header}"></div>
 
@@ -19,11 +20,13 @@
 </div>
 
 <div class="container">
-  <form action="/profile/update" method="post" enctype="multipart/form-data">
+  <form action="/profile/company/update" method="post" enctype="multipart/form-data">
     <input type="hidden" name="_csrf" value="${_csrf.token}">
     <div class="profile">
+
+      <!-- 프로필 사진 -->
       <div class="profile-pic">
-        <img th:src="${#strings.isEmpty(profileImageUrl) ? '/images/profile.png' : profileImageUrl}" alt="profile" id="profileimg">
+        <img th:src="${#strings.isEmpty(company.coImageUrl) ? '/images/profile.png' : company.coImageUrl}" alt="profile" id="profileimg">
         <input type="file" name="profileImage" id="profileImage" style="display: none;" accept="image/*">
         <label for="profileImage">
           <div class="edit-icon">
@@ -32,31 +35,34 @@
         </label>
       </div>
 
-      <label for="nickname">기업명</label>
-      <input type="text" id="nickname" name="nickname" th:value="${company.coName}">
+      <label for="coName">기업명</label>
+      <input type="text" id="coName" name="coName" th:value="${company.coName}">
 
-      <label for="name">담당자명</label>
-      <input type="text" id="name" name="name" th:value="${company.coNick}" readonly>
+      <label for="coNick">담당자명</label>
+      <input type="text" id="coNick" name="coNick" th:value="${company.coNick}" readonly>
 
-      <label for="username">아이디</label>
-      <input type="text" id="username" name="username" th:value="${company.coIdLogin}" readonly>
+      <label for="coIdLogin">아이디</label>
+      <input type="text" id="coIdLogin" name="coIdLogin" th:value="${company.coIdLogin}" readonly>
 
-      <label for="email">이메일</label>
-      <input type="email" id="email" name="email" th:value="${company.coEmail}" readonly>
+      <label for="coEmail">이메일</label>
+      <input type="email" id="coEmail" name="coEmail" th:value="${company.coEmail}" readonly>
 
-      <label for="bio" id="intro">기업 소개글</label>
-      <textarea id="bio" name="bio" th:text="${company.coBio}" placeholder="소개를 작성해보세요."></textarea>
+      <label for="coPhone">전화번호</label>
+      <input type="text" id="coPhone" name="coPhone" th:value="${company.coPhone}">
 
+      <label for="coBio" id="intro">기업 소개글</label>
+      <textarea id="bio" name="coBio" th:text="${company.coBio}" placeholder="소개를 작성해보세요."></textarea>
 
       <div class="actions">
         <button class="save">수정</button>
-        <button class="cancel" type="button" onclick="window.location.href='/profile'">취소</button>
+        <button class="cancel" type="button" onclick="window.location.href='/profile2'">취소</button>
       </div>
     </div>
   </form>
 </div>
 
 <script>
+  // 이미지 미리보기
   document.getElementById('profileImage').addEventListener('change', function(event) {
     const file = event.target.files[0];
     if (file) {
@@ -67,6 +73,11 @@
       reader.readAsDataURL(file);
     }
   });
+
+  // 수정 완료 메시지 표시
+  if (window.location.search.includes('success=true')) {
+    alert('수정되었습니다.');
+  }
 </script>
 
 </body>

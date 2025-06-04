@@ -10,6 +10,8 @@ import com.example.bob.security.CustomUserDetails;
 import com.example.bob.security.UserDetailsImpl;
 import com.example.bob.Service.DashboardService;
 import com.example.bob.Entity.CoJobPostEntity;
+import com.example.bob.DTO.CompanyDTO;
+
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -24,6 +26,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.multipart.MultipartFile;
+import com.example.bob.DTO.CompanyUpdateDTO;
+import com.example.bob.Service.CompanyService;
+
+
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -38,11 +45,14 @@ public class ProfileController {
 
     private final UserService userService;
     private final DashboardService dashboardService;
+    private final CompanyService companyService;
 
-    public ProfileController(UserService userService, DashboardService dashboardService) {
+    public ProfileController(UserService userService, DashboardService dashboardService, CompanyService companyService) {
         this.userService = userService;
         this.dashboardService = dashboardService;
+        this.companyService = companyService;
     }
+
 
     @GetMapping("/main")
     public String mainPage(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -173,20 +183,52 @@ public class ProfileController {
     }
 
     @GetMapping("/profile2")
-    public String showProfilePage(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public String showProfilePage(Model model, @AuthenticationPrincipal CustomUserDetails userDetails,
+                                  @RequestParam(value = "success", required = false) String success) {
         if (userDetails == null) return "redirect:/login";
 
+        if (success != null) {
+            model.addAttribute("message", "수정이 완료되었습니다!");
+        }
+
         if (userDetails instanceof CompanyDetailsImpl companyDetails) {
-            CompanyEntity company = companyDetails.getCompanyEntity();
-            model.addAttribute("company", company); // 🔄 user → company 로 수정
-            model.addAttribute("profileImageUrl", company.getCoImageUrl());
+            Long companyId = companyDetails.getCompanyEntity().getCompanyId();
+
+            // ✅ 여기서 최신 정보 조회
+            CompanyEntity updatedCompany = companyService.findCompanyId(companyId);
+
+            model.addAttribute("company", updatedCompany);
+            model.addAttribute("profileImageUrl", updatedCompany.getCoImageUrl());
+
         } else if (userDetails instanceof UserDetailsImpl userDetailsImpl) {
             UserEntity user = userDetailsImpl.getUserEntity();
-            model.addAttribute("user", user); // 일반 사용자용
+            model.addAttribute("user", user);
             model.addAttribute("profileImageUrl", user.getProfileImageUrl());
         }
 
         return "profile2";
     }
+
+
+    @PostMapping("/profile/company/update")
+    public String updateProfile(@ModelAttribute CompanyUpdateDTO updateDTO,
+                                @AuthenticationPrincipal CompanyDetailsImpl companyDetails,
+                                @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) {
+
+        Long companyId = companyDetails.getCompanyEntity().getCompanyId();
+
+        CompanyDTO updatedCompanyDTO = companyService.updateCompanyInfo(updateDTO, profileImage, companyId);
+
+        CompanyDetailsImpl newDetails = new CompanyDetailsImpl(updatedCompanyDTO.toCompanyEntity());
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(newDetails, newDetails.getPassword(), newDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        return "redirect:/profile2?success=true";
+    }
+
+
+
+
 
 }

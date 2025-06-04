@@ -13,6 +13,7 @@ import com.example.bob.security.CompanyDetailsImpl;
 import com.example.bob.Entity.JobApplicationEntity;
 
 
+
 import org.springframework.ui.Model;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,8 +69,5 @@ public class CompanyController {
 
         return "co_recruit"; // thymeleaf 템플릿 이름
     }
-
-
-
 
 }

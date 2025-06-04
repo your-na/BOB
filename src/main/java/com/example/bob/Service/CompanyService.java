@@ -56,42 +56,69 @@ public class CompanyService{
         companyRepository.save(companyEntity);
     }
 
-    // 기업 회원 정보 수정 (미완성. 기업 정보 페이지 제작 시 변경 예정)
     @Transactional
-    public CompanyDTO updateCompanyInfo(CompanyUpdateDTO companyUpdateDTO, MultipartFile profileImage, Long companyId){
-        CompanyEntity companyEntity = companyRepository.findById(companyId).orElseThrow(() -> new RuntimeException("User not found"));
+    public CompanyDTO updateCompanyInfo(CompanyUpdateDTO companyUpdateDTO, MultipartFile profileImage, Long companyId) {
+        CompanyEntity companyEntity = companyRepository.findById(companyId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // 기존 값 보존
         String oldCoEmail = companyEntity.getCoEmail();
         String oldCoPhone = companyEntity.getCoPhone();
         String oldCoBio = companyEntity.getCoBio();
         String oldCoImageUrl = companyEntity.getCoImageUrl();
 
-        // 수정 정보 업데이트
-        companyEntity.setCoEmail(companyUpdateDTO.getCoEmail());
-        companyEntity.setCoPhone(companyUpdateDTO.getCoPhone());
-        companyEntity.setCoBio(companyUpdateDTO.getCoBio());
-        companyEntity.setCoImageUrl(companyUpdateDTO.getCoImageUrl());
+        // null이 아닌 항목만 업데이트
+        if (companyUpdateDTO.getCoName() != null) {
+            companyEntity.setCoName(companyUpdateDTO.getCoName());
+        }
 
-        companyRepository.save(companyEntity); // 바뀐 정보 저장
+        if (companyUpdateDTO.getCoNick() != null) {
+            companyEntity.setCoNick(companyUpdateDTO.getCoNick());
+        }
 
-        // 변경 내용 히스토리 저장
-        saveCompanyHistory(companyEntity,
-                oldCoEmail, companyUpdateDTO.getCoEmail(),
-                oldCoPhone, companyUpdateDTO.getCoPhone(),
-                oldCoBio, companyUpdateDTO.getCoBio(),
-                oldCoImageUrl, companyUpdateDTO.getCoImageUrl());
+        if (companyUpdateDTO.getCoEmail() != null) {
+            companyEntity.setCoEmail(companyUpdateDTO.getCoEmail());
+        }
 
-        // 최신 기업 정보 반황
+        if (companyUpdateDTO.getCoPhone() != null) {
+            companyEntity.setCoPhone(companyUpdateDTO.getCoPhone());
+        }
+
+        if (companyUpdateDTO.getCoBio() != null) {
+            companyEntity.setCoBio(companyUpdateDTO.getCoBio());
+        }
+
+        if (companyUpdateDTO.getCoImageUrl() != null) {
+            companyEntity.setCoImageUrl(companyUpdateDTO.getCoImageUrl());
+        }
+
+        companyRepository.save(companyEntity); // 변경 저장
+
+        // 변경된 항목만 기록
+        saveCompanyHistory(
+                companyEntity,
+                oldCoEmail, companyEntity.getCoEmail(),
+                oldCoPhone, companyEntity.getCoPhone(),
+                oldCoBio, companyEntity.getCoBio(),
+                oldCoImageUrl, companyEntity.getCoImageUrl()
+        );
+
         return CompanyDTO.toCompanyDTO(companyEntity);
     }
 
-    private void saveCompanyHistory(CompanyEntity companyEntity,
-                                    String oldEmail, String newEmail,
-                                    String oldPhone, String newPhone,
-                                    String oldBio, String newBio,
-                                    String oldImageUrl, String newImageUrl){
-        // 변경된 값 존재 시 기록
-        if (!oldEmail.equals(newEmail) || !oldPhone.equals(newPhone) || !oldBio.equals(newBio) || !oldImageUrl.equals(newImageUrl)){
+    private void saveCompanyHistory(
+            CompanyEntity companyEntity,
+            String oldEmail, String newEmail,
+            String oldPhone, String newPhone,
+            String oldBio, String newBio,
+            String oldImageUrl, String newImageUrl) {
+
+        boolean isEmailChanged = (oldEmail != null && !oldEmail.equals(newEmail)) || (oldEmail == null && newEmail != null);
+        boolean isPhoneChanged = (oldPhone != null && !oldPhone.equals(newPhone)) || (oldPhone == null && newPhone != null);
+        boolean isBioChanged = (oldBio != null && !oldBio.equals(newBio)) || (oldBio == null && newBio != null);
+        boolean isImageChanged = (oldImageUrl != null && !oldImageUrl.equals(newImageUrl)) || (oldImageUrl == null && newImageUrl != null);
+
+        if (isEmailChanged || isPhoneChanged || isBioChanged || isImageChanged) {
             CompanyHistoryEntity history = CompanyHistoryEntity.builder()
                     .companyEntity(companyEntity)
                     .coName(companyEntity.getCoName())
@@ -108,6 +135,8 @@ public class CompanyService{
             companyHistoryRepository.save(history); // 변경 내용 저장
         }
     }
+
+
 
     // 이미지 저장은 유저 서비스에서 가져오기
 }
