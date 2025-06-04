@@ -7,6 +7,10 @@
     margin-top: 150px;
 }
 
+.application-card.project {
+    cursor: pointer;
+}
+
 /* ✅ 검색창 스타일 */
 #search-box {
     padding: 8px;

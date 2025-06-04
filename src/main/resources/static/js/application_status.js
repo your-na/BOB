@@ -51,3 +51,17 @@ document.addEventListener("DOMContentLoaded", function () {
     filterApplications();
     fetchJobApplications(); // ✅ 구직 카드 불러오기
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const projectCards = document.querySelectorAll(".application-card.project");
+
+    projectCards.forEach(card => {
+        card.addEventListener("click", function () {
+            const projectId = this.getAttribute("data-id");
+            if (projectId) {
+                // ✅ 실제 이동할 신청서 상세 페이지 URL로 변경하세요
+                window.location.href = `/projapplication2?projectId=${projectId}`;
+            }
+        });
+    });
+});

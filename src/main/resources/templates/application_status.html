@@ -36,16 +36,19 @@
 
     <!-- 구직 지원 -->
     <div class="application-card job">
-
+    </div>
 
     <!-- ✅ 프로젝트 지원 (신청중인 항목만 동적으로 렌더링) -->
-    <div th:each="project : ${projectApplications}" class="application-card project">
+    <div th:each="project : ${projectApplications}"
+         class="application-card project"
+         th:attr="data-id=${project.project.id}">
         <h3>[프로젝트] [[${project.project.title}]]</h3>
         <p class="date">📅 제출일 [[${#temporals.format(project.joinDate, 'yyyy.MM.dd')}]]</p>
         <button class="status-button pending">
             ⏳ [[${project.status == '신청중' ? '지원 후 대기중' : project.status}]]
         </button>
     </div>
+
 </div>
 
 <script src="/js/application_status.js"></script>
