@@ -18,6 +18,13 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.UUID;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,7 +34,7 @@ public class CompanyService{
     private final CompanyRepository companyRepository;
     private final CompanyHistoryRepository companyHistoryRepository;
 
-    @Value("uploads/profileImage")
+    @Value("uploads/profileImages")
     private String uploadDir;
 
     public CompanyEntity findCompanyId(Long companyId) {
@@ -91,6 +98,35 @@ public class CompanyService{
         if (companyUpdateDTO.getCoImageUrl() != null) {
             companyEntity.setCoImageUrl(companyUpdateDTO.getCoImageUrl());
         }
+
+        // ✅ 이미지가 업로드되었을 경우 새로 저장 처리
+        if (profileImage != null && !profileImage.isEmpty()) {
+            // 기존 이미지 삭제
+            if (oldCoImageUrl != null && !oldCoImageUrl.equals("/images/profile.png")) {
+                Path existingFilePath = Paths.get(uploadDir, oldCoImageUrl.replace("uploads/profileImages/", ""));
+                try {
+                    Files.deleteIfExists(existingFilePath);
+                    log.info("✅ 기존 이미지 삭제: {}", existingFilePath);
+                } catch (IOException e) {
+                    log.warn("⚠ 기존 이미지 삭제 실패", e);
+                }
+            }
+
+            try {
+                String filename = UUID.randomUUID().toString() + "_" + profileImage.getOriginalFilename();
+                Path savePath = Paths.get(uploadDir, filename);
+                Files.createDirectories(savePath.getParent());
+                Files.copy(profileImage.getInputStream(), savePath, StandardCopyOption.REPLACE_EXISTING);
+
+                companyEntity.setCoImageUrl("/profileImages/" + filename); // ✅
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                log.error("⚠ 이미지 저장 실패", e);
+                companyEntity.setCoImageUrl("/images/profile.png"); // 실패 시 기본 이미지
+            }
+        }
+
 
         companyRepository.save(companyEntity); // 변경 저장
 
