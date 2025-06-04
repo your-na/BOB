@@ -14,6 +14,15 @@ public class CompanyDetailsImpl implements CustomUserDetails {
     public CompanyDetailsImpl(CompanyEntity companyEntity) {
         this.companyEntity = companyEntity;
     }
+    public String getCoImageUrl() {
+        return companyEntity.getCoImageUrl();
+    }
+
+
+    public String getCoNick() {
+        return companyEntity.getCoNick();
+    }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
