@@ -252,6 +252,10 @@ public class CoResumeServiceImpl implements CoResumeService {
         coResumeRepository.save(resumeEntity);
     }
 
+    @Override
+    public List<CoResumeEntity> getResumesByCompanyId(Long companyId) {
+        return coResumeRepository.findByCompany_CompanyId(companyId);
+    }
 
 
     // ✅ 이력서 전체 목록 조회

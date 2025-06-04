@@ -22,4 +22,7 @@ public interface CoResumeService {
     // ✅ 이력서 수정 기능
     void updateResume(Long id, CoResumeRequestDTO updatedResume);
 
+    List<CoResumeEntity> getResumesByCompanyId(Long companyId);
+
+
 }

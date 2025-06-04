@@ -54,20 +54,25 @@
 
         // ✅ 로그인한 사용자 기반 조회
         @GetMapping("/me")
-        public List<JobApplicationDTO> getMyApplications() {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        public ResponseEntity<?> getMyApplications() {
+            try {
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            if (authentication != null && authentication.getPrincipal() instanceof UserDetailsImpl userDetails) {
-                UserEntity user = userDetails.getUserEntity();
-                Long userId = user.getUserId(); // 🟢 핵심: 로그인된 사용자 ID
-                System.out.println("✅ [API] 로그인 사용자 ID: " + userId);
-                return jobApplicationService.getUserJobApplications(userId);
+                if (authentication != null && authentication.getPrincipal() instanceof UserDetailsImpl userDetails) {
+                    UserEntity user = userDetails.getUserEntity();
+                    Long userId = user.getUserId();
+                    System.out.println("✅ [API] 로그인 사용자 ID: " + userId);
+                    List<JobApplicationDTO> result = jobApplicationService.getUserJobApplications(userId);
+                    return ResponseEntity.ok(result);
+                } else {
+                    return ResponseEntity.status(401).body(Map.of("message", "로그인이 필요합니다."));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(500).body(Map.of("message", "서버 오류: " + e.getMessage()));
             }
-
-            // 로그인 안 된 경우 or 예외 상황
-            System.out.println("⚠️ 로그인 사용자 정보가 없습니다.");
-            return List.of(); // 빈 리스트 반환
         }
+
 
         // ✅ 특정 공고에 지원한 지원자 목록 조회 (기업 전용)
         @GetMapping("/jobpost/{jobPostId}/applicants")

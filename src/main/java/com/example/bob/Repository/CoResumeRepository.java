@@ -4,6 +4,9 @@ import com.example.bob.Entity.CoResumeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
+
 /**
  * 기업 이력서 양식 저장/조회용 Repository
  */
@@ -11,5 +14,8 @@ import org.springframework.stereotype.Repository;
 public interface CoResumeRepository extends JpaRepository<CoResumeEntity, Long> {
 
     int countByCompany_CompanyId(Long companyId);
+
+    List<CoResumeEntity> findByCompany_CompanyId(Long companyId);
+
 
 }

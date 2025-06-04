@@ -50,23 +50,18 @@ public class CoResumeController {
     }
 
 
-    // ✅ 이력서 목록 조회
+    // ✅ 로그인한 기업의 이력서 목록만 조회
     @GetMapping
-    public ResponseEntity<List<CoResumeListResponseDTO>> getAllResumes() {
-        logger.info("이력서 목록 조회 요청");
+    public ResponseEntity<List<CoResumeListResponseDTO>> getAllResumes(
+            @AuthenticationPrincipal CompanyDetailsImpl companyDetails) {
 
-        List<CoResumeEntity> resumeEntities = coResumeService.getAllResumes();
-
-        if (resumeEntities.isEmpty()) {
-            logger.info("이력서 목록이 비어 있습니다.");
-        } else {
-            logger.info("불러온 이력서 목록 개수: {}", resumeEntities.size());
-        }
+        Long companyId = companyDetails.getCompanyEntity().getCompanyId();  // 로그인 기업 ID 가져오기
+        List<CoResumeEntity> resumeEntities = coResumeService.getResumesByCompanyId(companyId); // 해당 기업의 이력서만 조회
 
         List<CoResumeListResponseDTO> result = resumeEntities.stream()
                 .map(resume -> {
                     String formattedDate = (resume.getCreatedAt() != null)
-                            ? new SimpleDateFormat("yyyy-MM-dd").format(resume.getCreatedAt())
+                            ? new java.text.SimpleDateFormat("yyyy-MM-dd").format(resume.getCreatedAt())
                             : "날짜 미제공";
 
                     return new CoResumeListResponseDTO(
@@ -77,10 +72,9 @@ public class CoResumeController {
                 })
                 .collect(Collectors.toList());
 
-        logger.info("이력서 목록 조회 완료, 반환할 데이터 개수: {}", result.size());
-
         return ResponseEntity.ok(result);
     }
+
 
     // ✅ 이력서 삭제
     @DeleteMapping("/{id}")

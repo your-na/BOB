@@ -58,9 +58,13 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch(`/api/applications/me`)
             .then(res => res.json())
             .then(data => {
+                if (!Array.isArray(data)) {
+                    throw new Error("서버 응답이 배열이 아닙니다: " + JSON.stringify(data));
+                }
+
                 console.log("✅ 받아온 지원 데이터:", data);
                 window.__applicationData = data;
-                updateSummaryCounts(data); // ✅ 통계 업데이트
+                updateSummaryCounts(data);
                 renderList(currentTab, data);
             })
             .catch(err => {
@@ -68,6 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 listContainer.innerHTML = "<p style='color: red;'>데이터를 불러올 수 없습니다.</p>";
             });
     }
+
 
     tabs.forEach(tab => {
         tab.addEventListener("click", () => {

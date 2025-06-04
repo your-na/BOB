@@ -37,17 +37,21 @@ public class JobApplicationService {
 
         System.out.println("📄 [SERVICE] 지원 내역 수: " + applications.size());
 
-        return applications.stream().map(application -> {
-            JobApplicationDTO dto = new JobApplicationDTO();
-            dto.setAppliedDate(new SimpleDateFormat("yyyy.MM.dd").format(application.getResume().getSubmittedAt()));
-            dto.setJobTitle(application.getJobPost().getTitle());
-            dto.setCompanyIntro(application.getJobPost().getCompany().getCoBio());
-            dto.setStatus(application.getStatus().name()); // Enum to String
-            dto.setJobPostId(application.getJobPost().getId());
-            dto.setApplicationId(application.getId()); // 🙈 숨기기용 ID 추가
-            return dto;
-        }).collect(Collectors.toList());
+        return applications.stream()
+                .filter(app -> app.getJobPost() != null && app.getJobPost().getCompany() != null) // 💡 삭제된 공고 제외
+                .map(application -> {
+                    JobApplicationDTO dto = new JobApplicationDTO();
+                    dto.setAppliedDate(new SimpleDateFormat("yyyy.MM.dd").format(application.getResume().getSubmittedAt()));
+                    dto.setJobTitle(application.getJobPost().getTitle());
+                    dto.setCompanyIntro(application.getJobPost().getCompany().getCoBio());
+                    dto.setStatus(application.getStatus().name()); // Enum to String
+                    dto.setJobPostId(application.getJobPost().getId());
+                    dto.setApplicationId(application.getId());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
+
 
     // ✅ 특정 공고에 지원한 지원자 목록 조회 (공고 ID 기준)
     public List<ApplicantDTO> getApplicantsByJobPost(Long jobPostId) {
