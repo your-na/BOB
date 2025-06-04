@@ -98,7 +98,7 @@ body {
     padding-top: 10px;
 }
 
-.completed-header {
+.completed-toggle {
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;

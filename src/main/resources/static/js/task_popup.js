@@ -8,6 +8,7 @@ function getCookie(name) {
     return value ? decodeURIComponent(value.split("=")[1]) : null;
 }
 
+
 document.addEventListener("DOMContentLoaded", function () {
 
     fetch("http://localhost:8888/api/user/me", {
@@ -171,63 +172,66 @@ function loadPopupTodos() {
 // ✅ 우클릭 메뉴 삭제 처리
 document.addEventListener("DOMContentLoaded", () => {
     const popupList = document.querySelector(".popup-todo-list");
+    const completedList = document.getElementById("completed-list");
 
-    // 마우스 우클릭 시 컨텍스트 메뉴 표시
-    popupList.addEventListener("contextmenu", function (e) {
+    document.addEventListener("contextmenu", function (e) {
         const targetLi = e.target.closest(".task-item");
         if (!targetLi) return;
 
-        e.preventDefault(); // 기본 우클릭 메뉴 막기
+        e.preventDefault();
 
-        // 기존 삭제 메뉴 있으면 제거
+        const isCompleted = completedList.contains(targetLi);
+
+        // 기존 메뉴 제거
         const existingMenu = document.querySelector(".context-menu");
         if (existingMenu) existingMenu.remove();
 
-        // 삭제 메뉴 생성
+        // 메뉴 생성
         const menu = document.createElement("div");
         menu.className = "context-menu";
-        menu.textContent = "삭제";
-        menu.style.position = "absolute";
-        menu.style.top = `${e.pageY}px`;
-        menu.style.left = `${e.pageX}px`;
-        menu.style.background = "#fff";
-        menu.style.border = "1px solid #ccc";
-        menu.style.padding = "5px 10px";
-        menu.style.cursor = "pointer";
-        menu.style.zIndex = "9999";
+        menu.textContent = isCompleted ? "취소" : "완료";
+        Object.assign(menu.style, {
+            position: "absolute",
+            top: `${e.pageY}px`,
+            left: `${e.pageX}px`,
+            background: "#fff",
+            border: "1px solid #ccc",
+            padding: "5px 10px",
+            cursor: "pointer",
+            zIndex: "9999"
+        });
 
-        // 삭제 클릭 시
         menu.addEventListener("click", () => {
             const todoId = targetLi.getAttribute("data-id");
+            if (!todoId) return;
 
-            if (!todoId) {
-                alert("할 일 ID가 없습니다.");
-                menu.remove();
-                return;
-            }
+            const newCompletedState = !isCompleted;
 
-            if (!confirm("이 할 일을 삭제하시겠습니까?")) {
-                menu.remove();
-                return;
-            }
-
-            fetch(`http://localhost:8888/api/todos/${todoId}`, {
-                method: "DELETE",
+            fetch(`http://localhost:8888/api/todos/${todoId}/complete`, {
+                method: "PATCH",
                 headers: {
+                    "Content-Type": "application/json",
                     "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
                 },
-                credentials: "include"
+                credentials: "include",
+                body: JSON.stringify({ completed: newCompletedState })
             })
                 .then(res => {
-                    if (res.ok) {
-                        console.log(`✅ 삭제 완료: ${todoId}`);
-                        targetLi.remove();
+                    if (!res.ok) throw new Error("서버 응답 오류");
+
+                    const checkbox = targetLi.querySelector("input[type='checkbox']");
+                    checkbox.checked = newCompletedState;
+
+                    // 리스트 위치 이동
+                    if (newCompletedState) {
+                        completedList.appendChild(targetLi);
+                        completedList.style.display = "block";
                     } else {
-                        alert("삭제 실패");
+                        popupList.appendChild(targetLi);
                     }
                 })
                 .catch(err => {
-                    alert("삭제 중 오류 발생: " + err);
+                    alert("상태 업데이트 실패: " + err);
                 })
                 .finally(() => {
                     menu.remove();
@@ -236,7 +240,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.body.appendChild(menu);
 
-        // 다른 곳 클릭 시 메뉴 제거
         document.addEventListener("click", function closeMenu() {
             menu.remove();
             document.removeEventListener("click", closeMenu);
@@ -337,4 +340,18 @@ function loadMyProjectsForPopup() {
             alert("프로젝트 목록을 불러오는 중 오류가 발생했습니다.");
         });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    const toggleBtn = document.getElementById("completed-toggle");
+    const completedList = document.getElementById("completed-list");
+
+    if (toggleBtn && completedList) {
+        toggleBtn.addEventListener("click", () => {
+            const isHidden = completedList.style.display === "none";
+            completedList.style.display = isHidden ? "block" : "none";
+            toggleBtn.textContent = isHidden ? "완료된 항목 ▾" : "완료된 항목 ▴";
+        });
+    }
+});
+
 
