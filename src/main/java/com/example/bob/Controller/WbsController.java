@@ -51,14 +51,4 @@ public class WbsController {
         return "todo_crud"; // 프로젝트 WBS 페이지
     }
 
-    // ✅ 공모전용 WBS 화면
-    @GetMapping("/todocrud/contest/{teamId}")
-    public String showContestWbsPage(@PathVariable Long teamId, Model model) {
-        ContestTeamEntity team = contestTeamRepository.findById(teamId)
-                .orElseThrow(() -> new IllegalArgumentException("공모전 팀을 찾을 수 없습니다."));
-        model.addAttribute("teamId", team.getId());
-        model.addAttribute("projectTitle", team.getTeamName());
-        model.addAttribute("team", team);
-        return "todo_wbs2"; // 공모전 WBS 페이지
-    }
 }

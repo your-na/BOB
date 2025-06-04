@@ -154,7 +154,7 @@ public class SpaceController {
         return "todo_plan2"; // 공모전 전용 할 일 HTML
     }
 
-    @GetMapping("/todocrud/{teamId}")
+    @GetMapping("/todocrud/contest/{teamId}")
     public String showContestWBS(@PathVariable Long teamId, Model model) {
         ContestTeamEntity team = contestTeamRepository.findById(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("공모전 팀을 찾을 수 없습니다."));
@@ -162,7 +162,23 @@ public class SpaceController {
         model.addAttribute("teamId", team.getId());
         model.addAttribute("projectTitle", team.getTeamName());
 
+        // ✅ 이거 추가!
+        model.addAttribute("team", team);
+
         return "todo_wbs2"; // 공모전 전용 WBS HTML
     }
+
+
+    @GetMapping("/todocrud/{id}")
+    public String redirectToCorrectWbs(@PathVariable Long id) {
+        if (projectService.findById(id).isPresent()) {
+            return "redirect:/todocrud/project/" + id;
+        } else if (contestTeamRepository.existsById(id)) {
+            return "redirect:/todocrud/contest/" + id;
+        } else {
+            throw new IllegalArgumentException("❌ 유효하지 않은 ID입니다: " + id);
+        }
+    }
+
 
 }

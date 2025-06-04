@@ -76,6 +76,15 @@ public class ProjectService {
     }
 
     /**
+     * ✅ Optional 형태로 프로젝트 가져오기 (존재 여부만 판단 시 유용)
+     */
+    @Transactional(readOnly = true)
+    public Optional<ProjectEntity> findById(Long id) {
+        return projectRepository.findById(id);
+    }
+
+
+    /**
      * ✅ 프로젝트 저장 후 반환
      */
     @Transactional
