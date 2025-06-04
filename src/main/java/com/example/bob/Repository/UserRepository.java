@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 @Repository //객체타입, PK타입
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
@@ -23,6 +24,11 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     // 일반 회원 수 조회 (role 컬럼이 'USER'인 회원 수)
     long countByRole(String role);
+
+    // 최근 특정 기간 내 로그인한 일반 회원 수
+    long countByRoleAndLastLoginAtAfter(String role, LocalDateTime since);
+
+
 
 
 }

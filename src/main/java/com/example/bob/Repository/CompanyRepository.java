@@ -3,6 +3,7 @@
     import com.example.bob.Entity.CompanyEntity;
     import org.springframework.data.jpa.repository.JpaRepository;
     import org.springframework.stereotype.Repository;
+    import java.time.LocalDateTime;
 
     import java.util.Optional;
 
@@ -20,6 +21,8 @@
         // 기업 회원 수 조회 (모든 기업 회원 수를 세는 기본 count 메서드)
         long count();
 
+       // 최근 특정 일자 이후에 로그인한 기업 회원 수를 반환합니다
+        long countByLastLoginAtAfter(LocalDateTime since);
     }
 
 

@@ -62,6 +62,9 @@ public class UserEntity {
     @Column(length = 500)
     private String userBio = "소개를 작성해보세요.";
 
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt; // 마지막 로그인 시간
+
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserHistoryEntity> userHistories = new ArrayList<>();
 

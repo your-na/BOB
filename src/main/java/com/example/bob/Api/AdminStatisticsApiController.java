@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.example.bob.DTO.ActiveMemberCountDTO;
 
 @RestController
 @RequestMapping("/api/admin/statistics")
@@ -27,5 +28,13 @@ public class AdminStatisticsApiController {
         double successRate = adminStatisticsService.getJobSuccessRateLastYear();
         return ResponseEntity.ok(successRate);
     }
+
+    // 최근 30일 활동 회원 수 반환 API
+    @GetMapping("/active-members")
+    public ResponseEntity<ActiveMemberCountDTO> getActiveMembers() {
+        ActiveMemberCountDTO activeMembers = adminStatisticsService.getActiveMemberCountLast30Days();
+        return ResponseEntity.ok(activeMembers);
+    }
+
 
 }

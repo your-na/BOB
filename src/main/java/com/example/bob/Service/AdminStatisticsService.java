@@ -6,11 +6,15 @@ import com.example.bob.Repository.CompanyRepository;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import com.example.bob.Repository.JobApplicationRepository;
+import com.example.bob.DTO.ActiveMemberCountDTO;
+
+
 
 
 
 import java.util.Calendar;
 import java.util.Date;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -56,4 +60,22 @@ public class AdminStatisticsService {
         double rate = ((double) accepted / applicants) * 100;
         return Math.round(rate * 100) / 100.0;
     }
+
+    // 최근 30일 활동 회원 수 계산
+    public ActiveMemberCountDTO getActiveMemberCountLast30Days() {
+        LocalDateTime since = LocalDateTime.now().minusDays(30);
+
+        long activeGeneral = userRepository.countByRoleAndLastLoginAtAfter("USER", since);
+        long totalGeneral = userRepository.countByRole("USER");
+
+        long activeCompany = companyRepository.countByLastLoginAtAfter(since);
+        long totalCompany = companyRepository.count();
+
+        return new ActiveMemberCountDTO(
+                activeGeneral, activeCompany,
+                totalGeneral, totalCompany
+        );
+    }
+
+
 }

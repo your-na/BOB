@@ -17,6 +17,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+
 
 import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 
@@ -25,13 +27,16 @@ import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 public class SecurityConfig {
 
     private final CombinedUserDetailsService combinedUserDetailsService;
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    private final CustomAuthenticationProvider customAuthProvider;
 
     @Autowired
-    @Lazy  // 순환 의존성 방지
-    private CustomAuthenticationProvider customAuthProvider;
-
-    public SecurityConfig(CombinedUserDetailsService combinedUserDetailsService) {
+    public SecurityConfig(CombinedUserDetailsService combinedUserDetailsService,
+                          CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler,
+                          @Lazy CustomAuthenticationProvider customAuthProvider) {
         this.combinedUserDetailsService = combinedUserDetailsService;
+        this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;
+        this.customAuthProvider = customAuthProvider;
     }
 
     @Bean
@@ -68,20 +73,10 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .successHandler((request, response, authentication) -> {
-                            Object principal = authentication.getPrincipal();
-                            String redirectUrl = "/main";
-                            if (principal instanceof com.example.bob.security.UserDetailsImpl user) {
-                                if ("ADMIN".equals(user.getUserEntity().getRole())) {
-                                    redirectUrl = "/sidebar";
-                                }
-                            } else if (principal instanceof com.example.bob.security.CompanyDetailsImpl) {
-                                redirectUrl = "/main";
-                            }
-                            response.sendRedirect(redirectUrl);
-                        })
+                        .successHandler(customAuthenticationSuccessHandler)  // 딱 한 번만 등록
                         .failureUrl("/login?error=true")
                 )
+
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/main")

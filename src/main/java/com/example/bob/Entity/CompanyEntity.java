@@ -49,6 +49,10 @@ public class CompanyEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt;
+
+
     @Column(length = 500)
     private String coBio = "소개를 작성해보세요.";
 
