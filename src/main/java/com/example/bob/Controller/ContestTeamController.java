@@ -70,4 +70,24 @@ public class ContestTeamController {
         }
     }
 
+    @PostMapping("/application/respond")
+    public ResponseEntity<String> respondToApplication(
+            @RequestParam("notificationId") Long notificationId,
+            @RequestParam("accept") boolean accept,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+        }
+
+        UserEntity leader = userDetails.getUserEntity();
+        boolean result = contestTeamService.processContestApplicationResponse(notificationId, accept, leader);
+
+        if (result) {
+            return ResponseEntity.ok(accept ? "신청 수락 완료" : "신청 거절 완료");
+        } else {
+            return ResponseEntity.badRequest().body("처리에 실패했습니다.");
+        }
+    }
+
 }

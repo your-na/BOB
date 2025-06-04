@@ -34,6 +34,9 @@ public class NotificationEntity {
     @JoinColumn(name = "job_post_id")
     private CoJobPostEntity jobPost;  // 💼 기업 채용 공고 연결
 
+    @ManyToOne
+    @JoinColumn(name = "recruit_id")
+    private ContestRecruitEntity relatedRecruit;
 
     private LocalDateTime timestamp;  // 알림 시간
 
@@ -45,7 +48,6 @@ public class NotificationEntity {
     @ManyToOne
     @JoinColumn(name = "contest_team_id")
     private ContestTeamEntity contestTeam; // 공모전 팀 관련 알림
-
 
     @ManyToOne
     @JoinColumn(name = "sender_id")  // 신청을 보낸 사람

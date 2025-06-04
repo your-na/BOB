@@ -63,6 +63,8 @@ public class NotificationController {
             data.put("teamId", dto.getTeamId());
             data.put("teamName", dto.getTeamName());
             data.put("contestId", dto.getContestId());
+            data.put("senderNick", dto.getSenderNick());
+            data.put("applicationId", dto.getApplicationId());
 
             // ✅ 채용
             data.put("jobPostId", dto.getJobPostId());

@@ -218,19 +218,40 @@ public class ContestService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void sendApplicationNotification(Long recruitId, UserEntity applicant) {
         ContestRecruitEntity recruit = contestRecruitRepository.findById(recruitId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 모집글이 존재하지 않습니다."));
 
-        UserEntity owner = recruit.getWriter();
         ContestEntity contest = recruit.getContest();
+        UserEntity owner = recruit.getWriter();
 
+        if (hasUserAlreadyApplied(recruitId, applicant.getUserId())) {
+            return; // 이미 신청했다면 무시
+        }
+
+        ContestTeamEntity team = recruit.getTeam();
+        if (team == null) {
+            throw new IllegalArgumentException("모집글에 연결된 팀이 없습니다.");
+        }
+
+        ContestTeamMemberEntity member = ContestTeamMemberEntity.builder()
+                .team(team)
+                .user(applicant)
+                .isAccepted(false)       // 수락 X
+                .isInvitePending(true)   // 신청 상태
+                .role("MEMBER")
+                .build();
+        contestTeamMemberRepository.save(member);
+
+        // ✅ 알림 저장
         String message = applicant.getUserNick() + "님이 \"" + contest.getTitle() + "\" 팀 모집글에 참가 신청을 보냈습니다.";
 
         NotificationEntity notification = new NotificationEntity();
         notification.setUser(owner);
         notification.setSender(applicant);
         notification.setMessage(message);
+        notification.setRelatedRecruit(recruit);
         notification.setType(NotificationType.CONTEST_APPLICATION);
         notification.setRelatedContest(contest);
         notification.setTimestamp(LocalDateTime.now());
@@ -238,6 +259,7 @@ public class ContestService {
 
         notificationRepository.save(notification);
     }
+
 
     public boolean hasUserAlreadyApplied(Long recruitId, Long userId) {
         // 모집글을 가져온다

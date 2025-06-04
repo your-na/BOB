@@ -35,6 +35,10 @@ public class ContestRecruitEntity {
     // 모집 인원
     private int recruitCount;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "team_id")
+    private ContestTeamEntity team;
+
     // 작성자
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
