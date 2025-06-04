@@ -25,12 +25,12 @@ body {
 }
 
 .navigator {
-        position: fixed; /* 상단에 고정 */
-        top: 0; /* 화면의 맨 위에 위치 */
-        left: 0; /* 화면의 왼쪽에 위치 */
-        width: 100%; /* 화면 너비에 맞게 확장 */
-        z-index: 1000; /* 다른 요소들보다 위에 표시되도록 설정 */
-        background-color: #fff; /* 배경색 설정 */
+    position: fixed; /* 상단에 고정 */
+    top: 0; /* 화면의 맨 위에 위치 */
+    left: 0; /* 화면의 왼쪽에 위치 */
+    width: 100%; /* 화면 너비에 맞게 확장 */
+    z-index: 1000; /* 다른 요소들보다 위에 표시되도록 설정 */
+    background-color: #fff; /* 배경색 설정 */
     display: flex;
     justify-content: space-between;
     align-items: center;
