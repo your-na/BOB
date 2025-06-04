@@ -124,6 +124,28 @@ public class NotificationService {
                         dto.setLink(null);
                     }
 
+                    else if (notification.getType() == NotificationType.CONTEST_APPLICATION && notification.getRelatedRecruit() != null) {
+                        dto.setType("CONTEST_APPLICATION");
+
+                        System.out.println("sender 확인: " + notification.getSender());
+                        if (notification.getSender() != null) {
+                            dto.setSenderNick(notification.getSender().getUserNick());
+                            System.out.println("senderNick 확인: " + notification.getSender().getUserNick());
+                        }
+
+
+                        dto.setTeamName(notification.getRelatedRecruit().getTitle());
+
+                        if (notification.getRelatedRecruit().getTeam() != null) {
+                            dto.setTeamId(notification.getRelatedRecruit().getTeam().getId());
+                        }
+                        if (notification.getRelatedRecruit().getContest() != null) {
+                            dto.setContestId(notification.getRelatedRecruit().getContest().getId());
+                        }
+
+                        dto.setLink("#");
+                    }
+
                     // ✅ 기타 타입
                     else {
                         dto.setType(notification.getType().name());

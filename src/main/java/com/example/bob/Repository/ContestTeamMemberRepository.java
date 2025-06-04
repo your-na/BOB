@@ -32,4 +32,5 @@ public interface ContestTeamMemberRepository extends JpaRepository<ContestTeamMe
     @Query("SELECT m FROM ContestTeamMemberEntity m WHERE m.user = :user AND m.team.contest = :contest")
     List<ContestTeamMemberEntity> findByUserAndTeam_Contest(@Param("user") UserEntity user, @Param("contest") ContestEntity contest);
 
+    boolean existsByTeamAndUser(ContestTeamEntity team, UserEntity user);
 }

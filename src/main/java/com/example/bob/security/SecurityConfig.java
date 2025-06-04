@@ -44,7 +44,7 @@ public class SecurityConfig {
                                 "/login", "/signup", "/co_signup", "/profile/update", "/logout",
                                 "/teamrequest", "/teamrequest/accept", "/teamrequest/reject",
                                 "/file/project/submit", "/api/todos/**", "/api/notifications/delete-all", "/api/notifications/mark-as-read/**","/ws-chat", "/api/user/resumes/upload",
-                                "/api/user/resumes/submit", "/contest/team/invite/respond","/api/applications/job/pass", "/api/notifications/delete/**"
+                                "/api/user/resumes/submit", "/contest/team/invite/respond","/api/applications/job/pass", "/api/notifications/delete/**", "/contest/team/application/**"
                         )
                 )
                 .headers(headers -> headers

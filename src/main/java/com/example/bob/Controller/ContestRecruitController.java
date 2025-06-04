@@ -2,11 +2,15 @@ package com.example.bob.Controller;
 
 import com.example.bob.DTO.ContestRecruitDTO;
 import com.example.bob.Entity.ContestRecruitEntity;
+import com.example.bob.Entity.ContestTeamEntity;
+import com.example.bob.Entity.NotificationEntity;
 import com.example.bob.Entity.UserEntity;
+import com.example.bob.Repository.NotificationRepository;
 import com.example.bob.Service.ContestRecruitService;
 import com.example.bob.Service.ContestService;
 import com.example.bob.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +22,7 @@ public class ContestRecruitController {
 
     private final ContestRecruitService contestRecruitService;
     private final ContestService contestService;
+    private final NotificationRepository notificationRepository;
 
     @PostMapping("/contest/recruit")
     public String createRecruitPost(@ModelAttribute ContestRecruitDTO dto,
@@ -46,5 +51,6 @@ public class ContestRecruitController {
 
         return "recruit_detail";
     }
+
 
 }

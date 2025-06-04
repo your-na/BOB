@@ -217,5 +217,53 @@ public class ContestTeamService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public boolean processContestApplicationResponse(Long notificationId, boolean accept, UserEntity leader) {
+        NotificationEntity notification = notificationRepository.findById(notificationId).orElse(null);
+
+        if (notification == null || notification.getRelatedRecruit() == null || notification.getSender() == null) {
+            return false;
+        }
+
+        ContestRecruitEntity recruit = notification.getRelatedRecruit();
+        ContestTeamEntity team = recruit.getTeam();
+        UserEntity applicant = notification.getSender();
+
+        // 팀장 검증
+        // ✔ 팀의 멤버 중 리더 역할을 가진 사람 찾기
+        Optional<ContestTeamMemberEntity> leaderMember = team.getMembers().stream()
+                .filter(m -> m.getRole().equals("LEADER"))
+                .findFirst();
+
+        if (leaderMember.isEmpty() || !leaderMember.get().getUser().getUserId().equals(leader.getUserId())) {
+            return false;
+        }
+
+
+        if (accept) {
+            // 수락 처리: 팀원 추가
+            if (!contestTeamMemberRepository.existsByTeamAndUser(team, applicant)) {
+                ContestTeamMemberEntity member = new ContestTeamMemberEntity();
+                member.setTeam(team);
+                member.setUser(applicant);
+                member.setRole("MEMBER"); // 기본 역할
+                member.setInvitePending(false);
+                member.setAccepted(true);
+                contestTeamMemberRepository.save(member);
+            }
+
+            // 알림 메시지 갱신
+            notification.setMessage("[" + applicant.getUserNick() + "]님의 신청이 수락되었습니다.");
+        } else {
+            // 거절 처리 (필요시 알림만 남기고 끝)
+            notification.setMessage("[" + applicant.getUserNick() + "]님의 신청이 거절되었습니다.");
+        }
+
+        notification.setIsRead(true);
+        notification.setHidden(true); // 숨김 처리
+        notificationRepository.save(notification);
+
+        return true;
+    }
 
 }
