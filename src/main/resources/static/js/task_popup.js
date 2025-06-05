@@ -448,7 +448,12 @@ function loadTodosAndRenderCalendar(year, month) {
 function renderCalendar(year, month) {
     const title = document.getElementById("calendarTitle");
     const body = document.getElementById("calendarBody");
-    const todayStr = new Date().toISOString().split("T")[0];
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+
 
     const monthStart = new Date(year, month, 1);
     const monthEnd = new Date(year, month + 1, 0);
@@ -476,7 +481,14 @@ function renderCalendar(year, month) {
             cell.style.borderRadius = "50%";
         }
 
-        const tasksOnDay = allTodos.filter(todo => todo.startDate === dateStr);
+        const tasksOnDay = allTodos.filter(todo => {
+            if (todo.completed) return false; // ✅ 완료된 할 일은 무시
+            const start = new Date(todo.startDate);
+            const end = new Date(todo.endDate);
+            const current = new Date(dateStr);
+            return current >= start && current <= end;
+        });
+
         if (tasksOnDay.length > 0) {
             const dot = document.createElement("div");
             dot.style.width = "6px";
