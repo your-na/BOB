@@ -10,12 +10,9 @@
 <!-- header -->
 <div th:insert="~{header :: header}"></div>
 
-<!-- 메인 배너 -->
-<section class="main-banner">
-    <img src="/images/banner.png" alt="배너 이미지" class="banner-image">
-</section>
-
 <section class="project-list">
+    <h2>프로젝트</h2>
+    <hr>
     <div class="upupup">
         <form>
             <!-- 검색 아이콘 -->
@@ -111,6 +108,16 @@
         </tbody>
     </table>
 
+    <!-- ✅ 페이지네이션 영역 추가 -->
+    <div class="pagination">
+        <button class="page-btn" disabled>&lt;</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <span class="dots">...</span>
+        <button class="page-btn">10</button>
+        <button class="page-btn">&gt;</button>
+    </div>
 </section>
 
 <script>

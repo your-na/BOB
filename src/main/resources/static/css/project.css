@@ -8,9 +8,16 @@
 .project-list {
     width: 70%;
     padding: 20px;
-    margin: 0 10%;
+    margin-top: 8%;
+    margin-left: 12%;
 }
 
+.project-list h2 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: #00b800;
+}
 /* 📌 필터와 검색 아이콘을 같은 줄에 정렬 */
 .upupup {
     display: flex;
@@ -231,4 +238,42 @@
 
 .kbw:hover {
     font-weight: bold;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin: 30px 0;
+    gap: 5px;
+}
+
+.page-btn {
+    padding: 8px 14px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.page-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.page-btn.active {
+    background-color: #00b800;
+    color: white;
+    border-color: #00b800;
+}
+
+.page-btn:disabled {
+    cursor: default;
+    color: #aaa;
+    border-color: #eee;
+}
+
+.dots {
+    display: inline-block;
+    padding: 8px 10px;
+    color: #999;
 }
