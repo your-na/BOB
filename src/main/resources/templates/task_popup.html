@@ -20,6 +20,8 @@
                 <option value="오늘">오늘</option>
                 <option value="이번주">이번 주</option>
             </select>
+
+            <button id="openCalendarModal" class="calendar-btn">📅 캘린더 보기</button>
             <!-- 할 일 등록 버튼 -->
             <button id="openTodoModal" class="open-todo-btn">+ 할 일 등록</button>
 
@@ -34,12 +36,34 @@
 
     <!-- 완료된 할 일 -->
     <div class="completed-section">
-        <div class="completed-header" onclick="toggleCompleted()">
-            완료된 항목 ▾
+        <div id="completed-toggle" class="completed-toggle" onclick="toggleCompleted()">
+            <span id="completed-icon">▼</span> 완료된 항목
         </div>
         <ul id="completed-list" class="completed-list" style="display: none;">
             <!-- JS로 완료 항목 렌더링 -->
         </ul>
+    </div>
+</div>
+
+<!-- 📅 캘린더 모달 -->
+<div id="calendarModal" class="calendar-modal" style="display: none;">
+    <div class="calendar-content">
+        <button class="calendar-close-btn" onclick="closeCalendarModal()">✖</button>
+
+        <div class="calendar-header">
+            <button id="prevMonth">◀</button>
+            <span id="calendarTitle">2025년 6월</span>
+            <button id="nextMonth">▶</button>
+        </div>
+
+        <table class="calendar-table">
+            <thead>
+            <tr>
+                <th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
+            </tr>
+            </thead>
+            <tbody id="calendarBody"></tbody>
+        </table>
     </div>
 </div>
 

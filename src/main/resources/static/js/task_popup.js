@@ -8,6 +8,7 @@ function getCookie(name) {
     return value ? decodeURIComponent(value.split("=")[1]) : null;
 }
 
+
 document.addEventListener("DOMContentLoaded", function () {
 
     fetch("http://localhost:8888/api/user/me", {
@@ -46,6 +47,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ✅ 팝업 할 일 불러오기
     loadPopupTodos();
+
+    //캘린더
+    const calendarBtn = document.getElementById("openCalendarModal");
+    if (calendarBtn) {
+        calendarBtn.addEventListener("click", () => {
+            document.getElementById("calendarModal").style.display = "flex";
+            renderCalendar();
+        });
+    }
+
 });
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -157,7 +168,22 @@ function loadPopupTodos() {
                 li.appendChild(checkbox);  // 체크박스는 보이지만 클릭 불가
                 li.appendChild(tag);
                 li.appendChild(title);
-                li.appendChild(dday);
+                // 날짜 정보 영역 생성
+                const dateInfo = document.createElement("div");
+                dateInfo.classList.add("dates");
+
+                const startDate = todo.startDate;
+                const endDate = todo.endDate;
+                const ddayValue = getDday(todo.endDate);
+                const ddayClass = getDdayClass(todo.endDate);
+
+                dateInfo.innerHTML = `
+    <span class="date-range">${startDate} ~ ${endDate}</span>
+    <span class="due-date ${ddayClass}">${ddayValue}</span>
+`;
+
+                li.appendChild(dateInfo);
+
 
                 popupList.appendChild(li);
             });
@@ -171,63 +197,66 @@ function loadPopupTodos() {
 // ✅ 우클릭 메뉴 삭제 처리
 document.addEventListener("DOMContentLoaded", () => {
     const popupList = document.querySelector(".popup-todo-list");
+    const completedList = document.getElementById("completed-list");
 
-    // 마우스 우클릭 시 컨텍스트 메뉴 표시
-    popupList.addEventListener("contextmenu", function (e) {
+    document.addEventListener("contextmenu", function (e) {
         const targetLi = e.target.closest(".task-item");
         if (!targetLi) return;
 
-        e.preventDefault(); // 기본 우클릭 메뉴 막기
+        e.preventDefault();
 
-        // 기존 삭제 메뉴 있으면 제거
+        const isCompleted = completedList.contains(targetLi);
+
+        // 기존 메뉴 제거
         const existingMenu = document.querySelector(".context-menu");
         if (existingMenu) existingMenu.remove();
 
-        // 삭제 메뉴 생성
+        // 메뉴 생성
         const menu = document.createElement("div");
         menu.className = "context-menu";
-        menu.textContent = "삭제";
-        menu.style.position = "absolute";
-        menu.style.top = `${e.pageY}px`;
-        menu.style.left = `${e.pageX}px`;
-        menu.style.background = "#fff";
-        menu.style.border = "1px solid #ccc";
-        menu.style.padding = "5px 10px";
-        menu.style.cursor = "pointer";
-        menu.style.zIndex = "9999";
+        menu.textContent = isCompleted ? "취소" : "완료";
+        Object.assign(menu.style, {
+            position: "absolute",
+            top: `${e.pageY}px`,
+            left: `${e.pageX}px`,
+            background: "#fff",
+            border: "1px solid #ccc",
+            padding: "5px 10px",
+            cursor: "pointer",
+            zIndex: "9999"
+        });
 
-        // 삭제 클릭 시
         menu.addEventListener("click", () => {
             const todoId = targetLi.getAttribute("data-id");
+            if (!todoId) return;
 
-            if (!todoId) {
-                alert("할 일 ID가 없습니다.");
-                menu.remove();
-                return;
-            }
+            const newCompletedState = !isCompleted;
 
-            if (!confirm("이 할 일을 삭제하시겠습니까?")) {
-                menu.remove();
-                return;
-            }
-
-            fetch(`http://localhost:8888/api/todos/${todoId}`, {
-                method: "DELETE",
+            fetch(`http://localhost:8888/api/todos/${todoId}/complete`, {
+                method: "PATCH",
                 headers: {
+                    "Content-Type": "application/json",
                     "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
                 },
-                credentials: "include"
+                credentials: "include",
+                body: JSON.stringify({ completed: newCompletedState })
             })
                 .then(res => {
-                    if (res.ok) {
-                        console.log(`✅ 삭제 완료: ${todoId}`);
-                        targetLi.remove();
+                    if (!res.ok) throw new Error("서버 응답 오류");
+
+                    const checkbox = targetLi.querySelector("input[type='checkbox']");
+                    checkbox.checked = newCompletedState;
+
+                    // 리스트 위치 이동
+                    if (newCompletedState) {
+                        completedList.appendChild(targetLi);
+                        completedList.style.display = "block";
                     } else {
-                        alert("삭제 실패");
+                        popupList.appendChild(targetLi);
                     }
                 })
                 .catch(err => {
-                    alert("삭제 중 오류 발생: " + err);
+                    alert("상태 업데이트 실패: " + err);
                 })
                 .finally(() => {
                     menu.remove();
@@ -236,7 +265,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.body.appendChild(menu);
 
-        // 다른 곳 클릭 시 메뉴 제거
         document.addEventListener("click", function closeMenu() {
             menu.remove();
             document.removeEventListener("click", closeMenu);
@@ -338,3 +366,150 @@ function loadMyProjectsForPopup() {
         });
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+    const toggleBtn = document.getElementById("completed-toggle");
+    const completedList = document.getElementById("completed-list");
+
+    if (toggleBtn && completedList) {
+        toggleBtn.addEventListener("click", () => {
+            const isHidden = completedList.style.display === "none";
+            completedList.style.display = isHidden ? "block" : "none";
+            toggleBtn.textContent = isHidden ? "완료된 항목 ▾" : "완료된 항목 ▴";
+        });
+    }
+});
+
+
+function getDdayClass(dateStr) {
+    const today = new Date();
+    const target = new Date(dateStr);
+    const diff = target - today;
+
+    const ONE_DAY = 1000 * 60 * 60 * 24;
+    if (Math.abs(diff) < ONE_DAY) return "today";
+    if (diff < 0) return "overdue";
+    return "upcoming";
+}
+
+function closeCalendarModal() {
+    document.getElementById("calendarModal").style.display = "none";
+}
+
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+let allTodos = [];
+
+// 📌 캘린더 모달 열기
+document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById("openCalendarModal");
+    if (btn) {
+        btn.addEventListener("click", () => {
+            document.getElementById("calendarModal").style.display = "flex";
+            loadTodosAndRenderCalendar(currentYear, currentMonth);
+        });
+    }
+
+    document.getElementById("prevMonth").addEventListener("click", () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        renderCalendar(currentYear, currentMonth);
+    });
+
+    document.getElementById("nextMonth").addEventListener("click", () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        renderCalendar(currentYear, currentMonth);
+    });
+});
+
+function closeCalendarModal() {
+    document.getElementById("calendarModal").style.display = "none";
+}
+
+// 🧠 모든 할 일 불러오고 렌더
+function loadTodosAndRenderCalendar(year, month) {
+    fetch("http://localhost:8888/api/todos/popup", {
+        credentials: "include"
+    })
+        .then(res => res.json())
+        .then(data => {
+            allTodos = data;
+            renderCalendar(year, month);
+        });
+}
+
+// 📆 달력 렌더링
+function renderCalendar(year, month) {
+    const title = document.getElementById("calendarTitle");
+    const body = document.getElementById("calendarBody");
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+
+
+    const monthStart = new Date(year, month, 1);
+    const monthEnd = new Date(year, month + 1, 0);
+    const startDay = monthStart.getDay();
+    const daysInMonth = monthEnd.getDate();
+
+    title.textContent = `${year}년 ${month + 1}월`;
+    body.innerHTML = "";
+
+    let row = document.createElement("tr");
+
+    for (let i = 0; i < startDay; i++) {
+        row.appendChild(document.createElement("td"));
+    }
+
+    for (let date = 1; date <= daysInMonth; date++) {
+        const cell = document.createElement("td");
+        const dateObj = new Date(year, month, date);
+        const dateStr = dateObj.toISOString().split("T")[0];
+
+        cell.textContent = date;
+
+        if (dateStr === todayStr) {
+            cell.style.backgroundColor = "#d2f2ff";
+            cell.style.borderRadius = "50%";
+        }
+
+        const tasksOnDay = allTodos.filter(todo => {
+            if (todo.completed) return false; // ✅ 완료된 할 일은 무시
+            const start = new Date(todo.startDate);
+            const end = new Date(todo.endDate);
+            const current = new Date(dateStr);
+            return current >= start && current <= end;
+        });
+
+        if (tasksOnDay.length > 0) {
+            const dot = document.createElement("div");
+            dot.style.width = "6px";
+            dot.style.height = "6px";
+            dot.style.margin = "2px auto 0";
+            dot.style.backgroundColor = "red";
+            dot.style.borderRadius = "50%";
+            cell.appendChild(dot);
+
+            cell.style.cursor = "pointer";
+            cell.addEventListener("click", () => {
+                const taskTitles = tasksOnDay.map(t => `- ${t.title}`).join("\n");
+                alert(`${dateStr} 할 일:\n${taskTitles}`);
+            });
+        }
+
+        row.appendChild(cell);
+
+        if ((startDay + date) % 7 === 0 || date === daysInMonth) {
+            body.appendChild(row);
+            row = document.createElement("tr");
+        }
+    }
+}
