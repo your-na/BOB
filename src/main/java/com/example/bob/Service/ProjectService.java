@@ -22,7 +22,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import com.example.bob.DTO.UserProjectResponseDTO;
 import com.example.bob.Entity.NotificationType;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 
 
@@ -731,11 +732,12 @@ public class ProjectService {
         return projectRepository.findByTitle(title);
     }
 
+
+    // ✅ 페이징된 프로젝트 리스트 반환 (완료 제외)
+    public Page<ProjectDTO> getPagedProjects(Pageable pageable) {
+        // Entity를 Page로 받아서 DTO로 변환
+        return projectRepository.findAllActiveProjectsPaged(pageable)
+                .map(this::convertToDTO);
+    }
 }
-
-
-
-
-
-
 

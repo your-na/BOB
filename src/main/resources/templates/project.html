@@ -108,16 +108,26 @@
         </tbody>
     </table>
 
-    <!-- ✅ 페이지네이션 영역 추가 -->
+    <!-- ✅ 실제 동작하는 Thymeleaf 페이지네이션 -->
     <div class="pagination">
-        <button class="page-btn" disabled>&lt;</button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn">3</button>
-        <span class="dots">...</span>
-        <button class="page-btn">10</button>
-        <button class="page-btn">&gt;</button>
+        <!-- ◀ 이전 페이지 -->
+        <a class="page-btn" th:if="${currentPage > 0}"
+           th:href="@{/project(page=${currentPage - 1})}">&lt;</a>
+
+        <!-- 숫자 페이지들 -->
+        <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+        <a class="page-btn"
+           th:href="@{/project(page=${i})}"
+           th:text="${i + 1}"
+           th:classappend="${i == currentPage} ? 'active' : ''">
+        </a>
+    </span>
+
+        <!-- ▶ 다음 페이지 -->
+        <a class="page-btn" th:if="${currentPage < totalPages - 1}"
+           th:href="@{/project(page=${currentPage + 1})}">&gt;</a>
     </div>
+
 </section>
 
 <script>

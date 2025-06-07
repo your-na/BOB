@@ -28,7 +28,8 @@ import java.util.stream.Collectors;
 
 
 
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -44,12 +45,19 @@ public class ProjectController {
     private final ProjectRepository projectRepository;
     private final UserProjectRepository userProjectRepository;
 
-    // 프로젝트 목록 페이지에서 HTML을 반환하는 엔드포인트
     @GetMapping("/project")
-    public String projectList(Model model) {
-        List<ProjectDTO> activeProjects = projectService.getAllProjectsDTO();  // 완료된 프로젝트 제외
-        model.addAttribute("projects", activeProjects);  // Thymeleaf 템플릿으로 데이터 전달
-        return "project";  // "project.html" 템플릿 반환
+    public String projectList(@RequestParam(defaultValue = "0") int page,
+                              @RequestParam(defaultValue = "12") int size,
+                              Model model) {
+        // ✅ 페이징된 프로젝트 리스트 가져오기
+        Page<ProjectDTO> projectPage = projectService.getPagedProjects(PageRequest.of(page, size));
+
+        // ✅ 모델에 데이터 전달
+        model.addAttribute("projects", projectPage.getContent());  // 현재 페이지의 프로젝트들
+        model.addAttribute("currentPage", page);                   // 현재 페이지 번호
+        model.addAttribute("totalPages", projectPage.getTotalPages()); // 전체 페이지 수
+
+        return "project";
     }
 
     // 메인 페이지에서 JSON 응답을 받는 엔드포인트
