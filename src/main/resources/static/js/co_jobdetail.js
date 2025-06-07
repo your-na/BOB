@@ -89,13 +89,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const resumeSection = document.querySelector(".resume-template");
             const resumeListContainer = document.createElement("div"); // 여러 개 담을 div
 
-            data.resumeTitles.forEach(title => {
+            data.resumeTitles.forEach(resume => {
                 const item = document.createElement("div");
                 item.className = "resume-item";
-                item.textContent = `📄 ${title}`;
-                item.onclick = () => openResumeModal(title);
+                item.textContent = `📄 ${resume.title}`;  // ✨ 제목만 출력되도록 수정
+                item.onclick = () => openResumeModal(resume.title); // 모달에도 제목만 전달
                 resumeListContainer.appendChild(item);
             });
+
 
             resumeSection.appendChild(resumeListContainer);
 
