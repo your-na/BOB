@@ -315,6 +315,17 @@ public class CoJobPostService {
                 .collect(Collectors.toList());
     }
 
+    // ✅ 공고 삭제 메서드
+    public void deleteJobPost(Long id) {
+        // 1. 삭제할 공고를 ID로 조회
+        CoJobPostEntity post = coJobPostRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("삭제할 공고를 찾을 수 없습니다."));
+
+        // 2. 삭제 실행
+        coJobPostRepository.delete(post);
+    }
+
+
 
 
 

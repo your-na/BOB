@@ -1,3 +1,11 @@
+// 🍪 쿠키에서 CSRF 토큰(XSRF-TOKEN) 추출
+function getCsrfToken() {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; XSRF-TOKEN=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
 // 이력서 모달 열기
 function openResumeModal(title) {
     const modal = document.getElementById('resumeModal');
@@ -108,4 +116,34 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(err => {
             console.error("상세 공고 불러오기 실패:", err);
         });
+
+    // ✅ 삭제 버튼 클릭 시 DELETE 요청 보내기
+    document.querySelector(".delete").addEventListener("click", () => {
+        const jobId = new URLSearchParams(window.location.search).get("id");
+
+        if (!confirm("정말로 이 공고를 삭제하시겠습니까?")) {
+            return;
+        }
+
+        fetch(`/api/cojobs/${jobId}`, {
+            method: "DELETE",
+            headers: {
+                "X-XSRF-TOKEN": getCsrfToken()  // ✅ CSRF 토큰 헤더 추가!
+            }
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert("공고가 성공적으로 삭제되었습니다.");
+                    window.location.href = "/job2";
+                } else {
+                    return res.text().then(msg => {
+                        alert("삭제 실패: " + msg);
+                    });
+                }
+            })
+            .catch(error => {
+                alert("오류 발생: " + error.message);
+            });
+    });
+
 });

@@ -11,6 +11,9 @@ import com.example.bob.DTO.CompanyJobStatDTO;
 import com.example.bob.DTO.JobPostSummaryDTO;
 
 import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 
 
 
@@ -78,6 +81,23 @@ public class CoJobPostController {
     public ResponseEntity<List<String>> getAvailableMonths() {
         return ResponseEntity.ok(coJobPostService.getAvailableJobPostMonths());
     }
+
+    // ✅ 공고 삭제 요청을 처리하는 API
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteJobPost(@PathVariable Long id) {
+        try {
+            // 🔍 서비스에서 공고 ID로 삭제 수행
+            coJobPostService.deleteJobPost(id);
+
+            // ✅ 성공 응답 반환
+            return ResponseEntity.ok("공고가 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            // ❌ 실패 시 에러 메시지 반환
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("공고 삭제 실패: " + e.getMessage());
+        }
+    }
+
 
 
 

@@ -17,6 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
+import org.springframework.http.HttpMethod;
 import lombok.RequiredArgsConstructor;
 
 
@@ -50,7 +51,8 @@ public class SecurityConfig {
                                 "/teamrequest", "/teamrequest/accept", "/teamrequest/reject",
                                 "/file/project/submit", "/api/todos/**", "/api/notifications/delete-all", "/api/notifications/mark-as-read/**","/ws-chat", "/api/user/resumes/upload",
                                 "/api/user/resumes/submit", "/contest/team/invite/respond","/api/applications/job/pass", "/api/notifications/delete/**", "/profile/company/update",
-                                "/api/user/resumes/submit", "/contest/team/invite/respond","/api/applications/job/pass", "/api/notifications/delete/**", "/contest/team/application/**"
+                                "/api/user/resumes/submit", "/contest/team/invite/respond","/api/applications/job/pass", "/api/notifications/delete/**", "/contest/team/application/**",
+                                "/api/cojobs/**"
                         )
                 )
                 .headers(headers -> headers
@@ -69,6 +71,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**", "/sidebar", "/ad_contest", "/adcomcont", "/adcomcont").hasAuthority("ADMIN")
                         .requestMatchers("/contest/create", "/contest/submit").hasAnyAuthority("ADMIN", "COMPANY")
                         .requestMatchers("/api/applications/job/pass").hasAuthority("COMPANY")// ✅ 기업 사용자만 접근 가능
+                        .requestMatchers(HttpMethod.DELETE, "/api/cojobs/**").hasAuthority("COMPANY")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
