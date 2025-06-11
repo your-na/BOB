@@ -472,9 +472,14 @@ function renderCalendar(year, month) {
     for (let date = 1; date <= daysInMonth; date++) {
         const cell = document.createElement("td");
         const dateObj = new Date(year, month, date);
-        const dateStr = dateObj.toISOString().split("T")[0];
+        const yyyyStr = dateObj.getFullYear();
+        const mmStr = String(dateObj.getMonth() + 1).padStart(2, "0");
+        const ddStr = String(dateObj.getDate()).padStart(2, "0");
+        const dateStr = `${yyyyStr}-${mmStr}-${ddStr}`; // ✅ 로컬 기준 날짜 문자열
+
 
         cell.textContent = date;
+
 
         if (dateStr === todayStr) {
             cell.style.backgroundColor = "#d2f2ff";
@@ -482,12 +487,14 @@ function renderCalendar(year, month) {
         }
 
         const tasksOnDay = allTodos.filter(todo => {
-            if (todo.completed) return false; // ✅ 완료된 할 일은 무시
-            const start = new Date(todo.startDate);
-            const end = new Date(todo.endDate);
-            const current = new Date(dateStr);
-            return current >= start && current <= end;
+            if (todo.completed) return false;
+
+            const startStr = todo.startDate;  // e.g., "2025-06-11"
+            const endStr = todo.endDate;
+
+            return dateStr >= startStr && dateStr <= endStr;
         });
+
 
         if (tasksOnDay.length > 0) {
             const dot = document.createElement("div");
