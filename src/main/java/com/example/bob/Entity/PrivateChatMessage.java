@@ -25,4 +25,8 @@ public class PrivateChatMessage {
     private String message;
 
     private LocalDateTime sentAt;
+
+    private String type;
+    private String fileUrl;
+    private String filename;
 }

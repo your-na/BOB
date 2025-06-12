@@ -35,6 +35,9 @@ public class ChatMessageService {
                         .senderName(msg.getSender().getUserNick())
                         .message(msg.getMessage())
                         .sentAt(msg.getSentAt().toString())
+                        .type(msg.getType())
+                        .fileUrl(msg.getFileUrl())
+                        .fileName(msg.getFilename())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -51,6 +54,9 @@ public class ChatMessageService {
                 .sender(sender)
                 .message(dto.getMessage())
                 .sentAt(LocalDateTime.now())
+                .type(dto.getType())
+                .fileUrl(dto.getFileUrl())
+                .filename(dto.getFileName())
                 .build();
 
         chatMessageRepository.saveAndFlush(message);

@@ -12,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Controller
 @RequiredArgsConstructor
@@ -25,24 +26,22 @@ public class GroupChatWebSocketController {
     public void sendGroupMessage(@DestinationVariable Long roomId,
                                  @Payload ChatMessageDTO messageDTO) {
 
-        // 👇 senderId를 기반으로 유저 조회
         Long senderId = messageDTO.getSenderId();
         UserEntity sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new IllegalArgumentException("보낸 유저 없음"));
 
-        // 저장
-        groupChatMessageService.saveMessage(roomId, sender, messageDTO.getMessage());
+        // 보낸 시간 설정
+        String nowFormatted = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        messageDTO.setRoomId(roomId);
+        messageDTO.setSenderName(sender.getUserNick());
+        messageDTO.setSentAt(nowFormatted);
 
-        // 브로드캐스트
-        ChatMessageDTO outbound = ChatMessageDTO.builder()
-                .roomId(roomId)
-                .senderId(sender.getId())
-                .senderName(sender.getUserNick())
-                .message(messageDTO.getMessage())
-                .sentAt(LocalDateTime.now().toString())
-                .build();
+        // ✅ 파일/이미지/텍스트 모든 메시지 저장
+        groupChatMessageService.saveMessage(messageDTO, sender);
 
-        messagingTemplate.convertAndSend("/topic/grouproom." + roomId, outbound);
+        // ✅ 그대로 전송
+        messagingTemplate.convertAndSend("/topic/grouproom." + roomId, messageDTO);
     }
 
 }

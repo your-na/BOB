@@ -16,6 +16,8 @@ function getRoomIdFromURL() {
     return params.get("roomId");
 }
 
+let stompClient;
+
 document.addEventListener("DOMContentLoaded", function () {
     const chatType = document.querySelector("meta[name='chat-type']")?.content || "private";
 
@@ -50,7 +52,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const roomId = getRoomIdFromURL();
     const socket = new SockJS("/ws-chat");
-    const stompClient = Stomp.over(socket);
+
+    stompClient = Stomp.over(socket);
 
     loadMessages(roomId);
 
@@ -60,8 +63,17 @@ document.addEventListener("DOMContentLoaded", function () {
             const isMine = parseInt(payload.senderId) === currentUserId;
             const type = isMine ? "user" : "partner";
             const sender = chatType === "group" ? payload.senderId : payload.senderName;
-            appendMessage(type, sender, payload.message);
+
+            let displayText = payload.message || "";
+            if (payload.type === "image") {
+                displayText = "[image]";
+            } else if (payload.type === "file") {
+                displayText = "[file]";
+            }
+
+            appendMessage(type, sender, displayText, payload.fileUrl, payload.fileName);
         });
+
     });
 
     sendBtn.addEventListener("click", sendMessage);
@@ -70,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // 메세지 추가 함수
-    function appendMessage(type, senderIdOrName, text) {
+    function appendMessage(type, senderIdOrName, text, fileUrl = null, fileName = null) {
         const messageRow = document.createElement("div");
         messageRow.className = `message-row ${type}`;
         const messageContent = document.createElement("div");
@@ -78,6 +90,27 @@ document.addEventListener("DOMContentLoaded", function () {
         const messageBubble = document.createElement("div");
         messageBubble.className = `message ${type}`;
         messageBubble.textContent = text;
+
+        if (text === "[image]" && fileUrl) {
+            const img = document.createElement("img");
+            img.src = fileUrl;
+            img.alt = "전송된 이미지";
+            img.style.maxWidth = "200px";
+            img.style.borderRadius = "8px";
+            messageBubble.innerHTML = "";
+            messageBubble.appendChild(img);
+        } else if (text === "[file]" && fileUrl) {
+            const link = document.createElement("a");
+            link.href = fileUrl;
+            link.download = fileName || "download";
+            link.textContent = `📎 ${fileName}`;
+            link.style.color = "#007bff";
+            link.style.textDecoration = "underline";
+            messageBubble.innerHTML = "";
+            messageBubble.appendChild(link);
+        } else {
+            messageBubble.textContent = text;
+        }
 
         if (type === "user") {
             messageContent.appendChild(messageBubble);
@@ -139,7 +172,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     const isMine = parseInt(msg.senderId) === currentUserId;
                     const type = isMine ? "user" : "partner";
                     const sender = chatType === "group" ? msg.senderId : msg.senderName;
-                    appendMessage(type, sender, msg.message);
+                    appendMessage(type, sender, msg.message, msg.fileUrl, msg.fileName);
                 });
             });
     }
@@ -181,14 +214,56 @@ function handleFileSelect(event, type) {
     const file = event.target.files[0];
     if (!file) return;
 
-    if (type === 'image') {
-        alert(`📷 선택된 이미지: ${file.name}`);
-    } else {
-        alert(`📁 선택된 파일: ${file.name}`);
-    }
+    const roomId = getRoomIdFromURL();
+    const csrfToken = document.querySelector("meta[name=_csrf]").content;
+    const csrfHeader = document.querySelector("meta[name=_csrf_header]").content;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("roomId", roomId);
+    formData.append("type", type);
+
+    fetch("/chat/upload", {
+        method: "POST",
+        body: formData,
+        headers: {
+            [csrfHeader]: csrfToken
+        }
+    })
+        .then(res => res.json())
+        .then(data => {
+            const fileUrl = data.fileUrl;
+            const fileName = data.fileName;
+
+            const currentUserId = parseInt(document.querySelector("meta[name='current-user-id']").content);
+            const currentUserNick = document.querySelector("meta[name='current-user']").content;
+            const chatType = document.querySelector("meta[name='chat-type']").content;
+            const sendPrefix = chatType === "group" ? "/app/groupchat.send/" : "/app/chat.send/";
+
+            const payload = {
+                type: type,
+                message: type === "image" ? "[image]" : "[file]",
+                fileUrl: fileUrl,
+                fileName: fileName,
+                roomId: roomId
+            };
+
+            // 그룹 채팅이면 sender 정보 추가
+            if (chatType === "group") {
+                payload.senderId = currentUserId;
+                payload.senderName = currentUserNick;
+            }
+
+            stompClient.send(`${sendPrefix}${roomId}`, {}, JSON.stringify(payload));
+        })
+        .catch(err => {
+            console.error("❌ 파일 업로드 실패:", err);
+            alert("파일 전송에 실패했습니다.");
+        });
 
     document.getElementById('attachMenu').style.display = 'none';
 }
+
 
 function toggleChatMenu() {
     const menu = document.getElementById("chatDropdownMenu");
