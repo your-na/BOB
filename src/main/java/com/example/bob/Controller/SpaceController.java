@@ -160,7 +160,7 @@ public class SpaceController {
                 .orElseThrow(() -> new IllegalArgumentException("공모전 팀을 찾을 수 없습니다."));
 
         model.addAttribute("teamId", team.getId());
-        model.addAttribute("projectTitle", team.getTeamName());
+        model.addAttribute("projectTitle", team.getContest().getTitle());
 
         // ✅ 이거 추가!
         model.addAttribute("team", team);
