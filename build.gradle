@@ -18,32 +18,33 @@ repositories {
 }
 
 dependencies {
+	// Spring Boot Starter
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-
-	//JDBC, H2, MySql
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-
-	// Spring Security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-	testImplementation 'org.springframework.security:spring-security-test'
-	implementation 'org.springframework.security:spring-security-taglibs:5.8.0'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-	implementation 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+	// ✅ MySQL JDBC 드라이버 (runtimeOnly → implementation 으로 변경, 버전 명시)
+	implementation 'com.mysql:mysql-connector-j:8.0.33'
+
+	// Security 관련 추가 의존성
+	implementation 'org.springframework.security:spring-security-taglibs:5.8.0'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+	testImplementation 'org.springframework.security:spring-security-test'
+
+	// Lombok
+	implementation 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	// 개발용 도구 및 테스트
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
