@@ -439,7 +439,7 @@ document.addEventListener("click", function (e) {
 
                 if (!data.schoolName || !data.status) return;
 
-                fetch("/api/education-history", {
+                fetch("/api/education-history/save", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
