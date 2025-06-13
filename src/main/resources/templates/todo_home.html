@@ -9,6 +9,9 @@
     <!-- ✅ CSRF 토큰 메타태그 추가 -->
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <!-- ✅ 로그인 유저 닉네임 전달 -->
+    <meta name="current-user" th:content="${#authentication.principal.userEntity.userNick}" />
 </head>
 <body>
 
@@ -183,7 +186,7 @@
         const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
 
-        fetch(`/api/chat/group/team/${projectId}`, {
+        fetch(`/api/chat/group/project/${projectId}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -194,14 +197,11 @@
                 if (!res.ok) throw new Error("팀 채팅방 생성 실패");
                 return res.json();  // 반환값이 Long
             })
-            .then(data => {
-                if (!data || !data.roomId) {
-                    throw new Error("잘못된 응답");
-                }
-                const roomId = typeof data === "object" ? data.roomId ?? data.id : data;
+            .then(roomId => {
                 window.open(`/chat/group-chatroom?roomId=${roomId}&type=group`, "_blank", "width=500,height=700");
             })
-            .catch(err => {
+
+                .catch(err => {
                 alert("채팅 열기 실패");
                 console.error(err);
             });
