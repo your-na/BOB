@@ -89,6 +89,8 @@ public class TestController {
     public String pofolform() {return "portfolio_form";}
 
     //이력서
-    @GetMapping("/resumehistory")
-    public String rehistoryform() {return "resume_history";}
+    @GetMapping("/testhistory") // 충돌 안 나도록
+    public String rehistoryform() {
+        return "resumehistory";
+    }
 }
