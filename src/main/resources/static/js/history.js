@@ -59,11 +59,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
-    // ✅ 삭제 버튼
+    // ✅ 삭제 버튼 처리 (섹션별 메시지 + URL 다르게 적용)
     document.addEventListener("click", function (event) {
         if (event.target.classList.contains("delete-btn")) {
             const section = event.target.closest(".history-section");
-            if (section?.id === "job-history") return; // 구직 내역 삭제는 아래에서 처리됨
             const row = event.target.closest("tr");
             const id = event.target.getAttribute("data-id");
 
@@ -72,29 +71,51 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            if (confirm("⚠정말 삭제하시겠습니까?\n 삭제하면 마이프로젝트에서도 사라지며, 복구할 수 없습니다.")) {
-                fetch(`/project-history/${id}`, {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        [getCsrfHeader()]: getCsrfToken()
+            let deleteUrl = "";
+            let message = "정말 삭제하시겠습니까?";
+            let isHandled = true;
+
+            switch (section?.id) {
+                case "project-history":
+                    deleteUrl = `/project-history/${id}`;
+                    message = "⚠정말 삭제하시겠습니까?\n삭제하면 마이프로젝트에서도 사라지며, 복구할 수 없습니다.";
+                    break;
+                case "simple-history":
+                    deleteUrl = `/api/basic-info/${id}`;
+                    break;
+                case "school-history":
+                    deleteUrl = `/api/education-history/delete/${id}`;
+                    break;
+                default:
+                    isHandled = false;
+            }
+
+            if (!isHandled || !deleteUrl) return;
+
+            if (!confirm(message)) return;
+
+            fetch(deleteUrl, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    [getCsrfHeader()]: getCsrfToken()
+                }
+            })
+                .then(res => {
+                    if (res.ok) {
+                        alert("✅ 삭제되었습니다!");
+                        row.remove();
+                    } else {
+                        alert("❌ 삭제 실패");
                     }
                 })
-                    .then(response => {
-                        if (response.ok) {
-                            alert("✅ 삭제 완료!");
-                            if (row) row.remove();
-                        } else {
-                            alert("❌ 삭제 실패!");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("삭제 중 오류 발생:", error);
-                        alert("❌ 서버 오류가 발생했습니다.");
-                    });
-            }
+                .catch(err => {
+                    console.error("❌ 삭제 중 오류 발생:", err);
+                    alert("❌ 서버 오류가 발생했습니다.");
+                });
         }
     });
+
 
 
     // ✅ 셀 더블클릭 시 수정 (자격증 + 구직 상태 드롭다운 포함)
@@ -284,36 +305,6 @@ document.addEventListener("click", function (event) {
     }
 });
 
-// ✅ 구직내역 삭제 (구직 항목만)
-document.addEventListener("click", function (event) {
-    if (event.target.classList.contains("delete-btn") &&
-        event.target.closest("#job-history")) {
-
-        const row = event.target.closest("tr");
-        const id = event.target.getAttribute("data-id");
-
-        if (!id) {
-            row.remove(); // 저장 안 된 새 항목이라면 그냥 삭제
-            return;
-        }
-
-        if (!confirm("정말 구직 내역을 삭제하시겠습니까?")) return;
-
-        fetch(`/api/job-history/${id}`, {
-            method: "DELETE",
-            headers: { [getCsrfHeader()]: getCsrfToken() }
-        })
-            .then(response => {
-                if (response.ok) {
-                    row.remove();
-                    alert("✅ 삭제되었습니다!");
-                } else {
-                    alert("❌ 삭제 실패");
-                }
-            });
-    }
-});
-
 // ✅ 구직 내역 수정 시 자동 저장 (기존 row 더블클릭 수정 후 blur 시)
 document.addEventListener("blur", function (event) {
     if (event.target.classList.contains("editable-input")) {
@@ -429,6 +420,44 @@ document.addEventListener("click", function (e) {
     }
 });
 
+// ✅ 기본 정보 삭제 (simple-history 섹션)
+document.addEventListener("click", function (event) {
+    if (event.target.classList.contains("delete-btn") &&
+        event.target.closest("#simple-history")) {
+
+        const row = event.target.closest("tr");
+        const id = event.target.getAttribute("data-id");
+
+        if (!id) {
+            row.remove(); // 새로 추가된 미저장 행이면 그냥 제거
+            return;
+        }
+
+        if (!confirm("정말 삭제하시겠습니까?")) return;
+
+        fetch(`/api/basic-info/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                [getCsrfHeader()]: getCsrfToken()
+            }
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert("✅ 삭제되었습니다!");
+                    row.remove();
+                } else {
+                    alert("❌ 삭제 실패");
+                }
+            })
+            .catch(err => {
+                console.error("❌ 오류 발생:", err);
+                alert("❌ 서버 오류가 발생했습니다.");
+            });
+    }
+});
+
+
 
 // ✅ 학력 추가
 document.addEventListener("click", function (e) {
@@ -483,6 +512,8 @@ document.addEventListener("click", function (e) {
 
         section.querySelector("tbody").appendChild(newRow);
     }
+
+
 });
 
 

@@ -5,6 +5,8 @@ import com.example.bob.Service.BasicInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.bob.Repository.BasicInfoRepository;
+
 
 import java.security.Principal;
 import java.util.Map;
@@ -15,6 +17,7 @@ import java.util.Map;
 public class BasicInfoApiController {
 
     private final BasicInfoService basicInfoService;
+    private final BasicInfoRepository basicInfoRepository;
 
     // ✅ 기본 정보 저장 (POST)
     @PostMapping
@@ -36,4 +39,5 @@ public class BasicInfoApiController {
     private Long getUserIdFromPrincipal(Principal principal) {
         return 1L; // 🔁 나중에 로그인 연동되면 principal.getName() 등으로 변경
     }
+
 }
