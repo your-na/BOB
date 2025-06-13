@@ -385,17 +385,24 @@ document.addEventListener("click", function (e) {
         newRow.classList.remove("new-entry-row");
 
         const inputs = newRow.querySelectorAll("input");
+
+        let isSaved = false; // 중복 저장 방지
+
         inputs.forEach(input => {
             input.addEventListener("change", () => {
+                if (isSaved) return;
+
                 const data = {
-                    name: newRow.querySelector(".input-name").value,
-                    birthDate: newRow.querySelector(".input-birth").value,
-                    region: newRow.querySelector(".input-region").value,
-                    email: newRow.querySelector(".input-email").value,
-                    phone: newRow.querySelector(".input-phone").value
+                    name: newRow.querySelector(".input-name").value.trim(),
+                    birthDate: newRow.querySelector(".input-birth").value.trim(),
+                    region: newRow.querySelector(".input-region").value.trim(),
+                    email: newRow.querySelector(".input-email").value.trim(),
+                    phone: newRow.querySelector(".input-phone").value.trim()
                 };
 
-                if (!data.name || !data.email) return;
+                // ✅ 모든 항목이 입력되었을 때만 저장
+                const allFilled = data.name && data.birthDate && data.region && data.email && data.phone;
+                if (!allFilled) return;
 
                 fetch("/api/basic-info", {
                     method: "POST",
@@ -407,8 +414,13 @@ document.addEventListener("click", function (e) {
                 })
                     .then(res => res.json())
                     .then(saved => {
+                        isSaved = true;
                         newRow.querySelector(".delete-btn").setAttribute("data-id", saved.id);
                         alert("✅ 기본 정보 저장됨");
+                    })
+                    .catch(err => {
+                        console.error("❌ 저장 실패:", err);
+                        alert("❌ 저장 실패");
                     });
             });
         });
@@ -416,6 +428,7 @@ document.addEventListener("click", function (e) {
         section.querySelector("tbody").appendChild(newRow);
     }
 });
+
 
 // ✅ 학력 추가
 document.addEventListener("click", function (e) {
@@ -428,16 +441,24 @@ document.addEventListener("click", function (e) {
         newRow.classList.remove("new-entry-row");
 
         const inputs = newRow.querySelectorAll("input, select");
+
+        // ✅ 한번 저장된 row 중복 저장 방지
+        let isSaved = false;
+
         inputs.forEach(input => {
             input.addEventListener("change", () => {
+                if (isSaved) return; // 중복 저장 방지
+
                 const data = {
-                    schoolName: newRow.querySelector(".input-school").value,
+                    schoolName: newRow.querySelector(".input-school").value.trim(),
                     status: newRow.querySelector(".input-status").value,
                     startDate: newRow.querySelector(".input-start").value,
                     endDate: newRow.querySelector(".input-end").value
                 };
 
-                if (!data.schoolName || !data.status) return;
+                // ✅ 모든 항목이 채워져 있을 때만 저장
+                const allFilled = data.schoolName && data.status && data.startDate && data.endDate;
+                if (!allFilled) return;
 
                 fetch("/api/education-history/save", {
                     method: "POST",
@@ -449,8 +470,13 @@ document.addEventListener("click", function (e) {
                 })
                     .then(res => res.json())
                     .then(saved => {
+                        isSaved = true;
                         newRow.querySelector(".delete-btn").setAttribute("data-id", saved.id);
                         alert("✅ 학력 저장됨");
+                    })
+                    .catch(err => {
+                        console.error("❌ 저장 실패:", err);
+                        alert("❌ 저장 실패");
                     });
             });
         });
@@ -458,4 +484,5 @@ document.addEventListener("click", function (e) {
         section.querySelector("tbody").appendChild(newRow);
     }
 });
+
 
