@@ -1,5 +1,6 @@
 package com.example.bob.Service;
 
+import com.example.bob.DTO.ChatMessageDTO;
 import com.example.bob.Entity.*;
 import com.example.bob.Repository.*;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,34 @@ public class GroupChatMessageService {
         }
 
         System.out.println("✅ 단체 메시지 저장 및 읽음 상태 초기화 완료");
+    }
+
+    @Transactional
+    public void saveMessage(ChatMessageDTO dto, UserEntity sender) {
+        GroupChatRoom room = roomRepository.findById(dto.getRoomId())
+                .orElseThrow(() -> new IllegalArgumentException("채팅방 없음"));
+
+        GroupChatMessage message = GroupChatMessage.builder()
+                .groupChatRoom(room)
+                .sender(sender)
+                .message(dto.getMessage())
+                .sentAt(LocalDateTime.now())
+                .type(dto.getType())
+                .fileUrl(dto.getFileUrl())
+                .filename(dto.getFileName())
+                .build();
+
+        messageRepository.save(message);
+
+        List<GroupChatParticipant> participants = participantRepository.findByGroupChatRoom(room);
+        for (GroupChatParticipant participant : participants) {
+            if (!participant.getUser().getId().equals(sender.getId())) {
+                GroupMessageReadStatus status = new GroupMessageReadStatus(message, participant.getUser());
+                readStatusRepository.save(status);
+            }
+        }
+
+        System.out.println("✅ 단체 메시지 저장 완료 (파일/이미지 포함)");
     }
 
     @Transactional
