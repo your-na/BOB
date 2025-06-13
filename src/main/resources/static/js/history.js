@@ -373,3 +373,89 @@ function updateEndDateState(row) {
         endDateInput.placeholder = "YYYY-MM-DD";
     }
 }
+
+// ✅ 기본 사항 추가
+document.addEventListener("click", function (e) {
+    if (e.target.closest("#simple-history")?.classList.contains("history-section") &&
+        e.target.classList.contains("add-project-btn")) {
+
+        const section = e.target.closest(".history-section");
+        const newRow = section.querySelector(".new-entry-row").cloneNode(true);
+        newRow.style.display = "table-row";
+        newRow.classList.remove("new-entry-row");
+
+        const inputs = newRow.querySelectorAll("input");
+        inputs.forEach(input => {
+            input.addEventListener("change", () => {
+                const data = {
+                    name: newRow.querySelector(".input-name").value,
+                    birthDate: newRow.querySelector(".input-birth").value,
+                    region: newRow.querySelector(".input-region").value,
+                    email: newRow.querySelector(".input-email").value,
+                    phone: newRow.querySelector(".input-phone").value
+                };
+
+                if (!data.name || !data.email) return;
+
+                fetch("/api/basic-info", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        [getCsrfHeader()]: getCsrfToken()
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(res => res.json())
+                    .then(saved => {
+                        newRow.querySelector(".delete-btn").setAttribute("data-id", saved.id);
+                        alert("✅ 기본 정보 저장됨");
+                    });
+            });
+        });
+
+        section.querySelector("tbody").appendChild(newRow);
+    }
+});
+
+// ✅ 학력 추가
+document.addEventListener("click", function (e) {
+    if (e.target.closest("#school-history")?.classList.contains("history-section") &&
+        e.target.classList.contains("add-project-btn")) {
+
+        const section = e.target.closest(".history-section");
+        const newRow = section.querySelector(".new-entry-row").cloneNode(true);
+        newRow.style.display = "table-row";
+        newRow.classList.remove("new-entry-row");
+
+        const inputs = newRow.querySelectorAll("input, select");
+        inputs.forEach(input => {
+            input.addEventListener("change", () => {
+                const data = {
+                    schoolName: newRow.querySelector(".input-school").value,
+                    status: newRow.querySelector(".input-status").value,
+                    startDate: newRow.querySelector(".input-start").value,
+                    endDate: newRow.querySelector(".input-end").value
+                };
+
+                if (!data.schoolName || !data.status) return;
+
+                fetch("/api/education-history", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        [getCsrfHeader()]: getCsrfToken()
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(res => res.json())
+                    .then(saved => {
+                        newRow.querySelector(".delete-btn").setAttribute("data-id", saved.id);
+                        alert("✅ 학력 저장됨");
+                    });
+            });
+        });
+
+        section.querySelector("tbody").appendChild(newRow);
+    }
+});
+

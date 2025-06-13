@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>참여 내역 통합</title>
+  <link rel="stylesheet" href="/css/history.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
+
+  <!-- ✅ CSRF 토큰 메타 태그 두 개 모두 추가 -->
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+</head>
+
+<body>
+
+<!-- ✅ Header -->
+<div th:insert="~{header :: header}"></div>
+
+<!-- ✅ 탭 메뉴 -->
+<nav class="tab-menu">
+  <ul>
+    <li class="tab-item active" data-target="simple-history">기본 사항</li>
+    <li class="tab-item" data-target="school-history">학력 내역</li>
+    <li class="tab-item" data-target="job-history">경력 내역</li>
+    <li class="tab-item" data-target="project-history">프로젝트 참여 내역</li>
+    <li class="tab-item" data-target="contest-history">공모전 참여 내역</li>
+    <li class="tab-item" data-target="career-history">자격증</li>
+  </ul>
+</nav>
+
+<!-- ✅ 공통 검색창 -->
+<div class="searchcontainer">
+  <form id="searchform">
+    <input type="text" name="sw" id="search_sw" class="searchbar" placeholder="검색어 입력" th:value="${sw}">
+    <span class="searchicon"><img src="/images/search.png" alt=""></span>
+  </form>
+  <button class="external-btn">외부문서 불러오기</button>
+</div>
+
+<!-- ✅ 기본 사항 -->
+<div class="history-section" id="simple-history" style="display: block;">
+  <table class="history-table">
+    <thead>
+    <tr>
+      <th>No.</th>
+      <th>이름</th>
+      <th>생년월일</th>
+      <th>지역</th>
+      <th>이메일</th>
+      <th>전화번호</th>
+      <th>관리</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- 기존 데이터 출력 영역 -->
+    <tr th:each="item, stat : ${basicInfoList}">
+      <td th:text="${stat.count}">1</td>
+      <td th:text="${item.name}">홍길동</td>
+      <td th:text="${item.birthDate}">1995-01-01</td>
+      <td th:text="${item.region}">서울</td>
+      <td th:text="${item.email}">test@example.com</td>
+      <td th:text="${item.phone}">010-1234-5678</td>
+      <td><button class="delete-btn" th:attr="data-id=${item.id}">삭제</button></td>
+    </tr>
+
+    <!-- 빈 입력 행 (숨김) -->
+    <tr class="new-entry-row" style="display: none;">
+      <td>-</td>
+      <td><input type="text" class="input-name" placeholder="이름"></td>
+      <td><input type="date" class="input-birth"></td>
+      <td><input type="text" class="input-region" placeholder="지역"></td>
+      <td><input type="email" class="input-email" placeholder="이메일"></td>
+      <td><input type="text" class="input-phone" placeholder="전화번호"></td>
+      <td><button class="delete-btn">삭제</button></td>
+    </tr>
+    </tbody>
+  </table>
+
+  <button class="add-project-btn">+ 기본 정보 추가하기</button>
+</div>
+
+
+<!-- ✅ 학력 내역 -->
+<div class="history-section" id="school-history" style="display: none;">
+  <table class="history-table">
+    <thead>
+    <tr>
+      <th>No.</th>
+      <th>학교명</th>
+      <th>상태</th>
+      <th>입학일</th>
+      <th>졸업일</th>
+      <th>관리</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="edu, stat : ${educations}">
+      <td th:text="${stat.count}">1</td>
+      <td th:text="${edu.schoolName}">서울대</td>
+      <td th:text="${edu.status}">졸업</td>
+      <td th:text="${edu.startDate}">2015-03-01</td>
+      <td th:text="${edu.endDate}">2019-02-28</td>
+      <td><button class="delete-btn" th:attr="data-id=${edu.id}">삭제</button></td>
+    </tr>
+
+    <!-- 빈 입력 행 -->
+    <tr class="new-entry-row" style="display: none;">
+      <td>-</td>
+      <td><input type="text" class="input-school" placeholder="학교명"></td>
+      <td>
+        <select class="input-status">
+          <option value="재학">재학</option>
+          <option value="졸업">졸업</option>
+        </select>
+      </td>
+      <td><input type="date" class="input-start"></td>
+      <td><input type="date" class="input-end"></td>
+      <td><button class="delete-btn">삭제</button></td>
+    </tr>
+    </tbody>
+  </table>
+
+  <button class="add-project-btn">+ 학력 추가하기</button>
+</div>
+
+
+<!-- ✅ 구직 내역 -->
+<div class="history-section" id="job-history" style="display: block;">
+  <table class="history-table">
+    <thead>
+    <tr>
+      <th>No.</th>
+      <th>상태</th>
+      <th colspan="2">근무 기간</th>
+      <th>근무지</th>
+      <th>직무</th>
+      <th>관리</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th></th>
+      <th>시작일자</th>
+      <th>종료일자</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>1</td>
+      <td>퇴직</td>
+      <td>2021.01.04</td>
+      <td>2024.01.09</td>
+      <td>밥 소프트웨어 회사</td>
+      <td>백엔드</td>
+      <td><button class="delete-btn">삭제</button></td>
+    </tr>
+
+    <!-- ✅ 빈 행 (추가용) -->
+    <tr class="new-entry-row" style="display: none;">
+      <td>-</td>
+      <td>
+        <select class="status-select">
+          <option value="재직">재직</option>
+          <option value="퇴직">퇴직</option>
+        </select>
+      </td>
+      <td><input type="date" class="start-date"></td>
+      <td><input type="date" class="end-date"></td>
+      <td><input type="text" class="workplace" placeholder="회사명 입력"></td>
+      <td><input type="text" class="job-title" placeholder="직무 입력"></td>
+      <td><button class="delete-btn">삭제</button></td>
+    </tr>
+    </tbody>
+  </table>
+
+  <button class="add-project-btn">+ 구직 경력 추가 하기</button>
+</div>
+
+
+<!-- ✅ 프로젝트 참여 내역 -->
+<div class="history-section" id="project-history" style="display: none;">
+  <table class="history-table">
+    <thead>
+    <tr>
+      <th>No.</th>
+      <th>상태</th>
+      <th colspan="2">진행 기간</th>
+      <th>프로젝트</th> <!-- 프로젝트 제목이 표시되는 컬럼 -->
+      <th>제출파일</th>
+      <th>관리</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th></th>
+      <th>시작일자</th>
+      <th>종료일자</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="userProject, iterStat : ${completedProjects}">
+      <td th:text="${iterStat.count}">1</td>  <!-- 제출된 순서 (No) -->
+      <td th:text="${userProject.status}">완료</td>  <!-- 상태 -->
+      <td th:text="${userProject.project.startDate}">2025-03-17</td>  <!-- 프로젝트 시작 날짜 -->
+      <td th:text="${userProject.submissionDate}">2025-03-17</td>  <!-- 제출 날짜 -->
+      <td th:text="${userProject.project.title}">프로젝트 제목</td>  <!-- 프로젝트 제목 -->
+      <td>
+        <a th:if="${userProject.submittedFileName}"
+           th:href="@{'/uploads/projectFiles/' + ${userProject.submittedFileName}}"
+           th:text="${userProject.submittedFileName}"
+           target="_blank">파일보기</a>
+        <span th:unless="${userProject.submittedFileName}">미제출</span>
+      </td>
+      <td>
+        <button class="delete-btn" th:attr="data-id=${userProject.id}">삭제</button>
+      </td>
+    </tr>
+
+    <!-- ✅ 추가될 빈 행 (처음에는 숨겨놓음) -->
+    <tr class="new-entry-row" style="display: none;">
+      <td>-</td>
+      <td>
+        <select class="status-select">
+          <option value="참여중">참여중</option>
+          <option value="참여완료">참여완료</option>
+        </select>
+      </td>
+      <td><input type="date" class="start-date"></td>
+      <td><input type="date" class="end-date"></td>
+      <td><input type="text" class="project-name" placeholder="프로젝트 제목"></td>
+      <td>
+        <input type="file" class="file-upload">
+        <a href="#" class="file-view" style="display: none;">파일보기</a>
+      </td>
+      <td>
+        <button class="delete-btn">삭제</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <button class="add-project-btn">+ 프로젝트 내역 추가 하기</button>
+</div>
+
+<!-- ✅ 공모전 참여 내역 -->
+<div class="history-section" id="contest-history" style="display: none;">
+  <table class="history-table">
+    <thead>
+    <tr>
+      <th>No.</th>
+      <th>상태</th>
+      <th colspan="2">진행 기간</th>
+      <th>공모전</th>
+      <th>제출파일</th>
+      <th>관리</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th></th>
+      <th>시작일자</th>
+      <th>종료일자</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="contest, iterStat : ${submittedContests}">
+      <td th:text="${iterStat.count}">1</td>
+      <td th:text="${contest.status}">참여완료</td>
+      <td th:text="${contest.startDate}"></td>
+      <td th:text="${contest.endDate}"></td>
+      <td th:text="${contest.title}"></td>
+      <td>
+        <a th:if="${contest.submittedFileName}"
+           th:href="@{'/download/' + ${contest.submittedFileName}}"
+           th:text="${contest.submittedFileName}"
+           target="_blank" class="file-view">파일보기</a>
+        <span th:unless="${contest.submittedFileName}">미제출</span>
+      </td>
+      <td>
+        <button class="delete-btn">삭제</button>
+      </td>
+    </tr>
+
+    <!-- ✅ 추가될 빈 행 (처음에는 숨겨놓음) -->
+    <tr class="new-entry-row" style="display: none;">
+      <td>-</td>
+      <td>
+        <select class="status-select">
+          <option value="참여중">참여중</option>
+          <option value="참여완료">참여완료</option>
+        </select>
+      </td>
+      <td><input type="date" class="start-date"></td>
+      <td><input type="date" class="end-date"></td>
+      <td><input type="text" class="contest-name" placeholder="공모전 제목"></td>
+      <td>
+        <input type="file" class="file-upload">
+        <a href="#" class="file-view" style="display: none;">파일보기</a>
+      </td>
+      <td>
+        <button class="delete-btn">삭제</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <button class="add-project-btn">+ 공모전 내역 추가 하기</button>
+</div>
+
+<!-- ✅ 자격증 내역 -->
+<div class="history-section" id="career-history" style="display: none;">
+  <table class="history-table">
+    <thead>
+    <tr>
+      <th>No.</th>
+      <th>자격증명</th>
+      <th>발급 기관</th>
+      <th>취득일자</th>
+      <th>관리</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>1</td>
+      <td>정보처리기사</td>
+      <td>한국산업인력공단</td>
+      <td>2023-05-12</td>
+      <td><button class="delete-btn">삭제</button></td>
+    </tr>
+    <!-- 새로 추가될 행 (처음에는 숨김 처리) -->
+    <tr class="new-entry-row" style="display: none;">
+      <td>-</td>
+      <td><input type="text" class="cert-name" placeholder="자격증명 입력"></td>
+      <td><input type="text" class="cert-org" placeholder="발급기관 입력"></td>
+      <td><input type="date" class="cert-date"></td>
+      <td><button class="delete-btn">삭제</button></td>
+    </tr>
+    </tbody>
+  </table>
+
+  <button class="add-project-btn">+ 자격증 내역 추가 하기</button>
+</div>
+
+
+<script src="/js/history.js"></script>
+</body>
+</html>

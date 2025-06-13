@@ -649,3 +649,9 @@ body {
     background-color: #e0e0e0;
     font-weight: bold;
 }
+
+#resume {
+    text-decoration: none;
+    color: black;
+    margin-top: 10px;
+}
