@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -152,12 +153,49 @@ public class ChatRoomService {
                 .orElseThrow(() -> new IllegalArgumentException("그룹 채팅방이 존재하지 않습니다."));
     }
 
-    public List<UserEntity> getGroupMembers(Long roomId) {
+    public List<UserEntity>     getGroupMembers(Long roomId) {
         return groupChatParticipantRepository.findByGroupChatRoom_Id(roomId)
                 .stream()
                 .map(GroupChatParticipant::getUser)
                 .toList();
     }
+
+    public GroupChatRoom getOrCreateGroupRoomByProject(ProjectEntity project, List<UserEntity> members) {
+        String createdByNick = project.getCreatedBy();  // 이미 닉네임!
+        System.out.println("🔍 [ChatRoomService] 프로젝트 생성자 userNick: " + createdByNick);
+
+        String roomName = createdByNick + "의 팀";
+        System.out.println("📌 [ChatRoomService] 최종 roomName: " + roomName);
+
+        return groupChatRoomRepository.findByTeamId(project.getId())
+                .orElseGet(() -> {
+                    System.out.println("🆕 [ChatRoomService] 새 그룹 채팅방 생성 시작");
+
+                    GroupChatRoom newRoom = GroupChatRoom.builder()
+                            .roomName(roomName)
+                            .createdAt(LocalDateTime.now())
+                            .teamId(project.getId())
+                            .build();
+
+                    GroupChatRoom savedRoom = groupChatRoomRepository.save(newRoom);
+                    System.out.println("✅ [ChatRoomService] 새 그룹 채팅방 저장됨. roomId: " + savedRoom.getId());
+
+                    for (UserEntity member : members) {
+                        System.out.println("👥 [ChatRoomService] 참여자 추가: " + member.getUserNick());
+
+                        GroupChatParticipant participant = GroupChatParticipant.builder()
+                                .groupChatRoom(savedRoom)
+                                .user(member)
+                                .build();
+                        groupChatParticipantRepository.save(participant);
+                    }
+
+                    System.out.println("✅ [ChatRoomService] 모든 참여자 저장 완료");
+
+                    return savedRoom;
+                });
+    }
+
 
 
 }

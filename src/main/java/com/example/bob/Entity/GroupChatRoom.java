@@ -1,30 +1,30 @@
-package com.example.bob.Entity;
+    package com.example.bob.Entity;
 
-import jakarta.persistence.*;
-import lombok.*;
-import java.time.LocalDateTime;
-import java.util.List;
+    import jakarta.persistence.*;
+    import lombok.*;
+    import java.time.LocalDateTime;
+    import java.util.List;
 
-@Entity
-@Getter @Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class GroupChatRoom {
+    @Entity
+    @Getter @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public class GroupChatRoom {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
-    private String roomName;
+        private String roomName;
 
-    private LocalDateTime createdAt;
+        private LocalDateTime createdAt;
 
-    private boolean pinned = false;
+        private boolean pinned = false;
 
-    @OneToMany(mappedBy = "groupChatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<GroupChatParticipant> participants;
+        @OneToMany(mappedBy = "groupChatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+        private List<GroupChatParticipant> participants;
 
-    @Column(nullable = true)
-    private Long teamId; // 팀 채팅방 여부 식별용
-}
+        @Column(nullable = true)
+        private Long teamId; // 팀 채팅방 여부 식별용
+    }
