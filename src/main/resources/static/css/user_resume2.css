@@ -20,6 +20,8 @@
     position: sticky;
     top: 100px;
     flex: 1;
+    min-width: 350px;                /* ✅ 너비 넓힘 */
+    max-width: 560px;                /* ✅ 필요시 최대값도 지정 */
     height: fit-content;
     border: 1px solid #ccc;
     border-radius: 20px;
@@ -48,6 +50,11 @@
     padding: 10px 20px 0 20px;
 }
 
+#tab-list {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 15px;
+}
 .resume-title {
     border-top: 6px solid #19CB13;       /* 더 두꺼운 초록색 상단 선 */
     border-left: 1px solid black;        /* 좌측 검정 테두리 */
