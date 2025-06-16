@@ -1019,6 +1019,7 @@ window.addEventListener('DOMContentLoaded', () => {
         })
         .catch(err => console.error("프로젝트 불러오기 실패:", err));
 
+
     // ✅ 구직 내역 불러오기 (오른쪽 award 탭에 출력)
     fetch("/api/job-history")
         .then(res => res.json())
@@ -1313,3 +1314,4 @@ function togglePreview() {
         document.getElementById("resumePreviewFrame").src = "/showresume";
     });
 }
+
