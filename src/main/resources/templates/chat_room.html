@@ -107,6 +107,21 @@
   </div>
 </div>
 
+<div id="fileModal" class="modal" style="display: none;">
+  <div class="leave-content">
+    <div class="modal-header">
+      <span>📁</span>
+      <span class="leave-nickname">파일 전송</span>
+    </div>
+    <div class="leave-text" id="fileModalText">선택한 파일을 전송하시겠습니까?</div>
+    <div class="modal-buttons">
+      <button class="leave-confirm" onclick="confirmSendFile()">확인</button>
+      <button onclick="closeFileModal()">취소</button>
+    </div>
+  </div>
+</div>
+
+
 <script src="/js/chat_room.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
