@@ -28,6 +28,9 @@ public class GroupChatMessageController {
                 .senderName(msg.getSender().getUserNick())
                 .message(msg.getMessage())
                 .sentAt(msg.getSentAt().toString())
+                .type(msg.getType())
+                .fileUrl(msg.getFileUrl())
+                .fileName(msg.getFilename())
                 .build()).toList();
     }
 }
