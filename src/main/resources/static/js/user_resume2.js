@@ -1274,7 +1274,7 @@ window.addEventListener('DOMContentLoaded', () => {
     fetch("/api/user/resumes/contests")
         .then(res => res.json())
         .then(contests => {
-            const container = document.querySelector(".tab-content[data-content='portfolio']");
+            const container = document.querySelector(".tab-content[data-content='22']");
             container.innerHTML = "";
             contests.forEach(contest => {
                 const div = document.createElement("div");
