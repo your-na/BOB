@@ -1024,7 +1024,7 @@ window.addEventListener('DOMContentLoaded', () => {
     fetch("/api/job-history")
         .then(res => res.json())
         .then(histories => {
-            const container = document.querySelector(".tab-content[data-content='award']");
+            const container = document.querySelector(".tab-content[data-content='job']");
             container.innerHTML = "";
 
             if (!histories || histories.length === 0) return;
