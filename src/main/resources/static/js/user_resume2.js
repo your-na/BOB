@@ -1029,8 +1029,11 @@ window.addEventListener('DOMContentLoaded', () => {
     fetch("/api/job-history")
         .then(res => res.json())
         .then(histories => {
+            console.log("🔥 받아온 구직 이력:", histories);  // 이거 추가!
             const container = document.querySelector(".tab-content[data-content='job']");
             container.innerHTML = "";
+
+
 
             if (!histories || histories.length === 0) return;
 
@@ -1094,7 +1097,7 @@ window.addEventListener('DOMContentLoaded', () => {
     fetch("/api/user/resumes/contests")
         .then(res => res.json())
         .then(contests => {
-            const container = document.querySelector(".tab-content[data-content='job']");
+            const container = document.querySelector(".tab-content[data-content='portfolio']");
             container.innerHTML = "";
             contests.forEach(contest => {
                 const div = document.createElement("div");
