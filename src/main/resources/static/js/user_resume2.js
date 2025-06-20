@@ -171,7 +171,8 @@ function setupStatusListener(eduItem) {
     const endMonth = eduItem.querySelector(".end-month");
     const tilde = eduItem.querySelector(".tilde");
 
-    status.addEventListener("change", () => {
+    // ✅ 상태 변경될 때마다 실행
+    const toggleEndDateVisibility = () => {
         if (status.value === "재학") {
             endYear.style.display = "none";
             endMonth.style.display = "none";
@@ -181,8 +182,12 @@ function setupStatusListener(eduItem) {
             endMonth.style.display = "inline-block";
             if (tilde) tilde.style.display = "inline-block";
         }
-    });
+    };
+
+    status.addEventListener("change", toggleEndDateVisibility);
+    toggleEndDateVisibility();  // ✅ 초기 상태 반영
 }
+
 
 // ✅ 4. 삭제 기능
 function addDeleteFunction(button) {
