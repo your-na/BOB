@@ -21,6 +21,7 @@ public class EducationService {
         System.out.println("📌 [EducationService] 저장 시도");
         System.out.println("👉 userId: " + userId);
         System.out.println("👉 학교명: " + dto.getSchoolName());
+        System.out.println("👉 학과명: " + dto.getMajorName());
         System.out.println("👉 상태: " + dto.getStatus());
         System.out.println("👉 시작일: " + dto.getStartDate());
         System.out.println("👉 종료일: " + dto.getEndDate());
@@ -28,6 +29,7 @@ public class EducationService {
         Education education = new Education();
         education.setUserId(userId);
         education.setSchoolName(dto.getSchoolName());
+        education.setMajorName(dto.getMajorName());
         education.setStatus(dto.getStatus());
         education.setStartDate(dto.getStartDate());
         education.setEndDate(dto.getEndDate());
@@ -41,6 +43,7 @@ public class EducationService {
         return educationRepository.findAllByUserId(userId).stream()
                 .map(e -> new EducationSimpleDTO(
                         e.getSchoolName(),
+                        e.getMajorName(),
                         e.getStatus(),
                         e.getStartDate(),
                         e.getEndDate()))

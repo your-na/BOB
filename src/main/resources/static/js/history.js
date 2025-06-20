@@ -259,6 +259,7 @@ function loadEducations() {
                 row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${edu.schoolName}</td>
+                    <td>${edu.majorName}</td> 
                     <td>${edu.status}</td>
                     <td>${edu.startDate}</td>
                     <td>${edu.endDate}</td>
@@ -514,13 +515,14 @@ document.addEventListener("click", function (e) {
 
                 const data = {
                     schoolName: newRow.querySelector(".input-school").value.trim(),
+                    majorName: newRow.querySelector(".input-major").value.trim(),
                     status: newRow.querySelector(".input-status").value,
                     startDate: newRow.querySelector(".input-start").value,
                     endDate: newRow.querySelector(".input-end").value
                 };
 
                 // ✅ 모든 항목이 채워져 있을 때만 저장
-                const allFilled = data.schoolName && data.status && data.startDate && data.endDate;
+                const allFilled = data.schoolName && data.majorName && data.status && data.startDate && data.endDate;
                 if (!allFilled) return;
 
                 fetch("/api/education-history/save", {

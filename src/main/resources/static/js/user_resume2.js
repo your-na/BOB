@@ -227,6 +227,64 @@ setupStatusListener(firstItem);
 const deleteBtn = firstItem.querySelector(".del-btn");
 addDeleteFunction(deleteBtn);
 
+// ✅ 학력사항 드롭 처리
+const educationList = document.getElementById("education-list");
+
+educationList.addEventListener("dragover", e => {
+    e.preventDefault();  // drop 허용
+});
+
+educationList.addEventListener("drop", e => {
+    e.preventDefault();
+
+    const data = e.dataTransfer.getData("application/json");
+    if (!data) return;
+
+    let json;
+    try {
+        json = JSON.parse(data);
+    } catch {
+        return;
+    }
+
+    // 🎯 학력 항목이 아닐 경우 무시
+    if (json.type !== "EDUCATION") return;
+
+    // ✅ 첫 번째 .education-item을 복제
+    const firstItem = educationList.querySelector(".education-item");
+    const clone = firstItem.cloneNode(true);
+
+    // ✅ select 초기화 (복제 시 select 비어있을 수 있음)
+    createYearOptions(clone.querySelector(".start-year"));
+    createMonthOptions(clone.querySelector(".start-month"));
+    createYearOptions(clone.querySelector(".end-year"));
+    createMonthOptions(clone.querySelector(".end-month"));
+
+    // ✅ 값 주입
+    clone.querySelector("input[placeholder='학교명']").value = json.schoolName || "";
+    clone.querySelector("input[placeholder='학과명']").value = json.majorName || "";
+    clone.querySelector(".edu-status").value = json.status || "";
+
+    const [startY, startM] = (json.startDate || "").split("-");
+    const [endY, endM] = (json.endDate || "").split("-");
+
+    clone.querySelector(".start-year").value = startY || "";
+    clone.querySelector(".start-month").value = startM || "";
+    clone.querySelector(".end-year").value = endY || "";
+    clone.querySelector(".end-month").value = endM || "";
+
+    // ✅ 이벤트 다시 연결
+    setupStatusListener(clone);
+    addDeleteFunction(clone.querySelector(".del-btn"));
+
+    // ✅ 스타일 간격
+    clone.style.marginTop = "10px";
+
+    // ✅ 추가
+    educationList.appendChild(clone);
+});
+
+
 // ✅ 글자 수 세기 기능
 const selfIntro = document.getElementById("selfIntro");
 const charCount = document.getElementById("charCount");
@@ -1101,6 +1159,7 @@ window.addEventListener('DOMContentLoaded', () => {
                         startDate: edu.startDate,
                         endDate: edu.endDate
                     });
+                    console.log("🎒 드래그 데이터:", dragData);  // ✅ 이거 추가!
                     e.dataTransfer.setData("application/json", dragData);
                 });
 

@@ -18,6 +18,7 @@ public class Education {
     private Long userId;
 
     private String schoolName;
+    private String majorName;
 
     private String status;     // 재학 or 졸업
 
