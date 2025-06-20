@@ -1087,10 +1087,28 @@ window.addEventListener('DOMContentLoaded', () => {
                 div.className = "award-item";
                 const date = (edu.status === "재학" ? edu.startDate : edu.endDate).replace(/-/g, ".");
                 div.innerHTML = `${edu.schoolName}<br><small>${edu.status} ${date}</small>`;
+
+                // ✅ 드래그 가능하게 설정
+                div.setAttribute("draggable", true);
+
+                // ✅ dragstart 이벤트로 학력 데이터를 JSON으로 설정
+                div.addEventListener("dragstart", e => {
+                    const dragData = JSON.stringify({
+                        type: "EDUCATION",   // 학력 데이터임을 구분
+                        schoolName: edu.schoolName,
+                        majorName: edu.majorName,
+                        status: edu.status,
+                        startDate: edu.startDate,
+                        endDate: edu.endDate
+                    });
+                    e.dataTransfer.setData("application/json", dragData);
+                });
+
                 container.appendChild(div);
             });
         })
         .catch(err => console.error("학력 불러오기 실패:", err));
+
 
 
     // ✅ 📌 여기 공모전 fetch 넣기 – 프로젝트 fetch 밖으로!
