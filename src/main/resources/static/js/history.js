@@ -196,6 +196,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (section) section.style.display = "block";
     }
     loadJobHistories();
+    loadEducations();
 });
 
 // ✅ 구직 내역 초기 로딩 (GET 요청)
@@ -213,6 +214,8 @@ function loadJobHistories() {
         tbody.appendChild(templateRow);
         templateRow.style.display = "none"; // 템플릿은 안보이게 유지
     }
+
+
 
     fetch("/api/job-history", {
         headers: { [getCsrfHeader()]: getCsrfToken() }
@@ -235,6 +238,37 @@ function loadJobHistories() {
         });
 }
 
+// ✅ 여기서부터 loadEducations() 시작!
+function loadEducations() {
+    const tbody = document.querySelector("#school-history .history-table tbody");
+    const templateRow = tbody.querySelector(".new-entry-row");
+
+    tbody.innerHTML = "";
+    if (templateRow) {
+        tbody.appendChild(templateRow);
+        templateRow.style.display = "none";
+    }
+
+    fetch("/api/education-history/list", {
+        headers: { [getCsrfHeader()]: getCsrfToken() }
+    })
+        .then(res => res.json())
+        .then(data => {
+            data.forEach((edu, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${edu.schoolName}</td>
+                    <td>${edu.status}</td>
+                    <td>${edu.startDate}</td>
+                    <td>${edu.endDate}</td>
+                    <td><button class="delete-btn" data-id="${edu.id}">삭제</button></td>
+                `;
+                tbody.insertBefore(row, templateRow);
+            });
+        })
+        .catch(err => console.error("❌ 학력 불러오기 실패:", err));
+}
 
 // ✅ 새 경력 추가 시 서버로 POST 요청
 document.addEventListener("click", function (event) {
@@ -502,6 +536,9 @@ document.addEventListener("click", function (e) {
                         isSaved = true;
                         newRow.querySelector(".delete-btn").setAttribute("data-id", saved.id);
                         alert("✅ 학력 저장됨");
+
+                        loadEducations(); // ✅ 이 줄 추가!
+
                     })
                     .catch(err => {
                         console.error("❌ 저장 실패:", err);

@@ -948,6 +948,11 @@ window.addEventListener('DOMContentLoaded', () => {
     const defaultTab = document.querySelector('.tab.active');
     if (!defaultTab) return;
 
+    // ✅ 학력 탭 자동 클릭되게 하기
+    const schoolTab = document.querySelector('.tab[data-tab="school"]');
+    if (schoolTab) schoolTab.click();
+
+
     const tabName = defaultTab.dataset.tab;
     const targetContent = document.querySelector(`.tab-content[data-content="${tabName}"]`);
     const isEmpty = !targetContent || targetContent.children.length === 0;
@@ -1066,6 +1071,24 @@ window.addEventListener('DOMContentLoaded', () => {
             });
         })
         .catch(err => console.error("구직 내역 불러오기 실패:", err));
+
+    // ✅ 학력사항 목록 불러오기
+    fetch("/api/education-history/list")
+        .then(res => res.json())
+        .then(educations => {
+            const container = document.querySelector(`.tab-content[data-content='school']`);
+            container.innerHTML = "";
+
+            educations.forEach(edu => {
+                const div = document.createElement("div");
+                div.className = "award-item";
+                const date = (edu.status === "재학" ? edu.startDate : edu.endDate).replace(/-/g, ".");
+                div.innerHTML = `${edu.schoolName}<br><small>${edu.status} ${date}</small>`;
+                container.appendChild(div);
+            });
+        })
+        .catch(err => console.error("학력 불러오기 실패:", err));
+
 
     // ✅ 📌 여기 공모전 fetch 넣기 – 프로젝트 fetch 밖으로!
     fetch("/api/user/resumes/contests")
