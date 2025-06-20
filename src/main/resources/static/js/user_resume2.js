@@ -1143,8 +1143,22 @@ window.addEventListener('DOMContentLoaded', () => {
             educations.forEach(edu => {
                 const div = document.createElement("div");
                 div.className = "award-item";
-                const date = (edu.status === "재학" ? edu.startDate : edu.endDate).replace(/-/g, ".");
-                div.innerHTML = `${edu.schoolName}<br><small>${edu.status} ${date}</small>`;
+
+                // 날짜 포맷 (yyyy-mm-dd → yyyy.mm.dd)
+                const format = (date) => date?.replace(/-/g, ".");
+
+                // 상태에 따라 출력 문장 분기
+                let line2 = "";
+                if (edu.status === "재학") {
+                    line2 = `재학 ${format(edu.startDate)} 학과 ${edu.majorName || ""}`;
+                } else if (edu.status === "졸업") {
+                    line2 = `졸업 ${format(edu.startDate)} ~ ${format(edu.endDate)} 학과 ${edu.majorName || ""}`;
+                } else {
+                    line2 = `${edu.status || ""} 학과 ${edu.majorName || ""}`;
+                }
+
+                // HTML 구성
+                div.innerHTML = `${edu.schoolName}<br><small>${line2}</small>`;
 
                 // ✅ 드래그 가능하게 설정
                 div.setAttribute("draggable", true);
@@ -1159,7 +1173,7 @@ window.addEventListener('DOMContentLoaded', () => {
                         startDate: edu.startDate,
                         endDate: edu.endDate
                     });
-                    console.log("🎒 드래그 데이터:", dragData);  // ✅ 이거 추가!
+                    console.log("🎒 드래그 데이터:", dragData);
                     e.dataTransfer.setData("application/json", dragData);
                 });
 
@@ -1167,6 +1181,7 @@ window.addEventListener('DOMContentLoaded', () => {
             });
         })
         .catch(err => console.error("학력 불러오기 실패:", err));
+
 
 
 
