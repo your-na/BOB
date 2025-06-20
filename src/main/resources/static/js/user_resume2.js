@@ -58,6 +58,28 @@ function setupDropBox(box) {
             });
         } else if (e.dataTransfer.types.includes("application/json")) {
             const json = JSON.parse(e.dataTransfer.getData("application/json"));
+
+            // ✅ 학력사항이면 왼쪽 입력 필드에 자동 입력
+            if (json.type === "EDUCATION") {
+                const eduList = document.getElementById("education-list");
+                const firstItem = eduList?.querySelector(".education-item");
+                if (!firstItem) return;
+
+                const [startY, startM] = (json.startDate || "").split("-");
+                const [endY, endM] = (json.endDate || "").split("-");
+
+                firstItem.querySelector("input[placeholder='학교명']").value = json.schoolName || "";
+                firstItem.querySelector("input[placeholder='학과명']").value = json.majorName || "";
+                firstItem.querySelector(".edu-status").value = json.status || "";
+                firstItem.querySelector(".start-year").value = startY || "";
+                firstItem.querySelector(".start-month").value = startM || "";
+                firstItem.querySelector(".end-year").value = endY || "";
+                firstItem.querySelector(".end-month").value = endM || "";
+
+                setupStatusListener(firstItem);  // 재학이면 종료일 숨기기 적용
+                return; // ✅ uploaded-item 추가 금지
+            }
+
             const item = document.createElement('div');
             item.className = 'uploaded-item';
 
@@ -228,61 +250,64 @@ const deleteBtn = firstItem.querySelector(".del-btn");
 addDeleteFunction(deleteBtn);
 
 // ✅ 학력사항 드롭 처리
-const educationList = document.getElementById("education-list");
+document.addEventListener("DOMContentLoaded", () => {
+    const educationList = document.getElementById("education-list");
 
-educationList.addEventListener("dragover", e => {
-    e.preventDefault();  // drop 허용
+    if (!educationList) return;
+
+    educationList.addEventListener("dragover", e => {
+        e.preventDefault();  // drop 허용
+    });
+
+    educationList.addEventListener("drop", e => {
+        e.preventDefault();
+
+        const data = e.dataTransfer.getData("application/json");
+        if (!data) return;
+
+        let json;
+        try {
+            json = JSON.parse(data);
+        } catch {
+            return;
+        }
+
+        // 🎯 학력 항목이 아닐 경우 무시
+        if (json.type !== "EDUCATION") return;
+
+        // ✅ 첫 번째 항목 선택
+        const firstItem = educationList.querySelector(".education-item");
+        if (!firstItem) return;
+
+        // ✅ select 옵션이 비어 있으면 생성
+        const startYear = firstItem.querySelector(".start-year");
+        const startMonth = firstItem.querySelector(".start-month");
+        const endYear = firstItem.querySelector(".end-year");
+        const endMonth = firstItem.querySelector(".end-month");
+
+        if (startYear.options.length === 0) createYearOptions(startYear);
+        if (startMonth.options.length === 0) createMonthOptions(startMonth);
+        if (endYear.options.length === 0) createYearOptions(endYear);
+        if (endMonth.options.length === 0) createMonthOptions(endMonth);
+
+        // ✅ 값 주입
+        firstItem.querySelector("input[placeholder='학교명']").value = json.schoolName || "";
+        firstItem.querySelector("input[placeholder='학과명']").value = json.majorName || "";
+        firstItem.querySelector(".edu-status").value = json.status || "";
+
+        const [startY, startM] = (json.startDate || "").split("-");
+        const [endY, endM] = (json.endDate || "").split("-");
+
+        firstItem.querySelector(".start-year").value = startY || "";
+        firstItem.querySelector(".start-month").value = startM || "";
+        firstItem.querySelector(".end-year").value = endY || "";
+        firstItem.querySelector(".end-month").value = endM || "";
+
+        // ✅ 상태 선택에 따라 종료일 숨김 처리 다시 연결
+        setupStatusListener(firstItem);
+    });
 });
 
-educationList.addEventListener("drop", e => {
-    e.preventDefault();
-
-    const data = e.dataTransfer.getData("application/json");
-    if (!data) return;
-
-    let json;
-    try {
-        json = JSON.parse(data);
-    } catch {
-        return;
-    }
-
-    // 🎯 학력 항목이 아닐 경우 무시
-    if (json.type !== "EDUCATION") return;
-
-    // ✅ 첫 번째 .education-item을 복제
-    const firstItem = educationList.querySelector(".education-item");
-    const clone = firstItem.cloneNode(true);
-
-    // ✅ select 초기화 (복제 시 select 비어있을 수 있음)
-    createYearOptions(clone.querySelector(".start-year"));
-    createMonthOptions(clone.querySelector(".start-month"));
-    createYearOptions(clone.querySelector(".end-year"));
-    createMonthOptions(clone.querySelector(".end-month"));
-
-    // ✅ 값 주입
-    clone.querySelector("input[placeholder='학교명']").value = json.schoolName || "";
-    clone.querySelector("input[placeholder='학과명']").value = json.majorName || "";
-    clone.querySelector(".edu-status").value = json.status || "";
-
-    const [startY, startM] = (json.startDate || "").split("-");
-    const [endY, endM] = (json.endDate || "").split("-");
-
-    clone.querySelector(".start-year").value = startY || "";
-    clone.querySelector(".start-month").value = startM || "";
-    clone.querySelector(".end-year").value = endY || "";
-    clone.querySelector(".end-month").value = endM || "";
-
-    // ✅ 이벤트 다시 연결
-    setupStatusListener(clone);
-    addDeleteFunction(clone.querySelector(".del-btn"));
-
-    // ✅ 스타일 간격
-    clone.style.marginTop = "10px";
-
-    // ✅ 추가
-    educationList.appendChild(clone);
-});
 
 
 // ✅ 글자 수 세기 기능
@@ -551,6 +576,7 @@ function renderEducationSection(section, number) {
 
     const eduList = document.createElement("div");
     eduList.id = "education-list";
+    console.log("✅ education-list 생성됨:", eduList);  // << 확인용 콘솔
 
     const formGroup = document.createElement("div");
     formGroup.className = "form-group education-item";
@@ -599,9 +625,63 @@ function renderEducationSection(section, number) {
     sectionBox.appendChild(eduList);
     sectionBox.appendChild(addBtn);
 
+    setupDropBox(eduList);
+
+    // ✅ educationList에 drop 이벤트 직접 연결
+    eduList.addEventListener("dragover", e => {
+        e.preventDefault();
+    });
+
+    eduList.addEventListener("drop", e => {
+        e.preventDefault();
+
+        const data = e.dataTransfer.getData("application/json");
+        if (!data) return;
+
+        let json;
+        try {
+            json = JSON.parse(data);
+        } catch {
+            return;
+        }
+
+        if (json.type !== "EDUCATION") return;
+
+        const firstItem = eduList.querySelector(".education-item");
+        if (!firstItem) return;
+
+        const startYear = firstItem.querySelector(".start-year");
+        const startMonth = firstItem.querySelector(".start-month");
+        const endYear = firstItem.querySelector(".end-year");
+        const endMonth = firstItem.querySelector(".end-month");
+
+        if (startYear.options.length === 0) createYearOptions(startYear);
+        if (startMonth.options.length === 0) createMonthOptions(startMonth);
+        if (endYear.options.length === 0) createYearOptions(endYear);
+        if (endMonth.options.length === 0) createMonthOptions(endMonth);
+
+        firstItem.querySelector("input[placeholder='학교명']").value = json.schoolName || "";
+        firstItem.querySelector("input[placeholder='학과명']").value = json.majorName || "";
+        firstItem.querySelector(".edu-status").value = json.status || "";
+
+        const [startY, startM] = (json.startDate || "").split("-");
+        const [endY, endM] = (json.endDate || "").split("-");
+
+        firstItem.querySelector(".start-year").value = startY || "";
+        firstItem.querySelector(".start-month").value = startM || "";
+        firstItem.querySelector(".end-year").value = endY || "";
+        firstItem.querySelector(".end-month").value = endM || "";
+
+        setupStatusListener(firstItem);
+    });
+
+    console.log("📦 setupDropBox 호출 완료:", eduList);  // << 확인용 콘솔
+
     sectionBox.dataset.coSectionId = section.id;
     sectionBox.dataset.title = section.title;
     sectionBox.dataset.type = section.type;
+
+    console.log("🎓 최종 sectionBox 생성 완료:", sectionBox);  // << 최종 확인용 콘솔
 
     return sectionBox;
 }
