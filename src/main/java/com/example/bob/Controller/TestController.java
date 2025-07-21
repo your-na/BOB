@@ -93,4 +93,13 @@ public class TestController {
     public String rehistoryform() {
         return "resumehistory";
     }
+
+    //나만의 이력서 목록
+    @GetMapping ("/myresumelist")
+    public String relistform() {return "myresume_list";}
+
+    //나만의 이력서 생성
+    @GetMapping("/myresume")
+    public String myresumeform() {return "myresume";}
+
 }
