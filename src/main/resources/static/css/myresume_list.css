@@ -1,0 +1,108 @@
+body {
+    font-family: 'Pretendard', sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+}
+
+.resume-wrapper {
+    max-width: 700px;
+    margin: 100px auto 60px;
+    padding: 0 20px;
+}
+
+.resume-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.resume-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.add-resume-btn {
+    background-color: #0bba0b;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease;
+}
+
+.add-resume-btn:hover {
+    background-color: #00a100;
+}
+
+.resume-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.resume-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: box-shadow 0.2s;
+}
+
+.resume-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.resume-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.resume-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.resume-info {
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.resume-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.resume-buttons button {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.view-btn {
+    background-color: #007bff;
+}
+
+.edit-btn {
+    background-color: #28a745;
+}
+
+.delete-btn {
+    background-color: #dc3545;
+}
+
+.resume-buttons button:hover {
+    opacity: 0.9;
+}
