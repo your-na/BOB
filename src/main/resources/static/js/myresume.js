@@ -406,3 +406,95 @@ function reorderSectionsAndToc() {
         });
     });
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    const chatBtn = document.getElementById("openChat");
+    const chatBox = document.getElementById("chatBox");
+    const closeBtn = document.getElementById("closeChat");
+
+    chatBtn.addEventListener("click", () => {
+        chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex";
+    });
+
+    closeBtn.addEventListener("click", () => {
+        chatBox.style.display = "none";
+    });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    const chatBody = document.getElementById("chatBody");
+    const chatInput = document.getElementById("chatInput");
+    const sendChat = document.getElementById("sendChat");
+
+    sendChat.onclick = () => {
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        const userMsg = document.createElement("p");
+        userMsg.className = "user";
+        userMsg.textContent = message;
+        chatBody.appendChild(userMsg);
+        chatInput.value = "";
+
+        const aiMsg = document.createElement("p");
+        aiMsg.className = "ai";
+        aiMsg.textContent = getAiMockResponse(message);
+        chatBody.appendChild(aiMsg);
+
+        chatBody.scrollTop = chatBody.scrollHeight;
+    };
+});
+
+const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+
+fetch("/api/chat", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+        [csrfHeader]: csrfToken
+    },
+    body: JSON.stringify({ message: chatInput.value })
+})
+    .then(res => res.text())
+    .then(reply => {
+        const aiMsg = document.createElement("p");
+        aiMsg.className = "ai";
+        aiMsg.textContent = reply;
+        chatBody.appendChild(aiMsg);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    })
+    .catch(err => {
+        console.error("GPT 호출 오류:", err);
+    });
+
+
+
+//임의 채팅
+sendChat.onclick = () => {
+    const message = chatInput.value.trim();
+    if (!message) return;
+
+    const userMsg = document.createElement("p");
+    userMsg.className = "user";
+    userMsg.textContent = message;
+    chatBody.appendChild(userMsg);
+    chatInput.value = "";
+
+    const aiMsg = document.createElement("p");
+    aiMsg.className = "ai";
+    aiMsg.textContent = getAiMockResponse(message);
+    chatBody.appendChild(aiMsg);
+
+    chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+function getAiMockResponse(msg) {
+    if (msg.includes("자기소개")) {
+        return "저는 책임감 있게 성장하는 개발자입니다.";
+    }
+    if (msg.includes("경력")) {
+        return "2023년부터 프론트엔드 개발자로 근무했습니다.";
+    }
+    return "죄송해요! 해당 질문은 아직 학습되지 않았어요.";
+}
