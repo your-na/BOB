@@ -91,4 +91,12 @@ public class TestController {
     //이력서
     @GetMapping("/resumehistory")
     public String rehistoryform() {return "resume_history";}
+
+    //나만의 이력서 목록
+    @GetMapping ("/myresumelist")
+    public String relistform() {return "myresume_list";}
+
+    //나만의 이력서 생성
+    @GetMapping("/myresume")
+    public String myresumeform() {return "myresume";}
 }
