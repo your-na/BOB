@@ -23,7 +23,9 @@ public class ChatController {
     @PostMapping
     public ResponseEntity<String> chat(@RequestBody Map<String, String> request) {
         String userMessage = request.get("message");
+        System.out.println("💬 받은 메시지: " + userMessage); // 추가
         String reply = groqService.ask(userMessage);
         return ResponseEntity.ok(reply);
     }
+
 }

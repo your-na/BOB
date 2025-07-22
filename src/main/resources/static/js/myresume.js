@@ -422,72 +422,61 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-    const chatBody = document.getElementById("chatBody");
     const chatInput = document.getElementById("chatInput");
+    const chatBody = document.getElementById("chatBody");
     const sendChat = document.getElementById("sendChat");
 
-    sendChat.onclick = () => {
-        const message = chatInput.value.trim();
-        if (!message) return;
+    // ✅ CSRF 토큰 정의
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
 
-        const userMsg = document.createElement("p");
-        userMsg.className = "user";
-        userMsg.textContent = message;
-        chatBody.appendChild(userMsg);
-        chatInput.value = "";
+    if (sendChat && chatInput && chatBody) {
+        sendChat.onclick = () => {
+            const message = chatInput.value.trim();
+            if (!message) return;
 
-        const aiMsg = document.createElement("p");
-        aiMsg.className = "ai";
-        aiMsg.textContent = getAiMockResponse(message);
-        chatBody.appendChild(aiMsg);
+            const userMsg = document.createElement("p");
+            userMsg.className = "user";
+            userMsg.textContent = message;
+            chatBody.appendChild(userMsg);
+            chatInput.value = "";
 
-        chatBody.scrollTop = chatBody.scrollHeight;
-    };
-});
-
-const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
-const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
-
-fetch("/api/chat", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json",
-        [csrfHeader]: csrfToken
-    },
-    body: JSON.stringify({ message: chatInput.value })
+            // Groq 호출
+            fetch("/api/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify({message})
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error("응답 오류");
+                    return res.text();
+                })
+                .then(reply => {
+                    const aiMsg = document.createElement("p");
+                    aiMsg.className = "ai";
+                    aiMsg.textContent = reply;
+                    chatBody.appendChild(aiMsg);
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                })
+                .catch(err => {
+                    const aiMsg = document.createElement("p");
+                    aiMsg.className = "ai";
+                    aiMsg.textContent = "⚠ Groq 응답 오류가 발생했습니다.";
+                    chatBody.appendChild(aiMsg);
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                    console.error("GPT 오류:", err);
+                });
+        };
+    } else {
+        console.error("chatInput 또는 sendChat 또는 chatBody가 null입니다.");
+    }
 })
-    .then(res => res.text())
-    .then(reply => {
-        const aiMsg = document.createElement("p");
-        aiMsg.className = "ai";
-        aiMsg.textContent = reply;
-        chatBody.appendChild(aiMsg);
-        chatBody.scrollTop = chatBody.scrollHeight;
-    })
-    .catch(err => {
-        console.error("GPT 호출 오류:", err);
-    });
-
 
 
 //임의 채팅
-sendChat.onclick = () => {
-    const message = chatInput.value.trim();
-    if (!message) return;
-
-    const userMsg = document.createElement("p");
-    userMsg.className = "user";
-    userMsg.textContent = message;
-    chatBody.appendChild(userMsg);
-    chatInput.value = "";
-
-    const aiMsg = document.createElement("p");
-    aiMsg.className = "ai";
-    aiMsg.textContent = getAiMockResponse(message);
-    chatBody.appendChild(aiMsg);
-
-    chatBody.scrollTop = chatBody.scrollHeight;
-};
 
 function getAiMockResponse(msg) {
     if (msg.includes("자기소개")) {

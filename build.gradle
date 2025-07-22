@@ -29,8 +29,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
+	implementation 'org.jboss:jandex:2.4.2.Final'
+
 	// ✅ MySQL JDBC 드라이버 (runtimeOnly → implementation 으로 변경, 버전 명시)
 	implementation 'com.mysql:mysql-connector-j:8.0.33'
+
 
 	// Security 관련 추가 의존성
 	implementation 'org.springframework.security:spring-security-taglibs:5.8.0'
