@@ -35,7 +35,7 @@ public class GroqService {
 
             String body = """
                 {
-                  "model": "llama3-8b-8192",
+                  "model": "llama-3.3-70b-versatile",
                   "messages": [
                            { "role": "system", "content": "모든 답변은 반드시 한국어로 해주세요." },
                            { "role": "user", "content": "%s" }
