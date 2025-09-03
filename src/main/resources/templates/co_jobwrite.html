@@ -28,7 +28,7 @@
 <div class="main-container">
     <!-- 왼쪽 입력 영역 -->
     <div class="form-container">
-        <form id="jobForm">
+        <form id="jobForm" enctype="multipart/form-data">
             <label>회사 소개글:
                 <textarea name="companyIntro" required></textarea>
             </label>
@@ -78,12 +78,29 @@
                 <input type="text" name="surew">
             </label>
 
-            <label>이력서 양식: <button type="button" id="addResumeBtn">추가하기</button></label>
+            <!-- 지원서 접수 방식 -->
+            <fieldset class="apply-type">
+                <legend>지원서 접수 방식</legend>
+                <label><input type="radio" name="applyType" value="company" checked> 회사 양식으로 받기</label>
+                <label><input type="radio" name="applyType" value="member"> 회원 이력서로 받기</label>
+            </fieldset>
 
-            <!-- 드롭된 이력서 목록 -->
-            <div id="added-resume-list" class="added-resume-list">
-                <h4>📄 추가된 이력서</h4>
-                <ul id="resume-output"></ul>
+            <!-- 회사 양식 섹션(기존 UI) 감싸기 -->
+            <div id="company-form-box">
+                <label>이력서 양식: <button type="button" id="addResumeBtn">추가하기</button></label>
+                <div id="added-resume-list" class="added-resume-list">
+                    <h4>📄 추가된 이력서</h4>
+                    <ul id="resume-output"></ul>
+                </div>
+            </div>
+
+            <!-- 회원 이력서 섹션(새로 추가) -->
+            <div id="member-resume-box" class="hidden">
+                <label>회원 이력서 파일 업로드:
+                    <input type="file" name="resumeFile" id="resumeFile"
+                           accept=".pdf,.doc,.docx,.hwp,.hwpx,.rtf,.txt">
+                </label>
+                <p class="resume-hint">지원자가 직접 작성한 이력서 파일을 첨부하도록 받습니다.</p>
             </div>
 
             <div class="btns">

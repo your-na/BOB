@@ -8,6 +8,29 @@ document.addEventListener("DOMContentLoaded", function () {
     const resumeOutput = document.getElementById("resume-output");
     const addResumeText = document.querySelector(".add-resume-text");
 
+    // [추가] 지원 방식 라디오 & 회사양식 박스
+    const applyTypeRadios = document.querySelectorAll('input[name="applyType"]'); // 라디오
+    const companyBox = document.getElementById("company-form-box");               // 회사 양식 박스
+
+    // [추가] 현재 선택된 지원 방식
+    function getApplyType() {
+        return document.querySelector('input[name="applyType"]:checked')?.value || 'company';
+    }
+
+    // [추가] 지원 방식에 따라 UI 토글
+    function syncApplyTypeUI() {
+        const type = getApplyType();
+        if (type === 'company') {
+            companyBox?.classList.remove('hidden');
+        } else {
+            companyBox?.classList.add('hidden');
+        }
+    }
+
+    // [추가] 라디오 변경 이벤트
+    applyTypeRadios.forEach(r => r.addEventListener('change', syncApplyTypeUI));
+    syncApplyTypeUI();
+
     fetch('/api/coresumes')
         .then(res => res.json())
         .then(data => {
@@ -27,12 +50,6 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => {
             console.error("이력서 불러오기 실패:", error);
         });
-
-    const resumeTemplates = {
-        "백엔드 모집용 이력서": "Java, Spring Boot, MySQL 등 백엔드 기술 중심의 이력서입니다.",
-        "프론트 모집용 이력서": "HTML, CSS, JS, React 등을 포함한 프론트엔드 이력서입니다.",
-        "인턴 모집용 이력서": "실습 경험 위주의 이력서입니다. 학력 및 동아리 중심."
-    };
 
     // 모달 열기 & 드래그 등록
     document.getElementById("savedResumeList").addEventListener("click", (e) => {
@@ -80,8 +97,6 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
                     });
 
-
-
                     html += `</div>`;
                     modalBody.innerHTML = html;
                     modal.style.display = "flex";
@@ -89,15 +104,13 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-
-// 드래그 이벤트도 여기에 추가
+    // 드래그 이벤트도 여기에 추가
     document.getElementById("savedResumeList").addEventListener("dragstart", (e) => {
         if (e.target.classList.contains("resume-tab")) {
             const title = e.target.textContent;
             e.dataTransfer.setData("text/plain", title);
         }
     });
-
 
     modalClose.addEventListener("click", () => {
         modal.style.display = "none";
@@ -108,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
         alert("이력서 추가 기능은 추후 구현 예정입니다.");
     });
 
-    // 드롭 처리
+    // 드롭 처리 (회사 양식일 때만 의미 있음)
     addButton.addEventListener("dragover", (e) => {
         e.preventDefault();
         addButton.style.borderColor = "green";
@@ -157,6 +170,9 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelector(".submit-btn").addEventListener("click", function (e) {
         e.preventDefault();
 
+        // [추가] 현재 선택된 지원 방식
+        const applyType = getApplyType(); // 'company' | 'member'
+
         // 1. 기본 입력값 수집
         const data = {
             title: document.querySelector(".title-input").value,
@@ -173,7 +189,9 @@ document.addEventListener("DOMContentLoaded", function () {
             endDate: document.querySelector("#endDate").value,
             surew: document.querySelector("input[name='surew']").value,
             employmentTypes: [],
-            resumeIds: []
+            // [변경] 서버가 분기할 수 있도록 applyType을 포함
+            applyType: applyType,
+            resumeIds: [] // 회사 양식일 때만 채움
         };
 
         // 2. 고용형태 체크박스
@@ -181,16 +199,27 @@ document.addEventListener("DOMContentLoaded", function () {
             data.employmentTypes.push(cb.value);
         });
 
-        // 3. 드래그로 추가된 이력서 → title로 매칭해서 id 추출
-        const resumeItems = document.querySelectorAll("#resume-output .resume-item span");
-        const savedResumeMap = {}; // 텍스트 → ID 매핑을 위해
-        document.querySelectorAll("#savedResumeList .resume-tab").forEach(tab => {
-            savedResumeMap[tab.textContent] = tab.dataset.id;
-        });
-        resumeItems.forEach(span => {
-            const id = savedResumeMap[span.textContent];
-            if (id) data.resumeIds.push(Number(id));
-        });
+        // 3. 회사 양식 선택일 때만 이력서 템플릿 수집
+        if (applyType === 'company') {
+            const resumeItems = document.querySelectorAll("#resume-output .resume-item span");
+            const savedResumeMap = {}; // 텍스트 → ID 매핑
+            document.querySelectorAll("#savedResumeList .resume-tab").forEach(tab => {
+                savedResumeMap[tab.textContent] = tab.dataset.id;
+            });
+            resumeItems.forEach(span => {
+                const id = savedResumeMap[span.textContent];
+                if (id) data.resumeIds.push(Number(id));
+            });
+
+            // (선택) 유효성 검사: 회사 양식인데 아무 것도 안 골랐을 때 막기
+            // if (data.resumeIds.length === 0) {
+            //     alert('회사 양식으로 받기 선택 시, 최소 1개의 이력서 양식을 추가해 주세요.');
+            //     return;
+            // }
+        } else {
+            // member 모드: 이 화면에서는 템플릿을 받지 않음(지원 시 회원이 자기 이력서를 제출)
+            data.resumeIds = [];
+        }
 
         // 4. 서버 전송 (POST)
         const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
@@ -200,25 +229,21 @@ document.addEventListener("DOMContentLoaded", function () {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                [csrfHeader]: csrfToken      // 👉 CSRF 헤더 추가!
+                [csrfHeader]: csrfToken
             },
             body: JSON.stringify(data)
         })
-
             .then(res => {
                 if (!res.ok) throw new Error("서버 오류 발생");
-                return res.text();  // ✅ 문자열로 받아야 함
+                return res.text();  // 문자열로 받아야 함
             })
             .then(jobId => {
                 alert("공고가 성공적으로 등록되었습니다.");
-                window.location.href = `/cojobdetail?id=${jobId}`;  // 상세페이지로 이동
+                window.location.href = `/cojobdetail?id=${jobId}`;
             })
-
             .catch(err => {
                 console.error(err);
                 alert("저장 중 오류 발생!");
             });
     });
-
-
 });
