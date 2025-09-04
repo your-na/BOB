@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+  <input type="hidden" id="jobPostId" th:value="${jobPostId}" />
+  <input type="hidden" id="resumeId" th:value="${resume.id}" />
+  <title>이력서 상세보기</title>
+  <link rel="stylesheet" href="/css/resume_detail.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<!-- ✅ 기업 사용자면 header2 삽입 -->
+<div sec:authorize="hasAuthority('COMPANY')">
+  <div th:insert="~{header2 :: header}"></div>
+</div>
+
+<!-- ✅ 그 외 사용자나 비로그인 사용자는 기본 header 삽입 -->
+<div sec:authorize="!hasAuthority('COMPANY')">
+  <div th:insert="~{header :: header}"></div>
+</div>
+
+
+<form>
+  <div class="resume-detail-container">
+
+    <!-- 트리뷰 버튼 -->
+    <!-- <button type="button" id="treeViewBtn">🌳 트리뷰로 보기</button>-->
+
+
+    <!-- 수정/삭제 버튼 -->
+    <div class="resume-buttons">
+      <!-- 일반 사용자에게만 보이게 -->
+      <div sec:authorize="!hasAuthority('COMPANY')">
+        <button class="delete-btn">지원 취소하기</button>
+      </div>
+
+      <!-- 기업 사용자에게만 보이게 -->
+      <div sec:authorize="hasAuthority('COMPANY')">
+        <button type="button" class="nonpass-btn">❎ 불합격 처리</button>
+        <button type="button" class="pass-btn">✅ 합격 처리</button>
+      </div>
+    </div>
+
+    <!-- ✅ 합격 처리 모달 -->
+    <div id="passModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closePassModal()">&times;</span>
+        <h2>정말 합격 처리하시겠습니까?</h2>
+        <p>지원자에게 전달할 메시지를 입력해 주세요.</p>
+        <textarea id="passMessage" placeholder="예: 귀하의 지원을 축하드립니다!"></textarea>
+        <div class="modal-actions">
+          <button id="submitPassBtn" type="button">확인</button> <!-- 🔥 핵심 수정 -->
+          <button onclick="closePassModal()">취소</button>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- 프로필 정보 -->
+    <div class="profile-row">
+      <div class="photo-wrapper">
+        <img th:src="@{'/profileImages/' + ${resume.profileImageUrl}}" alt="프로필 사진">
+      </div>
+      <div class="profile-info">
+        <div class="name-skill">
+          <strong th:text="${resume.userName}">사용자 이름</strong>
+          <span class="skill" th:text="${resume.mainLanguage}">기술</span>
+        </div>
+        <div class="info-table">
+          <div><strong>성별</strong> <span th:text="${resume.sex}">성별</span></div>
+          <div><strong>생년월일</strong>
+            <span th:text="${resume.birthday}">YYYY-MM-DD</span>
+            (<span th:text="${resume.age}">나이</span>)
+          </div>
+          <div><strong>전화번호</strong> <span th:text="${resume.userPhone}">전화번호</span></div>
+          <div><strong>이메일</strong> <span th:text="${resume.userEmail}">이메일</span></div>
+          <div><strong>주소</strong> <span th:text="${resume.region}">주소</span></div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- 트리뷰 영역 -->
+    <div id="treeViewContainer" style="display: none;">
+      <ul id="treeRoot"></ul>
+    </div>
+
+    <!-- 본문 영역 -->
+    <div th:each="section : ${resume.sections}" class="info-section">
+      <strong th:text="${section.title}">섹션 제목</strong>
+
+
+
+      <!-- ✅ 드래그 항목이 있으면 content 출력 안 함 -->
+      <div th:if="${not #lists.isEmpty(section.dragItems)}">
+        <ul>
+          <li th:each="item : ${section.dragItems}" style="margin-bottom: 1em;">
+
+            <!-- ✅ 항목 전체 블록 정렬 -->
+            <div style="margin-left: 15px;">
+              <!-- 제목 -->
+              <div>
+                <strong th:text="${item.displayText}">항목</strong>
+              </div>
+
+              <!-- 날짜 -->
+              <div th:if="${item.startDate != null and item.endDate != null}" style="color: #444;">
+                <span th:text="|(${item.startDate} ~ ${item.endDate})|"></span>
+              </div>
+
+              <!-- 파일 링크 -->
+              <div th:if="${item.filePath != null}">
+                <a th:href="@{'/uploads/projectFiles/' + ${item.filePath}}" target="_blank">📁 파일 보기</a>
+              </div>
+            </div>
+
+          </li>
+        </ul>
+      </div>
+
+
+
+
+      <!-- ✅ dragItems 없고, content 있을 때만 출력 -->
+      <div th:if="${#lists.isEmpty(section.dragItems) and section.content != null and section.content != ''}">
+        <textarea th:if="${section.title == '자기소개'}" readonly th:text="${section.content}">자기소개</textarea>
+        <p th:if="${section.title != '자기소개'}" th:text="${section.content}"></p>
+      </div>
+
+      <!-- ✅ 선택형 태그 (경력사항/포트폴리오 제외) -->
+      <div th:if="${section.selectedTags != null
+            and #lists.size(section.selectedTags) > 0
+            and section.title != '경력사항'
+            and section.title != '포트폴리오'}">
+        <span th:each="tag : ${section.selectedTags}" class="tag" th:text="${tag}">태그</span>
+      </div>
+
+
+      <!-- ✅ 학력 리스트 -->
+      <div th:if="${section.educations != null and #lists.size(section.educations) > 0}">
+        <div th:each="edu : ${section.educations}">
+          <span th:text="|${edu.startYear}.${edu.startMonth} ~ ${edu.endYear}.${edu.endMonth} ${edu.schoolName} ${edu.majorName} ${edu.status}|"></span><br>
+        </div>
+      </div>
+
+      <!-- ✅ 사진 첨부 미리보기 -->
+      <div th:if="${not #lists.isEmpty(section.fileNames) and section.type?.trim() == '사진 첨부'}">
+        <div class="image-preview" th:each="imgName : ${section.fileNames}">
+          <img th:src="@{'/uploads/resumeFiles/' + ${imgName}}" alt="첨부 이미지">
+        </div>
+      </div>
+
+      <!-- ✅ 파일 다운로드 링크 -->
+      <div th:if="${not #lists.isEmpty(section.fileNames) and section.type?.trim() == '파일 첨부'}" class="attachments">
+        <div class="file-download" th:each="fileName : ${section.fileNames}">
+          <a th:href="@{'/uploads/resumeFiles/' + ${fileName}}" download>
+            📄 <span th:text="${fileName}">파일명</span> 다운로드
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</form>
+
+<script src="/js/resume_detail.js"></script>
+</body>
+</html>
