@@ -487,3 +487,283 @@ function getAiMockResponse(msg) {
     }
     return "죄송해요! 해당 질문은 아직 학습되지 않았어요.";
 }
+// ===================== 공통 드롭박스 세팅 =====================
+function setupDropBox(box) {
+    if (!box) return;
+
+    box.addEventListener('dragover', e => {
+        e.preventDefault();
+        box.style.border = '2px dashed #4CAF50';
+    });
+
+    box.addEventListener('dragleave', () => {
+        box.style.border = '1px dashed #ccc';
+    });
+
+    box.addEventListener('drop', e => {
+        e.preventDefault();
+        box.style.border = '1px dashed #ccc';
+
+        // 파일 드롭
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            [...e.dataTransfer.files].forEach(file => {
+                const item = document.createElement('div');
+                item.className = 'uploaded-item';
+                item.textContent = file.name;
+                const del = document.createElement('span');
+                del.className = 'delete-icon';
+                del.textContent = '삭제';
+                del.onclick = () => item.remove();
+                item.appendChild(del);
+                box.appendChild(item);
+            });
+            return;
+        }
+
+        // JSON 드래그(오른쪽 패널 항목)
+        const jsonText = e.dataTransfer.getData("application/json");
+        if (jsonText) {
+            try {
+                const data = JSON.parse(jsonText);
+                // 표시 텍스트 구성
+                let display = data.title || '';
+                if (data.type === 'JOB') {
+                    const fmt = s => s ? s.replace(/-/g, '.') : '';
+                    if (data.status === '재직') display += ` (재직: ${fmt(data.startDate)} ~)`;
+                    else display += ` (퇴직: ${fmt(data.startDate)} ~ ${fmt(data.endDate)})`;
+                }
+                const item = document.createElement('div');
+                item.className = 'uploaded-item';
+                item.textContent = display;
+                // 메타 데이터 보존
+                if (data.id) item.dataset.id = data.id;
+                if (data.type) item.dataset.type = data.type;
+                if (data.file) item.dataset.file = (data.file || '').replace(/^\/?download\//, '');
+                if (data.startDate) item.dataset.startDate = data.startDate;
+                if (data.endDate) item.dataset.endDate = data.endDate;
+
+                const del = document.createElement('span');
+                del.className = 'delete-icon';
+                del.textContent = '삭제';
+                del.onclick = () => item.remove();
+                item.appendChild(del);
+
+                box.appendChild(item);
+            } catch { /* 무시 */ }
+            return;
+        }
+
+        // 일반 텍스트
+        const title = e.dataTransfer.getData('text/plain');
+        if (title) {
+            const item = document.createElement('div');
+            item.className = 'uploaded-item';
+            item.textContent = title;
+            const del = document.createElement('span');
+            del.className = 'delete-icon';
+            del.textContent = '삭제';
+            del.onclick = () => item.remove();
+            item.appendChild(del);
+            box.appendChild(item);
+        }
+    });
+}
+
+// ===================== 탭 표시/빈 상태 토글 =====================
+function activateTab(tabName) {
+    document.querySelectorAll('#tab-list .tab').forEach(t => t.classList.remove('active'));
+    const activeTab = document.querySelector(`#tab-list .tab[data-tab="${tabName}"]`);
+    if (activeTab) activeTab.classList.add('active');
+
+    let isEmpty = true;
+    document.querySelectorAll('.tab-content').forEach(c => {
+        const show = c.dataset.content === tabName;
+        c.style.display = show ? 'block' : 'none';
+        if (show && c.children.length > 0) isEmpty = false;
+    });
+
+    const empty = document.querySelector('.empty-content[data-content="empty"]');
+    if (empty) empty.style.display = isEmpty ? 'block' : 'none';
+}
+
+// ===================== 오른쪽 패널 데이터 로딩 =====================
+function makeDraggable(div, payload) {
+    div.setAttribute('draggable', 'true');
+    div.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('application/json', JSON.stringify(payload));
+    });
+}
+
+function renderProjects() {
+    return fetch('/api/user/resumes/projects')
+        .then(res => res.json())
+        .then(projects => {
+            const cont = document.querySelector('.tab-content[data-content="portfolio"]');
+            if (!cont) return;
+            cont.innerHTML = '';
+            if (!projects || projects.length === 0) return;
+
+            projects.forEach(p => {
+                const d = document.createElement('div');
+                d.className = 'award-item';
+                d.innerHTML = `${p.title}<br><small>${p.submittedDate || ''}</small>`;
+                makeDraggable(d, {
+                    id: p.id, type: 'PROJECT',
+                    file: (p.filePath || '').replace(/^\/?download\//, ''),
+                    title: p.title, startDate: p.startDate || '', endDate: p.endDate || ''
+                });
+                cont.appendChild(d);
+            });
+        })
+        .catch(err => console.error('프로젝트 로드 실패:', err));
+}
+
+function renderJobs() {
+    return fetch('/api/job-history')
+        .then(res => res.json())
+        .then(list => {
+            const cont = document.querySelector('.tab-content[data-content="job"]');
+            if (!cont) return;
+            cont.innerHTML = '';
+            if (!list || list.length === 0) return;
+
+            list.forEach(it => {
+                const start = it.startDate?.replace(/-/g, '.') || '';
+                const end = it.endDate?.replace(/-/g, '.') || '';
+                const period = it.status === '재직' ? `재직: ${start} ~` : `퇴직: ${start} ~ ${end}`;
+
+                const d = document.createElement('div');
+                d.className = 'award-item';
+                d.innerHTML = `${it.jobTitle || '직무 없음'}<br><small>${period}</small>`;
+                makeDraggable(d, {
+                    id: it.id, type: 'JOB',
+                    title: it.jobTitle || '직무 없음',
+                    startDate: it.startDate, endDate: it.endDate, status: it.status
+                });
+                cont.appendChild(d);
+            });
+        })
+        .catch(err => console.error('구직 이력 로드 실패:', err));
+}
+
+function renderEducations() {
+    return fetch('/api/education-history/list')
+        .then(res => res.json())
+        .then(list => {
+            const cont = document.querySelector('.tab-content[data-content="school"]');
+            if (!cont) return;
+            cont.innerHTML = '';
+            if (!list || list.length === 0) return;
+
+            list.forEach(edu => {
+                const fmt = d => d?.replace(/-/g, '.');
+                let line2 = '';
+                if (edu.status === '재학')       line2 = `재학 ${fmt(edu.startDate)} 학과 ${edu.majorName || ''}`;
+                else if (edu.status === '졸업') line2 = `졸업 ${fmt(edu.startDate)} ~ ${fmt(edu.endDate)} 학과 ${edu.majorName || ''}`;
+                else                            line2 = `${edu.status || ''} 학과 ${edu.majorName || ''}`;
+
+                const d = document.createElement('div');
+                d.className = 'award-item';
+                d.innerHTML = `${edu.schoolName}<br><small>${line2}</small>`;
+                makeDraggable(d, {
+                    type: 'EDUCATION',
+                    schoolName: edu.schoolName,
+                    majorName: edu.majorName,
+                    status: edu.status,
+                    startDate: edu.startDate,
+                    endDate: edu.endDate
+                });
+                cont.appendChild(d);
+            });
+        })
+        .catch(err => console.error('학력 로드 실패:', err));
+}
+
+// (선택) 공모전을 포트폴리오 탭에 함께 표시하고 싶다면 이 함수도 호출하세요.
+function renderContestsIntoPortfolio() {
+    return fetch('/api/user/resumes/contests')
+        .then(res => res.json())
+        .then(list => {
+            const cont = document.querySelector('.tab-content[data-content="portfolio"]');
+            if (!cont || !list) return;
+            list.forEach(c => {
+                const d = document.createElement('div');
+                d.className = 'award-item';
+                d.innerHTML = `${c.title}<br><small>${c.date || ''}</small>`;
+                makeDraggable(d, { id: c.id, type: 'CONTEST', file: c.filePath || '', title: c.title });
+                cont.appendChild(d);
+            });
+        })
+        .catch(err => console.error('공모전 로드 실패:', err));
+}
+
+// ===================== 왼쪽 섹션 드롭 핸들러(학력 자동 채움 포함) =====================
+function setupLeftDrops() {
+    // 경력/포트폴리오 섹션의 드롭존
+    setupDropBox(document.querySelector('#section4 .upload-box'));
+    setupDropBox(document.querySelector('#section5 .upload-box'));
+
+    // 학력 섹션: EDUCATION 드롭 시 입력칸 자동 채움
+    const sec2 = document.getElementById('section2');
+    if (sec2) {
+        sec2.addEventListener('dragover', e => e.preventDefault());
+        sec2.addEventListener('drop', e => {
+            e.preventDefault();
+            const text = e.dataTransfer.getData('application/json');
+            if (!text) return;
+            try {
+                const data = JSON.parse(text);
+                if (data.type !== 'EDUCATION') return;
+
+                // 입력칸 매핑
+                const inputs = sec2.querySelectorAll('input, select');
+                // 가정: [학교명 input, 학과 input, 상태 select, 시작년도 select, 종료년도 select] 순서
+                const schoolInput = sec2.querySelector('input[placeholder="학교명"]');
+                const majorInput  = sec2.querySelector('input[placeholder="학과"]');
+                const statusSel   = sec2.querySelector('select');
+                const yearSelects = sec2.querySelectorAll('.date-group select');
+
+                if (schoolInput) schoolInput.value = data.schoolName || '';
+                if (majorInput)  majorInput.value  = data.majorName  || '';
+                if (statusSel)   statusSel.value   = (data.status === '졸업' ? '졸업' : '재학');
+
+                // 날짜(년도만 존재하는 현재 마크업 기준)
+                const [sYear] = (data.startDate || '').split('-');
+                const [eYear] = (data.endDate || '').split('-');
+                if (yearSelects[0]) yearSelects[0].value = sYear || yearSelects[0].value;
+                if (yearSelects[1]) yearSelects[1].value = eYear || yearSelects[1].value;
+            } catch { /* 무시 */ }
+        });
+    }
+}
+
+// ===================== 탭 클릭 바인딩 =====================
+function bindTabs() {
+    document.querySelectorAll('#tab-list .tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            activateTab(tab.dataset.tab);
+        });
+    });
+}
+
+// ===================== 초기화 =====================
+window.addEventListener('DOMContentLoaded', () => {
+    // 브라우저 기본 드래그 동작 방지(페이지 전체)
+    window.addEventListener('dragover', e => e.preventDefault());
+    window.addEventListener('drop', e => e.preventDefault());
+
+    bindTabs();
+    setupLeftDrops();
+
+    // 데이터 로드
+    Promise.all([
+        renderProjects(),
+        renderJobs(),
+        renderEducations(),
+        // 공모전을 포트폴리오에 함께 보여주려면 주석 해제
+        // renderContestsIntoPortfolio()
+    ]).then(() => {
+        // 기본 탭: 학력
+        activateTab('school');
+    });
+});

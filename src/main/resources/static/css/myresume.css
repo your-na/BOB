@@ -348,3 +348,40 @@ textarea {
 #sendChat:hover {
     background-color: #28b80a;
 }
+
+/* 오른쪽 고정 패널 */
+.right-content {
+    position: sticky;
+    top: 100px;
+    min-width: 350px;
+    max-width: 560px;
+    height: fit-content;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+    background-color: #fff;
+    overflow: hidden;
+}
+
+/* 헤더/탭/리스트/빈 상태 */
+.tab-header { background-color: #A6F4A6; padding: 16px 20px 12px 20px; border-radius: 20px 20px 0 0; }
+.tab-header h3 { margin: 0; font-size: 18px; font-weight: 800; color: #1C4C1C; }
+
+.tab-menu { background-color: #fff; padding: 10px 20px 0 20px; }
+#tab-list { display: flex; gap: 12px; list-style: none; padding: 0; margin: 0; }
+#tab-list .tab { cursor: pointer; font-size: 14px; color: #333; padding-bottom: 4px; border-bottom: 2px solid transparent; }
+#tab-list .tab.active { font-weight: bold; color: #0ED700; border-bottom-color: #0ED700; }
+
+.award-list { display: flex; flex-direction: column; gap: 12px; padding: 20px; }
+.award-item { border: 1px solid #000; border-radius: 10px; padding: 12px 16px; background: #fff; box-shadow: 1px 1px 6px rgba(0,0,0,0.1); }
+.award-item small { display: block; margin-top: 4px; color: #888; }
+
+.empty-content { padding: 50px 20px; text-align: center; color: #333; border-top: 1px solid #ccc; }
+.no-data-text { font-size: 15px; margin-bottom: 10px; }
+.view-link { font-size: 14px; font-weight: bold; color: #0c0c0c; cursor: pointer; text-decoration: underline; }
+
+/* 업로드 영역(왼쪽 섹션에서 재사용) */
+.upload-box { border: 1px dashed #ccc; text-align: center; padding: 20px; color: #999; margin-top: 10px; border-radius: 10px; }
+.uploaded-item { margin-top: 5px; padding: 6px 15px; background: #d1d1d1; border: 1px solid #2c2c2c; border-radius: 4px; font-size: 14px; display: flex; justify-content: space-between; }
+.uploaded-item .delete-icon { margin-left: 10px; cursor: pointer; font-size: 12px; }
+.uploaded-item .delete-icon:hover { color: red; }
