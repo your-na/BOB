@@ -385,3 +385,12 @@ textarea {
 .uploaded-item { margin-top: 5px; padding: 6px 15px; background: #d1d1d1; border: 1px solid #2c2c2c; border-radius: 4px; font-size: 14px; display: flex; justify-content: space-between; }
 .uploaded-item .delete-icon { margin-left: 10px; cursor: pointer; font-size: 12px; }
 .uploaded-item .delete-icon:hover { color: red; }
+.template-card {
+    cursor: pointer;   /* 마우스를 올리면 손가락 모양 아이콘으로 변경 */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.template-card:hover {
+    transform: translateY(-5px);   /* 살짝 위로 떠오르는 효과 */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* 그림자 강조 */
+}
