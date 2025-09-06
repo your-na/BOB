@@ -155,3 +155,87 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const listEl = document.getElementById('myResumeList');
+    let selectedResumeId = null; // 현재 선택된 하나
+
+    // ① 회원 이력서 목록 로드(예시 API)
+    fetch('/api/my/resumes')
+        .then(r => r.json())
+        .then(items => {
+            renderResumes(items);
+        })
+        .catch(err => console.error('이력서 목록 로드 실패:', err));
+
+    // ② 목록 렌더
+    function renderResumes(items) {
+        listEl.innerHTML = '';
+        items.forEach(item => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'resume-tab';
+            btn.dataset.id = item.id;
+            btn.innerHTML = `
+        <div class="resume-title">${item.title}</div>
+        <div class="resume-date">${item.date ?? ''}</div>
+      `;
+            btn.addEventListener('click', () => toggleSelect(btn));
+            listEl.appendChild(btn);
+        });
+    }
+
+    // ③ 단일 선택 토글
+    function toggleSelect(btn) {
+        const id = btn.dataset.id;
+
+        if (selectedResumeId === id) {
+            // 이미 선택된 것을 다시 클릭 → 해제
+            btn.classList.remove('selected');
+            selectedResumeId = null;
+            return;
+        }
+
+        // 기존 선택 제거
+        const prev = listEl.querySelector('.resume-tab.selected');
+        if (prev) prev.classList.remove('selected');
+
+        // 새 선택 적용
+        btn.classList.add('selected');
+        selectedResumeId = id;
+    }
+
+    // ④ “지원하기” 버튼에서 선택 값 사용
+    document.querySelector('.apply-btn')?.addEventListener('click', () => {
+        // 필요 시 선택 검증
+        if (!selectedResumeId) {
+            alert('제출할 이력서를 선택해 주세요.');
+            return;
+        }
+
+        // 예시: 공고 ID는 서버에서 데이터-속성이나 전역 변수로 내려주세요.
+        const jobId = window.JOB_ID || new URLSearchParams(location.search).get('id');
+
+        fetch('/api/apply', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                jobId,
+                resumeId: Number(selectedResumeId) // 하나만 보냄
+            })
+        })
+            .then(r => {
+                if (!r.ok) throw new Error('지원 실패');
+                return r.text();
+            })
+            .then(msg => {
+                alert('지원이 완료되었습니다.');
+                // 필요 시 이동
+                // location.href = `/apply/complete?jobId=${jobId}`;
+            })
+            .catch(err => {
+                console.error(err);
+                alert('지원 중 오류가 발생했습니다.');
+            });
+    });
+});
