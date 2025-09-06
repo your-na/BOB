@@ -340,3 +340,32 @@
     background-color: #00b800;
     color: white;
 }
+
+.resume-panel {
+    border: 2px solid #a8e6a1;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 16px;
+}
+
+/* 기본 카드 */
+.resume-tab {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    margin: 8px 0;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: #fff;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .15s, box-shadow .15s;
+}
+
+/* 선택 상태(초록색 굵은 테두리) */
+.resume-tab.selected {
+    border-color: #20c35a;
+    box-shadow: 0 0 0 3px rgba(32,195,90,0.15);
+}
+
+
