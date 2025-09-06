@@ -232,3 +232,221 @@ body {
     background: #f0f0f0;
 }
 
+/* ===============================
+   제출/상장 업로드 모달 스타일
+   =============================== */
+
+/* 배경 */
+.award-modal-backdrop{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.35);
+    display: none;           /* JS에서 display:flex로 전환 */
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: award-fade-in .18s ease-out forwards;
+}
+
+/* 모달 박스 */
+.award-modal{
+    width: min(720px, 92vw);
+    max-height: 90vh;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.2);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform: scale(.98);
+    animation: award-pop-in .18s ease-out forwards;
+}
+
+/* 헤더 */
+.award-modal-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid #eee;
+}
+.award-modal-header h3{
+    font-size: 18px;
+    margin: 0;
+}
+.award-modal-close{
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    line-height: 1;
+    color: #6b7280; /* gray-500 */
+}
+.award-modal-close:hover{ color:#111827; }
+
+/* 본문 */
+.award-modal-body{
+    padding: 16px;
+    overflow: auto;
+}
+
+/* 단계 화면 */
+.award-step{ }
+.award-step p{ margin: 0 0 8px; }
+
+/* 업로드 영역 */
+.award-upload{
+    margin-top: 12px;
+    display: grid;
+    gap: 6px;
+}
+.award-upload input[type="file"]{
+    border: 1px dashed #d1d5db; /* gray-300 */
+    padding: 12px;
+    border-radius: 10px;
+    background: #fafafa;
+}
+.award-upload small{
+    color:#6b7280;
+}
+
+/* 버튼 공통 */
+.award-actions{
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+.btn-primary,
+.btn-secondary{
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform .05s ease, background .2s ease, color .2s ease, opacity .2s ease;
+}
+.btn-primary{
+    background: #19CB13;  /* 프로젝트 포인트 컬러 */
+    color: #fff;
+}
+.btn-primary:hover{ background:#15b310; }
+.btn-secondary{
+    background: #f1f5f9;  /* slate-100 */
+    color: #111827;
+}
+.btn-secondary:hover{ background:#e5e7eb; }
+
+/* 비활성 버튼 */
+.award-next:disabled{
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+/* 진행바 */
+.award-progress{
+    height: 8px;
+    background:#eef2f7;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 12px;
+}
+.award-progress-bar{
+    height: 100%;
+    background:#19CB13;
+    width: 0%;
+    transition: width .2s ease;
+}
+
+/* 추출 원문/미리보기 */
+.award-preview-wrap{
+    margin-top: 12px;
+}
+#award-canvas,
+#award-image{
+    max-width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+/* 결과 폼 */
+.award-result{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 8px;
+}
+.award-result label{
+    font-size: 12px;
+    color:#475569;
+}
+.award-result input{
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 14px;
+}
+.award-result input:focus{
+    outline: none;
+    border-color: #19CB13;
+    box-shadow: 0 0 0 3px rgba(25,203,19,.15);
+}
+
+/* details 원문 토글 */
+.award-modal-body details{
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 8px 10px;
+    background: #fafafa;
+}
+.award-modal-body details summary{
+    cursor: pointer;
+    color: #374151;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+#award-raw-text{
+    width: 100%;
+    height: 120px;
+    padding: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 13px;
+    resize: vertical;
+    background:#fff;
+}
+
+/* 접근성 포커스 */
+.award-modal button:focus,
+.award-modal input:focus{
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(25,203,19,.18);
+}
+
+/* 약간의 마이크로 인터랙션 */
+.btn-primary:active,
+.btn-secondary:active{
+    transform: translateY(1px);
+}
+
+/* 반응형 */
+@media (max-width: 520px){
+    .award-modal{
+        width: 94vw;
+        border-radius: 12px;
+    }
+    .award-modal-body{
+        padding: 14px;
+    }
+}
+
+/* 등장 애니메이션 */
+@keyframes award-fade-in{
+    from{ opacity: 0; }
+    to{ opacity: 1; }
+}
+@keyframes award-pop-in{
+    from{ transform: scale(.98); }
+    to{ transform: scale(1); }
+}
