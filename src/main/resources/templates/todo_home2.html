@@ -12,6 +12,18 @@
 
     <meta name="current-user" th:content="${loginNick}" />
     <meta name="current-user-id" th:content="${user.id}" />
+
+    <!-- OCR 라이브러리 -->
+    <script src="https://unpkg.com/tesseract.js@5.1.0/dist/tesseract.min.js"></script>
+
+    <!-- PDF -> 이미지 변환용 (1페이지만 렌더링) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // 워커 경로 지정 필수
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.css"/>
 </head>
 <body>
 
@@ -87,6 +99,73 @@
         </a>
 
         <button class="sidebar-btn">+</button>
+    </div>
+</div>
+
+<!-- 제출/상장 업로드 모달 -->
+<div id="submit-award-modal" class="award-modal-backdrop" style="display:none;">
+    <div class="award-modal">
+        <div class="award-modal-header">
+            <h3>결과 제출</h3>
+            <button type="button" class="award-modal-close">&times;</button>
+        </div>
+
+        <div class="award-modal-body">
+            <!-- Step 1: 확인 -->
+            <div class="award-step" data-step="1">
+                <p><strong>결과를 제출하시겠습니까?</strong></p>
+                <p>상장을 업로드하시면 자동으로 등급과 주최기관을 인식해드립니다.</p>
+
+                <div class="award-upload">
+                    <input id="award-file" type="file" accept="image/*,.pdf"/>
+                    <small>권장: JPG/PNG (PDF는 첫 페이지만 인식)</small>
+                </div>
+
+                <div class="award-actions">
+                    <button type="button" class="btn-secondary award-cancel">취소</button>
+                    <button type="button" class="btn-primary award-next" disabled>업로드 & 인식</button>
+                </div>
+            </div>
+
+            <!-- Step 2: 진행상황 -->
+            <div class="award-step" data-step="2" style="display:none;">
+                <p><strong>상장 인식 중…</strong> 잠시만 기다려주세요.</p>
+                <div class="award-progress">
+                    <div class="award-progress-bar" style="width:0%;"></div>
+                </div>
+                <div class="award-preview-wrap">
+                    <canvas id="award-canvas" style="max-width:100%; display:none;"></canvas>
+                    <img id="award-image" alt="" style="max-width:100%; display:none;"/>
+                </div>
+                <details style="margin-top:8px;">
+                    <summary>추출 원문 보기</summary>
+                    <textarea id="award-raw-text" style="width:100%; height:120px;" readonly></textarea>
+                </details>
+            </div>
+
+            <!-- Step 3: 결과 요약 & 추가 여부 -->
+            <div class="award-step" data-step="3" style="display:none;">
+                <p><strong>다음 정보를 확인했습니다. 수상 경력에 추가하시겠습니까?</strong></p>
+                <div class="award-result">
+                    <label>수상 등급</label>
+                    <input id="award-grade" type="text" readonly/>
+                    <label>주최기관</label>
+                    <input id="award-organizer" type="text" readonly/>
+                </div>
+                <div class="award-actions">
+                    <button type="button" class="btn-secondary award-back">다시 인식</button>
+                    <button type="button" class="btn-primary award-confirm">추가하기</button>
+                </div>
+            </div>
+
+            <!-- Step 4: 완료/오류 -->
+            <div class="award-step" data-step="4" style="display:none;">
+                <p id="award-final-message"><strong>처리가 완료되었습니다.</strong></p>
+                <div class="award-actions">
+                    <button type="button" class="btn-primary award-done">닫기</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -204,6 +283,416 @@
                 console.error(err);
             });
     });
+</script>
+
+<script>
+    function lockReadOnlyInput(input, getLockedValue) {
+        const blocker = (e) => { e.preventDefault(); e.stopPropagation(); return false; };
+
+        // 기본 인터랙션 차단
+        ['keydown','keypress','input','paste','drop','cut'].forEach(ev =>
+            input.addEventListener(ev, blocker, true)
+        );
+        input.addEventListener('focus', () => input.blur());  // 포커스도 바로 해제
+        input.setAttribute('readonly', 'readonly');
+
+        // 누가 값을 바꿔도 즉시 되돌리기 (DOM 조작 견제)
+        const mo = new MutationObserver(() => {
+            if (input.value !== getLockedValue()) input.value = getLockedValue();
+        });
+        mo.observe(input, { attributes: true, attributeFilter: ['value'] });
+
+        // 주기적으로 동기화(개발자도구로 값 주입 견제)
+        setInterval(() => {
+            if (input.value !== getLockedValue()) input.value = getLockedValue();
+        }, 500);
+    }
+
+    (function(){
+        const modal = document.getElementById('submit-award-modal');
+        const steps = [...modal.querySelectorAll('.award-step')];
+        const openBtn = document.querySelector('.submit-btn');
+        const closeBtns = modal.querySelectorAll('.award-modal-close, .award-cancel, .award-done');
+        const nextBtn = modal.querySelector('.award-next');
+        const backBtn = modal.querySelector('.award-back');
+        const confirmBtn = modal.querySelector('.award-confirm');
+
+        const fileInput = document.getElementById('award-file');
+        const canvas = document.getElementById('award-canvas');
+        const imgEl = document.getElementById('award-image');
+        const rawTextEl = document.getElementById('award-raw-text');
+        const gradeInput = document.getElementById('award-grade');
+        const orgInput = document.getElementById('award-organizer');
+        const progressBar = modal.querySelector('.award-progress-bar');
+        const finalMsg = document.getElementById('award-final-message');
+
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+        let fileBlob = null;
+        let ocrText = '';
+        let parsed = { grade: '', organizer: '' };
+
+        async function downscaleDataURL(dataURL, maxDim = 2400){
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const W = img.naturalWidth, H = img.naturalHeight;
+                    const scale = Math.min(1, maxDim / Math.max(W, H));
+                    if (scale === 1) return resolve(dataURL);
+                    const c = document.createElement('canvas');
+                    c.width = Math.round(W * scale);
+                    c.height = Math.round(H * scale);
+                    const ctx = c.getContext('2d');
+                    ctx.drawImage(img, 0, 0, c.width, c.height);
+                    resolve(c.toDataURL('image/png'));
+                };
+                img.src = dataURL;
+            });
+        }
+
+        // ✅ [추가] 전처리: 업스케일 + 그레이 → 대비↑ → 이진화
+        async function preprocessForOcr(dataURL, targetMax = 3000){
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    // 업스케일
+                    const W = img.naturalWidth, H = img.naturalHeight;
+                    const scale = Math.max(1, targetMax / Math.max(W, H));
+                    let w = Math.round(W * scale), h = Math.round(H * scale);
+
+                    const c = document.createElement('canvas');
+                    c.width = w; c.height = h;
+                    const ctx = c.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.drawImage(img, 0, 0, w, h);
+
+                    // 가장자리 여백 6~8% 잘라내기 (상장 테두리/무늬 제거)
+                    const m = Math.round(Math.min(w, h) * 0.07);
+                    const w2 = w - m*2, h2 = h - m*2;
+                    const c2 = document.createElement('canvas');
+                    c2.width = w2; c2.height = h2;
+                    const ctx2 = c2.getContext('2d');
+                    ctx2.drawImage(c, m, m, w2, h2, 0, 0, w2, h2);
+
+                    // 그레이 + 대비↑ + Otsu 비슷한 임계
+                    const id = ctx2.getImageData(0, 0, w2, h2);
+                    const d = id.data, hist = new Array(256).fill(0);
+                    for (let i=0;i<d.length;i+=4){
+                        const g = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
+                        // 대비 부스트
+                        const boosted = Math.max(0, Math.min(255, (g-128)*1.35 + 128));
+                        const gi = boosted|0;
+                        hist[gi]++; d[i]=d[i+1]=d[i+2]=gi; d[i+3]=255;
+                    }
+                    let sum=0,sumB=0,wB=0,varMax=0,thr=190, N=w2*h2;
+                    for (let t=0;t<256;t++) sum += t*hist[t];
+                    for (let t=0;t<256;t++){
+                        wB += hist[t]; if (!wB) continue;
+                        const wF = N - wB; if (!wF) break;
+                        sumB += t*hist[t];
+                        const mB = sumB / wB, mF = (sum - sumB) / wF;
+                        const v = wB * wF * (mB - mF) * (mB - mF);
+                        if (v > varMax){ varMax = v; thr = t; }
+                    }
+                    thr = Math.min(210, Math.max(150, thr));
+                    for (let i=0;i<d.length;i+=4){
+                        const v = d[i] > thr ? 255 : 0;
+                        d[i]=d[i+1]=d[i+2]=v;
+                    }
+                    ctx2.putImageData(id, 0, 0);
+                    resolve(c2.toDataURL('image/png'));
+                };
+                img.src = dataURL;
+            });
+        }
+
+        // 전처리 함수(preprocessForOcr / downscaleDataURL)는 그대로 사용
+        async function runOCR(dataURL){
+            // 다운스케일은 생략(이미 PDF에서 키웠고 전처리에서 업스케일함)
+            const prepped = await preprocessForOcr(dataURL, 3000);
+
+            // ⬇️ 옵션: 상장 본문은 한 블록이 많아서 6/4가 잘 맞음.
+            const tries = [
+                { lang: 'kor+eng', psm: 6 },
+                { lang: 'kor',     psm: 6 },
+                { lang: 'kor+eng', psm: 4 },
+                { lang: 'kor',     psm: 4 },
+                { lang: 'eng',     psm: 6 }, // 혹시 영문 위주일 때
+            ];
+
+            // 키워드 가중치(길이가 긴 것만 고르면 잡음이 이기는 경우 방지)
+            const kw = ['상장','대상','최우수상','금상','우수상','은상','장려상','동상','입상','수여','주최','주관','대회','협회','교육청','대학교','고등학교'];
+
+            let best = { score: -1, text: '' };
+
+            // worke`r 1개로 돌려서 오버헤드 최소화
+            const worker = await Tesseract.createWorker('kor', 1, {
+                corePath: '/vendor/tesseract/tesseract-core-simd.wasm.js',     // ✅ 로컬 wasm
+                langPath: '/vendor/tesseract/tessdata',                // ✅ 로컬 언어데이터(가능하면 best)
+                workerPath: '/vendor/tesseract/worker.min.js',
+                logger: () => {}                                       // 에러 방지
+            });
+
+            // 공통 파라미터
+            const baseParams = {
+                tessedit_do_invert: '0',
+                user_defined_dpi: '300',                 // ✅ DPI 지정
+                preserve_interword_spaces: '1',
+            };
+
+            try {
+                for (const t of tries) {
+                    // lang 바꾸면 loadLanguage→initialize 필요 (v5에선 recognize에 lang 넘겨도 됨)
+                    const { data: { text } } = await worker.recognize(prepped, t.lang, {
+                        tessedit_pageseg_mode: String(t.psm),
+                        ...baseParams
+                        // 필요하면 화이트리스트(한글+기본문장부호):
+                        // tessedit_char_whitelist: '가-힣·()[]{}-—–~·,:.!?0-9a-zA-Z '
+                    });
+
+                    const clean = (text||'').replace(/\s+/g,' ').trim();
+                    if (!clean) continue;
+
+                    // 점수 = 키워드 매칭*50 + 길이*0.2 (대충)
+                    let score = clean.length * 0.2;
+                    const lc = clean;
+                    kw.forEach(k => { if (lc.includes(k)) score += 50; });
+
+                    if (score > best.score) best = { score, text: clean };
+                    // 키워드 많이 잡히면 조기 종료
+                    if (score >= 200) break;
+                }
+            } finally {
+                await worker.terminate();
+            }
+            return best.text;
+        }
+
+        // ===== 공통 유틸 =====
+        const goStep = (n) => steps.forEach(s => s.style.display = (s.dataset.step === String(n))?'block':'none');
+        const open = () => { modal.style.display='flex'; goStep(1); reset(); };
+        const close = () => { modal.style.display='none'; };
+        const reset = () => {
+            fileInput.value = '';
+            nextBtn.disabled = true;
+            canvas.style.display='none';
+            imgEl.style.display='none';
+            rawTextEl.value = '';
+            gradeInput.value = '';
+            orgInput.value = '';
+            progressBar.style.width='0%';
+            finalMsg.textContent = '처리가 완료되었습니다.';
+            ocrText = ''; parsed = { grade:'', organizer:'' };
+        };
+
+        // 열기/닫기
+        openBtn?.addEventListener('click', open);
+        closeBtns.forEach(b => b.addEventListener('click', close));
+        backBtn?.addEventListener('click', ()=> goStep(1));
+
+        // 파일 선택되면 다음 버튼 활성화
+        fileInput.addEventListener('change', () => {
+            nextBtn.disabled = !fileInput.files?.[0];
+            fileBlob = fileInput.files?.[0] ?? null;
+        });
+
+        // 인식 실행
+        nextBtn.addEventListener('click', async () => {
+            if(!fileBlob) return;
+            goStep(2);
+
+            try{
+                const isPDF = /\.pdf$/i.test(fileBlob.name);
+                let dataURL;
+                if(isPDF){
+                    dataURL = await renderPdfFirstPageToDataURL(fileBlob);
+                }else{
+                    dataURL = await readFileAsDataURL(fileBlob);
+                }
+
+                // 미리보기
+                await showPreview(dataURL);
+                console.log('[preview]', dataURL.slice(0, 50), 'len=', dataURL.length); // 길이가 매우 짧으면 이미지가 빈 겁니다.
+
+                let pseudo = 0;
+                const tick = setInterval(()=>{
+                    pseudo = Math.min(90, pseudo + 3); // 90%까지만 점진 증가
+                    progressBar.style.width = pseudo + '%';
+                }, 120);
+
+                ocrText = await runOCR(dataURL);
+                ocrText = normalizeKoreanForAward(ocrText);
+
+                console.log('[ocr]', ocrText.length, ocrText.slice(0, 80));
+
+                clearInterval(tick);
+                progressBar.style.width = '100%'; // 완료 표시
+
+                rawTextEl.value = ocrText.trim();
+
+                // 파싱
+                parsed = parseAward(ocrText);
+                gradeInput.value = parsed.grade || '';
+                orgInput.value = parsed.organizer || '';
+                lockReadOnlyInput(gradeInput, () => parsed.grade || '');
+                lockReadOnlyInput(orgInput,   () => parsed.organizer || '');
+
+                goStep(3);
+            }catch(err){
+                console.error(err);
+                finalMsg.textContent = '인식 중 오류가 발생했습니다. 파일 형식을 확인해 주세요.';
+                goStep(4);
+            }
+        });
+
+        // 확정(수상 경력 추가)
+        confirmBtn.addEventListener('click', async () => {
+            const grade = (parsed.grade || '').trim();
+            const organizer = (parsed.organizer || '').trim();
+
+            if(!grade && !organizer){
+                alert('인식된 정보가 없습니다. 다시 시도해 주세요.');
+                return;
+            }
+
+            try{
+                const body = { grade, organizer, source: 'certificate', teamId };
+                const res = await fetch('/api/awards', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(csrfHeader && csrfToken ? { [csrfHeader]: csrfToken } : {})
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                if(!res.ok) throw new Error('수상 경력 추가 실패');
+
+                finalMsg.textContent = '수상 경력에 추가되었습니다.';
+                goStep(4);
+            }catch(err){
+                console.error(err);
+                finalMsg.textContent = '수상 경력 추가 중 오류가 발생했습니다.';
+                goStep(4);
+            }
+        });
+
+        // ===== 파일/미리보기/PDF 렌더 =====
+        function readFileAsDataURL(file){
+            return new Promise((resolve,reject)=>{
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function renderPdfFirstPageToDataURL(file){
+            const arrayBuf = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuf }).promise;
+            const page = await pdf.getPage(1);
+            const viewport = page.getViewport({ scale: 2.4 }); // 속도/품질 밸런스
+            const cvs = document.createElement('canvas');
+            const ctx = cvs.getContext('2d');
+            cvs.width = viewport.width;
+            cvs.height = viewport.height;
+            await page.render({ canvasContext: ctx, viewport }).promise;
+            return cvs.toDataURL('image/png');
+        }
+
+        async function showPreview(dataURL){
+            imgEl.src = dataURL;
+            imgEl.style.display='block';
+            canvas.style.display='none';
+        }
+
+        // ===== 텍스트 파싱 =====
+        function parseAward(textRaw){
+            const text = (textRaw || '')
+                .replace(/\s+\n/g, '\n')
+                .replace(/\n+\s*/g, '\n')
+                .replace(/[^\uAC00-\uD7A3a-zA-Z0-9\s:·.,()\-]/g,'')  // 노이즈 제거
+                .trim();
+
+            // 1) 등급 추출: 사전 우선 + '부상' 제외
+            const gradeDict = ['대상','최우수상','금상','우수상','은상','장려상','동상','특별상','입상','본상'];
+            let foundGrade = '';
+
+            // 1-1) 사전(정확 매칭) 먼저
+            for (const g of gradeDict) {
+                const re = new RegExp(`\\b${g}\\b`);
+                if (re.test(text)) { foundGrade = g; break; }
+            }
+
+            // 1-2) 여전히 못 찾으면 일반 패턴(최대 6자+상) 시도하되 '부상'은 제외
+            if (!foundGrade) {
+                const m = text.match(/([가-힣A-Za-z0-9]{1,6}상)/);
+                if (m) {
+                    const cand = m[1];
+                    if (cand !== '부상') foundGrade = cand;
+                }
+            }
+
+            // 2) 주최기관 추출 강화
+            //    - 줄 단위로 나눠 '회사/기업/(주)/주식회사/대학교/교육청/협회/재단/문화재단/공사/공단' 포함 라인 우선
+            const lines = text.split('\n').map(x => x.trim()).filter(Boolean);
+            let organizer = '';
+
+            // 2-1) 키워드 들어간 라인 우선 탐색 (주로 하단에 있음 -> 뒤에서부터)
+            const orgKeys = /(주식회사|\(주\)|회사|기업|대학교|대학|고등학교|학교|시청|도청|교육청|협회|재단|문화재단|공사|공단)/;
+            for (let i = lines.length - 1; i >= 0; i--) {
+                const L = lines[i];
+                if (orgKeys.test(L) && L.length <= 40 && !/대표이사/.test(L)) {
+                    organizer = L.replace(/[:：\-]/g,'').trim();
+                    break;
+                }
+            }
+
+            // 2-2) 못 찾으면 '주최|주관|수여' 패턴으로 한 번 더
+            if (!organizer) {
+                const m2 = text.match(/(?:주최|주관|수여)[^\S\r\n:：-]*[:：-]?\s*([가-힣A-Za-z0-9·()]{3,30})/);
+                if (m2) organizer = (m2[1] || '').trim();
+            }
+
+            // 2-3) 마지막 보정: (주)와 회사/기업이 떨어져 있으면 합치기
+            if (!organizer) {
+                const m3 = text.match(/\(주\)\s*[가-힣A-Za-z0-9·()]{1,20}/);
+                if (m3) organizer = m3[0];
+            }
+
+            organizer = organizer.replace(/\s{2,}/g,' ').replace(/[:：-]$/,'').trim();
+
+            return { grade: foundGrade, organizer };
+        }
+
+        function normalizeKoreanForAward(t) {
+            if (!t) return '';
+
+            // 2-1) 줄바꿈을 보존하며 기본 정리
+            let s = t.replace(/\r/g, '').replace(/[ \t]+/g, ' ').replace(/\u00A0/g, ' ');
+
+            // 2-2) 한글 사이 공백 제거 (대 상 -> 대상, 최 우 수 상 -> 최우수상)
+            // 한글 사이에 낀 '단독 공백'을 제거합니다.
+            s = s.replace(/(?<=\p{Script=Hangul})\s+(?=\p{Script=Hangul})/gu, '');
+
+            // 2-3) 등급 키워드를 공백 허용 패턴으로 모두 교정
+            const grades = ['대상','최우수상','금상','우수상','은상','장려상','동상','특별상','입상','본상'];
+            for (const g of grades) {
+                // g의 각 글자 사이에 \s* 를 허용하는 패턴 생성
+                const spaced = new RegExp(g.split('').join('\\s*'), 'g');
+                s = s.replace(spaced, g);
+            }
+
+            // 2-4) OCR 흔한 오인 교정
+            s = s.replace(/브상/g, '부상'); // '부상'을 '브상'으로 오인
+            s = s.replace(/대 상/g, '대상'); // 혹시 남아있는 경우 한 번 더
+            s = s.replace(/최 우 수 상/g, '최우수상');
+
+            return s;
+        }
+
+    })();
 </script>
 </body>
 </html>
