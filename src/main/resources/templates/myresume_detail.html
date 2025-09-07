@@ -36,12 +36,6 @@
     </div>
   </div>
 
-
-
-  <!-- 이력서 제목 -->
-  <h2 th:text="${resume.title}">이력서 제목</h2>
-  <input type="hidden" id="resumeId" th:value="${resume.id}" />
-
   <!-- ✅ 섹션 반복 -->
   <div th:each="section : ${resume.sections}" class="info-section">
 
