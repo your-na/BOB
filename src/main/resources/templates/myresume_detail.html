@@ -43,11 +43,11 @@
       </ul>
     </div>
 
-    <!-- ✅ 내용 (dragItems 없을 때만) -->
-    <div th:if="${#lists.isEmpty(section.dragItems) and section.content != null and section.content != ''}">
-      <textarea th:if="${section.title == '자기소개'}" readonly th:text="${section.content}"></textarea>
-      <p th:if="${section.title != '자기소개'}" th:text="${section.content}"></p>
+    <!-- ✅ 내용 (content가 있으면 항상 보여줌) -->
+    <div th:if="${section.content != null and section.content != ''}">
+      <textarea readonly th:text="${section.content}"></textarea>
     </div>
+
 
     <!-- ✅ 조건 태그 -->
     <div th:if="${section.conditions != null and !section.conditions.isEmpty()}">
