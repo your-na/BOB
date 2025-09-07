@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>나만의 이력서</title>
-  <link rel="stylesheet" href="/css/myresume_list.css">
+  <link rel="stylesheet" th:href="@{/css/myresume_list.css}">
   <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 <body>
@@ -18,31 +18,21 @@
   </div>
 
   <div class="resume-list">
-    <div class="resume-card">
+    <div class="resume-card" th:each="resume : ${resumes}">
       <div class="resume-text">
-        <div class="resume-title">프론트엔드 포지션용 이력서</div>
-        <div class="resume-info">작성일: 2025-07-20</div>
+        <div class="resume-title" th:text="${resume.title}">이력서 제목</div>
+        <div class="resume-info"
+             th:if="${resume.createdAt != null}"
+             th:text="'작성일: ' + ${#temporals.format(resume.createdAt, 'yyyy-MM-dd')}">
+          작성일
+        </div>
       </div>
       <div class="resume-buttons">
-        <button class="view-btn">보기</button>
-        <button class="edit-btn">수정</button>
-        <button class="delete-btn">삭제</button>
+        <button class="view-btn" th:attr="data-id=${resume.id}">보기</button>
+        <button class="edit-btn" th:attr="data-id=${resume.id}">수정</button>
+        <button class="delete-btn" th:attr="data-id=${resume.id}">삭제</button>
       </div>
     </div>
-
-    <div class="resume-card">
-      <div class="resume-text">
-        <div class="resume-title">백엔드 공채 지원용</div>
-        <div class="resume-info">작성일: 2025-07-10</div>
-      </div>
-      <div class="resume-buttons">
-        <button class="view-btn">보기</button>
-        <button class="edit-btn">수정</button>
-        <button class="delete-btn">삭제</button>
-      </div>
-    </div>
-
-    <!-- 이력서 항목 추가 가능 -->
   </div>
 </div>
 

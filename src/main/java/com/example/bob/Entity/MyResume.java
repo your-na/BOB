@@ -1,0 +1,43 @@
+package com.example.bob.Entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import java.util.ArrayList;
+import java.util.List;
+import org.hibernate.annotations.CreationTimestamp;
+import java.time.LocalDateTime;
+
+
+/**
+ * 나만의 이력서 Entity (제목, 작성자, 섹션 목록 포함)
+ */
+@Entity
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class MyResume {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; // 이력서 고유 ID
+
+    private String title; // 이력서 제목
+
+    private Long memberId; // 사용자 ID (로그인 기능 연동 예정)
+
+    @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<MyResumeSection> sections = new ArrayList<>();
+
+    @CreationTimestamp // INSERT 시 자동 생성됨
+    private LocalDateTime createdAt;
+
+
+
+    // 섹션 추가 시 양방향 연관관계 세팅
+    public void addSection(MyResumeSection section) {
+        section.setResume(this);
+        this.sections.add(section);
+    }
+}

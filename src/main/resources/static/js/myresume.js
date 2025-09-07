@@ -322,7 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
 
-        fetch("/api/coresumes", {
+        fetch("/api/myresumes", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
