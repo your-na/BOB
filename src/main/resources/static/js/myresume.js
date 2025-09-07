@@ -261,7 +261,22 @@
 
                 const comment = section.querySelector("#ohcomment")?.value || "";
                 const textarea = section.querySelector("textarea");
-                const content = textarea ? textarea.value : "";
+                let content = "";
+
+                if (sectionTitle.includes("학력")) {
+                    const school = section.querySelector('input[placeholder="학교명"]')?.value || '';
+                    const major = section.querySelector('input[placeholder="학과"]')?.value || '';
+                    const status = section.querySelector('select')?.value || '';
+                    const years = section.querySelectorAll('.date-group select');
+                    const start = years[0]?.value || '';
+                    const end = years[1]?.value || '';
+                    content = `학교: ${school} / 학과: ${major} / 상태: ${status} / 기간: ${start} ~ ${end}`;
+                } else {
+                    const textarea = section.querySelector("textarea");
+                    content = textarea ? textarea.value : "";
+                }
+
+
 
                 const selectedConditions = [];
                 section.querySelectorAll(".tag-list .selected-tag").forEach(tag => {
