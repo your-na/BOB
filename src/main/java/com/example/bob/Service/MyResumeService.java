@@ -2,14 +2,21 @@ package com.example.bob.Service;
 
 import com.example.bob.DTO.MyResumeDto;
 import com.example.bob.DTO.MyResumeSectionDto;
+import com.example.bob.DTO.MyResumeDragItemDto;
 import com.example.bob.Entity.MyResume;
 import com.example.bob.Entity.MyResumeSection;
+import com.example.bob.Entity.MyResumeDragItem;
 import com.example.bob.Repository.MyResumeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 나만의 이력서 저장 처리 서비스
@@ -19,11 +26,13 @@ import java.util.stream.Collectors;
 public class MyResumeService {
 
     private final MyResumeRepository myResumeRepository;
+    private static final Logger log = LoggerFactory.getLogger(MyResumeService.class);
 
     /**
      * 이력서 저장 처리 (프론트에서 전달한 DTO 기준)
      */
     public Long save(MyResumeDto dto) {
+        log.info("🔄 이력서 저장 시작 - title: {}, memberId: {}", dto.getTitle(), dto.getMemberId());
         // 이력서 엔티티 생성
         MyResume resume = MyResume.builder()
                 .title(dto.getTitle())
@@ -39,15 +48,16 @@ public class MyResumeService {
 
         // DB 저장
         MyResume saved = myResumeRepository.save(resume);
+        log.info("✅ 이력서 저장 완료 - ID: {}", saved.getId());
         return saved.getId(); // 저장된 ID 반환
     }
 
-
     /**
-     * 섹션 DTO → Entity 변환 메서드
+     * 섹션 DTO → Entity 변환 (dragItems 포함)
      */
     private MyResumeSection convertToEntity(MyResumeSectionDto dto) {
-        return MyResumeSection.builder()
+        log.info("📦 섹션 변환 시작 - title: {}, type: {}", dto.getTitle(), dto.getType());
+        MyResumeSection section = MyResumeSection.builder()
                 .type(dto.getType())
                 .title(dto.getTitle())
                 .comment(dto.getComment())
@@ -56,6 +66,45 @@ public class MyResumeService {
                 .tags(dto.getTags())
                 .conditions(dto.getConditions())
                 .build();
+
+        if (dto.getDragItems() != null && !dto.getDragItems().isEmpty()) {
+            log.info("📎 섹션 '{}'에 드래그 항목 {}개 존재", dto.getTitle(), dto.getDragItems().size());
+
+            List<MyResumeDragItem> dragItemEntities = dto.getDragItems().stream()
+                    .map(this::convertDragItemDtoToEntity)
+                    .collect(Collectors.toList());
+
+            dragItemEntities.forEach(item -> {
+                log.debug("🧷 드래그 아이템 - text: {}, file: {}", item.getDisplayText(), item.getFilePath());
+                section.addDragItem(item);
+            });
+        } else {
+            log.info("⚠️ 섹션 '{}'에 드래그 항목 없음", dto.getTitle());
+        }
+
+        return section;
+    }
+
+    /**
+     * 드래그 항목 DTO → Entity 변환
+     */
+    private MyResumeDragItem convertDragItemDtoToEntity(MyResumeDragItemDto dto) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        return MyResumeDragItem.builder()
+                .displayText(dto.getDisplayText())
+                .filePath(dto.getFilePath())
+                .startDate(parseDate(dto.getStartDate(), formatter))
+                .endDate(parseDate(dto.getEndDate(), formatter))
+                .build();
+    }
+
+    /**
+     * 문자열 → LocalDate 파싱
+     */
+    private LocalDate parseDate(String dateStr, DateTimeFormatter formatter) {
+        if (dateStr == null || dateStr.isBlank()) return null;
+        return LocalDate.parse(dateStr, formatter);
     }
 
     /**
@@ -65,4 +114,11 @@ public class MyResumeService {
         return myResumeRepository.findAllByMemberId(memberId);
     }
 
+    /**
+     * ID로 이력서 + 섹션들까지 함께 조회 (상세보기용)
+     */
+    public MyResume findByIdWithSections(Long resumeId) {
+        return myResumeRepository.findByIdWithSections(resumeId)
+                .orElseThrow(() -> new IllegalArgumentException("이력서를 찾을 수 없습니다. ID=" + resumeId));
+    }
 }

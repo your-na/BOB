@@ -26,4 +26,7 @@ public class MyResumeSectionDto {
     private List<String> tags; // 사용자 입력 태그
 
     private List<String> conditions; // 선택한 조건
+
+    // ✅ [추가] 드래그 항목 목록
+    private List<MyResumeDragItemDto> dragItems;
 }

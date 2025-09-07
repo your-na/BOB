@@ -3,6 +3,8 @@ package com.example.bob.Entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
+import java.util.ArrayList;
+
 
 /**
  * 이력서의 개별 섹션 Entity (예: 학력, 경력 등)
@@ -34,4 +36,19 @@ public class MyResumeSection {
 
     @ElementCollection
     private List<String> conditions; // 선택된 조건 태그들
+
+    @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<MyResumeDragItem> dragItems = new ArrayList<>();
+
+
+    // 연관관계 메서드
+    public void addDragItem(MyResumeDragItem item) {
+        if (dragItems == null) {
+            dragItems = new ArrayList<>();
+        }
+        dragItems.add(item);
+        item.setSection(this);
+    }
+
 }
