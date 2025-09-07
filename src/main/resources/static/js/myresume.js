@@ -336,7 +336,7 @@
                     memberId: memberId ? parseInt(memberId) : null,
                     sections: sectionsData
                 };
-    
+
 
                 fetch("/api/myresumes", {
                     method: "POST",
@@ -347,11 +347,15 @@
                     body: JSON.stringify(resumeData)
                 })
                     .then(res => res.json())
-                    .then(() => alert("저장 완료!"))
+                    .then(() => {
+                        alert("저장 완료!");
+                        window.location.href = "/myresumelist";  // ✅ 여기서 이동!
+                    })
                     .catch(err => {
                         alert("저장 중 오류 발생");
                         console.error(err);
                     });
+
             });
 
 
