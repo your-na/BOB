@@ -15,8 +15,8 @@ import java.util.Optional;
 @Repository
 public interface MyResumeRepository extends JpaRepository<MyResume, Long> {
 
-    // ✅ memberId 기준으로 이력서 목록 가져오기
-    List<MyResume> findAllByMemberId(Long memberId);
+    // ✅ memberId (String) 기준으로 이력서 목록 가져오기
+    List<MyResume> findAllByMemberId(String memberId);  // ⚠️ 여기 타입을 String으로 바꿔야 에러 안 남
 
     // ✅ 이력서 ID로 조회하면서 섹션도 함께 fetch (상세보기용)
     @Query("""
@@ -25,7 +25,7 @@ public interface MyResumeRepository extends JpaRepository<MyResume, Long> {
     LEFT JOIN FETCH r.sections s
     LEFT JOIN FETCH s.dragItems
     WHERE r.id = :resumeId
-""")
+    """)
     Optional<MyResume> findByIdWithSections(@Param("resumeId") Long resumeId);
 
 }

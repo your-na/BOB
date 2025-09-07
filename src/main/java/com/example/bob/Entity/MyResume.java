@@ -9,7 +9,6 @@ import java.util.HashSet;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
-
 /**
  * 나만의 이력서 Entity (제목, 작성자, 섹션 목록 포함)
  */
@@ -26,12 +25,11 @@ public class MyResume {
 
     private String title; // 이력서 제목
 
-    private Long memberId; // 사용자 ID (로그인 기능 연동 예정)
+    private String memberId; // 사용자 아이디 (user_id_login 저장됨)
 
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<MyResumeSection> sections = new HashSet<>();
-
 
     @CreationTimestamp // INSERT 시 자동 생성됨
     private LocalDateTime createdAt;
@@ -63,11 +61,6 @@ public class MyResume {
 
     @Transient
     private String region;
-
-
-
-
-
 
     // 섹션 추가 시 양방향 연관관계 세팅
     public void addSection(MyResumeSection section) {

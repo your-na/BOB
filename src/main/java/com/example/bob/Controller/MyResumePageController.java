@@ -3,6 +3,8 @@ package com.example.bob.Controller;
 import com.example.bob.Entity.MyResume;
 import com.example.bob.Service.MyResumeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,10 +22,13 @@ public class MyResumePageController {
 
     @GetMapping("/myresumelist")
     public String showMyResumeList(Model model) {
-        Long memberId = 1L; // 고정 memberId
+        // 🔐 현재 로그인한 사용자의 ID(user_id_login)를 가져옴
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String memberId = auth.getName(); // 기본적으로 로그인 ID가 됨
+
         List<MyResume> resumes = myResumeService.findAllByMemberId(memberId);
 
-        // ✅ 로그 찍어보자
+        // ✅ 로그 찍기
         System.out.println("⏺ 이력서 개수: " + resumes.size());
         resumes.forEach(r -> System.out.println("⏺ title: " + r.getTitle()));
 

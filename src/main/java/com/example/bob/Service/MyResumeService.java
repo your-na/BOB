@@ -38,11 +38,12 @@ public class MyResumeService {
      * 이력서 저장 처리 (프론트에서 전달한 DTO 기준)
      */
     public Long save(MyResumeDto dto) {
-        log.info("🔄 이력서 저장 시작 - title: {}, memberId: {}", dto.getTitle(), dto.getMemberId());
+        log.info("🔄 이력서 저장 시작 - title: {}, memberId(userIdLogin): {}", dto.getTitle(), dto.getMemberId());
+
         // 이력서 엔티티 생성
         MyResume resume = MyResume.builder()
                 .title(dto.getTitle())
-                .memberId(dto.getMemberId())
+                .memberId(dto.getMemberId())  // ⚠️ String 타입 (userIdLogin)
                 .build();
 
         // 각 섹션 DTO를 엔티티로 변환 후 이력서에 추가
@@ -55,8 +56,11 @@ public class MyResumeService {
         // DB 저장
         MyResume saved = myResumeRepository.save(resume);
         log.info("✅ 이력서 저장 완료 - ID: {}", saved.getId());
+
         return saved.getId(); // 저장된 ID 반환
     }
+
+
 
     /**
      * 섹션 DTO → Entity 변환 (dragItems 포함)
@@ -116,20 +120,29 @@ public class MyResumeService {
     /**
      * 특정 사용자의 모든 이력서 목록 조회
      */
-    public List<MyResume> findAllByMemberId(Long memberId) {
+    public List<MyResume> findAllByMemberId(String memberId) {
         return myResumeRepository.findAllByMemberId(memberId);
     }
+
 
     /**
      *사용자 정보 주입
      */
     public MyResume findByIdWithSections(Long id) {
+        log.info("🔍 이력서 상세 조회 시작 - resumeId: {}", id);
+
         MyResume resume = myResumeRepository.findByIdWithSections(id)
                 .orElseThrow(() -> new IllegalArgumentException("이력서를 찾을 수 없습니다. ID=" + id));
 
-        // ✅ 사용자 정보 주입
-        UserEntity user = userRepository.findById(resume.getMemberId()).orElse(null);
+        log.info("✅ 이력서 조회 성공 - id: {}, title: {}", resume.getId(), resume.getTitle());
+        log.info("📌 이력서의 memberId(userIdLogin으로 저장됨): {}", resume.getMemberId());
+
+        // ✅ 사용자 정보 조회 (user_id_login 기준)
+        UserEntity user = userRepository.findByUserIdLogin(resume.getMemberId()).orElse(null);
+
         if (user != null) {
+            log.info("🙋 사용자 조회 성공 - userId: {}, userName: {}", user.getUserId(), user.getUserName());
+
             resume.setUserName(user.getUserName());
             resume.setProfileImageUrl(user.getProfileImageUrl());
             resume.setMainLanguage(user.getMainLanguage());
@@ -141,18 +154,25 @@ public class MyResumeService {
                 try {
                     int age = Period.between(LocalDate.parse(user.getBirthday()), LocalDate.now()).getYears();
                     resume.setAge(age);
+                    log.info("📆 생년월일: {}, 계산된 나이: {}", user.getBirthday(), age);
                 } catch (Exception e) {
                     resume.setAge(0); // 파싱 실패 시 기본값
+                    log.error("❌ 생일 파싱 실패 - 생일 문자열: {}", user.getBirthday(), e);
                 }
             }
 
             resume.setUserPhone(user.getUserPhone());
             resume.setUserEmail(user.getUserEmail());
             resume.setRegion(user.getRegion());
+        } else {
+            log.warn("⚠ 사용자 조회 실패 - userIdLogin: {}", resume.getMemberId());
         }
 
         return resume;
     }
+
+
+
 
 
 
