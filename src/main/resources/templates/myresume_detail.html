@@ -105,6 +105,27 @@
   </div> <!-- end of section -->
 
 </div> <!-- end of container -->
+<script>
+  // 일반회원 정보 섹션 숨기기
+  document.addEventListener("DOMContentLoaded", () => {
+    const sections = document.querySelectorAll(".info-section");
+    console.log("✅ 섹션 개수:", sections.length);
 
+    sections.forEach((section, index) => {
+      const titleEl = section.querySelector("h3"); // 이 페이지는 <h3> 태그 사용함
+      if (!titleEl) return;
+
+      const rawTitle = titleEl.textContent;
+      const normalized = rawTitle.trim().replace(/\s+/g, "").toLowerCase();
+      console.log(`🔍 섹션 ${index} - 원본: "${rawTitle}", 정제: "${normalized}"`);
+
+      if (normalized === "일반회원정보") {
+        console.log(`🚫 숨김 처리된 섹션: ${index}`);
+        section.style.display = "none";
+      }
+    });
+  });
+</script>
 </body>
 </html>
+
