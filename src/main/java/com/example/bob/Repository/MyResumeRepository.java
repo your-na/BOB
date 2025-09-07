@@ -19,6 +19,13 @@ public interface MyResumeRepository extends JpaRepository<MyResume, Long> {
     List<MyResume> findAllByMemberId(Long memberId);
 
     // ✅ 이력서 ID로 조회하면서 섹션도 함께 fetch (상세보기용)
-    @Query("SELECT r FROM MyResume r LEFT JOIN FETCH r.sections WHERE r.id = :resumeId")
+    @Query("""
+    SELECT DISTINCT r
+    FROM MyResume r
+    LEFT JOIN FETCH r.sections s
+    LEFT JOIN FETCH s.dragItems
+    WHERE r.id = :resumeId
+""")
     Optional<MyResume> findByIdWithSections(@Param("resumeId") Long resumeId);
+
 }

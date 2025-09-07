@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
@@ -28,7 +30,8 @@ public class MyResume {
 
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<MyResumeSection> sections = new ArrayList<>();
+    private Set<MyResumeSection> sections = new HashSet<>();
+
 
     @CreationTimestamp // INSERT 시 자동 생성됨
     private LocalDateTime createdAt;

@@ -37,6 +37,10 @@ public class MyResumeSection {
     @ElementCollection
     private List<String> conditions; // 선택된 조건 태그들
 
+    @ElementCollection
+    private List<String> fileNames = new ArrayList<>(); // 첨부된 파일 이름 리스트
+    
+
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<MyResumeDragItem> dragItems = new ArrayList<>();

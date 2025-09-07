@@ -8,61 +8,78 @@
 </head>
 <body>
 
-<!-- ✅ 기본 사용자용 헤더 -->
+<!-- ✅ 헤더 삽입 -->
 <div th:insert="~{header :: header}"></div>
 
 <div class="resume-detail-container">
 
   <!-- 이력서 제목 -->
   <h2 th:text="${resume.title}">이력서 제목</h2>
+  <input type="hidden" id="resumeId" th:value="${resume.id}" />
 
-  <!-- ✅ 섹션들 반복 -->
+  <!-- ✅ 섹션 반복 -->
   <div th:each="section : ${resume.sections}" class="info-section">
+
     <!-- 섹션 제목 -->
     <h3 th:text="${section.title}">섹션 제목</h3>
 
-    <!-- 설명(comment) -->
-    <p th:if="${section.comment}" th:text="${section.comment}">섹션 설명</p>
+    <!-- 설명 -->
+    <p th:if="${section.comment}" th:text="${section.comment}">설명</p>
 
-    <!-- 본문 내용 -->
-    <div th:if="${section.content != null and section.content != ''}">
-      <p th:text="${section.content}">본문 내용</p>
+    <!-- ✅ 드래그 항목 리스트 -->
+    <div th:if="${not #lists.isEmpty(section.dragItems)}">
+      <ul>
+        <li th:each="item : ${section.dragItems}" style="margin-bottom: 1em;">
+          <div>
+            <strong th:text="${item.displayText}">항목</strong>
+            <span th:if="${item.startDate != null and item.endDate != null}" style="float:right; color:#888;">
+              (<span th:text="${item.startDate}"></span> ~ <span th:text="${item.endDate}"></span>)
+            </span>
+          </div>
+          <div th:if="${item.filePath}">
+            <a th:href="@{'/uploads/projectFiles/' + ${item.filePath}}" target="_blank">📁 파일 보기</a>
+          </div>
+        </li>
+      </ul>
     </div>
 
-    <!-- ✅ 조건 리스트 -->
-    <div th:if="${section.conditions != null and !section.conditions.isEmpty()}" class="tag-box">
+    <!-- ✅ 내용 (dragItems 없을 때만) -->
+    <div th:if="${#lists.isEmpty(section.dragItems) and section.content != null and section.content != ''}">
+      <textarea th:if="${section.title == '자기소개'}" readonly th:text="${section.content}"></textarea>
+      <p th:if="${section.title != '자기소개'}" th:text="${section.content}"></p>
+    </div>
+
+    <!-- ✅ 조건 태그 -->
+    <div th:if="${section.conditions != null and !section.conditions.isEmpty()}">
       <strong>조건:</strong>
       <span th:each="cond : ${section.conditions}" class="tag" th:text="${cond}">조건</span>
     </div>
 
-    <!-- ✅ 태그 리스트 -->
-    <div th:if="${section.tags != null and !section.tags.isEmpty()}" class="tag-box">
+    <!-- ✅ 선택 태그 -->
+    <div th:if="${section.tags != null and !section.tags.isEmpty()}">
       <strong>태그:</strong>
       <span th:each="tag : ${section.tags}" class="tag" th:text="${tag}">태그</span>
     </div>
 
-    <!-- ✅ 사진 첨부 미리보기 -->
-    <div th:if="${not #lists.isEmpty(section.fileNames) and section.type?.trim() == '사진 첨부'}">
-      <div class="image-preview" th:each="imgName : ${section.fileNames}">
-        <img th:src="@{'/uploads/resumeFiles/' + ${imgName}}" alt="첨부 이미지" style="width: 150px;">
+    <!-- ✅ 사진 첨부 -->
+    <div th:if="${section.fileNames != null and !section.fileNames.isEmpty() and section.type?.trim() == '사진 첨부'}">
+      <div class="image-preview" th:each="img : ${section.fileNames}">
+        <img th:src="@{'/uploads/resumeFiles/' + ${img}}" alt="첨부 이미지" style="width: 150px;">
       </div>
     </div>
 
-    <!-- ✅ 파일 다운로드 링크 -->
-    <div th:if="${not #lists.isEmpty(section.fileNames) and section.type?.trim() == '파일 첨부'}" class="attachments">
-      <div class="file-download" th:each="fileName : ${section.fileNames}">
-        <a th:href="@{'/uploads/resumeFiles/' + ${fileName}}" download>
-          📄 <span th:text="${fileName}">파일명</span> 다운로드
+    <!-- ✅ 파일 첨부 -->
+    <div th:if="${section.fileNames != null and !section.fileNames.isEmpty() and section.type?.trim() == '파일 첨부'}" class="attachments">
+      <div class="file-download" th:each="file : ${section.fileNames}">
+        <a th:href="@{'/uploads/resumeFiles/' + ${file}}" download>
+          📄 <span th:text="${file}">파일명</span> 다운로드
         </a>
       </div>
     </div>
 
-  </div> <!-- end of section 반복 -->
+  </div> <!-- end of section -->
 
-</div> <!-- end of resume-detail-container -->
-
-<!-- ✅ 트리 뷰 JS 연결 -->
-<script src="/js/myresume_detail.js"></script>
+</div> <!-- end of container -->
 
 </body>
 </html>
