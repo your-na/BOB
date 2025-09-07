@@ -9,6 +9,8 @@ import com.example.bob.Entity.MyResumeDragItem;
 import com.example.bob.Repository.MyResumeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.example.bob.Entity.UserEntity;
+import com.example.bob.Repository.UserRepository;
 
 
 import java.time.LocalDate;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.time.Period;
 
 /**
  * 나만의 이력서 저장 처리 서비스
@@ -27,6 +30,9 @@ public class MyResumeService {
 
     private final MyResumeRepository myResumeRepository;
     private static final Logger log = LoggerFactory.getLogger(MyResumeService.class);
+    private final UserRepository userRepository;
+
+
 
     /**
      * 이력서 저장 처리 (프론트에서 전달한 DTO 기준)
@@ -115,10 +121,40 @@ public class MyResumeService {
     }
 
     /**
-     * ID로 이력서 + 섹션들까지 함께 조회 (상세보기용)
+     *사용자 정보 주입
      */
-    public MyResume findByIdWithSections(Long resumeId) {
-        return myResumeRepository.findByIdWithSections(resumeId)
-                .orElseThrow(() -> new IllegalArgumentException("이력서를 찾을 수 없습니다. ID=" + resumeId));
+    public MyResume findByIdWithSections(Long id) {
+        MyResume resume = myResumeRepository.findByIdWithSections(id)
+                .orElseThrow(() -> new IllegalArgumentException("이력서를 찾을 수 없습니다. ID=" + id));
+
+        // ✅ 사용자 정보 주입
+        UserEntity user = userRepository.findById(resume.getMemberId()).orElse(null);
+        if (user != null) {
+            resume.setUserName(user.getUserName());
+            resume.setProfileImageUrl(user.getProfileImageUrl());
+            resume.setMainLanguage(user.getMainLanguage());
+            resume.setSex(user.getSex());
+            resume.setBirthday(user.getBirthday());
+
+            // ✅ 나이 계산
+            if (user.getBirthday() != null && !user.getBirthday().isEmpty()) {
+                try {
+                    int age = Period.between(LocalDate.parse(user.getBirthday()), LocalDate.now()).getYears();
+                    resume.setAge(age);
+                } catch (Exception e) {
+                    resume.setAge(0); // 파싱 실패 시 기본값
+                }
+            }
+
+            resume.setUserPhone(user.getUserPhone());
+            resume.setUserEmail(user.getUserEmail());
+            resume.setRegion(user.getRegion());
+        }
+
+        return resume;
     }
+
+
+
+
 }

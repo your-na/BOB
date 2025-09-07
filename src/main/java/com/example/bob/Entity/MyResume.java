@@ -36,6 +36,37 @@ public class MyResume {
     @CreationTimestamp // INSERT 시 자동 생성됨
     private LocalDateTime createdAt;
 
+    // --- 사용자 정보 (상세보기 전용) ---
+    @Transient
+    private String userName;
+
+    @Transient
+    private String profileImageUrl;
+
+    @Transient
+    private String mainLanguage;
+
+    @Transient
+    private String sex;
+
+    @Transient
+    private String birthday;
+
+    @Transient
+    private Integer age;
+
+    @Transient
+    private String userPhone;
+
+    @Transient
+    private String userEmail;
+
+    @Transient
+    private String region;
+
+
+
+
 
 
     // 섹션 추가 시 양방향 연관관계 세팅

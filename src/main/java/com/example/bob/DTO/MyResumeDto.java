@@ -18,4 +18,15 @@ public class MyResumeDto {
     private Long memberId; // 사용자 ID
 
     private List<MyResumeSectionDto> sections; // 섹션 리스트
+
+    private String userName;
+    private String profileImageUrl;
+    private String mainLanguage;
+    private String sex;
+    private String birthday;
+    private Integer age;
+    private String userPhone;
+    private String userEmail;
+    private String region;
+
 }
