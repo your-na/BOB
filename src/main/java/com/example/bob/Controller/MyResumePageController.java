@@ -7,19 +7,42 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
+import com.example.bob.Repository.UserRepository;
+import com.example.bob.Entity.UserEntity;
 
 import java.util.List;
 
-/**
- * 이력서 목록 페이지를 보여주는 Controller (HTML 렌더링용)
- */
 @Controller
 @RequiredArgsConstructor
 public class MyResumePageController {
 
     private final MyResumeService myResumeService;
+    private final UserRepository userRepository;
 
+
+    /**
+     * 이력서 만들기 HTML 렌더링
+     */
+    @GetMapping("/myresume")
+    public String createResumePage(Model model) {
+        // 로그인 정보 가져오기
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String memberId = auth.getName(); // 로그인된 사용자 ID
+
+        // 사용자 정보 조회해서 넘겨주기
+        UserEntity user = userRepository.findByUserIdLogin(memberId).orElse(null);
+        model.addAttribute("user", user);
+
+        model.addAttribute("resume", new MyResume()); // 비어있는 이력서
+        return "myresume";
+    }
+
+
+
+    /**
+     * 이력서 목록 페이지 렌더링
+     */
     @GetMapping("/myresumelist")
     public String showMyResumeList(Model model) {
         // 🔐 현재 로그인한 사용자의 ID(user_id_login)를 가져옴

@@ -94,9 +94,4 @@ public class TestController {
         return "resumehistory";
     }
 
-
-    //나만의 이력서 생성
-    @GetMapping("/myresume")
-    public String myresumeform() {return "myresume";}
-
 }
