@@ -1,9 +1,5 @@
     document.addEventListener("DOMContentLoaded", () => {
         let sections = document.querySelectorAll(".resume-section");
-        const jobInput = document.getElementById("job-input");
-        const jobTagContainer = document.querySelector(".job-tags");
-        const multiOnBtn = document.getElementById("multi-on");
-        const multiOffBtn = document.getElementById("multi-off");
         const addBtn = document.getElementById("add-section");
         const popup = document.getElementById("section-popup");
 
@@ -221,35 +217,26 @@
             });
         });
 
-        // 복수선택 on/off
-        multiOnBtn?.addEventListener("click", () => {
-            multiOnBtn.classList.add("selected-tag");
-            multiOffBtn.classList.remove("selected-tag");
-            document.querySelectorAll(".resume-section").forEach(section => {
-                section.setAttribute("data-multi-select", "true");
-            });
-        });
-
-        multiOffBtn?.addEventListener("click", () => {
-            multiOnBtn.classList.remove("selected-tag");
-            multiOffBtn.classList.add("selected-tag");
-            document.querySelectorAll(".resume-section").forEach(section => {
-                section.setAttribute("data-multi-select", "false");
-            });
-        });
-
-        // 희망 직무 태그
-        jobInput?.addEventListener("keydown", e => {
-            if (e.key === "Enter" && jobInput.value.trim()) {
+        // 직무 입력창에서 엔터로 태그 추가
+        document.addEventListener("keydown", function (e) {
+            if (e.target.id === "job-input" && e.key === "Enter") {
                 e.preventDefault();
-                const text = jobInput.value.trim();
+                const value = e.target.value.trim();
+                if (!value) return;
+
+                const tagList = document.querySelector(".job-tags");
                 const tag = document.createElement("span");
                 tag.className = "tag";
-                tag.innerHTML = `<span class="tag-label">${text}</span><span class="tag-remove">✕</span>`;
-                jobTagContainer.appendChild(tag);
-                jobInput.value = "";
+                tag.innerHTML = `
+      <span class="tag-label">${value}</span>
+      <span class="tag-remove">✕</span>
+    `;
+                tagList.appendChild(tag);
+                e.target.value = "";
             }
         });
+
+
 
         // 저장 버튼
         document.querySelector(".save-btn")?.addEventListener("click", () => {
@@ -322,9 +309,6 @@
             });
 
             const jobTags = Array.from(jobTagContainer.querySelectorAll(".tag .tag-label"))
-                .map(tag => tag.textContent.trim());
-
-            const resumeData = { title, sections: sectionsData, jobTags };
 
             const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
             const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
@@ -782,3 +766,4 @@
             activateTab('school');
         });
     });
+

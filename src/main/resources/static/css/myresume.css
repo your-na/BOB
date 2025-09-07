@@ -92,16 +92,17 @@
 }
 
 textarea {
+    pointer-events: auto;   /* ✅ 클릭 가능하도록 변경 */
+    background-color: #fff; /* ✅ 밝은 배경 */
+    color: #000;            /* ✅ 일반 텍스트 색 */
     resize: none;
     width: 95%;
     height: 100px;
     border: 1px solid #ccc;
     padding: 10px;
     border-radius: 6px;
-    pointer-events: none;   /* 클릭, 입력 등 모든 인터랙션 차단 */
-    background-color: #f5f5f5; /* 비활성화 느낌 배경색 */
-    color: #888;             /* 비활성화 느낌 텍스트 색상 */
 }
+
 
 .tag-mode {
     margin-bottom: 10px;
