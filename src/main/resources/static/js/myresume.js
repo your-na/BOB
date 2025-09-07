@@ -2,6 +2,7 @@
         let sections = document.querySelectorAll(".resume-section");
         const addBtn = document.getElementById("add-section");
         const popup = document.getElementById("section-popup");
+        const jobTagContainer = document.querySelector(".job-tags");
 
         // ➕ 버튼 클릭 시 팝업 위치 설정
         addBtn.addEventListener("click", (e) => {
@@ -312,6 +313,13 @@
 
             const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
             const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+
+            const resumeData = {
+                title,
+                memberId: 1, // ✳️ 임시로 1 (나중에 로그인 연동 시 동적으로 넣어줘야 함)
+                sections: sectionsData
+            };
+
 
             fetch("/api/myresumes", {
                 method: "POST",
