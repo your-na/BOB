@@ -181,13 +181,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const listEl = document.getElementById('myResumeList');
     let selectedResumeId = null; // 현재 선택된 하나
 
-    // ① 회원 이력서 목록 로드(예시 API)
-    fetch('/api/my/resumes')
+    // ①회원 이력서 목록 로드
+    fetch('/api/myresumes')
         .then(r => r.json())
         .then(items => {
             renderResumes(items);
         })
         .catch(err => console.error('이력서 목록 로드 실패:', err));
+
 
     // ② 목록 렌더
     function renderResumes(items) {

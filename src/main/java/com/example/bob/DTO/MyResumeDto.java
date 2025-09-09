@@ -14,6 +14,8 @@ import java.util.List;
 @Builder
 public class MyResumeDto {
 
+    private Long id;
+
     private String title; // 이력서 제목
 
     private String memberId; // 사용자 ID (userIdLogin)
