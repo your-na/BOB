@@ -71,6 +71,8 @@ public class CoJobPostService {
         entity.setStartDate(dto.getStartDate());
         entity.setEndDate(dto.getEndDate());
         entity.setSurew(dto.getSurew());
+        entity.setApplyType(dto.getApplyType());
+
 
         // 모집 상태 설정
         LocalDate today = LocalDate.now();

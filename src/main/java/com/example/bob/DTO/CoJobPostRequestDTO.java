@@ -26,5 +26,6 @@
             private List<Long> resumeIds;
             private String companyName;
             private String surew;
+            private String applyType;  // "company" 또는 "member"
 
         }
