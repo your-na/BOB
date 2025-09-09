@@ -368,4 +368,8 @@
     box-shadow: 0 0 0 3px rgba(32,195,90,0.15);
 }
 
+.hidden {
+    display: none !important;
+}
+
 

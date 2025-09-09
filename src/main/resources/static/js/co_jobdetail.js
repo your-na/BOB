@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 memberBox.classList.remove("hidden");
             }
 
-            
+
             // 제목 표시
             document.getElementById("job-title").textContent = `${data.title}`;
 

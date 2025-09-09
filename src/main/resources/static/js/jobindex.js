@@ -21,6 +21,27 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
             console.log('API 응답 데이터:', data);
 
+            // ✅ 이력서 패널 및 힌트 영역 처리
+            const resumeHint = document.querySelector(".resume-hint");
+            const resumePanel = document.getElementById("my-resume-panel");
+            const dropZone = document.getElementById("drop-zone");
+
+            if (data.applyType === "company" && data.resumeTitles && data.resumeTitles.length > 0) {
+                // 기업이 이력서 양식을 제공했으면 → 회원 이력서 숨김
+                if (resumeHint) resumeHint.style.display = "none";
+                if (resumePanel) resumePanel.classList.add("hidden");
+                if (dropZone) dropZone.classList.add("hidden");
+            } else {
+                // 기업 이력서 양식이 없으면 → 회원 이력서 사용 가능
+                if (resumeHint) resumeHint.style.display = "block";
+                if (resumePanel) resumePanel.classList.remove("hidden");
+                if (dropZone) dropZone.classList.remove("hidden");
+            }
+
+
+
+
+
             // 공고 제목 업데이트
             const jobTitleElement = document.querySelector('.job-header h2');
             if (jobTitleElement && data.title) {
