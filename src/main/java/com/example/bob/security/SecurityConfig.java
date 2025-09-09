@@ -72,6 +72,7 @@ public class SecurityConfig {
                         .requestMatchers("/contest/create", "/contest/submit").hasAnyAuthority("ADMIN", "COMPANY")
                         .requestMatchers("/api/applications/job/pass").hasAuthority("COMPANY")// ✅ 기업 사용자만 접근 가능
                         .requestMatchers(HttpMethod.DELETE, "/api/cojobs/**").hasAuthority("COMPANY")
+                        .requestMatchers(HttpMethod.DELETE, "/api/myresumes/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

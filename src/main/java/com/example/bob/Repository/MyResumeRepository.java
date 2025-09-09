@@ -28,4 +28,8 @@ public interface MyResumeRepository extends JpaRepository<MyResume, Long> {
     """)
     Optional<MyResume> findByIdWithSections(@Param("resumeId") Long resumeId);
 
+    // ✅ 이력서 삭제 시 본인 것만 삭제되도록
+    void deleteByIdAndMemberId(Long id, String memberId);
+
+
 }

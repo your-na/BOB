@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>나만의 이력서</title>
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
   <link rel="stylesheet" th:href="@{/css/myresume_list.css}">
   <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
@@ -50,7 +52,45 @@
         }
       });
     });
+
+    // ✅ CSRF 토큰 읽기
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+    
+    // 삭제 버튼
+    const deleteButtons = document.querySelectorAll(".delete-btn");
+    deleteButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const resumeId = btn.getAttribute("data-id");
+        if (!resumeId) return;
+
+        const confirmed = confirm("정말 이 이력서를 삭제하시겠습니까?");
+        if (!confirmed) return;
+
+        fetch(`/api/myresumes/${resumeId}`, {
+          method: 'DELETE',
+          headers: {
+            [csrfHeader]: csrfToken  // ✅ 헤더에 CSRF 토큰 추가!
+          }
+        })
+                .then(res => {
+                  if (res.status === 204) {
+                    alert("삭제되었습니다.");
+                    const card = btn.closest(".resume-card");
+                    if (card) card.remove();
+                  } else {
+                    alert("삭제 실패! 다시 시도해 주세요.");
+                  }
+                })
+                .catch(err => {
+                  console.error("삭제 요청 실패:", err);
+                  alert("오류가 발생했습니다.");
+                });
+      });
+    });
   });
+
+
 </script>
 
 </body>
