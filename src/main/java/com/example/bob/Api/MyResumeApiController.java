@@ -72,4 +72,21 @@ public class MyResumeApiController {
         return ResponseEntity.ok(dtos);
     }
 
+    /**
+     * ✅ [3단계] 이력서 삭제 API
+     * - 로그인한 사용자만 자신의 이력서를 삭제 가능
+     */
+    @DeleteMapping("/{resumeId}")
+    public ResponseEntity<Void> deleteMyResume(@PathVariable Long resumeId) {
+        // 🔐 현재 로그인 사용자 ID
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String memberId = auth.getName();
+
+        // 🗑️ 삭제 요청
+        myResumeService.deleteResume(resumeId, memberId);
+
+        return ResponseEntity.noContent().build(); // 상태 204 반환
+    }
+
+
 }

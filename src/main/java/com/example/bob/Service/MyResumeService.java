@@ -171,6 +171,27 @@ public class MyResumeService {
         return resume;
     }
 
+    /**
+     * ✅ 로그인 사용자의 이력서를 삭제 (본인 것만 가능)
+     */
+    public void deleteResume(Long id, String memberId) {
+        log.info("🗑️ 이력서 삭제 요청 - resumeId: {}, memberId: {}", id, memberId);
+
+        MyResume resume = myResumeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("이력서 없음"));
+
+        log.info("📌 이력서 작성자: {}, 로그인 사용자: {}", resume.getMemberId(), memberId);
+
+        if (!resume.getMemberId().equals(memberId)) {
+            throw new SecurityException("본인의 이력서만 삭제 가능합니다.");
+        }
+
+        myResumeRepository.deleteById(id);
+        log.info("✅ 삭제 완료");
+    }
+
+
+
 
 
 
