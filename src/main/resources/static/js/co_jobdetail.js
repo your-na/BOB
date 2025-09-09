@@ -48,6 +48,20 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(res => res.json())
         .then(data => {
             console.log("서버에서 받은 공고 데이터:", data);  // ✅ 이거 추가!
+
+            // ✅ 지원서 접수 방식에 따른 이력서 영역 분기 처리
+            const companyBox = document.getElementById("company-resume-box");
+            const memberBox = document.getElementById("member-resume-box");
+
+            if (data.applyType === "company") {
+                companyBox.classList.remove("hidden");
+                memberBox.classList.add("hidden");
+            } else if (data.applyType === "member") {
+                companyBox.classList.add("hidden");
+                memberBox.classList.remove("hidden");
+            }
+
+            
             // 제목 표시
             document.getElementById("job-title").textContent = `${data.title}`;
 

@@ -182,6 +182,7 @@ public class CoJobPostService {
                 entity.getStartDate(),
                 entity.getEndDate(),
                 entity.getSurew(),
+                entity.getApplyType(),
                 resumeTitles
         );
     }
