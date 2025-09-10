@@ -776,23 +776,205 @@
 
         // ===================== 초기화 =====================
         window.addEventListener('DOMContentLoaded', () => {
-            // 브라우저 기본 드래그 동작 방지(페이지 전체)
+            // 브라우저 기본 드래그 방지
             window.addEventListener('dragover', e => e.preventDefault());
             window.addEventListener('drop', e => e.preventDefault());
 
             bindTabs();
             setupLeftDrops();
 
-            // 데이터 로드
+            // ✅ 프로필 불러오기 (내 정보 채움)
+            fetch("/api/user/resumes/me")
+                .then(res => res.json())
+                .then(user => {
+                    document.getElementById("profileImage").src = user.profileImageUrl || "/images/user.png";
+                    document.getElementById("userName").textContent = user.userName || "이름 없음";
+                    document.getElementById("mainLanguage").textContent = user.mainLanguage || "";
+                    document.getElementById("sex").textContent = user.sex || "";
+                    document.getElementById("birthday").textContent = user.birthday || "";
+                    document.getElementById("phone").textContent = user.userPhone || "";
+                    document.getElementById("email").textContent = user.userEmail || "";
+                    document.getElementById("region").textContent = user.region || "";
+                })
+                .catch(err => console.error("프로필 불러오기 실패:", err));
+
+            // ✅ 다른 데이터들(경력, 학력, 프로젝트 등) 로드
             Promise.all([
                 renderProjects(),
                 renderJobs(),
                 renderEducations(),
-                // 공모전을 포트폴리오에 함께 보여주려면 주석 해제
                 // renderContestsIntoPortfolio()
             ]).then(() => {
                 // 기본 탭: 학력
                 activateTab('school');
             });
         });
+
+        document.querySelectorAll('.resume-section, .section-box').forEach(box => {
+            box.addEventListener('click', () => {
+                // 다른 박스 선택 해제
+                document.querySelectorAll('.resume-section, .section-box').forEach(b => b.classList.remove('selected'));
+                // 클릭한 박스만 선택
+                box.classList.add('selected');
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const addEduBtn = document.getElementById("add-edu");
+            const section2 = document.getElementById("section2");
+
+            // 학력 추가 버튼
+            addEduBtn.addEventListener("click", () => {
+                const firstItem = section2.querySelector(".education-item");
+                if (firstItem) {
+                    const clone = firstItem.cloneNode(true);
+                    // input/select 값 초기화
+                    clone.querySelectorAll("input, select").forEach(el => el.value = "");
+
+                    // 삭제 버튼 이벤트 새로 붙이기
+                    const delBtn = clone.querySelector(".edu-del");
+                    if (delBtn) {
+                        delBtn.addEventListener("click", () => clone.remove());
+                    }
+
+                    section2.insertBefore(clone, addEduBtn);
+                }
+            });
+
+            // 초기 삭제 버튼 이벤트 바인딩
+            document.querySelectorAll(".edu-del").forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    e.target.closest(".education-item").remove();
+                });
+            });
+        });
+
+        //템플릿
+        document.addEventListener("DOMContentLoaded", () => {
+            const arrow = document.querySelector(".arrow-toggle");
+            if (arrow) {
+                arrow.addEventListener("click", () => {
+                    window.location.href = "/profile";  // ✅ 이동할 페이지 주소
+                });
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const firstTemplate = document.querySelector(".template-card"); // 첫 번째 카드
+            const modal = document.getElementById("templateModal");
+            const closeBtn = modal.querySelector(".close-btn");
+
+            // 카드 클릭 → 모달 열기
+            if (firstTemplate) {
+                firstTemplate.addEventListener("click", () => {
+                    modal.style.display = "flex";
+                });
+            }
+
+            // 닫기 버튼 클릭 → 모달 닫기
+            closeBtn.addEventListener("click", () => {
+                modal.style.display = "none";
+            });
+
+            // 바깥 영역 클릭 시 닫기
+            window.addEventListener("click", (e) => {
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const applyBtn = document.getElementById("applyTemplateBtn");
+
+            if (applyBtn) {
+                applyBtn.addEventListener("click", () => {
+                    alert("이 템플릿이 적용되었습니다!");
+                    // 👉 여기서 실제 템플릿 적용 로직을 추가하면 됨
+                    document.getElementById("templateModal").style.display = "none";
+                });
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const cards = document.querySelectorAll(".template-card");
+            const modal = document.getElementById("templateModal");
+            const questionList = document.getElementById("questionList");
+            const closeBtn = modal.querySelector(".close-btn");
+            const applyBtn = document.getElementById("applyTemplateBtn");
+
+            // ✅ 템플릿별 질문 세트
+            const templates = [
+                {
+                    title: "템플릿 1",
+                    questions: [
+                        "자기소개를 해주세요.",
+                        "가장 기억에 남는 프로젝트 경험은?",
+                        "지원 동기는 무엇인가요?"
+                    ]
+                },
+                {
+                    title: "템플릿 2",
+                    questions: [
+                        "본인의 강점을 설명해주세요.",
+                        "리더십을 발휘한 경험은?",
+                        "입사 후 목표는 무엇인가요?"
+                    ]
+                },
+                {
+                    title: "템플릿 3",
+                    questions: [
+                        "가장 어려웠던 문제 해결 경험은?",
+                        "협업 과정에서의 갈등 해결 경험은?",
+                        "자신의 가치관을 설명해주세요."
+                    ]
+                },
+                {
+                    title: "템플릿 4",
+                    questions: [
+                        "창의성을 발휘한 경험은?",
+                        "본인이 성장했다고 느낀 순간은?",
+                        "우리 회사에서 하고 싶은 일은?"
+                    ]
+                }
+            ];
+
+            let selectedTemplate = null; // 현재 선택된 템플릿 저장
+
+            // 카드 클릭 시 모달 열고 질문 표시
+            cards.forEach((card, index) => {
+                card.addEventListener("click", () => {
+                    selectedTemplate = templates[index]; // 현재 선택
+                    modal.style.display = "flex";
+
+                    // 질문 리스트 초기화 후 새로 채우기
+                    questionList.innerHTML = "";
+                    selectedTemplate.questions.forEach(q => {
+                        const li = document.createElement("li");
+                        li.textContent = q;
+                        questionList.appendChild(li);
+                    });
+                });
+            });
+
+            // 닫기 버튼
+            closeBtn.addEventListener("click", () => {
+                modal.style.display = "none";
+            });
+
+            // 배경 클릭 시 닫기
+            window.addEventListener("click", (e) => {
+                if (e.target === modal) modal.style.display = "none";
+            });
+
+            // "적용하기" 버튼 클릭 → 질문들을 본문에 적용
+            applyBtn.addEventListener("click", () => {
+                if (selectedTemplate) {
+                    alert(`${selectedTemplate.title} 템플릿이 적용되었습니다!`);
+                    // ✅ 여기서 실제 적용 로직 (예: 이력서 입력창에 질문 붙이기)
+                }
+                modal.style.display = "none";
+            });
+        });
+
 

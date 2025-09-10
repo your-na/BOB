@@ -50,24 +50,60 @@
             </div>
 
             <!-- 일반회원 정보 -->
-            <section class="resume-section selected" id="section1" data-multi-select="false">
-                <div class="section-header"><span>1. 일반회원 정보</span></div>
-                <p class="section-note">사이트 등록 정보를 기반으로 보여집니다.</p>
+            <section class="section-box">
+                <div class="section-title">
+                    <div class="number">1.</div>
+                    <div class="title-content">
+                        <h3>
+                            내 정보
+                            <span class="red">* 내 정보에서 불러온 정보입니다.</span>
+                        </h3>
+                    </div>
+                    <div class="arrow-toggle">❯</div>
+                </div>
+                <div class="user-info">
+                    <img id="profileImage" src="/images/user.png" alt="프로필 사진">
+                    <div class="user-detail">
+                        <p><strong id="userName">이름</strong></p>
+                        <p class="skill" id="mainLanguage">기술스택</p>
+                        <p><strong>성별:</strong> <span id="sex"></span></p>
+                        <p><strong>생년월일:</strong> <span id="birthday"></span></p>
+                        <p><strong>연락처:</strong> <span id="phone"></span></p>
+                        <p><strong>이메일:</strong> <span id="email"></span></p>
+                        <p><strong>지역:</strong> <span id="region"></span></p>
+                    </div>
+                </div>
             </section>
 
             <!-- 학력사항 -->
-            <section class="resume-section" id="section2" data-multi-select="false">
+            <section class="resume-section" id="section2" data-multi-select="true">
                 <div class="section-header">
                     <span>2. 학력사항</span>
                     <button class="delete-btn">✕</button>
                 </div>
-                <input type="text" placeholder="학교명"><br>
-                <input type="text" placeholder="학과">
-                <select><option>재학</option><option>졸업</option></select>
-                <div class="date-group">
-                    <select><option>2020</option></select> ~ <select><option>2023</option></select>
+
+                <!-- 학력 입력 세트 -->
+                <div class="education-item">
+                    <input type="text" placeholder="학교명"><br>
+                    <input type="text" placeholder="학과">
+                    <select>
+                        <option>재학</option>
+                        <option>졸업</option>
+                    </select>
+                    <div class="date-group">
+                        <select><option>2020</option></select> ~ <select><option>2023</option></select>
+                    </div>
+                    <!-- ✅ 개별 삭제 버튼 -->
+                    <button type="button" class="edu-del">✕</button>
                 </div>
+
+                <!-- 학력 추가 버튼 -->
+                <button type="button" class="edu-btn" id="add-edu">
+                    <span class="plus">＋</span> 학력 추가
+                </button>
             </section>
+
+
 
             <!-- 희망직무 (복수선택 기능 적용) -->
             <section class="resume-section" id="section3" data-multi-select="false">
@@ -160,6 +196,14 @@
                     <div class="template-card">미리보기</div>
                 </div>
             </div>
+        </div>
+    </div>
+    <div id="templateModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>템플릿 미리보기</h2>
+            <p>여기에 템플릿 내용을 보여줄 수 있습니다.</p>
+            <button id="applyTemplateBtn" class="apply-btn">적용하기</button>
         </div>
     </div>
     <!-- AI 플로팅 버튼 -->
