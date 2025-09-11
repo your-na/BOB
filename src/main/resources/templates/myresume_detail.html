@@ -13,6 +13,11 @@
 
 <div class="resume-detail-container">
 
+  <!-- ✅ 오른쪽 상단 버튼 -->
+  <div class="resume-buttons">
+    <button id="downloadBtn">다운받기</button>
+  </div>
+
   <!-- ✅ 사용자 프로필 정보 -->
   <div class="profile-row">
     <div class="photo-wrapper">
@@ -62,11 +67,10 @@
       </ul>
     </div>
 
-    <!-- ✅ 내용 (content가 있으면 항상 보여줌) -->
+    <!-- ✅ 내용 -->
     <div th:if="${section.content != null and section.content != ''}">
       <textarea readonly th:text="${section.content}"></textarea>
     </div>
-
 
     <!-- ✅ 조건 태그 -->
     <div th:if="${section.conditions != null and !section.conditions.isEmpty()}">
@@ -99,27 +103,76 @@
   </div> <!-- end of section -->
 
 </div> <!-- end of container -->
+
+<!-- ✅ 기존 JS -->
 <script>
   // 일반회원 정보 섹션 숨기기
   document.addEventListener("DOMContentLoaded", () => {
     const sections = document.querySelectorAll(".info-section");
-    console.log("✅ 섹션 개수:", sections.length);
 
     sections.forEach((section, index) => {
-      const titleEl = section.querySelector("h3"); // 이 페이지는 <h3> 태그 사용함
+      const titleEl = section.querySelector("h3");
       if (!titleEl) return;
 
       const rawTitle = titleEl.textContent;
       const normalized = rawTitle.trim().replace(/\s+/g, "").toLowerCase();
-      console.log(`🔍 섹션 ${index} - 원본: "${rawTitle}", 정제: "${normalized}"`);
 
       if (normalized === "일반회원정보") {
-        console.log(`🚫 숨김 처리된 섹션: ${index}`);
         section.style.display = "none";
       }
     });
   });
+
+  // 섹션 순서 정렬
+  document.addEventListener("DOMContentLoaded", () => {
+    const container = document.querySelector(".resume-detail-container");
+    const order = ["일반회원정보", "학력사항", "경력사항", "포트폴리오", "자기소개"];
+
+    order.forEach(title => {
+      const section = [...document.querySelectorAll(".info-section")]
+              .find(sec => sec.querySelector("h3")?.textContent.trim() === title);
+      if (section) container.appendChild(section);
+    });
+  });
 </script>
+
+<!-- ✅ PDF 변환 라이브러리 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- ✅ 다운로드 버튼 기능 -->
+<script>
+  document.getElementById("downloadBtn").addEventListener("click", () => {
+    const { jsPDF } = window.jspdf;
+    const resume = document.querySelector(".resume-detail-container");
+
+    html2canvas(resume, { scale: 2 }).then(canvas => {
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      const imgWidth = pageWidth;
+      const imgHeight = canvas.height * pageWidth / canvas.width;
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save("이력서.pdf");
+    });
+  });
+</script>
+
 </body>
 </html>
-
