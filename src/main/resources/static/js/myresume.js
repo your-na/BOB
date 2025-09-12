@@ -901,95 +901,46 @@
 
             document.addEventListener("DOMContentLoaded", () => {
                 const applyBtn = document.getElementById("applyTemplateBtn");
-
-                if (applyBtn) {
-                    applyBtn.addEventListener("click", () => {
-                        alert("이 템플릿이 적용되었습니다!");
-                        // 👉 여기서 실제 템플릿 적용 로직을 추가하면 됨
-                        document.getElementById("templateModal").style.display = "none";
-                    });
-                }
-            });
-
-            document.addEventListener("DOMContentLoaded", () => {
-                const cards = document.querySelectorAll(".template-card");
                 const modal = document.getElementById("templateModal");
-                const questionList = document.getElementById("questionList");
-                const closeBtn = modal.querySelector(".close-btn");
-                const applyBtn = document.getElementById("applyTemplateBtn");
 
-                // ✅ 템플릿별 질문 세트
-                const templates = [
-                    {
-                        title: "템플릿 1",
-                        questions: [
-                            "자기소개를 해주세요.",
-                            "가장 기억에 남는 프로젝트 경험은?",
-                            "지원 동기는 무엇인가요?"
-                        ]
-                    },
-                    {
-                        title: "템플릿 2",
-                        questions: [
-                            "본인의 강점을 설명해주세요.",
-                            "리더십을 발휘한 경험은?",
-                            "입사 후 목표는 무엇인가요?"
-                        ]
-                    },
-                    {
-                        title: "템플릿 3",
-                        questions: [
-                            "가장 어려웠던 문제 해결 경험은?",
-                            "협업 과정에서의 갈등 해결 경험은?",
-                            "자신의 가치관을 설명해주세요."
-                        ]
-                    },
-                    {
-                        title: "템플릿 4",
-                        questions: [
-                            "창의성을 발휘한 경험은?",
-                            "본인이 성장했다고 느낀 순간은?",
-                            "우리 회사에서 하고 싶은 일은?"
-                        ]
-                    }
-                ];
-
-                let selectedTemplate = null; // 현재 선택된 템플릿 저장
-
-                // 카드 클릭 시 모달 열고 질문 표시
-                cards.forEach((card, index) => {
-                    card.addEventListener("click", () => {
-                        selectedTemplate = templates[index]; // 현재 선택
-                        modal.style.display = "flex";
-
-                        // 질문 리스트 초기화 후 새로 채우기
-                        questionList.innerHTML = "";
-                        selectedTemplate.questions.forEach(q => {
-                            const li = document.createElement("li");
-                            li.textContent = q;
-                            questionList.appendChild(li);
-                        });
-                    });
-                });
-
-                // 닫기 버튼
-                closeBtn.addEventListener("click", () => {
-                    modal.style.display = "none";
-                });
-
-                // 배경 클릭 시 닫기
-                window.addEventListener("click", (e) => {
-                    if (e.target === modal) modal.style.display = "none";
-                });
-
-                // "적용하기" 버튼 클릭 → 질문들을 본문에 적용
                 applyBtn.addEventListener("click", () => {
-                    if (selectedTemplate) {
-                        alert(`${selectedTemplate.title} 템플릿이 적용되었습니다!`);
-                        // ✅ 여기서 실제 적용 로직 (예: 이력서 입력창에 질문 붙이기)
-                    }
+                    // 질문 리스트
+                    const questions = [
+                        "내가 가진 큰 강점",
+                        "내가 지원한 직무와 내가 잘 맞는 이유",
+                        "어려운 상황을 극복한 경험",
+                        "입사 후 이루고 싶은 목표"
+                    ];
+
+                    // 현재 몇 개 섹션이 있는지 계산
+                    let sectionIndex = document.querySelectorAll(".resume-section").length;
+
+                    questions.forEach(q => {
+                        sectionIndex++;
+                        const newSection = document.createElement("section");
+                        newSection.className = "resume-section";
+                        newSection.id = `section${sectionIndex}`;
+                        newSection.setAttribute("data-multi-select", "false");
+
+                        newSection.innerHTML = `
+                <div class="section-header">
+                    <span>${sectionIndex}. ${q}</span>
+                    <button class="delete-btn">✕</button>
+                </div>
+                <textarea placeholder="${q}에 대해 작성해주세요."></textarea>
+            `;
+
+                        // "➕ 추가" 버튼 바로 위에 붙이기
+                        document.querySelector(".add-section").before(newSection);
+
+                        // 목차도 자동 업데이트
+                        const outlineList = document.querySelector(".outline-list");
+                        const tocItem = document.createElement("li");
+                        tocItem.innerHTML = `<a href="#section${sectionIndex}">${sectionIndex}. ${q}</a>`;
+                        outlineList.appendChild(tocItem);
+                    });
+
+                    // 모달 닫기
                     modal.style.display = "none";
                 });
             });
-
-
