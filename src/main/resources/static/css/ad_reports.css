@@ -1,0 +1,134 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 20px;
+    background-color: #f9f9f9;
+}
+
+/* 제목 */
+h2 {
+    color: #000000;
+    margin-bottom: 10px; /* 필터와 간격 좁게 */
+}
+
+
+#search-input {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* 테이블 */
+.inquiry-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background-color: white;
+}
+
+.inquiry-table th, .inquiry-table td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.inquiry-table th {
+    background-color: #eafbea;
+    color: #2ea44f;
+    font-weight: bold;
+}
+
+/* 상세보기 버튼 */
+.detail-btn {
+    background-color: #ddd;
+    color: black;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.detail-btn:hover {
+    background-color: #ccc;
+}
+
+/* 페이지네이션 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.pagination button {
+    border: none;
+    background-color: #ddd;
+    padding: 5px 10px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.pagination button:disabled {
+    background-color: #eee;
+    cursor: default;
+}
+
+.pagination span {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0 5px;
+}
+
+/* 필터 드롭다운 */
+.filter-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.filter-btn {
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    background: white;
+}
+
+/* 드롭다운 메뉴 */
+.filter-menu {
+    position: absolute;
+    display: none;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px 0;
+    list-style: none;
+    width: 120px;
+    margin-top: 2px;
+}
+
+.filter-menu li {
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.filter-menu li:hover {
+    background-color: #eee;
+}
+
+/* 검색창 */
+#search-input {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 220px;
+}
+
+/* 상단 바 */
+.top-bar {
+    display: flex;
+    align-items: center;   /* 세로 가운데 정렬 */
+    justify-content: space-between; /* 좌우 정렬 */
+    margin-bottom: 10px;
+}
+
