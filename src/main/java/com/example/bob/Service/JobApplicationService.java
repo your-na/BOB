@@ -71,9 +71,12 @@ public class JobApplicationService {
                 .map(app -> {
                     String userName = app.getUser().getUserName(); // 🙋‍♂️ 지원자 이름
                     String appliedAt = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(app.getAppliedAt()); // ⏰ 날짜
-                    Long resumeId = app.getResume().getId(); // 📄 이력서 ID
+                    Long resumeIdFromCompany = (app.getResume() != null) ? app.getResume().getId() : null; // 📄 기업 이력서 ID
+                    Long myResumeId = (app.getMyResume() != null) ? app.getMyResume().getId() : null; // 📄 나만의 이력서 ID
 
-                    return new ApplicantDTO(userName, appliedAt, resumeId);
+
+                    return new ApplicantDTO(userName, appliedAt, resumeIdFromCompany, myResumeId);
+
                 })
 
                 // 📤 리스트로 반환
