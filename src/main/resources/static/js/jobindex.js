@@ -246,11 +246,20 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .then(data => {
                 alert(data.message || '지원이 완료되었습니다.');
+
+                // 서버에서 resumeId를 반환하면 해당 페이지로 이동
+                if (data.resumeId) {
+                    window.location.href = `/myresume/${data.resumeId}`;
+                } else {
+                    // fallback: title 기반 상세보기
+                    window.location.href = `/resume/detail?title=${encodeURIComponent(selectedResumeTitle)}`;
+                }
             })
             .catch(err => {
                 console.error(err);
                 alert('지원 중 오류가 발생했습니다.');
             });
+
     });
 
 });

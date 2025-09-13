@@ -215,7 +215,8 @@
                 jobApplicationService.applyForJobWithMyResume(user, jobId, myResume);
 
                 return ResponseEntity.ok(Map.of(
-                        "message", "지원이 완료되었습니다."
+                        "message", "지원이 완료되었습니다.",
+                        "resumeId", myResume.getId()  // ✅ 여기에 id 추가
                 ));
             } catch (IllegalStateException e) {
                 return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
