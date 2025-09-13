@@ -228,14 +228,18 @@
             "Content-Type": "application/json",
             [csrfHeader]: csrfToken
           },
-          body: JSON.stringify({ jobPostId, myResumeId: resumeId, message })
-
+          body: JSON.stringify({
+            jobPostId,
+            myResumeId: resumeId,
+            message: ""   // ✅ 빈 문자열로 고정
+          })
         })
                 .then(res => res.ok ? res.json() : res.text().then(msg => { throw new Error(msg); }))
                 .then(data => alert("❎ " + data.message))
                 .catch(err => alert("⚠️ 불합격 처리 실패: " + err.message));
       });
     }
+
 
     // ✅ 합격 처리
     const passBtn = document.querySelector(".pass-btn");
