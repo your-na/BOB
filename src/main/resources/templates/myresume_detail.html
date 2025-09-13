@@ -26,7 +26,30 @@
   <!-- ✅ 오른쪽 상단 버튼 -->
   <div class="resume-buttons">
     <button id="downloadBtn">다운받기</button>
+
+    <!-- 기업 사용자에게만 보이게 -->
+    <div sec:authorize="hasAuthority('COMPANY')">
+      <button type="button" class="nonpass-btn">❎ 불합격 처리</button>
+      <button type="button" class="pass-btn">✅ 합격 처리</button>
+    </div>
   </div>
+
+  <!-- ✅ 합격 처리 모달 -->
+  <div id="passModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closePassModal()">&times;</span>
+      <h2>정말 합격 처리하시겠습니까?</h2>
+      <p>지원자에게 전달할 메시지를 입력해 주세요.</p>
+      <textarea id="passMessage" placeholder="예: 귀하의 지원을 축하드립니다!"></textarea>
+      <div class="modal-actions">
+        <button id="submitPassBtn" type="button">확인</button>
+        <button type="button" onclick="closePassModal()">취소</button>
+      </div>
+    </div>
+  </div>
+
+
+
 
   <!-- ✅ 사용자 프로필 정보 -->
   <div class="profile-row">
@@ -181,6 +204,70 @@
 
       pdf.save("이력서.pdf");
     });
+  });
+</script>
+
+<!-- ✅ 합격/불합격 처리 기능 -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const jobPostId = new URLSearchParams(location.search).get("jobPostId");
+    const resumeId = new URLSearchParams(location.search).get("resumeId");
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+    // ❎ 불합격 처리
+    const nonpassBtn = document.querySelector(".nonpass-btn");
+    if (nonpassBtn) {
+      nonpassBtn.addEventListener("click", () => {
+        if (!confirm("정말 이 지원자를 불합격 처리하시겠습니까?")) return;
+
+        fetch("/api/applications/job/reject-myresume", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            [csrfHeader]: csrfToken
+          },
+          body: JSON.stringify({ jobPostId, resumeId })
+        })
+                .then(res => res.ok ? res.json() : res.text().then(msg => { throw new Error(msg); }))
+                .then(data => alert("❎ " + data.message))
+                .catch(err => alert("⚠️ 불합격 처리 실패: " + err.message));
+      });
+    }
+
+    // ✅ 합격 처리
+    const passBtn = document.querySelector(".pass-btn");
+    const passModal = document.getElementById("passModal");
+    const submitPassBtn = document.getElementById("submitPassBtn");
+
+    if (passBtn && passModal) {
+      passBtn.addEventListener("click", () => {
+        passModal.style.display = "block";
+      });
+
+      submitPassBtn?.addEventListener("click", () => {
+        const message = document.getElementById("passMessage").value.trim();
+        if (!message) {
+          alert("메시지를 입력해 주세요.");
+          return;
+        }
+
+        fetch("/api/applications/job/pass-myresume", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            [csrfHeader]: csrfToken
+          },
+          body: JSON.stringify({ jobPostId, resumeId, message })
+        })
+                .then(res => res.ok ? res.json() : res.text().then(msg => { throw new Error(msg); }))
+                .then(data => {
+                  alert("✅ " + data.message);
+                  passModal.style.display = "none";
+                })
+                .catch(err => alert("⚠️ 합격 처리 실패: " + err.message));
+      });
+    }
   });
 </script>
 
