@@ -203,7 +203,72 @@ public class JobApplicationService {
     }
 
 
+    // ✅ 나만의 이력서 합격 처리 메서드
+    public void acceptMyResumeApplicant(Long myResumeId, Long jobPostId, String message) {
+        System.out.println("📥 [SERVICE] acceptMyResumeApplicant 호출됨");
 
+        // 📄 나만의 이력서 조회
+        MyResume myResume = myResumeRepository.findById(myResumeId)
+                .orElseThrow(() -> {
+                    System.out.println("❌ MyResume 조회 실패 - myResumeId: " + myResumeId);
+                    return new RuntimeException("이력서를 찾을 수 없습니다.");
+                });
+
+        // 📦 지원 내역 조회
+        JobApplicationEntity application = jobApplicationRepository
+                .findTopByMyResumeOrderByAppliedAtDesc(myResume)
+                .orElseThrow(() -> {
+                    System.out.println("❌ 지원 내역 조회 실패 - myResumeId: " + myResumeId);
+                    return new RuntimeException("지원 내역이 존재하지 않습니다.");
+                });
+
+        // 👤 지원자 정보 가져오기 (application에서 직접 꺼냄)
+        UserEntity user = application.getUser();
+
+        // 🔄 상태 변경 → 합격
+        application.setStatus(JobApplicationStatus.ACCEPTED);
+        application.setAcceptedAt(new Date());
+        jobApplicationRepository.save(application);
+        System.out.println("✅ 상태 저장 완료: ACCEPTED");
+
+        // 📩 합격 알림 전송
+        notificationService.sendHireNotification(user, application.getJobPost().getCompany(), message, application.getJobPost());
+
+        System.out.println("✅ 나만의 이력서 합격 처리 완료");
+    }
+
+    // ❎ 나만의 이력서 불합격 처리 메서드
+    public void rejectMyResumeApplicant(Long myResumeId, Long jobPostId, String message) {
+        System.out.println("📥 [SERVICE] rejectMyResumeApplicant 호출됨");
+
+        // 📄 나만의 이력서 조회
+        MyResume myResume = myResumeRepository.findById(myResumeId)
+                .orElseThrow(() -> {
+                    System.out.println("❌ MyResume 조회 실패 - myResumeId: " + myResumeId);
+                    return new RuntimeException("이력서를 찾을 수 없습니다.");
+                });
+
+        // 📦 지원 내역 조회
+        JobApplicationEntity application = jobApplicationRepository
+                .findTopByMyResumeOrderByAppliedAtDesc(myResume)
+                .orElseThrow(() -> {
+                    System.out.println("❌ 지원 내역 조회 실패 - myResumeId: " + myResumeId);
+                    return new RuntimeException("지원 내역이 존재하지 않습니다.");
+                });
+
+        // 👤 지원자 정보 가져오기 (application에서 직접 꺼냄)
+        UserEntity user = application.getUser();
+
+        // 🔄 상태 변경 → 불합격
+        application.setStatus(JobApplicationStatus.REJECTED);
+        jobApplicationRepository.save(application);
+        System.out.println("✅ 상태 저장 완료: REJECTED");
+
+        // 📩 불합격 알림 전송
+        notificationService.sendRejectNotification(user, application.getJobPost().getCompany(), application.getJobPost());
+
+        System.out.println("✅ 나만의 이력서 불합격 처리 완료");
+    }
 
 
 

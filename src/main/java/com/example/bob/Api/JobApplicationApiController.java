@@ -19,6 +19,9 @@
     import org.springframework.security.core.annotation.AuthenticationPrincipal; // ✅ 로그인 정보 주입
     import com.example.bob.Entity.CoJobPostEntity;
     import com.example.bob.Entity.CoJobPostEntity;
+    import com.example.bob.DTO.MyResumeApplicationRequest;   // ✅ 방금 만든 DTO
+    import com.example.bob.Entity.MyResume;                  // ✅ 엔티티
+    import com.example.bob.Repository.MyResumeRepository;    // ✅ 레포지토리
     import com.example.bob.Repository.CoJobPostRepository;
     import com.example.bob.DTO.JobApplyRequestDTO;
     import com.example.bob.Entity.MyResume;
@@ -225,6 +228,53 @@
                 return ResponseEntity.status(500).body(Map.of("message", "서버 오류: " + e.getMessage()));
             }
         }
+
+        // ✅ 내가 만든 이력서(MyResume) 합격 처리
+        @PostMapping("/job/pass-myresume")
+        public ResponseEntity<Map<String, String>> passMyResumeApplicant(
+                @AuthenticationPrincipal CompanyDetailsImpl companyDetails,
+                @RequestBody MyResumeApplicationRequest request) {
+
+            if (companyDetails == null) {
+                return ResponseEntity.status(401).body(Map.of("message", "로그인이 필요합니다."));
+            }
+
+            try {
+                jobApplicationService.acceptMyResumeApplicant(
+                        request.getMyResumeId(), // 여기서 resumeId = myResumeId
+                        request.getJobPostId(),
+                        request.getMessage()
+                );
+                return ResponseEntity.ok(Map.of("message", "🎉 나만의 이력서 합격 처리가 완료되었습니다."));
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(500).body(Map.of("message", "서버 오류: " + e.getMessage()));
+            }
+        }
+
+        // ❎ 내가 만든 이력서(MyResume) 불합격 처리
+        @PostMapping("/job/reject-myresume")
+        public ResponseEntity<Map<String, String>> rejectMyResumeApplicant(
+                @AuthenticationPrincipal CompanyDetailsImpl companyDetails,
+                @RequestBody MyResumeApplicationRequest request) {
+
+            if (companyDetails == null) {
+                return ResponseEntity.status(401).body(Map.of("message", "로그인이 필요합니다."));
+            }
+
+            try {
+                jobApplicationService.rejectMyResumeApplicant(
+                        request.getMyResumeId(),
+                        request.getJobPostId(),
+                        request.getMessage()
+                );
+                return ResponseEntity.ok(Map.of("message", "❎ 나만의 이력서 불합격 처리가 완료되었습니다."));
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(500).body(Map.of("message", "서버 오류: " + e.getMessage()));
+            }
+        }
+
 
 
 

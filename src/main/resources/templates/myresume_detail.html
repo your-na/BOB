@@ -211,7 +211,8 @@
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const jobPostId = new URLSearchParams(location.search).get("jobPostId");
-    const resumeId = new URLSearchParams(location.search).get("resumeId");
+    const pathParts = window.location.pathname.split("/");
+    const resumeId = pathParts[pathParts.length - 1];
     const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
 
@@ -227,7 +228,8 @@
             "Content-Type": "application/json",
             [csrfHeader]: csrfToken
           },
-          body: JSON.stringify({ jobPostId, resumeId })
+          body: JSON.stringify({ jobPostId, myResumeId: resumeId, message })
+
         })
                 .then(res => res.ok ? res.json() : res.text().then(msg => { throw new Error(msg); }))
                 .then(data => alert("❎ " + data.message))
@@ -258,7 +260,7 @@
             "Content-Type": "application/json",
             [csrfHeader]: csrfToken
           },
-          body: JSON.stringify({ jobPostId, resumeId, message })
+          body: JSON.stringify({ jobPostId, myResumeId: resumeId, message })
         })
                 .then(res => res.ok ? res.json() : res.text().then(msg => { throw new Error(msg); }))
                 .then(data => {
