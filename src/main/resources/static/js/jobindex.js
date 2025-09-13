@@ -106,10 +106,13 @@ document.addEventListener("DOMContentLoaded", function () {
         if (modal && modalTitle && confirmBtn) {
             modalTitle.textContent = title;
             modal.style.display = 'flex';
-            confirmBtn.dataset.resumeTitle = title; // title 기준
+            confirmBtn.dataset.resumeTitle = title;
+            confirmBtn.dataset.resumeId = resumeId; // ✅ resumeId 추가
             confirmBtn.dataset.jobPostId = jobPostId;
         }
     }
+
+
 
     // 모달 닫기 버튼
     document.getElementById("cancel-btn")?.addEventListener("click", () => {
@@ -118,14 +121,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 예 버튼 → 이력서 작성 페이지 이동
     document.getElementById("confirm-btn")?.addEventListener("click", function () {
-        const resumeTitle = this.dataset.resumeTitle;
+        const resumeId = this.dataset.resumeId;   // ✅ resumeId 사용
         const jobPostId = this.dataset.jobPostId;
-        if (resumeTitle && jobPostId) {
-            window.location.href = `/resume/write?title=${encodeURIComponent(resumeTitle)}&jobPostId=${jobPostId}`;
-             } else {
-            console.error("이동할 수 없습니다. resumeTitle 또는 jobPostId가 없습니다.");
+        if (resumeId && jobPostId) {
+            window.location.href = `/resume/write?id=${resumeId}&jobPostId=${jobPostId}`; // 원래 이동 경로
+        } else {
+            console.error("이동할 수 없습니다. resumeId 또는 jobPostId가 없습니다.");
         }
     });
+
 });
 
 // ✅ 회원 이력서 목록 불러오기
