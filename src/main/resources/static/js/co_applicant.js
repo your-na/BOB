@@ -26,9 +26,23 @@ document.addEventListener("DOMContentLoaded", function () {
     <td>${applicant.userName}</td>
     <td>${applicant.appliedAt}</td>
     <td>
-        <button class="view-resume-btn" onclick="viewResume(${applicant.resumeId})">이력서 열기</button>
+        <button class="view-resume-btn"
+            data-resume-id="${applicant.resumeId ?? ''}"
+            data-my-resume-id="${applicant.myResumeId ?? ''}">
+            이력서 열기
+        </button>
     </td>
 `;
+
+                const btn = row.querySelector(".view-resume-btn");
+                btn.addEventListener("click", function () {
+                    // 문자열 ''이면 null로 처리, 값이 있으면 숫자로 변환
+                    let resumeId = this.dataset.resumeId === '' ? null : Number(this.dataset.resumeId);
+                    let myResumeId = this.dataset.myResumeId === '' ? null : Number(this.dataset.myResumeId);
+
+                    viewResume(resumeId, myResumeId);
+                });
+
 
                 tbody.appendChild(row);
             });
@@ -51,13 +65,24 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 });
 
-function viewResume(resumeId) {
-    if (!resumeId) {
-        alert("이력서 ID가 없습니다.");
-        return;
+function viewResume(resumeId, myResumeId) {
+    // 문자열 'null' 처리 + null/undefined 처리
+    resumeId = (resumeId === null || resumeId === 'null') ? null : resumeId;
+    myResumeId = (myResumeId === null || myResumeId === 'null') ? null : myResumeId;
+
+    console.log("📌 클릭 시 resumeId:", resumeId, "myResumeId:", myResumeId);
+
+    if (myResumeId) {
+        // 나만의 이력서 상세보기
+        window.location.href = `/myresume/${myResumeId}`;
+    } else if (resumeId) {
+        // 기업 이력서 상세보기
+        window.open(`/resume/detail?jobPostId=${jobPostId}&resumeId=${resumeId}`, '_blank'); // 새 탭에서 열기
+
+    } else {
+        alert("이력서 정보가 없습니다.");
     }
-
-    // ✅ 이력서 상세 페이지로 이동
-    location.href = `/resume/detail?jobPostId=${jobPostId}&resumeId=${resumeId}`;
-
 }
+
+
+

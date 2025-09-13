@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
@@ -9,7 +10,16 @@
 <body>
 
 <!-- ✅ 헤더 삽입 -->
-<div th:insert="~{header :: header}"></div>
+<!-- 기업 사용자면 header2 삽입 -->
+<div sec:authorize="hasAuthority('COMPANY')">
+  <div th:insert="~{header2 :: header}"></div>
+</div>
+
+<!-- 그 외 사용자나 비로그인 사용자는 기본 header 삽입 -->
+<div sec:authorize="!hasAuthority('COMPANY')">
+  <div th:insert="~{header :: header}"></div>
+</div>
+
 
 <div class="resume-detail-container">
 
