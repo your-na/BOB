@@ -1,4 +1,4 @@
-let selectedResumeId = null; // 전역 선언 (모든 함수에서 접근 가능)
+let selectedResumeTitle = null;  // 전역 선언 (모든 함수에서 접근 가능)
 
 document.addEventListener("DOMContentLoaded", function () {
     // 공고 ID 가져오기
@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (modal && modalTitle && confirmBtn) {
             modalTitle.textContent = title;
             modal.style.display = 'flex';
-            confirmBtn.dataset.resumeId = resumeId;
+            confirmBtn.dataset.resumeTitle = title; // title 기준
             confirmBtn.dataset.jobPostId = jobPostId;
         }
     }
@@ -118,12 +118,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 예 버튼 → 이력서 작성 페이지 이동
     document.getElementById("confirm-btn")?.addEventListener("click", function () {
-        const resumeId = this.dataset.resumeId;
+        const resumeTitle = this.dataset.resumeTitle;
         const jobPostId = this.dataset.jobPostId;
-        if (resumeId && jobPostId) {
-            window.location.href = `/resume/write?id=${resumeId}&jobPostId=${jobPostId}`;
-        } else {
-            console.error("이동할 수 없습니다. resumeId 또는 jobPostId가 없습니다.");
+        if (resumeTitle && jobPostId) {
+            window.location.href = `/resume/write?title=${encodeURIComponent(resumeTitle)}&jobPostId=${jobPostId}`;
+             } else {
+            console.error("이동할 수 없습니다. resumeTitle 또는 jobPostId가 없습니다.");
         }
     });
 });
@@ -135,8 +135,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // ① 회원 이력서 목록 로드
     fetch('/api/myresumes')
         .then(r => r.json())
-        .then(items => renderResumes(items))
+        .then(items => {
+            console.log('이력서 목록:', items); // 🔴 여기 꼭 확인
+            renderResumes(items);
+        })
         .catch(err => console.error('이력서 목록 로드 실패:', err));
+
 
     // ② 목록 렌더
     function renderResumes(items) {
@@ -157,63 +161,97 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ③ 단일 선택 토글
     function toggleSelect(btn) {
-        const id = btn.dataset.id;
-        if (selectedResumeId === id) {
+        const title = btn.querySelector('.resume-title').textContent; // 제목 가져오기
+        if (selectedResumeTitle === title) {
             btn.classList.remove('selected');
-            selectedResumeId = null;
+            selectedResumeTitle = null;
             return;
         }
         const prev = listEl.querySelector('.resume-tab.selected');
         if (prev) prev.classList.remove('selected');
         btn.classList.add('selected');
-        selectedResumeId = id;
+        selectedResumeTitle = title; // 선택된 제목 저장
+
+        console.log('선택된 이력서 title(selectedResumeTitle) 업데이트:', selectedResumeTitle);
     }
 });
 
-// ✅ 지원하기 버튼 클릭
-document.querySelector('.apply-btn')?.addEventListener('click', () => {
-    if (!selectedResumeId) {
-        // 이력서 선택 안 했으면 경고 모달
-        document.getElementById("alertModal").style.display = "flex";
-        return;
-    }
-    // 선택된 이력서 있으면 확인 모달
-    document.getElementById("confirmApplyModal").style.display = "flex";
+// ✅ 지원하기 버튼 클릭 + 확인 모달 이벤트
+document.addEventListener("DOMContentLoaded", () => {
+    // 지원하기 버튼
+    document.querySelector('.apply-btn')?.addEventListener('click', () => {
+        if (!selectedResumeTitle) {
+            // 이력서 선택 안 했으면 경고 모달
+            document.getElementById("alertModal").style.display = "flex";
+            return;
+        }
+        // 선택된 이력서 있으면 확인 모달
+        document.getElementById("confirmApplyModal").style.display = "flex";
+    });
+
+    // "아니오" 버튼 → 모달 닫기
+    document.getElementById("apply-cancel-btn")?.addEventListener('click', () => {
+        document.getElementById("confirmApplyModal").style.display = "none";
+    });
+
+    // "예" 버튼 → 지원 요청
+    document.getElementById("apply-confirm-btn")?.addEventListener('click', () => {
+        document.getElementById("confirmApplyModal").style.display = "none";
+
+        const jobId = window.JOB_ID || new URLSearchParams(location.search).get('id');
+
+        const csrfMeta = document.querySelector('meta[name="_csrf"]');
+        const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+
+        // 🔴 여기에 로그 추가
+        console.log('csrfMeta:', csrfMeta);
+        console.log('csrfHeaderMeta:', csrfHeaderMeta);
+
+        if (!csrfMeta || !csrfHeaderMeta) {
+            console.error('CSRF 메타 태그가 없습니다.');
+            return;
+        }
+
+        const csrfToken = csrfMeta.getAttribute('content');
+        const csrfHeader = csrfHeaderMeta.getAttribute('content');
+
+        // 🔴 여기에도 값 출력
+        console.log('csrfToken:', csrfToken);
+        console.log('csrfHeader:', csrfHeader);
+
+        if (!csrfHeader || !csrfToken) {
+            console.error('CSRF 토큰 또는 헤더 이름이 없습니다.');
+            return;
+        }
+
+        const headers = { 'Content-Type': 'application/json' };
+        if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+
+        // ✅ 여기에 로그 추가
+        console.log('보낼 jobId:', jobId);
+
+        console.log('fetch headers:', headers); // 🔴 실제 fetch 보내기 전 확인
+
+        fetch('/api/applications/apply', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({
+                jobId: Number(jobId),
+                myResumeTitle: selectedResumeTitle // 이제 title 기준
+            })
+        })
+            .then(r => {
+                if (!r.ok) throw new Error('지원 실패');
+                return r.json();
+            })
+            .then(data => {
+                alert(data.message || '지원이 완료되었습니다.');
+            })
+            .catch(err => {
+                console.error(err);
+                alert('지원 중 오류가 발생했습니다.');
+            });
+    });
+
 });
 
-// ✅ 지원 확인 모달 이벤트
-document.getElementById("apply-cancel-btn")?.addEventListener('click', () => {
-    document.getElementById("confirmApplyModal").style.display = "none";
-});
-
-document.getElementById("apply-confirm-btn")?.addEventListener('click', () => {
-    document.getElementById("confirmApplyModal").style.display = "none";
-
-    const jobId = window.JOB_ID || new URLSearchParams(location.search).get('id');
-    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-
-    fetch('/api/apply', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            [csrfHeader]: csrfToken
-        },
-        body: JSON.stringify({
-            jobId,
-            resumeId: Number(selectedResumeId)
-        })
-    })
-        .then(r => {
-            if (!r.ok) throw new Error('지원 실패');
-            return r.text();
-        })
-        .then(() => {
-            alert('지원이 완료되었습니다.');
-            // location.href = `/apply/complete?jobId=${jobId}`;
-        })
-        .catch(err => {
-            console.error(err);
-            alert('지원 중 오류가 발생했습니다.');
-        });
-});

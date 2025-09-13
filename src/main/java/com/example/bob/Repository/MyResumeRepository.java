@@ -31,5 +31,10 @@ public interface MyResumeRepository extends JpaRepository<MyResume, Long> {
     // ✅ 이력서 삭제 시 본인 것만 삭제되도록
     void deleteByIdAndMemberId(Long id, String memberId);
 
+    // 유저아이디로 조회
+    Optional<MyResume> findByUserIdAndTitle(Long userId, String title);
+
+
+
 
 }

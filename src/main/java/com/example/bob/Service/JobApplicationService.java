@@ -10,6 +10,10 @@ import com.example.bob.Entity.JobApplicationStatus;
 import com.example.bob.Entity.ResumeEntity;
 import com.example.bob.Entity.UserEntity;
 import com.example.bob.Repository.ResumeRepository;
+import com.example.bob.Entity.CoJobPostEntity;
+import com.example.bob.Entity.MyResume;
+import com.example.bob.Repository.CoJobPostRepository;
+import com.example.bob.Repository.MyResumeRepository;
 
 
 
@@ -28,6 +32,11 @@ public class JobApplicationService {
     private final ResumeRepository resumeRepository;
 
     private final NotificationService notificationService;
+
+    private final CoJobPostRepository jobPostRepository;
+
+    private final MyResumeRepository myResumeRepository;
+
 
 
     public List<JobApplicationDTO> getUserJobApplications(Long userId) {
@@ -160,6 +169,36 @@ public class JobApplicationService {
 
         System.out.println("✅ 상태 저장 완료: HIDDEN");
     }
+
+    // ✅ 이미 조회한 MyResume 객체를 받아서 처리
+    public void applyForJobWithMyResume(UserEntity user, Long jobPostId, MyResume myResume) {
+
+        // 1️⃣ 중복 지원 체크
+        boolean alreadyApplied = jobApplicationRepository
+                .existsByUserAndJobPost_IdAndMyResumeAndStatus(user, jobPostId, myResume, JobApplicationStatus.SUBMITTED);
+
+        if (alreadyApplied) {
+            throw new RuntimeException("이미 해당 공고에 이력서를 제출했습니다.");
+        }
+
+        // 2️⃣ 공고 조회
+        CoJobPostEntity jobPost = jobPostRepository.findById(jobPostId)
+                .orElseThrow(() -> new RuntimeException("공고를 찾을 수 없습니다."));
+
+        // 3️⃣ 지원 내역 생성 및 저장
+        JobApplicationEntity application = JobApplicationEntity.builder()
+                .user(user)
+                .jobPost(jobPost)
+                .myResume(myResume)
+                .appliedAt(new Date())
+                .status(JobApplicationStatus.SUBMITTED)
+                .build();
+
+        jobApplicationRepository.save(application);
+
+        System.out.println("✅ 내가 만든 이력서 지원 저장 완료 - jobPostId=" + jobPostId + ", myResumeId=" + myResume.getId());
+    }
+
 
 
 

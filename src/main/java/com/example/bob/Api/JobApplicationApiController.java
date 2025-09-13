@@ -20,7 +20,14 @@
     import com.example.bob.Entity.CoJobPostEntity;
     import com.example.bob.Entity.CoJobPostEntity;
     import com.example.bob.Repository.CoJobPostRepository;
+    import com.example.bob.DTO.JobApplyRequestDTO;
+    import com.example.bob.Entity.MyResume;
+    import com.example.bob.Repository.MyResumeRepository;
+    import org.springframework.web.bind.annotation.PostMapping;
+    import org.springframework.web.bind.annotation.RequestBody;
+
     import java.util.Map;
+
 
 
 
@@ -43,6 +50,9 @@
         private final NotificationService notificationService;
 
         private final CoJobPostRepository jobPostRepository;
+
+        private final MyResumeRepository myResumeRepository;
+
 
 
 
@@ -178,6 +188,46 @@
                 return ResponseEntity.status(500).body(Map.of("message", "❌ 숨기기 실패: " + e.getMessage()));
             }
         }
+
+        // ✅ [POST] 내가 만든 이력서로 공고 지원 (title 기반)
+        @PostMapping("/apply")
+        public ResponseEntity<?> applyWithMyResume(
+                @AuthenticationPrincipal UserDetailsImpl userDetails,
+                @RequestBody JobApplyRequestDTO requestDTO) {
+
+            if (userDetails == null) {
+                return ResponseEntity.status(401).body(Map.of("message", "로그인이 필요합니다."));
+            }
+
+            UserEntity user = userDetails.getUserEntity();
+            Long userId = user.getUserId(); // 💡 여기서 userId 변수 생성
+            Long jobId = requestDTO.getJobId();
+            String myResumeTitle = requestDTO.getMyResumeTitle(); // 💡 title 필드 사용
+
+            System.out.println("📌 [지원 요청] jobId=" + jobId + ", myResumeTitle=" + myResumeTitle + ", userId=" + userId);
+
+            try {
+                // 💡 memberId 대신 userId 기반 조회
+                MyResume myResume = myResumeRepository.findByUserIdAndTitle(userId, myResumeTitle)
+                        .orElseThrow(() -> new RuntimeException("해당 제목의 이력서를 찾을 수 없습니다."));
+
+                // 서비스 호출
+                jobApplicationService.applyForJobWithMyResume(user, jobId, myResume);
+
+                return ResponseEntity.ok(Map.of(
+                        "message", "지원이 완료되었습니다."
+                ));
+            } catch (IllegalStateException e) {
+                return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(500).body(Map.of("message", "서버 오류: " + e.getMessage()));
+            }
+        }
+
+
+
+
 
 
     }

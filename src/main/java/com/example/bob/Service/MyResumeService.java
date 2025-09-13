@@ -38,27 +38,35 @@ public class MyResumeService {
      * 이력서 저장 처리 (프론트에서 전달한 DTO 기준)
      */
     public Long save(MyResumeDto dto) {
-        log.info("🔄 이력서 저장 시작 - title: {}, memberId(userIdLogin): {}", dto.getTitle(), dto.getMemberId());
+        log.info("🔄 이력서 저장 시작 - title: {}, memberId(userIdLogin): {}",
+                dto.getTitle(), dto.getMemberId());
+
+        // 🔹 memberId로 실제 UserEntity 조회
+        UserEntity loginUser = userRepository.findByUserIdLogin(dto.getMemberId())
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. memberId=" + dto.getMemberId()));
 
         // 이력서 엔티티 생성
         MyResume resume = MyResume.builder()
                 .title(dto.getTitle())
-                .memberId(dto.getMemberId())  // ⚠️ String 타입 (userIdLogin)
+                .memberId(dto.getMemberId())   // 로그인 아이디
+                .userId(loginUser.getUserId()) // 실제 유저 고유 ID
                 .build();
 
-        // 각 섹션 DTO를 엔티티로 변환 후 이력서에 추가
+        // 섹션 변환 후 추가
         List<MyResumeSection> sections = dto.getSections().stream()
                 .map(this::convertToEntity)
                 .collect(Collectors.toList());
 
-        sections.forEach(resume::addSection); // 연관관계 설정 포함
+        sections.forEach(resume::addSection);
 
         // DB 저장
         MyResume saved = myResumeRepository.save(resume);
-        log.info("✅ 이력서 저장 완료 - ID: {}", saved.getId());
+        log.info("✅ 이력서 저장 완료 - ID: {}, userId: {}", saved.getId(), saved.getUserId());
 
-        return saved.getId(); // 저장된 ID 반환
+        return saved.getId();
     }
+
+
 
 
 

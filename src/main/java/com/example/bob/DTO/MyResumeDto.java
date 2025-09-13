@@ -20,6 +20,10 @@ public class MyResumeDto {
 
     private String memberId; // 사용자 ID (userIdLogin)
 
+    private Long userId; // 새로 추가
+
+
+
     private List<MyResumeSectionDto> sections; // 섹션 리스트
 
     private String userName;

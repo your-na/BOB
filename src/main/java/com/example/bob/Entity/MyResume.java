@@ -27,6 +27,8 @@ public class MyResume {
 
     private String memberId; // 사용자 아이디 (user_id_login 저장됨)
 
+    private Long userId; // 새로 추가: 유저 고유 ID 저장
+
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<MyResumeSection> sections = new HashSet<>();

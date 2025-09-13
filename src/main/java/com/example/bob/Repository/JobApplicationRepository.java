@@ -80,6 +80,16 @@
         @Query("SELECT COUNT(DISTINCT ja.user.userId) FROM JobApplicationEntity ja WHERE ja.status = 'ACCEPTED' AND ja.appliedAt >= :startDate")
         long countDistinctAcceptedSince(@Param("startDate") Date startDate);
 
+        // ✅ 내가 만든 이력서 기준으로 가장 최근 지원 내역 조회
+        Optional<JobApplicationEntity> findTopByMyResumeOrderByAppliedAtDesc(com.example.bob.Entity.MyResume myResume);
+
+        // ✅ 중복 지원 여부 확인 (내 이력서 기준 + 상태)
+        boolean existsByUserAndJobPost_IdAndMyResumeAndStatus(
+                UserEntity user,
+                Long jobPostId,
+                com.example.bob.Entity.MyResume myResume,
+                JobApplicationStatus status
+        );
 
 
 
