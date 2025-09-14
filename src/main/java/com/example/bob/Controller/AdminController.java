@@ -50,4 +50,14 @@ public class AdminController {
     public String ad_reportsPage() {
         return "ad_reports"; // templates/ad_inquiries.html
     }
+
+    @GetMapping("/ad_jobpost")
+    public String ad_jobpostPage() {
+        return "ad_jobpost"; // templates/ad_inquiries.html
+    }
+
+    @GetMapping("/ad_jobpost2")
+    public String ad_jobpost2Page() {
+        return "ad_jobpost2"; // templates/ad_inquiries.html
+    }
 }
