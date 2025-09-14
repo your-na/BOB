@@ -1,0 +1,182 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    background-color: #f9f9f9;
+}
+
+/* 전체 가운데 정렬 */
+.container {
+    max-width: 900px;
+    margin: 30px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 제목 */
+h2 {
+    color: #2ea44f;   /* 기존 색상 유지 */
+    font-weight: bold;
+    font-size: 24px;
+    text-align: left;   /* 🔥 왼쪽 정렬 */
+    margin-bottom: 10px;
+}
+
+/* 상단 필터 */
+.filter-wrapper {
+    display: flex;
+    justify-content: flex-start; /* 🔥 왼쪽 정렬 */
+    margin-bottom: 15px;
+}
+
+.filter-container {
+    display: flex;
+    gap: 10px;
+}
+
+/* 정렬 셀렉트 */
+#sort-filter {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* 테이블 */
+.post-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: white;
+}
+
+.post-table th, .post-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.post-table th {
+    background-color: #eafbea;
+    color: #2ea44f;
+    font-weight: bold;
+}
+
+.post-table td {
+    color: #555;
+}
+
+.aa {
+    text-decoration: none;
+    color: #333;
+}
+
+.aa:hover {
+    font-weight: bold;
+}
+
+.top-bar {
+    margin-bottom: 15px;
+}
+
+/* 제목은 왼쪽 고정 */
+.top-bar h2 {
+    color: #2ea44f;
+    font-weight: bold;
+    font-size: 24px;
+    margin: 0;
+    margin-bottom: 10px; /* 🔥 제목과 필터 사이 간격 */
+}
+
+.right-tools {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#sort-filter {
+    padding: 6px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 2px 5px;
+}
+
+.search-box input {
+    border: none;
+    outline: none;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.search-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.search-btn img {
+    width: 18px;
+    height: 18px;
+}
+
+/* 최신순 왼쪽 + 검색창 오른쪽 */
+.filter-search {
+    display: flex;
+    justify-content: space-between; /* 양쪽 정렬 */
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+/* 검색 박스는 기존 스타일 그대로 */
+.search-box {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 2px 5px;
+}
+
+/* h2 + 삭제 버튼 한 줄 정렬 */
+.title-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+/* 삭제 버튼 */
+.delete-btn {
+    background: none;
+    color: red;
+    border: 1.5px solid red;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.delete-btn:hover {
+    background: red;
+    color: white;
+}
+
+/* 데이터 없을 때 안내 문구 */
+.post-table td[colspan="4"] {
+    text-align: center;
+    font-size: 15px;
+    color: gray;
+    padding: 20px;
+}

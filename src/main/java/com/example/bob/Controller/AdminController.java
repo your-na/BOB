@@ -60,4 +60,9 @@ public class AdminController {
     public String ad_jobpost2Page() {
         return "ad_jobpost2"; // templates/ad_inquiries.html
     }
+
+    @GetMapping("/ad_postmana")
+    public String ad_postmanaPage() {
+        return "ad_postmana"; // templates/ad_inquiries.html
+    }
 }

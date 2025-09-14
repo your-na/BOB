@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>게시글 관리</title>
+  <link rel="stylesheet" href="/css/ad_postmana.css">
+</head>
+<body>
+
+<div class="container">
+  <section class="post-list">
+    <div class="top-bar">
+      <div class="title-bar">
+        <h2>게시글 관리</h2>
+        <!-- 🔥 삭제 버튼 -->
+        <button class="delete-btn" id="delete-selected">삭제</button>
+      </div>
+
+      <!-- 🔥 새로운 줄에 배치 -->
+      <div class="filter-search">
+        <!-- 최신순 드롭다운 (왼쪽) -->
+        <select id="sort-filter">
+          <option value="latest">최신순</option>
+          <option value="oldest">오래된순</option>
+        </select>
+
+        <!-- 검색창 (오른쪽) -->
+        <div class="search-box">
+          <input type="text" id="search-input" placeholder="게시글 검색...">
+          <button class="search-btn">
+            <img src="/images/search-icon.png" alt="검색">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 삭제 기능용 form -->
+    <form id="deleteForm" method="post" action="/admin/post/delete">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+      <table class="post-table">
+        <thead>
+        <tr>
+          <th>게시글 제목</th>
+          <th>회원명</th>
+          <th>게시 날짜</th>
+          <th><input type="checkbox" id="select-all"></th> <!-- ✅ 전체 선택 -->
+        </tr>
+        </thead>
+        <tbody>
+        <!-- ✅ 데이터 있을 경우 -->
+        <tr th:each="post : ${posts}">
+          <td th:text="${post.title}"></td>
+          <td th:text="${post.memberName}"></td>
+          <td th:text="${post.createdDate}"></td>
+          <td><input type="checkbox" class="post-checkbox" name="idsToDelete" th:value="${post.id}"></td>
+        </tr>
+
+        <!-- ✅ 데이터 없을 경우 -->
+        <tr th:if="${#lists.isEmpty(posts)}">
+          <td colspan="4" style="text-align:center; color: gray; padding: 20px;">
+            등록된 게시글이 없습니다.
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </form>
+  </section>
+</div>
+
+</body>
+</html>
