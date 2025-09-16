@@ -503,7 +503,7 @@ textarea {
     position: sticky;
     top: 100px;
     min-width: 280px;   /* 기존 350px → 280px */
-    max-width: 420px;   /* 기존 560px → 420px */
+    max-width: 300px;   /* 기존 560px → 420px */
     height: fit-content;
     border: 1px solid #ccc;
     border-radius: 20px;
