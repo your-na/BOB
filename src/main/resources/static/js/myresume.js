@@ -10,6 +10,38 @@ function populateYearOptions(selectElement, year) {
     }
 }
 
+function bindDropToEducationItem(item) {
+    item.addEventListener('dragover', e => e.preventDefault());
+    item.addEventListener('drop', e => {
+        e.preventDefault();
+        const text = e.dataTransfer.getData('application/json');
+        if (!text) return;
+        try {
+            const data = JSON.parse(text);
+            if (data.type !== 'EDUCATION') return;
+
+            const schoolInput = item.querySelector('input[placeholder="학교명"]');
+            const majorInput  = item.querySelector('input[placeholder="학과"]');
+            const statusSel   = item.querySelector('select');
+            const yearSelects = item.querySelectorAll('.date-group select');
+
+            if (schoolInput) schoolInput.value = data.schoolName || '';
+            if (majorInput)  majorInput.value  = data.majorName  || '';
+            if (statusSel)   statusSel.value   = data.status === '졸업' ? '졸업' : '재학';
+
+            const [sYear] = (data.startDate || '').split('-');
+            const [eYear] = (data.endDate || '').split('-');
+
+            populateYearOptions(yearSelects[0], sYear);
+            populateYearOptions(yearSelects[1], eYear);
+
+            if (yearSelects[0]) yearSelects[0].value = sYear || yearSelects[0].value;
+            if (yearSelects[1]) yearSelects[1].value = eYear || yearSelects[1].value;
+        } catch { /* 무시 */ }
+    });
+}
+
+
     document.addEventListener("DOMContentLoaded", () => {
                 let sections = document.querySelectorAll(".resume-section");
                 const addBtn = document.getElementById("add-section");
@@ -799,7 +831,10 @@ function populateYearOptions(selectElement, year) {
                 }
             }
 
-            // ===================== 탭 클릭 바인딩 =====================
+document.querySelectorAll('.education-item').forEach(bindDropToEducationItem);
+
+
+// ===================== 탭 클릭 바인딩 =====================
             function bindTabs() {
                 document.querySelectorAll('#tab-list .tab').forEach(tab => {
                     tab.addEventListener('click', () => {
@@ -872,6 +907,8 @@ function populateYearOptions(selectElement, year) {
                         }
 
                         section2.insertBefore(clone, addEduBtn);
+                        bindDropToEducationItem(clone);
+
                     }
                 });
 
