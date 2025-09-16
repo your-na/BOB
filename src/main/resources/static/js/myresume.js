@@ -1,4 +1,16 @@
-            document.addEventListener("DOMContentLoaded", () => {
+
+function populateYearOptions(selectElement, year) {
+    if (!selectElement || !year) return;
+    const exists = Array.from(selectElement.options).some(opt => opt.value === year);
+    if (!exists) {
+        const opt = document.createElement("option");
+        opt.value = year;
+        opt.textContent = year;
+        selectElement.appendChild(opt);
+    }
+}
+
+    document.addEventListener("DOMContentLoaded", () => {
                 let sections = document.querySelectorAll(".resume-section");
                 const addBtn = document.getElementById("add-section");
                 const popup = document.getElementById("section-popup");
@@ -773,8 +785,15 @@
                             // 날짜(년도만 존재하는 현재 마크업 기준)
                             const [sYear] = (data.startDate || '').split('-');
                             const [eYear] = (data.endDate || '').split('-');
+
+                           // ✅ 연도 옵션이 없으면 추가
+                            populateYearOptions(yearSelects[0], sYear);
+                            populateYearOptions(yearSelects[1], eYear);
+
+                            // ✅ 선택
                             if (yearSelects[0]) yearSelects[0].value = sYear || yearSelects[0].value;
                             if (yearSelects[1]) yearSelects[1].value = eYear || yearSelects[1].value;
+
                         } catch { /* 무시 */ }
                     });
                 }
