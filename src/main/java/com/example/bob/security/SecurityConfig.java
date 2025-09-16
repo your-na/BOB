@@ -52,7 +52,8 @@ public class SecurityConfig {
                                 "/file/project/submit", "/api/todos/**", "/api/notifications/delete-all", "/api/notifications/mark-as-read/**","/ws-chat", "/api/user/resumes/upload",
                                 "/api/user/resumes/submit", "/contest/team/invite/respond","/api/applications/job/pass", "/api/notifications/delete/**", "/profile/company/update",
                                 "/api/user/resumes/submit", "/contest/team/invite/respond","/api/applications/job/pass", "/api/notifications/delete/**", "/contest/team/application/**",
-                                "/api/cojobs/**", "/vendor/**"
+                                "/api/cojobs/**", "/vendor/**","/api/applications/job/pass-myresume",
+                                "/api/applications/job/reject-myresume"
                         )
                 )
                 .headers(headers -> headers
@@ -72,6 +73,7 @@ public class SecurityConfig {
                         .requestMatchers("/contest/create", "/contest/submit").hasAnyAuthority("ADMIN", "COMPANY")
                         .requestMatchers("/api/applications/job/pass").hasAuthority("COMPANY")// ✅ 기업 사용자만 접근 가능
                         .requestMatchers(HttpMethod.DELETE, "/api/cojobs/**").hasAuthority("COMPANY")
+                        .requestMatchers(HttpMethod.DELETE, "/api/myresumes/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

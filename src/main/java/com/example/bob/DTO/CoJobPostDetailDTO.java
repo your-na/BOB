@@ -21,6 +21,7 @@ public class CoJobPostDetailDTO {
     private String startDate;
     private String endDate;
     private String surew;
+    private String applyType;
 
 
     // ⬇️ 이력서 양식 제목들

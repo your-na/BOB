@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>구인 공고</title>
+  <link rel="stylesheet" href="/css/ad_jobpost2.css">
+</head>
+<body>
+
+<div class="container">
+  <section class="jobpost-list">
+    <div class="top-bar">
+      <div class="title-bar">
+        <h2>구인 공고</h2>
+        <!-- 🔥 삭제 버튼 -->
+        <button class="delete-btn" id="delete-selected">삭제</button>
+      </div>
+
+      <!-- 🔥 새로운 줄에 배치 -->
+      <div class="filter-search">
+        <!-- 최신순 드롭다운 (왼쪽) -->
+        <select id="sort-filter">
+          <option value="latest">최신순</option>
+          <option value="oldest">오래된순</option>
+        </select>
+
+        <!-- 검색창 (오른쪽) -->
+        <div class="search-box">
+          <input type="text" id="search-input" placeholder="구인 공고 검색...">
+          <button class="search-btn">
+            <img src="/images/search-icon.png" alt="검색">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 삭제 기능용 form -->
+    <form id="deleteForm" method="post" action="/admin/jobpost/delete">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+      <table class="jobpost-table">
+        <thead>
+        <tr>
+          <th>제목</th>
+          <th>기업명</th>
+          <th>기업회원 닉네임</th> <!-- ✅ 추가 -->
+          <th>등록일</th>
+          <th>마감일</th>
+          <th>상태</th>
+          <th><input type="checkbox" id="select-all"></th> <!-- ✅ 오른쪽 전체 선택 -->
+        </tr>
+        </thead>
+        <tbody>
+        <!-- ✅ 데이터 있을 경우 -->
+        <tr th:each="job : ${jobs}">
+          <td th:text="${job.title}"></td>
+          <td th:text="${job.company}"></td>
+          <td th:text="${job.nickname}"></td> <!-- ✅ 새로운 컬럼 -->
+          <td th:text="${job.deadline}"></td>
+          <td><input type="checkbox" class="job-checkbox" name="idsToDelete" th:value="${job.id}"></td>
+        </tr>
+
+        <!-- ✅ 데이터 없을 경우 -->
+        <tr th:if="${#lists.isEmpty(jobs)}">
+          <td colspan="7" style="text-align:center; color: gray; padding: 20px;">
+            등록된 구인 공고가 없습니다.
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </form>
+  </section>
+</div>
+
+</body>
+</html>

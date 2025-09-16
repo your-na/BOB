@@ -28,15 +28,41 @@ public class AdminController {
     public String adminContestList(Model model) {
         List<ContestDTO> contests = contestService.getAllContests();
         model.addAttribute("contests", contests);
-        return "ad_contest";  // ← templates/ad_contest.html
+        return "ad_contest";  // templates/ad_contest.html
     }
 
+    // ✅ 공모전 상세 페이지
     @GetMapping("/contest/{id}")
     public String showContestDetail(@PathVariable Long id, Model model) {
         ContestEntity entity = contestService.getById(id);
         ContestDTO dto = ContestDTO.fromEntity(entity);
         model.addAttribute("contest", dto);
-        return "postcontest"; // postcontest.html
+        return "postcontest"; // templates/postcontest.html
     }
 
+    // ✅ 문의 내역 페이지
+    @GetMapping("/ad_inquiries")
+    public String adInquiriesPage() {
+        return "ad_inquiries"; // templates/ad_inquiries.html
+    }
+
+    @GetMapping("/ad_reports")
+    public String ad_reportsPage() {
+        return "ad_reports"; // templates/ad_inquiries.html
+    }
+
+    @GetMapping("/ad_jobpost")
+    public String ad_jobpostPage() {
+        return "ad_jobpost"; // templates/ad_inquiries.html
+    }
+
+    @GetMapping("/ad_jobpost2")
+    public String ad_jobpost2Page() {
+        return "ad_jobpost2"; // templates/ad_inquiries.html
+    }
+
+    @GetMapping("/ad_postmana")
+    public String ad_postmanaPage() {
+        return "ad_postmana"; // templates/ad_inquiries.html
+    }
 }

@@ -21,10 +21,15 @@ public class JobApplicationEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
-    // 어떤 이력서(Resume)를
+    // 기업이 만든 이력서(Resume)를
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resume_id")
     private ResumeEntity resume;
+
+    // 내가 만든 이력서 (새 경로)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "my_resume_id")
+    private MyResume myResume;
 
     // 어떤 공고(CoJobPost)에 제출했는가
     @ManyToOne(fetch = FetchType.LAZY)

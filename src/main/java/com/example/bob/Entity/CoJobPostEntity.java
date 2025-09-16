@@ -34,6 +34,10 @@ public class CoJobPostEntity {
     private String endDate;
     private String surew;
 
+    @Column(nullable = false)
+    private String applyType;  // "company" 또는 "member"
+
+
     @ManyToOne
     @JoinColumn(name = "company_id")
     @JsonIgnoreProperties({"CompanyHistories"}) // 또는 모든 관련 필드
