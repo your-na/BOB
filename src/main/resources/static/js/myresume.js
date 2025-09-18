@@ -141,18 +141,29 @@ function bindDropToEducationItem(item) {
                     }
                 });
 
+        document.querySelectorAll(".popup-option").forEach(option => {
+            option.addEventListener("click", () => {
+                const type = option.textContent.trim();
 
+                // 🔹 현재 모든 resume-section 중 마지막 섹션의 번호 찾기
+                const allSections = document.querySelectorAll(".resume-section");
+                let lastNumber = 0;
+                if (allSections.length > 0) {
+                    const lastSection = allSections[allSections.length - 1];
+                    // id가 "section6" 이런 식이라고 가정
+                    const match = lastSection.id.match(/section(\d+)/);
+                    if (match) {
+                        lastNumber = parseInt(match[1], 10);
+                    }
+                }
 
-                document.querySelectorAll(".popup-option").forEach(option => {
-                    option.addEventListener("click", () => {
-                        const type = option.textContent.trim();
-                        const sectionIndex = document.querySelectorAll(".resume-section").length + 1;
+                const sectionIndex = lastNumber + 1;
 
-                        const newSection = document.createElement("section");
-                        newSection.className = "resume-section";
-                        newSection.id = `section${sectionIndex}`;
+                const newSection = document.createElement("section");
+                newSection.className = "resume-section";
+                newSection.id = `section${sectionIndex}`;
 
-                        let content = "";
+                let content = "";
                         switch (type) {
                             case "선택형":
                                 content = `
@@ -191,9 +202,12 @@ function bindDropToEducationItem(item) {
                                         <button class="delete-btn">✕</button>
                                     </div>
                                     <input type="text" id="ohcomment" placeholder="설명 입력">
-                                    <textarea placeholder="구직자 사진 입력란"></textarea>
+                                    <!-- 📌 사진 첨부 input -->
+                                    <input type="file" accept="image/*" multiple class="file-input">
+                                    <div class="upload-preview"></div>
                                 `;
                                 break;
+
                             case "파일 첨부":
                                 content = `
                                     <div class="section-header">
@@ -202,9 +216,12 @@ function bindDropToEducationItem(item) {
                                         <button class="delete-btn">✕</button>
                                     </div>
                                     <input type="text" id="ohcomment" placeholder="설명 입력">
-                                    <textarea placeholder="구직자 파일 첨부란"></textarea>
+                                    <!-- 📌 파일 첨부 input -->
+                                    <input type="file" multiple class="file-input">
+                                    <div class="upload-preview"></div>
                                 `;
                                 break;
+
                         }
 
                         newSection.innerHTML = content;
@@ -968,8 +985,18 @@ document.querySelectorAll('.education-item').forEach(bindDropToEducationItem);
                         "입사 후 이루고 싶은 목표"
                     ];
 
-                    // 현재 몇 개 섹션이 있는지 계산
-                    let sectionIndex = document.querySelectorAll(".resume-section").length;
+                    // 🔹 현재 모든 resume-section 중 마지막 섹션 번호 찾기
+                    const allSections = document.querySelectorAll(".resume-section");
+                    let lastNumber = 0;
+                    if (allSections.length > 0) {
+                        const lastSection = allSections[allSections.length - 1];
+                        const match = lastSection.id.match(/section(\d+)/);
+                        if (match) {
+                            lastNumber = parseInt(match[1], 10);
+                        }
+                    }
+
+                    let sectionIndex = lastNumber;
 
                     questions.forEach(q => {
                         sectionIndex++;
@@ -979,12 +1006,13 @@ document.querySelectorAll('.education-item').forEach(bindDropToEducationItem);
                         newSection.setAttribute("data-multi-select", "false");
 
                         newSection.innerHTML = `
-                <div class="section-header">
-                    <span>${sectionIndex}. ${q}</span>
-                    <button class="delete-btn">✕</button>
-                </div>
-                <textarea placeholder="${q}에 대해 작성해주세요."></textarea>
-            `;
+                            <div class="section-header">
+                                <span class="section-title-text">${sectionIndex}. ${q}</span>
+                                <input type="text" class="section-title-input" value="${q}" style="display: none;">
+                                <button class="delete-btn">✕</button>
+                            </div>
+                            <textarea placeholder="${q}에 대해 작성해주세요."></textarea>
+                        `;
 
                         // "➕ 추가" 버튼 바로 위에 붙이기
                         document.querySelector(".add-section").before(newSection);
@@ -1000,3 +1028,160 @@ document.querySelectorAll('.education-item').forEach(bindDropToEducationItem);
                     modal.style.display = "none";
                 });
             });
+
+    // 파일/사진 업로드 미리보기
+                document.addEventListener("change", (e) => {
+                    if (e.target.classList.contains("file-input")) {
+                        const preview = e.target.nextElementSibling;
+                        preview.innerHTML = "";
+
+                        [...e.target.files].forEach(file => {
+                            const item = document.createElement("div");
+                            item.className = "uploaded-item";
+                            item.textContent = file.name;
+
+                            // 삭제 버튼
+                            const del = document.createElement("span");
+                            del.className = "delete-icon";
+                            del.textContent = "삭제";
+                            del.onclick = () => item.remove();
+                            item.appendChild(del);
+
+                            // 이미지 파일일 경우 썸네일 표시
+                            if (file.type.startsWith("image/")) {
+                                const img = document.createElement("img");
+                                img.src = URL.createObjectURL(file);
+                                img.style.maxWidth = "100px";
+                                img.style.display = "block";
+                                img.style.marginTop = "5px";
+                                item.appendChild(img);
+                            }
+
+                            preview.appendChild(item);
+                        });
+                    }
+                });
+    function renderEducations() {
+        return fetch('/api/education-history/list')
+            .then(res => res.json())
+            .then(list => {
+                const cont = document.querySelector('.tab-content[data-content="school"]');
+                if (!cont) return;
+                cont.innerHTML = '';
+
+                if (list && list.length > 0) {
+                    list.forEach(edu => {
+                        const fmt = d => d?.replace(/-/g, '.');
+                        let line2 = '';
+                        if (edu.status === '재학')       line2 = `재학 ${fmt(edu.startDate)} 학과 ${edu.majorName || ''}`;
+                        else if (edu.status === '졸업') line2 = `졸업 ${fmt(edu.startDate)} ~ ${fmt(edu.endDate)} 학과 ${edu.majorName || ''}`;
+                        else                            line2 = `${edu.status || ''} 학과 ${edu.majorName || ''}`;
+
+                        const d = document.createElement('div');
+                        d.className = 'award-item';
+                        d.innerHTML = `${edu.schoolName}<br><small>${line2}</small>`;
+                        makeDraggable(d, {
+                            type: 'EDUCATION',
+                            schoolName: edu.schoolName,
+                            majorName: edu.majorName,
+                            status: edu.status,
+                            startDate: edu.startDate,
+                            endDate: edu.endDate
+                        });
+                        cont.appendChild(d);
+                    });
+                }
+
+                // ✅ 버튼은 항상 추가
+                const addBtn = document.createElement('button');
+                addBtn.className = 'add-school-btn';
+                addBtn.textContent = '＋';
+                addBtn.onclick = () => {
+                    // 연도 select 채우기 함수
+                    function fillYearOptions(select, start, end) {
+                        if (!select) return;
+                        select.innerHTML = "";
+                        for (let y = start; y <= end; y++) {
+                            const opt = document.createElement("option");
+                            opt.value = y;
+                            opt.textContent = y;
+                            select.appendChild(opt);
+                        }
+                    }
+
+                    // 새 학력 입력칸 생성
+                    const eduBox = document.createElement('div');
+                    eduBox.className = 'award-item editable';
+                    eduBox.innerHTML = `
+        <input type="text" class="school-input" placeholder="학교명">
+        <input type="text" class="major-input" placeholder="학과">
+        <select class="status-input">
+            <option value="재학">재학</option>
+            <option value="졸업">졸업</option>
+        </select>
+        <div class="date-group">
+            <select class="start-year"></select>
+            ~
+            <select class="end-year"></select>
+        </div>
+    `;
+
+                    // ✅ 연도 select 옵션 채우기 (1980 ~ 올해)
+                    const now = new Date().getFullYear();
+                    fillYearOptions(eduBox.querySelector(".start-year"), 1980, now);
+                    fillYearOptions(eduBox.querySelector(".end-year"), 1980, now);
+
+                    // ✅ 엔터 키 → 입력칸을 바로 박스로 변환
+                    eduBox.addEventListener("keydown", (e) => {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+
+                            const school = eduBox.querySelector(".school-input").value.trim();
+                            const major = eduBox.querySelector(".major-input").value.trim();
+                            const status = eduBox.querySelector(".status-input").value;
+                            const startYear = eduBox.querySelector(".start-year").value;
+                            const endYear = eduBox.querySelector(".end-year").value;
+
+                            if (!school) {
+                                alert("학교명을 입력하세요!");
+                                return;
+                            }
+
+                            // 새로운 네모 박스로 변환
+                            let line2 = "";
+                            if (status === "재학") {
+                                line2 = `재학 ${startYear} 학과 ${major}`;
+                            } else {
+                                line2 = `졸업 ${startYear} ~ ${endYear} 학과 ${major}`;
+                            }
+
+                            eduBox.className = "award-item";  // editable 제거
+                            eduBox.innerHTML = `${school}<br><small>${line2}</small>`;
+
+                            // 기존 학력 박스처럼 드래그 가능하도록
+                            makeDraggable(eduBox, {
+                                type: 'EDUCATION',
+                                schoolName: school,
+                                majorName: major,
+                                status: status,
+                                startDate: startYear,
+                                endDate: endYear
+                            });
+                        }
+                    });
+
+                    // 버튼 위에 삽입
+                    cont.insertBefore(eduBox, addBtnWrapper);
+                };
+
+
+                const addBtnWrapper = document.createElement('div');
+                addBtnWrapper.style.display = 'flex';
+                addBtnWrapper.style.justifyContent = 'center';
+                addBtnWrapper.appendChild(addBtn);
+                cont.appendChild(addBtnWrapper);
+            })
+            .catch(err => console.error('학력 로드 실패:', err));
+    }
+
+

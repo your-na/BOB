@@ -84,16 +84,28 @@
     gap: 40px;
     padding: 40px;
     margin-top: 5%;
+    align-items: flex-start;
+    overflow: visible;
 }
 
 .resume-container {
     flex: 2;
 }
 
+/* .resume-side {
+    flex: 1;
+    position: fixed;
+    top: 100px;
+    right: 40px;
+    width: 300px;
+    height: auto;
+} */
+
 .resume-side {
     flex: 1;
     position: sticky;
-    top: 20px;
+    top: 100px;     /* 스크롤 시 화면 상단에서 떨어질 거리 */
+    width: 300px;
     height: fit-content;
 }
 
@@ -205,6 +217,7 @@ textarea {
     margin-bottom: 20px;
     border-radius: 8px;
     background: #fdfdfd;
+    position: static;
 }
 .outline-title {
     color: #00b800;
@@ -239,6 +252,7 @@ textarea {
     padding: 15px;
     background: #fdfdfd;
     border-radius: 8px;
+    position: static;
 }
 
 .template-grid {
@@ -663,4 +677,51 @@ textarea {
 #templateModal .apply-btn:active {
     background-color: #007a00 !important;
     transform: scale(0.95);
+}
+
+.upload-preview img {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-top: 5px;
+}
+
+.add-school-btn {
+    background-color: #ffffff;
+    color: #000;
+    font-weight: bold;
+    font-size: 13px;
+    padding: 6px 12px;
+    border: 1px solid #6a6a6a;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    margin-top: 10px;
+}
+.add-school-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+    background-color: #f9f9f9;
+}
+
+.award-item.editable {
+    border: 1px dashed #aaa;
+    padding: 10px;
+    margin: 6px 0;
+    border-radius: 6px;
+    background-color: #fafafa;
+}
+.award-item.editable input,
+.award-item.editable select {
+    margin: 4px;
+    padding: 4px;
+    font-size: 13px;
+}
+.award-item.editable .edu-del {
+    margin-left: 6px;
+    color: red;
+    cursor: pointer;
 }
