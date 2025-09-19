@@ -684,8 +684,8 @@
             }
 
             try{
-                const body = { grade, organizer, source: 'certificate', teamId };
-                const res = await fetch('/api/awards', {
+                const body = { grade, organizer, source: 'certificate', teamId, ocrRawText: ocrText };
+                const res = await fetch('/api/contest-history', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

@@ -10,6 +10,110 @@ function getCsrfHeader() {
     return csrfHeaderMeta ? csrfHeaderMeta.getAttribute("content") : "X-CSRF-TOKEN";
 }
 
+// ✅ 공모전 참여 내역 초기 로딩
+function loadContests() {
+    const tbody = document.querySelector("#contest-history .history-table tbody");
+    const templateRow = tbody.querySelector(".new-entry-row");
+
+    tbody.innerHTML = "";
+    if (templateRow) {
+        tbody.appendChild(templateRow);
+        templateRow.style.display = "none";
+    }
+
+    fetch("/api/contest-history", {
+        headers: { [getCsrfHeader()]: getCsrfToken() }
+    })
+        .then(res => res.json())
+        .then(data => {
+            data.forEach((contest, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${contest.status}</td>
+                    <td>${contest.startDate || ""}</td>
+                    <td>${contest.endDate || ""}</td>
+                    <td>${contest.title || ""}</td>
+                    <td>
+                        ${contest.submittedFileName
+                    ? `<a href="/download/${contest.submittedFileName}" 
+                                   target="_blank" 
+                                   class="file-view">${contest.submittedFileName}</a>`
+                    : `${contest.grade || ""} / ${contest.organizer || ""}`}
+                    </td>
+                    <td><button class="delete-btn" data-id="${contest.id}">삭제</button></td>
+                `;
+                tbody.insertBefore(row, templateRow);
+            });
+        })
+        .catch(err => console.error("❌ 공모전 불러오기 실패:", err));
+}
+
+// ✅ 공모전 내역 추가
+document.addEventListener("click", function (e) {
+    if (e.target.closest("#contest-history")?.classList.contains("history-section") &&
+        e.target.classList.contains("add-project-btn")) {
+
+        const section = e.target.closest(".history-section");
+        const newRow = section.querySelector(".new-entry-row").cloneNode(true);
+        newRow.style.display = "table-row";
+        newRow.classList.remove("new-entry-row");
+
+        const inputs = newRow.querySelectorAll("input, select");
+        let isSaved = false;
+
+        inputs.forEach(input => {
+            input.addEventListener("change", () => {
+                if (isSaved) return;
+
+                const data = {
+                    status: newRow.querySelector(".status-select").value,
+                    startDate: newRow.querySelector(".start-date").value,
+                    endDate: newRow.querySelector(".end-date").value,
+                    title: newRow.querySelector(".contest-name").value.trim()
+                };
+
+                // 파일 첨부
+                const fileInput = newRow.querySelector(".file-upload");
+                const formData = new FormData();
+                formData.append("status", data.status);
+                formData.append("startDate", data.startDate);
+                formData.append("endDate", data.endDate);
+                formData.append("title", data.title);
+                if (fileInput.files.length > 0) {
+                    formData.append("file", fileInput.files[0]);
+                }
+
+                // ✅ 모든 항목 채워졌을 때만 저장
+                if (!data.status || !data.startDate || !data.endDate || !data.title) return;
+
+                fetch("/api/contest-history", {
+                    method: "POST",
+                    headers: {
+                        [getCsrfHeader()]: getCsrfToken()
+                    },
+                    body: formData
+                })
+                    .then(res => res.json())
+                    .then(saved => {
+                        isSaved = true;
+                        newRow.querySelector(".delete-btn").setAttribute("data-id", saved.id);
+                        alert("✅ 공모전 저장됨");
+
+                        loadContests(); // 새로고침
+                    })
+                    .catch(err => {
+                        console.error("❌ 저장 실패:", err);
+                        alert("❌ 저장 실패");
+                    });
+            });
+        });
+
+        section.querySelector("tbody").appendChild(newRow);
+    }
+});
+
+
 // ✅ 파일 업로드 시 파일보기 링크 활성화
 document.addEventListener("change", function (event) {
     if (event.target.classList.contains("file-upload")) {
@@ -85,6 +189,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     break;
                 case "school-history":
                     deleteUrl = `/api/education-history/delete/${id}`;
+                    break;
+                case "contest-history":
+                    deleteUrl = `/api/contest-history/${id}`;
                     break;
                 default:
                     isHandled = false;
@@ -197,6 +304,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     loadJobHistories();
     loadEducations();
+    loadContests();
 });
 
 // ✅ 구직 내역 초기 로딩 (GET 요청)
