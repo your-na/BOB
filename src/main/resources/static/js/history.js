@@ -46,62 +46,69 @@ function loadContests() {
         .catch(err => console.error("❌ 공모전 불러오기 실패:", err));
 }
 
-// ✅ 공모전 내역 추가
-document.addEventListener("click", function (e) {
-    if (e.target.closest("#contest-history")?.classList.contains("history-section") &&
-        e.target.classList.contains("add-project-btn")) {
 
-        const section = e.target.closest(".history-section");
-        const newRow = section.querySelector(".new-entry-row").cloneNode(true);
-        newRow.style.display = "table-row";
-        newRow.classList.remove("new-entry-row");
 
-        let isSaved = false;
+// ✅ OCR 업로드 팝업 열기
+document.querySelector("#contest-history .add-project-btn")
+    .addEventListener("click", () => {
+        const fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.accept = "image/*";
+        fileInput.click();
 
-        const inputs = newRow.querySelectorAll("input, select");
-        inputs.forEach(input => {
-            input.addEventListener("change", () => {
-                if (isSaved) return;
+        fileInput.onchange = async () => {
+            if (!fileInput.files.length) return;
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
 
-                const data = {
-                    status: newRow.querySelector(".status-select").value,
-                    startDate: newRow.querySelector(".start-date").value,
-                    endDate: newRow.querySelector(".end-date").value,
-                    title: newRow.querySelector(".contest-name").value.trim(),
-                    organizer: newRow.querySelector(".contest-org").value.trim(),
-                    grade: newRow.querySelector(".contest-grade").value.trim()
-                };
+            try {
+                // 1) OCR 요청
+                const res = await fetch("/api/contest-history/ocr", {
+                    method: "POST",
+                    headers: { [getCsrfHeader()]: getCsrfToken() },
+                    body: formData
+                });
+                const ocrResult = await res.json();
 
-                // ✅ 모든 항목이 채워졌을 때만 저장
-                if (!data.status || !data.startDate || !data.endDate || !data.title || !data.organizer || !data.grade) {
+                // 2) OCR 결과에서 수상/기관 추출
+                const { grade, organizer, ocrRawText } = ocrResult;
+
+                // 3) 사용자에게 공모전명 입력 요청
+                const title = prompt(`공모전명을 입력해주세요\n(수상: ${grade}, 주최: ${organizer})`);
+
+                if (!title) {
+                    alert("❌ 공모전명을 입력해야 저장됩니다.");
                     return;
                 }
 
-                fetch("/api/contest-history", {
+                // 4) 저장 요청
+                const saveRes = await fetch("/api/contest-history", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         [getCsrfHeader()]: getCsrfToken()
                     },
-                    body: JSON.stringify(data)
-                })
-                    .then(res => res.json())
-                    .then(saved => {
-                        isSaved = true;
-                        newRow.querySelector(".delete-btn").setAttribute("data-id", saved.id);
-                        alert("✅ 공모전 저장됨");
-                        loadContests();
+                    body: JSON.stringify({
+                        grade,
+                        organizer,
+                        ocrRawText,
+                        title,
+                        source: "certificate"
                     })
-                    .catch(err => {
-                        console.error("❌ 저장 실패:", err);
-                        alert("❌ 저장 실패");
-                    });
-            });
-        });
+                });
 
-        section.querySelector("tbody").appendChild(newRow);
-    }
-});
+                if (saveRes.ok) {
+                    alert("✅ 공모전 수상 경력 등록 완료");
+                    loadContests();
+                } else {
+                    alert("❌ 저장 실패");
+                }
+            } catch (err) {
+                console.error("OCR 처리 실패:", err);
+                alert("❌ OCR 처리 실패");
+            }
+        };
+    });
 
 
 // ✅ 파일 업로드 시 파일보기 링크 활성화

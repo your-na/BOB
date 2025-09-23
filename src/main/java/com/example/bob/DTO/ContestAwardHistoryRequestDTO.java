@@ -13,5 +13,6 @@ public class ContestAwardHistoryRequestDTO {
     private String source;
     private Long teamId;
     private String ocrRawText;
+    private String title;
 }
 
