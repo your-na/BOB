@@ -33,14 +33,11 @@ function loadContests() {
                     <td>${contest.status}</td>
                     <td>${contest.startDate || ""}</td>
                     <td>${contest.endDate || ""}</td>
-                    <td>${contest.title || ""}</td>
                     <td>
-                        ${contest.submittedFileName
-                    ? `<a href="/download/${contest.submittedFileName}" 
-                                   target="_blank" 
-                                   class="file-view">${contest.submittedFileName}</a>`
-                    : `${contest.grade || ""} / ${contest.organizer || ""}`}
+                        <span>${contest.title || ""}</span><br/>
+                        <small>${contest.organizer || ""}</small>
                     </td>
+                    <td>${contest.grade || ""}</td>
                     <td><button class="delete-btn" data-id="${contest.id}">삭제</button></td>
                 `;
                 tbody.insertBefore(row, templateRow);
@@ -59,9 +56,9 @@ document.addEventListener("click", function (e) {
         newRow.style.display = "table-row";
         newRow.classList.remove("new-entry-row");
 
-        const inputs = newRow.querySelectorAll("input, select");
         let isSaved = false;
 
+        const inputs = newRow.querySelectorAll("input, select");
         inputs.forEach(input => {
             input.addEventListener("change", () => {
                 if (isSaved) return;
@@ -70,37 +67,30 @@ document.addEventListener("click", function (e) {
                     status: newRow.querySelector(".status-select").value,
                     startDate: newRow.querySelector(".start-date").value,
                     endDate: newRow.querySelector(".end-date").value,
-                    title: newRow.querySelector(".contest-name").value.trim()
+                    title: newRow.querySelector(".contest-name").value.trim(),
+                    organizer: newRow.querySelector(".contest-org").value.trim(),
+                    grade: newRow.querySelector(".contest-grade").value.trim()
                 };
 
-                // 파일 첨부
-                const fileInput = newRow.querySelector(".file-upload");
-                const formData = new FormData();
-                formData.append("status", data.status);
-                formData.append("startDate", data.startDate);
-                formData.append("endDate", data.endDate);
-                formData.append("title", data.title);
-                if (fileInput.files.length > 0) {
-                    formData.append("file", fileInput.files[0]);
+                // ✅ 모든 항목이 채워졌을 때만 저장
+                if (!data.status || !data.startDate || !data.endDate || !data.title || !data.organizer || !data.grade) {
+                    return;
                 }
-
-                // ✅ 모든 항목 채워졌을 때만 저장
-                if (!data.status || !data.startDate || !data.endDate || !data.title) return;
 
                 fetch("/api/contest-history", {
                     method: "POST",
                     headers: {
+                        "Content-Type": "application/json",
                         [getCsrfHeader()]: getCsrfToken()
                     },
-                    body: formData
+                    body: JSON.stringify(data)
                 })
                     .then(res => res.json())
                     .then(saved => {
                         isSaved = true;
                         newRow.querySelector(".delete-btn").setAttribute("data-id", saved.id);
                         alert("✅ 공모전 저장됨");
-
-                        loadContests(); // 새로고침
+                        loadContests();
                     })
                     .catch(err => {
                         console.error("❌ 저장 실패:", err);
