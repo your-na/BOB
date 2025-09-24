@@ -166,7 +166,7 @@ body {
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 5px;
-    width: 150px; /* 드롭다운 크기 */
+    width: 180px; /* 드롭다운 크기 */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 5px 0; /* 위, 아래 간격만 추가 */
     z-index: 1000;
@@ -182,7 +182,7 @@ body {
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 5px;
-    width: 120px; /* 드롭다운 크기 */
+    width: 180px; /* 드롭다운 크기 */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 15px;
     z-index: 1000;
@@ -231,6 +231,7 @@ body {
     text-decoration: none;
     color: black;
     font-size: 14px;
+    white-space: nowrap;
 }
 
 .all-dropdown-menu ul li a:hover {

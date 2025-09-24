@@ -738,10 +738,10 @@ function renderJobs() {
 
                 const d = document.createElement('div');
                 d.className = 'award-item';
-                d.innerHTML = `${it.jobTitle || '직무 없음'}<br><small>${period}</small>`;
+                d.innerHTML = `${it.workplace || '직무 없음'}<br><small>${period}</small>`;
                 makeDraggable(d, {
                     id: it.id, type: 'JOB',
-                    title: it.jobTitle || '직무 없음',
+                    title: it.workplace || '직무 없음',
                     startDate: it.startDate, endDate: it.endDate, status: it.status
                 });
                 cont.appendChild(d);
