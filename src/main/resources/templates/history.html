@@ -165,8 +165,8 @@
             <th>No.</th>
             <th>상태</th>
             <th colspan="2">진행 기간</th>
-            <th>공모전</th>
-            <th>결과/주최</th>
+            <th>공모전 / 주최기관</th>
+            <th>수상</th>
             <th>관리</th>
         </tr>
         <tr>
@@ -185,14 +185,12 @@
             <td th:text="${contest.status}">참여완료</td>
             <td th:text="${contest.startDate}"></td>
             <td th:text="${contest.endDate}"></td>
-            <td th:text="${contest.title}"></td>
             <td>
-                <a th:if="${contest.submittedFileName}"
-                   th:href="@{'/download/' + ${contest.submittedFileName}}"
-                   th:text="${contest.submittedFileName}"
-                   target="_blank" class="file-view">파일보기</a>
-                <span th:unless="${contest.submittedFileName}">미제출</span>
+                <span th:text="${contest.title}"></span>
+                <br/>
+                <small th:text="${contest.organizer}"></small>
             </td>
+            <td th:text="${contest.grade}">대상</td>
             <td>
                 <button class="delete-btn">삭제</button>
             </td>
@@ -209,14 +207,13 @@
             </td>
             <td><input type="date" class="start-date"></td>
             <td><input type="date" class="end-date"></td>
-            <td><input type="text" class="contest-name" placeholder="공모전 제목"></td>
             <td>
-                <input type="file" class="file-upload">
-                <a href="#" class="file-view" style="display: none;">파일보기</a>
+                <input type="text" class="contest-name" placeholder="공모전 제목">
+                <br/>
+                <input type="text" class="contest-org" placeholder="주최기관">
             </td>
-            <td>
-                <button class="delete-btn">삭제</button>
-            </td>
+            <td><input type="text" class="contest-grade" placeholder="수상 등급"></td>
+            <td><button class="delete-btn">삭제</button></td>
         </tr>
         </tbody>
     </table>

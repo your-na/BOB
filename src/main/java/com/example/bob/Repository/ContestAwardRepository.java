@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface ContestAwardRepository extends JpaRepository<ContestAwardHistory, Long> {
     List<ContestAwardHistory> findByUser(UserEntity user);
+    List<ContestAwardHistory> findByUser_UserId(Long userId);
 }

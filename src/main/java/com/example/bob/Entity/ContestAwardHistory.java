@@ -32,7 +32,13 @@ public class ContestAwardHistory {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    private String source;          // ✅ 추가: certificate, manual 등
-    private Long teamId;            // ✅ 추가: 팀 아이디 기록
-    private LocalDateTime createdAt; // ✅ 추가: 기록 생성 시각
+    private String source;
+    private Long teamId;
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+
 }
