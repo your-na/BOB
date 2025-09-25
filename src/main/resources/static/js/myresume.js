@@ -21,46 +21,41 @@ function bindDropToEducationItem(item) {
         e.preventDefault();
         const text = e.dataTransfer.getData('application/json');
         if (!text) return;
+
         try {
             const data = JSON.parse(text);
             if (data.type !== 'EDUCATION') return;
 
             const schoolInput = item.querySelector('input[placeholder="학교명"]');
             const majorInput  = item.querySelector('input[placeholder="학과"]');
-            const statusInput = item.querySelector('.status-input');   // 텍스트 input
-            const dateGroup   = item.querySelector('.date-group');
+            const statusInput = item.querySelector('.status-input');
+            const dateGroup   = item.querySelector('.date-group2');
 
             if (schoolInput) schoolInput.value = data.schoolName || '';
             if (majorInput)  majorInput.value  = data.majorName  || '';
             if (statusInput) statusInput.value = data.status     || '';
 
+            // 🔥 payload에서 날짜 가져오기
             const [sy, sm = ''] = (data.startDate || '').split('-');
             const [ey, em = ''] = (data.endDate   || '').split('-');
 
-            // 1) 새 마크업: YYYY/MM 텍스트 input
-            const yInputs = dateGroup ? dateGroup.querySelectorAll('.year-input') : null;
-            const mInputs = dateGroup ? dateGroup.querySelectorAll('.month-input') : null;
-            if (yInputs && yInputs.length >= 2) {
-                if (yInputs[0]) yInputs[0].value = sy || '';
-                if (yInputs[1]) yInputs[1].value = ey || '';
-                if (mInputs && mInputs.length >= 2) {
-                    if (mInputs[0]) mInputs[0].value = sm || '';
-                    if (mInputs[1]) mInputs[1].value = em || '';
-                }
-                return;
-            }
+            if (dateGroup) {
+                // 새 마크업 대응
+                const ySelects = dateGroup.querySelectorAll('.year-select');
+                const mSelects = dateGroup.querySelectorAll('.month-select');
 
-            // 2) 구 마크업: select(연도)
-            const yearSelects = dateGroup ? dateGroup.querySelectorAll('select') : [];
-            if (yearSelects[0]) {
-                populateYearOptions(yearSelects[0], sy);
-                yearSelects[0].value = sy || yearSelects[0].value;
+                if (ySelects.length >= 2) {
+                    if (ySelects[0]) ySelects[0].value = sy || '';
+                    if (ySelects[1]) ySelects[1].value = ey || '';
+                }
+                if (mSelects.length >= 2) {
+                    if (mSelects[0]) mSelects[0].value = sm || '';
+                    if (mSelects[1]) mSelects[1].value = em || '';
+                }
             }
-            if (yearSelects[1]) {
-                populateYearOptions(yearSelects[1], ey);
-                yearSelects[1].value = ey || yearSelects[1].value;
-            }
-        } catch {}
+        } catch (err) {
+            console.error("교육 drop 파싱 오류:", err);
+        }
     });
 }
 
@@ -357,7 +352,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // 기간: input(year/month) 우선 → 없으면 select(연도)
                 let start = '', end = '';
-                const dg = section.querySelector('.date-group');
+                const dg = section.querySelector('.date-group2');
                 if (dg) {
                     const yInputs = dg.querySelectorAll('.year-input');
                     const mInputs = dg.querySelectorAll('.month-input');
@@ -858,14 +853,61 @@ function renderEducations() {
                 eduBox.innerHTML = `
                     <input type="text" class="school-input" placeholder="학교명">
                     <input type="text" class="major-input" placeholder="학과">
-                    <input type="text" class="status-input" placeholder="상태 (예: 재학/졸업)">
-                    <div class="date-group">
-                        <input class="year-input"  placeholder="YYYY" />
-                        <input class="month-input" placeholder="MM" />
-                        ~
-                        <input class="year-input"  placeholder="YYYY" />
-                        <input class="month-input" placeholder="MM" />
+                    <select class="status-input">
+                        <option value="">상태 선택</option>
+                        <option value="재학">재학</option>
+                        <option value="졸업">졸업</option>
+                        <option value="휴학">휴학</option>
+                        
+                        
+                        <option value="중퇴">중퇴</option>
+                    </select>
+                    <div class="date-group2">
+                      <!-- 시작 연도 -->
+                      <div class="date-item">
+                        <input class="year-select" placeholder="YYYY" maxlength="4"/>
+                        <select class="month-select">
+                          <option value="">월</option>
+                          <option value="01">1</option>
+                          <option value="02">2</option>
+                          <option value="03">3</option>
+                          <option value="04">4</option>
+                          <option value="05">5</option>
+                          <option value="06">6</option>
+                          <option value="07">7</option>
+                          <option value="08">8</option>
+                          <option value="09">9</option>
+                          <option value="10">10</option>
+                          <option value="11">11</option>
+                          <option value="12">12</option>
+                        </select>
+                        
+                        <div class="tilde">~</div>
+                      </div>
+                    
+
+                    
+                      <!-- 종료 연도 -->
+                      <div class="date-item2">
+                        <input class="year-select" placeholder="YYYY" maxlength="4"/>
+                        <select class="month-select">
+                          <option value="">월</option>
+                          <option value="01">1</option>
+                          <option value="02">2</option>
+                          <option value="03">3</option>
+                          <option value="04">4</option>
+                          <option value="05">5</option>
+                          <option value="06">6</option>
+                          <option value="07">7</option>
+                          <option value="08">8</option>
+                          <option value="09">9</option>
+                          <option value="10">10</option>
+                          <option value="11">11</option>
+                          <option value="12">12</option>
+                        </select>
+                      </div>
                     </div>
+
                 `;
 
                 // Enter → 확정
@@ -876,26 +918,43 @@ function renderEducations() {
                         const school = eduBox.querySelector(".school-input").value.trim();
                         const major  = eduBox.querySelector(".major-input").value.trim();
                         const status = eduBox.querySelector(".status-input").value.trim();
-                        const sy = eduBox.querySelectorAll(".year-input")?.[0]?.value || '';
-                        const sm = eduBox.querySelectorAll(".month-input")?.[0]?.value || '';
-                        const ey = eduBox.querySelectorAll(".year-input")?.[1]?.value || '';
-                        const em = eduBox.querySelectorAll(".month-input")?.[1]?.value || '';
+                        // 시작 연도/월
+                        const sy = eduBox.querySelector(".year-input, .year-select")?.value || '';
+                        const sm = eduBox.querySelector(".month-input, .month-select")?.value || '';
+
+                        // 종료 연도/월
+                        const ey = eduBox.querySelectorAll(".year-input, .year-select")?.[1]?.value || '';
+                        const em = eduBox.querySelectorAll(".month-input, .month-select")?.[1]?.value || '';
+
                         const startYear = [sy, sm].filter(Boolean).join('-');
                         const endYear   = [ey, em].filter(Boolean).join('-');
+
 
                         if (!school) {
                             alert("학교명을 입력하세요!");
                             return;
                         }
 
+                        let dateText = "";
+                        if (startYear && endYear) {
+                            dateText = `${startYear.replace(/-/g, '.')} ~ ${endYear.replace(/-/g, '.')}`;
+                        } else if (startYear) {
+                            dateText = `${startYear.replace(/-/g, '.')} ~`;
+                        } else if (endYear) {
+                            dateText = `~ ${endYear.replace(/-/g, '.')}`;
+                        }
+
                         let line2 = "";
                         if (status === "재학") {
-                            line2 = `재학 ${startYear?.replace(/-/g, '.')} 학과 ${major}`;
+                            line2 = `재학 ${dateText} 학과 ${major}`;
+                        } else if (status === "졸업") {
+                            line2 = `졸업 ${dateText} 학과 ${major}`;
                         } else if (status) {
-                            line2 = `${status} ${startYear?.replace(/-/g, '.')} ~ ${endYear?.replace(/-/g, '.')} 학과 ${major}`;
+                            line2 = `${status} ${dateText} 학과 ${major}`;
                         } else {
-                            line2 = `학과 ${major}`;
+                            line2 = `${dateText} 학과 ${major}`;
                         }
+
 
                         eduBox.className = "award-item";
                         eduBox.innerHTML = `${school}<br><small>${line2}</small>`;

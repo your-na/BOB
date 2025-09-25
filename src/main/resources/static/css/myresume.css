@@ -1002,3 +1002,40 @@ textarea {
 #section2 .education-item .status-input {
     margin-right: 0; /* 기존 30px → 0 */
 }
+
+.year-select {
+    width: 50px;   /* 기존 60px → 줄임 */
+    font-size: 11px;
+}
+.month-select {
+    width: 45px;   /* 기존 50px → 줄임 */
+    font-size: 11px;
+}
+.date-group2 {
+    display: flex;
+    flex-wrap: wrap;   /* 필요시 자동 줄바꿈 */
+    justify-content: space-between;
+    gap: 6px;
+    max-width: 100%;   /* 부모 박스 기준 안 넘게 */
+    overflow: hidden;  /* 혹시 넘치면 숨김 */
+}
+
+
+.date-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;            /* 연도와 월 사이 간격 */
+}
+
+.date-item2 {
+    display: flex;
+    align-items: center;
+    gap: 4px;            /* 연도와 월 사이 간격 */
+    margin-left: 35%;
+}
+
+
+.tilde {
+    font-weight: bold;
+    text-align: left;
+}
