@@ -660,4 +660,49 @@ document.addEventListener("click", function (e) {
 
 });
 
+// ✅ 개월 수 계산 함수
+function calculateMonths(startDate, endDate) {
+    if (!startDate) return "";
+    const start = new Date(startDate);
+    const end = endDate ? new Date(endDate) : new Date(); // 종료일 없으면 오늘 기준
+    let months = (end.getFullYear() - start.getFullYear()) * 12;
+    months += end.getMonth() - start.getMonth();
+    if (end.getDate() < start.getDate()) months -= 1; // 일자 차이 보정
+    return months >= 0 ? months : 0;
+}
+
+// ✅ 구직 내역 초기 로딩 (GET 요청)
+function loadJobHistories() {
+    const tbody = document.querySelector("#job-history .history-table tbody");
+    const templateRow = tbody.querySelector(".new-entry-row");
+
+    tbody.innerHTML = "";
+    if (templateRow) {
+        tbody.appendChild(templateRow);
+        templateRow.style.display = "none";
+    }
+
+    fetch("/api/job-history", {
+        headers: { [getCsrfHeader()]: getCsrfToken() }
+    })
+        .then(response => response.json())
+        .then(data => {
+            data.forEach((item, index) => {
+                const months = calculateMonths(item.startDate, item.endDate);
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.status}</td>
+                    <td>${months}개월</td> <!-- ✅ 계산된 개월 수 -->
+                    <td>${item.startDate || ""}</td>
+                    <td>${item.endDate || (item.status === "재직" ? "현재" : "")}</td>
+                    <td>${item.workplace || ""}</td>
+                    <td>${item.jobTitle || ""}</td>
+                    <td><button class="delete-btn" data-id="${item.id}">삭제</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+}
 
