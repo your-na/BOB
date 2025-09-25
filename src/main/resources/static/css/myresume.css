@@ -904,3 +904,101 @@ textarea {
     height: 30px;
     padding-left: 10px;
 }
+
+/* 학력사항 코드 */
+.education-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    position: relative;
+    background: #fafafa;
+    border-radius: 6px;
+}
+
+.edu-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.edu-row input,
+.edu-row select {
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.edu-del {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    cursor: pointer;
+    color: red;
+}
+
+/* === 학력 카드를 경력/포폴과 동일 스타일로 === */
+#section2 .education-item{
+    border:1px solid #ddd;
+    padding:12px;
+    margin-top:15px;
+    border-radius:6px;
+    position:relative;
+    background:#fff;           /* 경력/포폴과 톤 맞춤 */
+    padding-right:48px;        /* 우상단 삭제 버튼과 겹치지 않게 */
+}
+
+/* 우상단 개별 삭제 버튼(경력/포폴과 동일) */
+#section2 .education-item .edu-del{
+    position:absolute;
+    top:8px;
+    right:8px;
+    background:none;
+    border:none;
+    color:#888;
+    font-size:16px;
+    cursor:pointer;
+}
+#section2 .education-item .edu-del:hover{ color:red; }
+
+/* 전역 input/select 폭(70%/20%) 무력화 + 공통 스타일 */
+#section2 .education-item input,
+#section2 .education-item select{
+    width:auto;                 /* 전역 70%/20% 해제 */
+    height:30px;
+    border:1px solid #ccc;
+    border-radius:20px;
+    padding:0 10px;
+    margin:0;
+}
+
+/* 한 줄 레이아웃 */
+#section2 .education-item .edu-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+}
+
+/* 1줄: 학교명/학과 → 반반 */
+#section2 .education-item .school-input,
+#section2 .education-item .major-input{
+    flex:1;
+}
+
+/* 2줄: 기간(넓게) + 상태(고정폭) */
+#section2 .education-item .date-group{
+    flex:2;                     /* 상태보다 넓게 */
+    display:flex;
+    align-items:center;
+    gap:5px;
+    margin-left:8px;
+}
+#section2 .education-item .year-input{  width:80px;  text-align:center; }
+#section2 .education-item .month-input{ width:40px;  text-align:center; }
+
+#section2 .education-item .status-input {
+    margin-right: 0; /* 기존 30px → 0 */
+}

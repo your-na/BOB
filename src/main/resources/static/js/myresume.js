@@ -1,4 +1,6 @@
-
+/***********************
+ * 공통 유틸
+ ***********************/
 function populateYearOptions(selectElement, year) {
     if (!selectElement || !year) return;
     const exists = Array.from(selectElement.options).some(opt => opt.value === year);
@@ -10,6 +12,9 @@ function populateYearOptions(selectElement, year) {
     }
 }
 
+/***********************
+ * EDUCATION 드롭 바인딩 (신/구 마크업 모두 대응)
+ ***********************/
 function bindDropToEducationItem(item) {
     item.addEventListener('dragover', e => e.preventDefault());
     item.addEventListener('drop', e => {
@@ -22,46 +27,68 @@ function bindDropToEducationItem(item) {
 
             const schoolInput = item.querySelector('input[placeholder="학교명"]');
             const majorInput  = item.querySelector('input[placeholder="학과"]');
-            const statusSel   = item.querySelector('select');
-            const yearSelects = item.querySelectorAll('.date-group select');
+            const statusInput = item.querySelector('.status-input');   // 텍스트 input
+            const dateGroup   = item.querySelector('.date-group');
 
             if (schoolInput) schoolInput.value = data.schoolName || '';
             if (majorInput)  majorInput.value  = data.majorName  || '';
-            if (statusSel)   statusSel.value   = data.status === '졸업' ? '졸업' : '재학';
+            if (statusInput) statusInput.value = data.status     || '';
 
-            const [sYear] = (data.startDate || '').split('-');
-            const [eYear] = (data.endDate || '').split('-');
+            const [sy, sm = ''] = (data.startDate || '').split('-');
+            const [ey, em = ''] = (data.endDate   || '').split('-');
 
-            populateYearOptions(yearSelects[0], sYear);
-            populateYearOptions(yearSelects[1], eYear);
+            // 1) 새 마크업: YYYY/MM 텍스트 input
+            const yInputs = dateGroup ? dateGroup.querySelectorAll('.year-input') : null;
+            const mInputs = dateGroup ? dateGroup.querySelectorAll('.month-input') : null;
+            if (yInputs && yInputs.length >= 2) {
+                if (yInputs[0]) yInputs[0].value = sy || '';
+                if (yInputs[1]) yInputs[1].value = ey || '';
+                if (mInputs && mInputs.length >= 2) {
+                    if (mInputs[0]) mInputs[0].value = sm || '';
+                    if (mInputs[1]) mInputs[1].value = em || '';
+                }
+                return;
+            }
 
-            if (yearSelects[0]) yearSelects[0].value = sYear || yearSelects[0].value;
-            if (yearSelects[1]) yearSelects[1].value = eYear || yearSelects[1].value;
-        } catch { /* 무시 */ }
+            // 2) 구 마크업: select(연도)
+            const yearSelects = dateGroup ? dateGroup.querySelectorAll('select') : [];
+            if (yearSelects[0]) {
+                populateYearOptions(yearSelects[0], sy);
+                yearSelects[0].value = sy || yearSelects[0].value;
+            }
+            if (yearSelects[1]) {
+                populateYearOptions(yearSelects[1], ey);
+                yearSelects[1].value = ey || yearSelects[1].value;
+            }
+        } catch {}
     });
 }
 
-
+/***********************
+ * 섹션/팝업/태그/저장 등 메인 UI
+ ***********************/
 document.addEventListener("DOMContentLoaded", () => {
     let sections = document.querySelectorAll(".resume-section");
     const addBtn = document.getElementById("add-section");
     const popup = document.getElementById("section-popup");
     const jobTagContainer = document.querySelector(".job-tags");
 
-    // ➕ 버튼 클릭 시 팝업 위치 설정
-    addBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const rect = addBtn.getBoundingClientRect();
-        popup.style.top = `${rect.bottom + window.scrollY + 5}px`;
-        popup.style.left = `${rect.left + window.scrollX}px`;
-        popup.style.display = popup.style.display === "block" ? "none" : "block";
-    });
+    // ➕ 버튼 클릭 시 팝업 위치 설정 (가드)
+    if (addBtn) {
+        addBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const rect = addBtn.getBoundingClientRect();
+            popup.style.top = `${rect.bottom + window.scrollY + 5}px`;
+            popup.style.left = `${rect.left + window.scrollX}px`;
+            popup.style.display = popup.style.display === "block" ? "none" : "block";
+        });
+    }
 
     document.addEventListener("click", (e) => {
         const target = e.target;
 
         // 팝업 바깥 클릭 시 닫기
-        if (!popup.contains(target) && target !== addBtn) {
+        if (popup && !popup.contains(target) && target !== addBtn) {
             popup.style.display = "none";
         }
 
@@ -91,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             tag.classList.toggle("selected-tag");
 
-            // ✅ 직접입력 input 처리
+            // 직접입력 input 처리
             const isDirect = tag.classList.contains("direct-input-tag");
             if (isDirect) {
                 const exists = tag.nextElementSibling;
@@ -113,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
             } else {
-                // ✅ 다른 태그 클릭 시 직접입력 input 제거
+                // 다른 태그 클릭 시 직접입력 input 제거
                 const allDirect = container?.querySelectorAll(".direct-input-tag") || [];
                 allDirect.forEach(dtag => {
                     dtag.classList.remove("selected-tag");
@@ -127,8 +154,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // 태그 삭제
         if (target.classList.contains("tag-remove")) {
-            const tag = target.closest(".tag");
-            if (tag) tag.remove();
+            const t = target.closest(".tag");
+            if (t) t.remove();
         }
 
         // 섹션 삭제
@@ -138,25 +165,24 @@ document.addEventListener("DOMContentLoaded", () => {
             section.remove();
             const tocLink = document.querySelector(`.outline-list a[href="#${sectionId}"]`);
             tocLink?.closest("li")?.remove();
+            // 번호/목차 재정렬
+            reorderSectionsAndToc();
         }
     });
 
+    // 팝업 옵션으로 새 섹션 추가
     document.querySelectorAll(".popup-option").forEach(option => {
         option.addEventListener("click", () => {
             const type = option.textContent.trim();
 
-            // 🔹 현재 모든 resume-section 중 마지막 섹션의 번호 찾기
+            // 마지막 섹션 번호
             const allSections = document.querySelectorAll(".resume-section");
             let lastNumber = 0;
             if (allSections.length > 0) {
                 const lastSection = allSections[allSections.length - 1];
-                // id가 "section6" 이런 식이라고 가정
                 const match = lastSection.id.match(/section(\d+)/);
-                if (match) {
-                    lastNumber = parseInt(match[1], 10);
-                }
+                if (match) lastNumber = parseInt(match[1], 10);
             }
-
             const sectionIndex = lastNumber + 1;
 
             const newSection = document.createElement("section");
@@ -167,68 +193,65 @@ document.addEventListener("DOMContentLoaded", () => {
             switch (type) {
                 case "선택형":
                     content = `
-                                    <div class="section-header">
-                                        <span class="section-title-text">${sectionIndex}. 제목 입력</span>
-                                        <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
-                                        <label>선택 방식</label>
-                                        <select><option>선택형</option></select>
-                                        <button class="delete-btn">✕</button>
-                                    </div>
-                                    <input type="text" id="ohcomment" placeholder="설명 입력">
-                                    <div class="tag-mode">
-                                        <button class="mode-btn selected-tag">복수선택 ⭕</button>
-                                        <button class="mode-btn">복수선택 ❌</button>
-                                    </div>
-                                    <div class="tag-list job-tags"></div>
-                                    <input class="tag-input" type="text" placeholder="항목 입력 후 엔터">
-                                `;
+                        <div class="section-header">
+                            <span class="section-title-text">${sectionIndex}. 제목 입력</span>
+                            <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                            <label>선택 방식</label>
+                            <select><option>선택형</option></select>
+                            <button class="delete-btn">✕</button>
+                        </div>
+                        <input type="text" id="ohcomment" placeholder="설명 입력">
+                        <div class="tag-mode">
+                            <button class="mode-btn selected-tag">복수선택 ⭕</button>
+                            <button class="mode-btn">복수선택 ❌</button>
+                        </div>
+                        <div class="tag-list job-tags"></div>
+                        <input class="tag-input" type="text" placeholder="항목 입력 후 엔터">
+                    `;
                     break;
                 case "서술형":
                     content = `
-                                    <div class="section-header">
-                                        <span class="section-title-text">${sectionIndex}. 제목 입력</span>
-                                        <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
-                                        <button class="delete-btn">✕</button>
-                                    </div>
-                                    <input type="text" id="ohcomment" placeholder="설명 입력">
-                                    <textarea placeholder="구직자 답변 입력란"></textarea>
-                                `;
+                        <div class="section-header">
+                            <span class="section-title-text">${sectionIndex}. 제목 입력</span>
+                            <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                            <button class="delete-btn">✕</button>
+                        </div>
+                        <input type="text" id="ohcomment" placeholder="설명 입력">
+                        <textarea placeholder="구직자 답변 입력란"></textarea>
+                    `;
                     break;
                 case "사진 첨부":
                     content = `
-                                    <div class="section-header">
-                                        <span class="section-title-text">${sectionIndex}. 제목 입력</span>
-                                        <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
-                                        <button class="delete-btn">✕</button>
-                                    </div>
-                                    <input type="text" id="ohcomment" placeholder="설명 입력">
-                                    <!-- 📌 사진 첨부 input -->
-                                    <input type="file" accept="image/*" multiple class="file-input">
-                                    <div class="upload-preview"></div>
-                                `;
+                        <div class="section-header">
+                            <span class="section-title-text">${sectionIndex}. 제목 입력</span>
+                            <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                            <button class="delete-btn">✕</button>
+                        </div>
+                        <input type="text" id="ohcomment" placeholder="설명 입력">
+                        <input type="file" accept="image/*" multiple class="file-input">
+                        <div class="upload-preview"></div>
+                    `;
                     break;
-
                 case "파일 첨부":
                     content = `
-                                    <div class="section-header">
-                                        <span class="section-title-text">${sectionIndex}. 제목 입력</span>
-                                        <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
-                                        <button class="delete-btn">✕</button>
-                                    </div>
-                                    <input type="text" id="ohcomment" placeholder="설명 입력">
-                                    <!-- 📌 파일 첨부 input -->
-                                    <input type="file" multiple class="file-input">
-                                    <div class="upload-preview"></div>
-                                `;
+                        <div class="section-header">
+                            <span class="section-title-text">${sectionIndex}. 제목 입력</span>
+                            <input type="text" class="section-title-input" value="제목 입력" style="display: none;">
+                            <button class="delete-btn">✕</button>
+                        </div>
+                        <input type="text" id="ohcomment" placeholder="설명 입력">
+                        <input type="file" multiple class="file-input">
+                        <div class="upload-preview"></div>
+                    `;
                     break;
-
             }
 
             newSection.innerHTML = content;
-            document.querySelector(".add-section").before(newSection);
-            popup.style.display = "none";
+            const addSectionAnchor = document.querySelector(".add-section");
+            if (addSectionAnchor) addSectionAnchor.before(newSection);
+            if (popup) popup.style.display = "none";
 
-            // ✅ 새로 추가된 섹션에서도 복수선택 버튼 토글 작동하게 만들기
+            // 복수선택 토글
             const multiBtns = newSection.querySelectorAll(".mode-btn");
             multiBtns.forEach(btn => {
                 btn.addEventListener("click", () => {
@@ -237,21 +260,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             });
 
-
+            // 목차 동기화
             const outlineList = document.querySelector(".outline-list");
-            const tocItem = document.createElement("li");
-            const tocLink = document.createElement("a");
-            tocLink.href = `#section${sectionIndex}`;
-            tocLink.textContent = `${sectionIndex}. 제목 입력`;
-            tocItem.appendChild(tocLink);
-            outlineList.appendChild(tocItem);
+            if (outlineList) {
+                const tocItem = document.createElement("li");
+                const tocLink = document.createElement("a");
+                tocLink.href = `#section${sectionIndex}`;
+                tocLink.textContent = `${sectionIndex}. 제목 입력`;
+                tocItem.appendChild(tocLink);
+                outlineList.appendChild(tocItem);
 
-            const titleInput = newSection.querySelector(".section-title-input");
-            titleInput?.addEventListener("input", () => {
-                tocLink.textContent = `${sectionIndex}. ${titleInput.value || "제목 입력"}`;
-            });
+                const titleInput = newSection.querySelector(".section-title-input");
+                titleInput?.addEventListener("input", () => {
+                    tocLink.textContent = `${sectionIndex}. ${titleInput.value || "제목 입력"}`;
+                });
+            }
 
             sections = document.querySelectorAll(".resume-section");
+            reorderSectionsAndToc();
         });
     });
 
@@ -298,9 +324,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-
-
-    // 저장 버튼
+    // 저장 버튼 (개선: 상태/기간/타입 판별 보강)
     document.querySelector(".save-btn")?.addEventListener("click", () => {
         const title = document.getElementById("resumeTitle")?.value.trim();
         if (!title) return alert("제목을 입력해주세요!");
@@ -321,23 +345,42 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const comment = section.querySelector("#ohcomment")?.value || "";
-            const textarea = section.querySelector("textarea");
             let content = "";
 
             if (sectionTitle.includes("학력")) {
                 const school = section.querySelector('input[placeholder="학교명"]')?.value || '';
-                const major = section.querySelector('input[placeholder="학과"]')?.value || '';
-                const status = section.querySelector('select')?.value || '';
-                const years = section.querySelectorAll('.date-group select');
-                const start = years[0]?.value || '';
-                const end = years[1]?.value || '';
+                const major  = section.querySelector('input[placeholder="학과"]')?.value  || '';
+                const status =
+                    section.querySelector('.status-input')?.value ||
+                    section.querySelector('select')?.value ||
+                    '';
+
+                // 기간: input(year/month) 우선 → 없으면 select(연도)
+                let start = '', end = '';
+                const dg = section.querySelector('.date-group');
+                if (dg) {
+                    const yInputs = dg.querySelectorAll('.year-input');
+                    const mInputs = dg.querySelectorAll('.month-input');
+                    const sy = yInputs?.[0]?.value || '';
+                    const sm = mInputs?.[0]?.value || '';
+                    const ey = yInputs?.[1]?.value || '';
+                    const em = mInputs?.[1]?.value || '';
+
+                    if (sy || ey || sm || em) {
+                        start = [sy, sm].filter(Boolean).join('-');
+                        end   = [ey, em].filter(Boolean).join('-');
+                    } else {
+                        const years = dg.querySelectorAll('select');
+                        start = years[0]?.value || '';
+                        end   = years[1]?.value || '';
+                    }
+                }
+
                 content = `학교: ${school} / 학과: ${major} / 상태: ${status} / 기간: ${start} ~ ${end}`;
             } else {
                 const textarea = section.querySelector("textarea");
                 content = textarea ? textarea.value : "";
             }
-
-
 
             const selectedConditions = [];
             section.querySelectorAll(".tag-list .selected-tag").forEach(tag => {
@@ -348,16 +391,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 .map(tag => tag.textContent.trim());
             const multiSelect = section.querySelector(".mode-btn.selected-tag")?.textContent.includes("⭕") || false;
 
+            // 타입 판별 개선
             let type = "서술형";
             if (section.querySelector(".tag-list") || section.querySelector(".tag-input")) {
                 type = "선택형";
-            } else if (textarea?.placeholder?.includes("사진")) {
+            } else if (section.querySelector('input.file-input[accept*="image"]')) {
                 type = "사진 첨부";
-            } else if (textarea?.placeholder?.includes("파일")) {
+            } else if (section.querySelector('input.file-input:not([accept*="image"])')) {
                 type = "파일 첨부";
             }
 
-            // ✅ 드래그 항목 수집
+            // 드래그 아이템 수집
             const dragItems = [];
             section.querySelectorAll(".uploaded-item").forEach(item => {
                 const displayText = item.textContent.replace("삭제", "").trim();
@@ -381,23 +425,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 content,
                 multiSelect,
                 conditions: selectedConditions,
-                dragItems // ✅ 추가됨!
+                dragItems
             });
         });
 
-        const jobTags = Array.from(jobTagContainer.querySelectorAll(".tag .tag-label"))
+        // (선택) 직무 태그 사용 시 여기에 포함하고 싶다면 주석 해제
+        // const jobTags = Array.from(jobTagContainer?.querySelectorAll(".tag .tag-label") || []).map(el => el.textContent.trim());
 
         const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
-
         const memberId = document.getElementById("memberId")?.value;
 
         const resumeData = {
             title,
             memberId: memberId ? parseInt(memberId) : null,
             sections: sectionsData
+            // , jobTags
         };
-
 
         fetch("/api/myresumes", {
             method: "POST",
@@ -410,16 +454,15 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(res => res.json())
             .then(() => {
                 alert("저장 완료!");
-                window.location.href = "/myresumelist";  // ✅ 여기서 이동!
+                window.location.href = "/myresumelist";
             })
             .catch(err => {
                 alert("저장 중 오류 발생");
                 console.error(err);
             });
-
     });
 
-
+    // 제목 인풋 Enter → span 반영
     document.addEventListener("keydown", function (e) {
         if (e.target.classList.contains("section-title-input") && e.key === "Enter") {
             e.preventDefault();
@@ -429,7 +472,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const number = span.textContent.split(".")[0];
             const newTitle = input.value.trim() || "제목 없음";
             span.textContent = `${number}. ${newTitle}`;
-            input.value = newTitle; // ✅ span이 바뀌었으면 input도 동기화!
+            input.value = newTitle;
             input.style.display = "none";
             span.style.display = "inline-block";
 
@@ -440,20 +483,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-
-// 목차 클릭 → 스크롤
-document.querySelectorAll(".outline-list a").forEach(link => {
-    link.addEventListener("click", e => {
-        e.preventDefault();
-        const targetId = e.target.getAttribute("href").substring(1);
-        const target = document.getElementById(targetId);
-        if (target) {
-            target.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
+/***********************
+ * 목차 클릭 → 스크롤
+ ***********************/
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".outline-list a").forEach(link => {
+        link.addEventListener("click", e => {
+            e.preventDefault();
+            const targetId = e.target.getAttribute("href").substring(1);
+            const target = document.getElementById(targetId);
+            if (target) {
+                target.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        });
     });
 });
 
-// 섹션 및 목차 동기화
+/***********************
+ * 섹션/목차 동기화 & 모드버튼 토글 바인딩 보장
+ ***********************/
 function reorderSectionsAndToc() {
     const allSections = document.querySelectorAll(".resume-section");
     const allTocLinks = document.querySelectorAll(".outline-list a");
@@ -477,7 +525,7 @@ function reorderSectionsAndToc() {
         }
     });
 
-    // ✅ 기존 섹션에서도 복수선택 버튼 토글 작동
+    // 기존 섹션에서도 복수선택 버튼 토글 작동
     document.querySelectorAll(".resume-section").forEach(section => {
         const btns = section.querySelectorAll(".mode-btn");
         btns.forEach(btn => {
@@ -489,10 +537,15 @@ function reorderSectionsAndToc() {
     });
 }
 
+/***********************
+ * 채팅 열기/닫기
+ ***********************/
 document.addEventListener("DOMContentLoaded", function () {
     const chatBtn = document.getElementById("openChat");
     const chatBox = document.getElementById("chatBox");
     const closeBtn = document.getElementById("closeChat");
+
+    if (!chatBtn || !chatBox || !closeBtn) return;
 
     chatBtn.addEventListener("click", () => {
         chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex";
@@ -503,29 +556,28 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+/***********************
+ * 채팅 전송
+ ***********************/
 document.addEventListener("DOMContentLoaded", () => {
     const chatInput = document.getElementById("chatInput");
     const chatBody = document.getElementById("chatBody");
     const sendChat = document.getElementById("sendChat");
 
-    // ✅ CSRF 토큰 정의
     const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
 
     if (sendChat && chatInput && chatBody) {
-        // 공통 메시지 전송 함수
         function sendMessage() {
             const message = chatInput.value.trim();
             if (!message) return;
 
-            // 사용자 메시지 표시
             const userMsg = document.createElement("p");
             userMsg.className = "user";
             userMsg.textContent = message;
             chatBody.appendChild(userMsg);
             chatInput.value = "";
 
-            // Groq 호출
             fetch("/api/chat", {
                 method: "POST",
                 headers: {
@@ -555,26 +607,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
         }
 
-        // 버튼 클릭 → 전송
         sendChat.onclick = sendMessage;
 
-        // 엔터 입력 → 전송 (줄바꿈 방지)
         chatInput.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
                 e.preventDefault();
                 sendMessage();
             }
         });
-
     } else {
         console.error("chatInput 또는 sendChat 또는 chatBody가 null입니다.");
     }
 });
 
-
-
-//임의 채팅
-
+/***********************
+ * 임의 응답 (미사용시 무시)
+ ***********************/
 function getAiMockResponse(msg) {
     if (msg.includes("자기소개")) {
         return "저는 책임감 있게 성장하는 개발자입니다.";
@@ -584,7 +632,10 @@ function getAiMockResponse(msg) {
     }
     return "죄송해요! 해당 질문은 아직 학습되지 않았어요.";
 }
-// ===================== 공통 드롭박스 세팅 =====================
+
+/***********************
+ * 공통 드롭박스 세팅
+ ***********************/
 function setupDropBox(box) {
     if (!box) return;
 
@@ -622,7 +673,6 @@ function setupDropBox(box) {
         if (jsonText) {
             try {
                 const data = JSON.parse(jsonText);
-                // 표시 텍스트 구성
                 let display = data.title || '';
                 if (data.type === 'JOB') {
                     const fmt = s => s ? s.replace(/-/g, '.') : '';
@@ -633,18 +683,13 @@ function setupDropBox(box) {
                 item.className = 'uploaded-item';
                 item.textContent = display;
 
-                // ✅✅✅ 요 아래 코드 추가!! (dataset 채우기)
-                item.dataset.file = data.file || '';
+                // dataset 보존
+                item.dataset.file = (data.file || '').replace(/^\/?download\//, '');
                 item.dataset.startDate = data.startDate || '';
                 item.dataset.endDate = data.endDate || '';
                 item.dataset.displayText = display;
-
-                // 메타 데이터 보존
-                if (data.id) item.dataset.id = data.id;
+                if (data.id)   item.dataset.id = data.id;
                 if (data.type) item.dataset.type = data.type;
-                if (data.file) item.dataset.file = (data.file || '').replace(/^\/?download\//, '');
-                if (data.startDate) item.dataset.startDate = data.startDate;
-                if (data.endDate) item.dataset.endDate = data.endDate;
 
                 const del = document.createElement('span');
                 del.className = 'delete-icon';
@@ -673,7 +718,9 @@ function setupDropBox(box) {
     });
 }
 
-// ===================== 탭 활성화 =====================
+/***********************
+ * 탭 활성화
+ ***********************/
 function activateTab(tabName) {
     document.querySelectorAll('#tab-list .tab').forEach(t => t.classList.remove('active'));
     const activeTab = document.querySelector(`#tab-list .tab[data-tab="${tabName}"]`);
@@ -684,7 +731,6 @@ function activateTab(tabName) {
         const show = c.dataset.content === tabName;
         c.style.display = show ? 'block' : 'none';
         if (show) {
-            // award-item만 카운트 (버튼 제외)
             isEmpty = c.querySelectorAll(".award-item").length === 0;
         }
     });
@@ -693,7 +739,9 @@ function activateTab(tabName) {
     if (empty) empty.style.display = isEmpty ? 'block' : 'none';
 }
 
-// ===================== 오른쪽 패널 데이터 로딩 =====================
+/***********************
+ * 우측 패널 데이터 로딩
+ ***********************/
 function makeDraggable(div, payload) {
     div.setAttribute('draggable', 'true');
     div.addEventListener('dragstart', e => {
@@ -753,322 +801,9 @@ function renderJobs() {
         .catch(err => console.error('구직 이력 로드 실패:', err));
 }
 
-/*
-function renderEducations() {
-    return fetch('/api/education-history/list')
-        .then(res => res.json())
-        .then(list => {
-            const cont = document.querySelector('.tab-content[data-content="school"]');
-            if (!cont) return;
-            cont.innerHTML = '';
-            if (!list || list.length === 0) return;
-
-            list.forEach(edu => {
-                const fmt = d => d?.replace(/-/g, '.');
-                let line2 = '';
-                if (edu.status === '재학')       line2 = `재학 ${fmt(edu.startDate)} 학과 ${edu.majorName || ''}`;
-                else if (edu.status === '졸업') line2 = `졸업 ${fmt(edu.startDate)} ~ ${fmt(edu.endDate)} 학과 ${edu.majorName || ''}`;
-                else                            line2 = `${edu.status || ''} 학과 ${edu.majorName || ''}`;
-
-                const d = document.createElement('div');
-                d.className = 'award-item';
-                d.innerHTML = `${edu.schoolName}<br><small>${line2}</small>`;
-                makeDraggable(d, {
-                    type: 'EDUCATION',
-                    schoolName: edu.schoolName,
-                    majorName: edu.majorName,
-                    status: edu.status,
-                    startDate: edu.startDate,
-                    endDate: edu.endDate
-                });
-                cont.appendChild(d);
-            });
-        })
-        .catch(err => console.error('학력 로드 실패:', err));
-}
-*/
-
-// (선택) 공모전을 포트폴리오 탭에 함께 표시하고 싶다면 이 함수도 호출하세요.
-function renderContestsIntoPortfolio() {
-    return fetch('/api/user/resumes/contests')
-        .then(res => res.json())
-        .then(list => {
-            const cont = document.querySelector('.tab-content[data-content="portfolio"]');
-            if (!cont || !list) return;
-            list.forEach(c => {
-                const d = document.createElement('div');
-                d.className = 'award-item';
-                d.innerHTML = `${c.title}<br><small>${c.date || ''}</small>`;
-                makeDraggable(d, { id: c.id, type: 'CONTEST', file: c.filePath || '', title: c.title });
-                cont.appendChild(d);
-            });
-        })
-        .catch(err => console.error('공모전 로드 실패:', err));
-}
-
-// ===================== 왼쪽 섹션 드롭 핸들러(학력 자동 채움 포함) =====================
-function setupLeftDrops() {
-    // 경력/포트폴리오 섹션의 드롭존
-    setupDropBox(document.querySelector('#section4 .upload-box'));
-    setupDropBox(document.querySelector('#section5 .upload-box'));
-
-    // 학력 섹션: EDUCATION 드롭 시 입력칸 자동 채움
-    const sec2 = document.getElementById('section2');
-    if (sec2) {
-        sec2.addEventListener('dragover', e => e.preventDefault());
-        sec2.addEventListener('drop', e => {
-            e.preventDefault();
-            const text = e.dataTransfer.getData('application/json');
-            if (!text) return;
-            try {
-                const data = JSON.parse(text);
-                if (data.type !== 'EDUCATION') return;
-
-                // 입력칸 매핑
-                const inputs = sec2.querySelectorAll('input, select');
-                // 가정: [학교명 input, 학과 input, 상태 select, 시작년도 select, 종료년도 select] 순서
-                const schoolInput = sec2.querySelector('input[placeholder="학교명"]');
-                const majorInput  = sec2.querySelector('input[placeholder="학과"]');
-                const statusSel   = sec2.querySelector('select');
-                const yearSelects = sec2.querySelectorAll('.date-group select');
-
-                if (schoolInput) schoolInput.value = data.schoolName || '';
-                if (majorInput)  majorInput.value  = data.majorName  || '';
-                if (statusSel)   statusSel.value   = (data.status === '졸업' ? '졸업' : '재학');
-
-                // 날짜(년도만 존재하는 현재 마크업 기준)
-                const [sYear] = (data.startDate || '').split('-');
-                const [eYear] = (data.endDate || '').split('-');
-
-                // ✅ 연도 옵션이 없으면 추가
-                populateYearOptions(yearSelects[0], sYear);
-                populateYearOptions(yearSelects[1], eYear);
-
-                // ✅ 선택
-                if (yearSelects[0]) yearSelects[0].value = sYear || yearSelects[0].value;
-                if (yearSelects[1]) yearSelects[1].value = eYear || yearSelects[1].value;
-
-            } catch { /* 무시 */ }
-        });
-    }
-}
-
-document.querySelectorAll('.education-item').forEach(bindDropToEducationItem);
-
-
-// ===================== 탭 클릭 바인딩 =====================
-function bindTabs() {
-    document.querySelectorAll('#tab-list .tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-            activateTab(tab.dataset.tab);
-        });
-    });
-}
-
-// ===================== 초기화 =====================
-window.addEventListener('DOMContentLoaded', () => {
-    // 브라우저 기본 드래그 방지
-    window.addEventListener('dragover', e => e.preventDefault());
-    window.addEventListener('drop', e => e.preventDefault());
-
-    bindTabs();
-    setupLeftDrops();
-
-    // ✅ 프로필 불러오기 (내 정보 채움)
-    fetch("/api/user/resumes/me")
-        .then(res => res.json())
-        .then(user => {
-            document.getElementById("profileImage").src = user.profileImageUrl || "/images/user.png";
-            document.getElementById("userName").textContent = user.userName || "이름 없음";
-            document.getElementById("mainLanguage").textContent = user.mainLanguage || "";
-            document.getElementById("sex").textContent = user.sex || "";
-            document.getElementById("birthday").textContent = user.birthday || "";
-            document.getElementById("phone").textContent = user.userPhone || "";
-            document.getElementById("email").textContent = user.userEmail || "";
-            document.getElementById("region").textContent = user.region || "";
-        })
-        .catch(err => console.error("프로필 불러오기 실패:", err));
-
-    // ✅ 다른 데이터들(경력, 학력, 프로젝트 등) 로드
-    Promise.all([
-        renderProjects(),
-        renderJobs(),
-        renderEducations(),
-        // renderContestsIntoPortfolio()
-    ]).then(() => {
-        // 기본 탭: 학력
-        activateTab('school');
-    });
-});
-
-document.querySelectorAll('.resume-section, .section-box').forEach(box => {
-    box.addEventListener('click', () => {
-        // 다른 박스 선택 해제
-        document.querySelectorAll('.resume-section, .section-box').forEach(b => b.classList.remove('selected'));
-        // 클릭한 박스만 선택
-        box.classList.add('selected');
-    });
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-    const addEduBtn = document.getElementById("add-edu");
-    const section2 = document.getElementById("section2");
-
-    // 학력 추가 버튼
-    addEduBtn.addEventListener("click", () => {
-        const firstItem = section2.querySelector(".education-item");
-        if (firstItem) {
-            const clone = firstItem.cloneNode(true);
-            // input/select 값 초기화
-            clone.querySelectorAll("input, select").forEach(el => el.value = "");
-
-            // 삭제 버튼 이벤트 새로 붙이기
-            const delBtn = clone.querySelector(".edu-del");
-            if (delBtn) {
-                delBtn.addEventListener("click", () => clone.remove());
-            }
-
-            section2.insertBefore(clone, addEduBtn);
-            bindDropToEducationItem(clone);
-
-        }
-    });
-
-    // 초기 삭제 버튼 이벤트 바인딩
-    document.querySelectorAll(".edu-del").forEach(btn => {
-        btn.addEventListener("click", (e) => {
-            e.target.closest(".education-item").remove();
-        });
-    });
-});
-
-//템플릿
-document.addEventListener("DOMContentLoaded", () => {
-    const arrow = document.querySelector(".arrow-toggle");
-    if (arrow) {
-        arrow.addEventListener("click", () => {
-            window.location.href = "/profile";  // ✅ 이동할 페이지 주소
-        });
-    }
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-    const firstTemplate = document.querySelector(".template-card"); // 첫 번째 카드
-    const modal = document.getElementById("templateModal");
-    const closeBtn = modal.querySelector(".close-btn");
-
-    // 카드 클릭 → 모달 열기
-    if (firstTemplate) {
-        firstTemplate.addEventListener("click", () => {
-            modal.style.display = "flex";
-        });
-    }
-
-    // 닫기 버튼 클릭 → 모달 닫기
-    closeBtn.addEventListener("click", () => {
-        modal.style.display = "none";
-    });
-
-    // 바깥 영역 클릭 시 닫기
-    window.addEventListener("click", (e) => {
-        if (e.target === modal) {
-            modal.style.display = "none";
-        }
-    });
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-    const applyBtn = document.getElementById("applyTemplateBtn");
-    const modal = document.getElementById("templateModal");
-
-    applyBtn.addEventListener("click", () => {
-        // 질문 리스트
-        const questions = [
-            "내가 가진 큰 강점",
-            "내가 지원한 직무와 내가 잘 맞는 이유",
-            "어려운 상황을 극복한 경험",
-            "입사 후 이루고 싶은 목표"
-        ];
-
-        // 🔹 현재 모든 resume-section 중 마지막 섹션 번호 찾기
-        const allSections = document.querySelectorAll(".resume-section");
-        let lastNumber = 0;
-        if (allSections.length > 0) {
-            const lastSection = allSections[allSections.length - 1];
-            const match = lastSection.id.match(/section(\d+)/);
-            if (match) {
-                lastNumber = parseInt(match[1], 10);
-            }
-        }
-
-        let sectionIndex = lastNumber;
-
-        questions.forEach(q => {
-            sectionIndex++;
-            const newSection = document.createElement("section");
-            newSection.className = "resume-section";
-            newSection.id = `section${sectionIndex}`;
-            newSection.setAttribute("data-multi-select", "false");
-
-            newSection.innerHTML = `
-                            <div class="section-header">
-                                <span class="section-title-text">${sectionIndex}. ${q}</span>
-                                <input type="text" class="section-title-input" value="${q}" style="display: none;">
-                                <button class="delete-btn">✕</button>
-                            </div>
-                            <textarea placeholder="${q}에 대해 작성해주세요."></textarea>
-                        `;
-
-            // "➕ 추가" 버튼 바로 위에 붙이기
-            document.querySelector(".add-section").before(newSection);
-
-            // 목차도 자동 업데이트
-            const outlineList = document.querySelector(".outline-list");
-            const tocItem = document.createElement("li");
-            tocItem.innerHTML = `<a href="#section${sectionIndex}">${sectionIndex}. ${q}</a>`;
-            outlineList.appendChild(tocItem);
-        });
-
-        // 모달 닫기
-        modal.style.display = "none";
-    });
-});
-
-// 파일/사진 업로드 미리보기
-document.addEventListener("change", (e) => {
-    if (e.target.classList.contains("file-input")) {
-        const preview = e.target.nextElementSibling;
-        preview.innerHTML = "";
-
-        [...e.target.files].forEach(file => {
-            const item = document.createElement("div");
-            item.className = "uploaded-item";
-            item.textContent = file.name;
-
-            // 이미지 파일일 경우 썸네일 표시
-            if (file.type.startsWith("image/")) {
-                const img = document.createElement("img");
-                img.src = URL.createObjectURL(file);
-                img.style.maxWidth = "100px";
-                img.style.display = "block";
-                img.style.marginTop = "5px";
-                img.style.marginLeft = "340px";
-                item.appendChild(img);
-            }
-
-            // 삭제 버튼
-            const del = document.createElement("span");
-            del.className = "delete-icon";
-            del.textContent = "삭제";
-            del.onclick = () => item.remove();
-            item.appendChild(del);
-
-            preview.appendChild(item);
-        });
-    }
-});
-
-// ===================== 학력 탭 렌더링 =====================
+/***********************
+ * 학력 탭 렌더링 (상태=텍스트, 연/월 input)
+ ***********************/
 function renderEducations() {
     return fetch('/api/education-history/list')
         .then(res => res.json())
@@ -1077,7 +812,7 @@ function renderEducations() {
             if (!cont) return;
             cont.innerHTML = '';
 
-            // 학력 데이터가 있으면 award-item으로 채움
+            // 기존 학력 데이터
             if (list && list.length > 0) {
                 list.forEach(edu => {
                     const fmt = d => d?.replace(/-/g, '.');
@@ -1104,55 +839,49 @@ function renderEducations() {
                 });
             }
 
-            // ✅ 버튼은 항상 추가
+            // 추가 버튼
             const addBtn = document.createElement('button');
             addBtn.className = 'add-school-btn';
             addBtn.textContent = '＋';
-            addBtn.onclick = () => {
-                // 연도 select 채우기 함수
-                function fillYearOptions(select, start, end) {
-                    if (!select) return;
-                    select.innerHTML = "";
-                    for (let y = start; y <= end; y++) {
-                        const opt = document.createElement("option");
-                        opt.value = y;
-                        opt.textContent = y;
-                        select.appendChild(opt);
-                    }
-                }
 
-                // 새 학력 입력칸 생성
+            // 버튼 래퍼
+            const addBtnWrapper = document.createElement('div');
+            addBtnWrapper.style.display = 'flex';
+            addBtnWrapper.style.justifyContent = 'center';
+            addBtnWrapper.appendChild(addBtn);
+            cont.appendChild(addBtnWrapper);
+
+            // 클릭 시 인라인 입력칸
+            addBtn.onclick = () => {
                 const eduBox = document.createElement('div');
                 eduBox.className = 'award-item editable';
                 eduBox.innerHTML = `
                     <input type="text" class="school-input" placeholder="학교명">
                     <input type="text" class="major-input" placeholder="학과">
-                    <select class="status-input">
-                        <option value="재학">재학</option>
-                        <option value="졸업">졸업</option>
-                    </select>
+                    <input type="text" class="status-input" placeholder="상태 (예: 재학/졸업)">
                     <div class="date-group">
-                        <select class="start-year"></select>
+                        <input class="year-input"  placeholder="YYYY" />
+                        <input class="month-input" placeholder="MM" />
                         ~
-                        <select class="end-year"></select>
+                        <input class="year-input"  placeholder="YYYY" />
+                        <input class="month-input" placeholder="MM" />
                     </div>
                 `;
 
-                // 연도 select 옵션 (1980 ~ 현재)
-                const now = new Date().getFullYear();
-                fillYearOptions(eduBox.querySelector(".start-year"), 1980, now);
-                fillYearOptions(eduBox.querySelector(".end-year"), 1980, now);
-
-                // 엔터 입력 → 일반 award-item으로 변환
+                // Enter → 확정
                 eduBox.addEventListener("keydown", (e) => {
                     if (e.key === "Enter") {
                         e.preventDefault();
 
                         const school = eduBox.querySelector(".school-input").value.trim();
-                        const major = eduBox.querySelector(".major-input").value.trim();
-                        const status = eduBox.querySelector(".status-input").value;
-                        const startYear = eduBox.querySelector(".start-year").value;
-                        const endYear = eduBox.querySelector(".end-year").value;
+                        const major  = eduBox.querySelector(".major-input").value.trim();
+                        const status = eduBox.querySelector(".status-input").value.trim();
+                        const sy = eduBox.querySelectorAll(".year-input")?.[0]?.value || '';
+                        const sm = eduBox.querySelectorAll(".month-input")?.[0]?.value || '';
+                        const ey = eduBox.querySelectorAll(".year-input")?.[1]?.value || '';
+                        const em = eduBox.querySelectorAll(".month-input")?.[1]?.value || '';
+                        const startYear = [sy, sm].filter(Boolean).join('-');
+                        const endYear   = [ey, em].filter(Boolean).join('-');
 
                         if (!school) {
                             alert("학교명을 입력하세요!");
@@ -1161,14 +890,15 @@ function renderEducations() {
 
                         let line2 = "";
                         if (status === "재학") {
-                            line2 = `재학 ${startYear} 학과 ${major}`;
+                            line2 = `재학 ${startYear?.replace(/-/g, '.')} 학과 ${major}`;
+                        } else if (status) {
+                            line2 = `${status} ${startYear?.replace(/-/g, '.')} ~ ${endYear?.replace(/-/g, '.')} 학과 ${major}`;
                         } else {
-                            line2 = `졸업 ${startYear} ~ ${endYear} 학과 ${major}`;
+                            line2 = `학과 ${major}`;
                         }
 
-                        eduBox.className = "award-item";  // editable 제거
+                        eduBox.className = "award-item";
                         eduBox.innerHTML = `${school}<br><small>${line2}</small>`;
-
                         makeDraggable(eduBox, {
                             type: 'EDUCATION',
                             schoolName: school,
@@ -1182,44 +912,333 @@ function renderEducations() {
 
                 cont.insertBefore(eduBox, addBtnWrapper);
             };
-
-            const addBtnWrapper = document.createElement('div');
-            addBtnWrapper.style.display = 'flex';
-            addBtnWrapper.style.justifyContent = 'center';
-            addBtnWrapper.appendChild(addBtn);
-            cont.appendChild(addBtnWrapper);
         })
         .catch(err => console.error('학력 로드 실패:', err));
 }
 
-// ===================== 내 경력내역 보기 > 클릭 처리 =====================
+/***********************
+ * 공모전 → 포폴에 같이 표시(선택)
+ ***********************/
+function renderContestsIntoPortfolio() {
+    return fetch('/api/user/resumes/contests')
+        .then(res => res.json())
+        .then(list => {
+            const cont = document.querySelector('.tab-content[data-content="portfolio"]');
+            if (!cont || !list) return;
+            list.forEach(c => {
+                const d = document.createElement('div');
+                d.className = 'award-item';
+                d.innerHTML = `${c.title}<br><small>${c.date || ''}</small>`;
+                makeDraggable(d, { id: c.id, type: 'CONTEST', file: c.filePath || '', title: c.title });
+                cont.appendChild(d);
+            });
+        })
+        .catch(err => console.error('공모전 로드 실패:', err));
+}
+
+/***********************
+ * 왼쪽 섹션 드롭 설정 (학력 자동 채움 포함)
+ ***********************/
+function setupLeftDrops() {
+    setupDropBox(document.querySelector('#section4 .upload-box'));
+    setupDropBox(document.querySelector('#section5 .upload-box'));
+
+    const sec2 = document.getElementById('section2');
+    if (sec2) {
+        sec2.addEventListener('dragover', e => e.preventDefault());
+        sec2.addEventListener('drop', e => {
+            e.preventDefault();
+            const text = e.dataTransfer.getData('application/json');
+            if (!text) return;
+            try {
+                const data = JSON.parse(text);
+                if (data.type !== 'EDUCATION') return;
+
+                const schoolInput = sec2.querySelector('input[placeholder="학교명"]');
+                const majorInput  = sec2.querySelector('input[placeholder="학과"]');
+                const statusInput = sec2.querySelector('.status-input');
+                const dateGroup   = sec2.querySelector('.date-group');
+
+                if (schoolInput) schoolInput.value = data.schoolName || '';
+                if (majorInput)  majorInput.value  = data.majorName  || '';
+                if (statusInput) statusInput.value = data.status     || '';
+
+                const [sy, sm = ''] = (data.startDate || '').split('-');
+                const [ey, em = ''] = (data.endDate   || '').split('-');
+
+                const yInputs = dateGroup ? dateGroup.querySelectorAll('.year-input') : null;
+                const mInputs = dateGroup ? dateGroup.querySelectorAll('.month-input') : null;
+
+                if (yInputs && yInputs.length >= 2) {
+                    if (yInputs[0]) yInputs[0].value = sy || '';
+                    if (yInputs[1]) yInputs[1].value = ey || '';
+                    if (mInputs && mInputs.length >= 2) {
+                        if (mInputs[0]) mInputs[0].value = sm || '';
+                        if (mInputs[1]) mInputs[1].value = em || '';
+                    }
+                } else {
+                    const yearSelects = dateGroup ? dateGroup.querySelectorAll('select') : [];
+                    if (yearSelects[0]) {
+                        populateYearOptions(yearSelects[0], sy);
+                        yearSelects[0].value = sy || yearSelects[0].value;
+                    }
+                    if (yearSelects[1]) {
+                        populateYearOptions(yearSelects[1], ey);
+                        yearSelects[1].value = ey || yearSelects[1].value;
+                    }
+                }
+            } catch {}
+        });
+    }
+}
+
+/***********************
+ * 초기 education-item 드롭 바인딩
+ ***********************/
 document.addEventListener("DOMContentLoaded", () => {
-    const viewLink = document.querySelector(".view-link");
-    if (viewLink) {
-        viewLink.addEventListener("click", () => {
-            window.location.href = "/resumehistory";  // 🔹 페이지 이동
+    document.querySelectorAll('.education-item').forEach(bindDropToEducationItem);
+});
+
+/***********************
+ * 탭 바인딩
+ ***********************/
+function bindTabs() {
+    document.querySelectorAll('#tab-list .tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            activateTab(tab.dataset.tab);
+        });
+    });
+}
+
+/***********************
+ * 페이지 초기화
+ ***********************/
+window.addEventListener('DOMContentLoaded', () => {
+    // 브라우저 기본 드래그 방지
+    window.addEventListener('dragover', e => e.preventDefault());
+    window.addEventListener('drop', e => e.preventDefault());
+
+    bindTabs();
+    setupLeftDrops();
+
+    // 프로필 불러오기
+    fetch("/api/user/resumes/me")
+        .then(res => res.json())
+        .then(user => {
+            const img = document.getElementById("profileImage");
+            if (img) img.src = user.profileImageUrl || "/images/user.png";
+            const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v || ""; };
+            setText("userName", user.userName || "이름 없음");
+            setText("mainLanguage", user.mainLanguage);
+            setText("sex", user.sex);
+            setText("birthday", user.birthday);
+            setText("phone", user.userPhone);
+            setText("email", user.userEmail);
+            setText("region", user.region);
+        })
+        .catch(err => console.error("프로필 불러오기 실패:", err));
+
+    // 데이터 로드
+    Promise.all([
+        renderProjects(),
+        renderJobs(),
+        renderEducations(),
+        // renderContestsIntoPortfolio()
+    ]).then(() => {
+        activateTab('school');
+    });
+});
+
+/***********************
+ * 박스 선택 하이라이트
+ ***********************/
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('.resume-section, .section-box').forEach(box => {
+        box.addEventListener('click', () => {
+            document.querySelectorAll('.resume-section, .section-box').forEach(b => b.classList.remove('selected'));
+            box.classList.add('selected');
+        });
+    });
+});
+
+/***********************
+ * 학력 섹션: + 추가 및 삭제 바인딩
+ ***********************/
+document.addEventListener("DOMContentLoaded", () => {
+    const addEduBtn = document.getElementById("add-edu");
+    const section2 = document.getElementById("section2");
+
+    if (addEduBtn && section2) {
+        addEduBtn.addEventListener("click", () => {
+            const firstItem = section2.querySelector(".education-item");
+            if (firstItem) {
+                const clone = firstItem.cloneNode(true);
+                clone.querySelectorAll("input, select").forEach(el => el.value = "");
+                const delBtn = clone.querySelector(".edu-del");
+                if (delBtn) {
+                    delBtn.addEventListener("click", () => clone.remove());
+                }
+                section2.insertBefore(clone, addEduBtn);
+                bindDropToEducationItem(clone);
+            }
+        });
+    }
+
+    document.querySelectorAll(".edu-del").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.target.closest(".education-item").remove();
+        });
+    });
+});
+
+/***********************
+ * 템플릿 이동/모달
+ ***********************/
+document.addEventListener("DOMContentLoaded", () => {
+    const arrow = document.querySelector(".arrow-toggle");
+    if (arrow) {
+        arrow.addEventListener("click", () => {
+            window.location.href = "/profile";
         });
     }
 });
 
-// 경력 추가 버튼 눌렀을 때 //
+document.addEventListener("DOMContentLoaded", () => {
+    const firstTemplate = document.querySelector(".template-card");
+    const modal = document.getElementById("templateModal");
+    if (!firstTemplate || !modal) return;
+    const closeBtn = modal.querySelector(".close-btn");
+
+    firstTemplate.addEventListener("click", () => {
+        modal.style.display = "flex";
+    });
+
+    closeBtn?.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    window.addEventListener("click", (e) => {
+        if (e.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    const applyBtn = document.getElementById("applyTemplateBtn");
+    const modal = document.getElementById("templateModal");
+    if (!applyBtn || !modal) return;
+
+    applyBtn.addEventListener("click", () => {
+        const questions = [
+            "내가 가진 큰 강점",
+            "내가 지원한 직무와 내가 잘 맞는 이유",
+            "어려운 상황을 극복한 경험",
+            "입사 후 이루고 싶은 목표"
+        ];
+
+        const allSections = document.querySelectorAll(".resume-section");
+        let lastNumber = 0;
+        if (allSections.length > 0) {
+            const lastSection = allSections[allSections.length - 1];
+            const match = lastSection.id.match(/section(\d+)/);
+            if (match) lastNumber = parseInt(match[1], 10);
+        }
+
+        let sectionIndex = lastNumber;
+
+        questions.forEach(q => {
+            sectionIndex++;
+            const newSection = document.createElement("section");
+            newSection.className = "resume-section";
+            newSection.id = `section${sectionIndex}`;
+            newSection.setAttribute("data-multi-select", "false");
+
+            newSection.innerHTML = `
+                <div class="section-header">
+                    <span class="section-title-text">${sectionIndex}. ${q}</span>
+                    <input type="text" class="section-title-input" value="${q}" style="display: none;">
+                    <button class="delete-btn">✕</button>
+                </div>
+                <textarea placeholder="${q}에 대해 작성해주세요."></textarea>
+            `;
+
+            const addAnchor = document.querySelector(".add-section");
+            addAnchor?.before(newSection);
+
+            const outlineList = document.querySelector(".outline-list");
+            if (outlineList) {
+                const tocItem = document.createElement("li");
+                tocItem.innerHTML = `<a href="#section${sectionIndex}">${sectionIndex}. ${q}</a>`;
+                outlineList.appendChild(tocItem);
+            }
+        });
+
+        modal.style.display = "none";
+        reorderSectionsAndToc();
+    });
+});
+
+/***********************
+ * 파일/사진 업로드 미리보기
+ ***********************/
+document.addEventListener("change", (e) => {
+    if (e.target.classList.contains("file-input")) {
+        const preview = e.target.nextElementSibling;
+        if (!preview) return;
+        preview.innerHTML = "";
+
+        [...e.target.files].forEach(file => {
+            const item = document.createElement("div");
+            item.className = "uploaded-item";
+            item.textContent = file.name;
+
+            if (file.type.startsWith("image/")) {
+                const img = document.createElement("img");
+                img.src = URL.createObjectURL(file);
+                img.style.maxWidth = "100px";
+                img.style.display = "block";
+                img.style.marginTop = "5px";
+                img.style.marginLeft = "340px";
+                item.appendChild(img);
+            }
+
+            const del = document.createElement("span");
+            del.className = "delete-icon";
+            del.textContent = "삭제";
+            del.onclick = () => item.remove();
+            item.appendChild(del);
+
+            preview.appendChild(item);
+        });
+    }
+});
+
+/***********************
+ * 내 경력 내역 보기 링크
+ ***********************/
+document.addEventListener("DOMContentLoaded", () => {
+    const viewLink = document.querySelector(".view-link");
+    if (viewLink) {
+        viewLink.addEventListener("click", () => {
+            window.location.href = "/resumehistory";
+        });
+    }
+});
+
+/***********************
+ * 경력 섹션: + 추가 및 삭제, 입력잠금
+ ***********************/
 document.addEventListener("DOMContentLoaded", () => {
     const addCareerBtn = document.getElementById("add-career");
 
     if (addCareerBtn) {
         addCareerBtn.addEventListener("click", () => {
-            // 기존 첫 번째 경력 항목 가져오기
             const firstCareer = document.querySelector("#section4 .career-item");
             if (firstCareer) {
-                // 복제
                 const newCareer = firstCareer.cloneNode(true);
+                newCareer.querySelectorAll("input, textarea").forEach(el => { el.value = ""; });
 
-                // 새로 추가되는 칸은 값 비우기
-                newCareer.querySelectorAll("input, textarea").forEach(el => {
-                    el.value = "";
-                });
-
-                // 설명 칸 외에는 입력/클릭 불가 처리
                 newCareer.querySelectorAll("input:not(.desc-input)").forEach(el => {
                     el.disabled = true;
                     el.style.pointerEvents = "none";
@@ -1227,7 +1246,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     el.style.cursor = "default";
                 });
 
-                // 삭제 버튼 이벤트 다시 바인딩
                 const delBtn = newCareer.querySelector(".career-del");
                 if (delBtn) {
                     delBtn.addEventListener("click", () => {
@@ -1235,62 +1253,54 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                 }
 
-                // #section4의 추가 버튼 앞에 붙이기
                 addCareerBtn.parentNode.insertBefore(newCareer, addCareerBtn);
             }
         });
     }
 
-    // 처음 로드된 경력 항목에도 삭제 기능 연결
     document.querySelectorAll("#section4 .career-item .career-del").forEach(btn => {
         btn.addEventListener("click", (e) => {
             e.target.closest(".career-item").remove();
         });
     });
-});
 
-
-// 경력사항 칸 //
-// 처음 로드될 때 기존 경력 항목 처리
-document.addEventListener("DOMContentLoaded", () => {
     lockCareerInputs();
 });
 
-// 함수 정의
+// 입력잠금 함수
 function lockCareerInputs() {
     document.querySelectorAll("#section4 .career-item input:not(.desc-input)")
         .forEach(input => {
-            input.disabled = true;     // ✅ 입력 막기
-            input.style.pointerEvents = "none"; // ✅ 클릭 이벤트 차단
-            input.style.backgroundColor = "#f5f5f5"; // ✅ 회색 배경 (비활성화 느낌)
-            input.style.cursor = "default"; // ✅ 커서 변경
+            input.disabled = true;
+            input.style.pointerEvents = "none";
+            input.style.backgroundColor = "#f5f5f5";
+            input.style.cursor = "default";
         });
 }
 
-// 경력 추가 버튼 눌렀을 때도 적용
-document.getElementById("add-career").addEventListener("click", () => {
-    setTimeout(lockCareerInputs, 50); // DOM 추가 후 실행
-});
+// 경력 추가 버튼 누른 후에도 잠금
+const addCareerBtnOnce = document.getElementById("add-career");
+if (addCareerBtnOnce) {
+    addCareerBtnOnce.addEventListener("click", () => {
+        setTimeout(lockCareerInputs, 50);
+    });
+}
 
-// ===================== 포트폴리오 칸 =====================
+/***********************
+ * 포트폴리오 섹션: + 추가/삭제, 입력잠금
+ ***********************/
 document.addEventListener("DOMContentLoaded", () => {
     const addPortfolioBtn = document.getElementById("add-portfolio");
 
-    // 기존 항목 잠금
     lockPortfolioInputs();
 
-    // + 버튼 클릭 → 새 항목 추가
     if (addPortfolioBtn) {
         addPortfolioBtn.addEventListener("click", () => {
             const firstPortfolio = document.querySelector("#section5 .portfolio-item");
             if (firstPortfolio) {
-                // 기존 항목 복제
                 const newPortfolio = firstPortfolio.cloneNode(true);
-
-                // input 값 초기화
                 newPortfolio.querySelectorAll("input").forEach(el => el.value = "");
 
-                // 삭제 버튼 이벤트 다시 바인딩
                 const delBtn = newPortfolio.querySelector(".portfolio-del");
                 if (delBtn) {
                     delBtn.addEventListener("click", () => {
@@ -1298,16 +1308,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                 }
 
-                // 추가 버튼 앞에 삽입
                 addPortfolioBtn.parentNode.insertBefore(newPortfolio, addPortfolioBtn);
-
-                // 새 항목도 입력 제한 적용
                 lockPortfolioInputs();
             }
         });
     }
 
-    // 처음 로드 시 삭제 버튼 이벤트 바인딩
     document.querySelectorAll("#section5 .portfolio-item .portfolio-del").forEach(btn => {
         btn.addEventListener("click", (e) => {
             e.target.closest(".portfolio-item").remove();
@@ -1315,13 +1321,37 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// 입력 제한 함수
 function lockPortfolioInputs() {
     document.querySelectorAll("#section5 .portfolio-item input:not(.desc-input), #section5 .portfolio-item select, #section5 .portfolio-item .portfolio-file")
         .forEach(el => {
-            el.disabled = true;                  // 입력 막기
-            el.style.pointerEvents = "none";     // 클릭 차단
-            el.style.backgroundColor = "#f5f5f5"; // 회색 배경
-            el.style.cursor = "default";         // 커서 변경
+            el.disabled = true;
+            el.style.pointerEvents = "none";
+            el.style.backgroundColor = "#f5f5f5";
+            el.style.cursor = "default";
         });
 }
+
+/***********************
+ * 학력 입력 잠금
+ ***********************/
+function lockEducationInputs() {
+    document.querySelectorAll("#section2 .education-item input, #section2 .education-item select, #section2 .education-item textarea")
+        .forEach(el => {
+            el.disabled = true;
+            el.style.pointerEvents = "none";
+            el.style.backgroundColor = "#f5f5f5";
+            el.style.cursor = "default";
+        });
+}
+
+// DOMContentLoaded 시 적용
+document.addEventListener("DOMContentLoaded", () => {
+    lockEducationInputs();
+
+    const addEduBtn = document.getElementById("add-edu");
+    if (addEduBtn) {
+        addEduBtn.addEventListener("click", () => {
+            setTimeout(lockEducationInputs, 50); // 새 학력 항목 추가 후에도 잠금 적용
+        });
+    }
+});

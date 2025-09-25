@@ -82,28 +82,37 @@
                     <button class="delete-btn">✕</button>
                 </div>
 
-                <!-- 학력 입력 세트 -->
                 <div class="education-item">
-                    <input type="text" placeholder="학교명"><br>
-                    <input type="text" placeholder="학과">
-                    <select>
-                        <option>재학</option>
-                        <option>졸업</option>
-                    </select>
-                    <div class="date-group">
-                        <select><option>2020</option></select> ~ <select><option>2023</option></select>
-                    </div>
-                    <!-- ✅ 개별 삭제 버튼 -->
                     <button type="button" class="edu-del">✕</button>
+
+                    <!-- 1줄: 학교명 + 학과 -->
+                    <div class="edu-row">
+                        <input type="text" class="school-input" placeholder="학교명">
+                        <input type="text" class="major-input"  placeholder="학과">
+                    </div>
+
+                    <!-- 2줄: 기간 + 상태 -->
+                    <div class="edu-row">
+                        <div class="date-group">
+                            <input type="text" class="year-input"  placeholder="YYYY">
+                            -
+                            <input type="text" class="month-input" placeholder="MM">
+                            ~
+                            <input type="text" class="year-input"  placeholder="YYYY">
+                            -
+                            <input type="text" class="month-input" placeholder="MM">
+                        </div>
+
+                        <!-- ⬇️ 여기 변경 -->
+                        <input type="text" class="status-input" placeholder="상태">
+                    </div>
+
                 </div>
 
-                <!-- 학력 추가 버튼 -->
                 <button type="button" class="edu-btn" id="add-edu">
                     <span class="plus">＋</span>
                 </button>
             </section>
-
-
 
             <!-- 희망직무 (복수선택 기능 적용) -->
             <section class="resume-section" id="section3" data-multi-select="false">
