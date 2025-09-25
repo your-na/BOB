@@ -673,7 +673,7 @@ function setupDropBox(box) {
     });
 }
 
-// ===================== 탭 표시/빈 상태 토글 =====================
+// ===================== 탭 활성화 =====================
 function activateTab(tabName) {
     document.querySelectorAll('#tab-list .tab').forEach(t => t.classList.remove('active'));
     const activeTab = document.querySelector(`#tab-list .tab[data-tab="${tabName}"]`);
@@ -683,7 +683,10 @@ function activateTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(c => {
         const show = c.dataset.content === tabName;
         c.style.display = show ? 'block' : 'none';
-        if (show && c.children.length > 0) isEmpty = false;
+        if (show) {
+            // award-item만 카운트 (버튼 제외)
+            isEmpty = c.querySelectorAll(".award-item").length === 0;
+        }
     });
 
     const empty = document.querySelector('.empty-content[data-content="empty"]');
@@ -750,6 +753,7 @@ function renderJobs() {
         .catch(err => console.error('구직 이력 로드 실패:', err));
 }
 
+/*
 function renderEducations() {
     return fetch('/api/education-history/list')
         .then(res => res.json())
@@ -782,6 +786,7 @@ function renderEducations() {
         })
         .catch(err => console.error('학력 로드 실패:', err));
 }
+*/
 
 // (선택) 공모전을 포트폴리오 탭에 함께 표시하고 싶다면 이 함수도 호출하세요.
 function renderContestsIntoPortfolio() {
@@ -1062,6 +1067,8 @@ document.addEventListener("change", (e) => {
         });
     }
 });
+
+// ===================== 학력 탭 렌더링 =====================
 function renderEducations() {
     return fetch('/api/education-history/list')
         .then(res => res.json())
@@ -1070,13 +1077,17 @@ function renderEducations() {
             if (!cont) return;
             cont.innerHTML = '';
 
+            // 학력 데이터가 있으면 award-item으로 채움
             if (list && list.length > 0) {
                 list.forEach(edu => {
                     const fmt = d => d?.replace(/-/g, '.');
                     let line2 = '';
-                    if (edu.status === '재학')       line2 = `재학 ${fmt(edu.startDate)} 학과 ${edu.majorName || ''}`;
-                    else if (edu.status === '졸업') line2 = `졸업 ${fmt(edu.startDate)} ~ ${fmt(edu.endDate)} 학과 ${edu.majorName || ''}`;
-                    else                            line2 = `${edu.status || ''} 학과 ${edu.majorName || ''}`;
+                    if (edu.status === '재학')
+                        line2 = `재학 ${fmt(edu.startDate)} 학과 ${edu.majorName || ''}`;
+                    else if (edu.status === '졸업')
+                        line2 = `졸업 ${fmt(edu.startDate)} ~ ${fmt(edu.endDate)} 학과 ${edu.majorName || ''}`;
+                    else
+                        line2 = `${edu.status || ''} 학과 ${edu.majorName || ''}`;
 
                     const d = document.createElement('div');
                     d.className = 'award-item';
@@ -1114,25 +1125,25 @@ function renderEducations() {
                 const eduBox = document.createElement('div');
                 eduBox.className = 'award-item editable';
                 eduBox.innerHTML = `
-        <input type="text" class="school-input" placeholder="학교명">
-        <input type="text" class="major-input" placeholder="학과">
-        <select class="status-input">
-            <option value="재학">재학</option>
-            <option value="졸업">졸업</option>
-        </select>
-        <div class="date-group">
-            <select class="start-year"></select>
-            ~
-            <select class="end-year"></select>
-        </div>
-    `;
+                    <input type="text" class="school-input" placeholder="학교명">
+                    <input type="text" class="major-input" placeholder="학과">
+                    <select class="status-input">
+                        <option value="재학">재학</option>
+                        <option value="졸업">졸업</option>
+                    </select>
+                    <div class="date-group">
+                        <select class="start-year"></select>
+                        ~
+                        <select class="end-year"></select>
+                    </div>
+                `;
 
-                // ✅ 연도 select 옵션 채우기 (1980 ~ 올해)
+                // 연도 select 옵션 (1980 ~ 현재)
                 const now = new Date().getFullYear();
                 fillYearOptions(eduBox.querySelector(".start-year"), 1980, now);
                 fillYearOptions(eduBox.querySelector(".end-year"), 1980, now);
 
-                // ✅ 엔터 키 → 입력칸을 바로 박스로 변환
+                // 엔터 입력 → 일반 award-item으로 변환
                 eduBox.addEventListener("keydown", (e) => {
                     if (e.key === "Enter") {
                         e.preventDefault();
@@ -1148,7 +1159,6 @@ function renderEducations() {
                             return;
                         }
 
-                        // 새로운 네모 박스로 변환
                         let line2 = "";
                         if (status === "재학") {
                             line2 = `재학 ${startYear} 학과 ${major}`;
@@ -1159,7 +1169,6 @@ function renderEducations() {
                         eduBox.className = "award-item";  // editable 제거
                         eduBox.innerHTML = `${school}<br><small>${line2}</small>`;
 
-                        // 기존 학력 박스처럼 드래그 가능하도록
                         makeDraggable(eduBox, {
                             type: 'EDUCATION',
                             schoolName: school,
@@ -1171,10 +1180,8 @@ function renderEducations() {
                     }
                 });
 
-                // 버튼 위에 삽입
                 cont.insertBefore(eduBox, addBtnWrapper);
             };
-
 
             const addBtnWrapper = document.createElement('div');
             addBtnWrapper.style.display = 'flex';
@@ -1185,4 +1192,136 @@ function renderEducations() {
         .catch(err => console.error('학력 로드 실패:', err));
 }
 
+// ===================== 내 경력내역 보기 > 클릭 처리 =====================
+document.addEventListener("DOMContentLoaded", () => {
+    const viewLink = document.querySelector(".view-link");
+    if (viewLink) {
+        viewLink.addEventListener("click", () => {
+            window.location.href = "/resumehistory";  // 🔹 페이지 이동
+        });
+    }
+});
 
+// 경력 추가 버튼 눌렀을 때 //
+document.addEventListener("DOMContentLoaded", () => {
+    const addCareerBtn = document.getElementById("add-career");
+
+    if (addCareerBtn) {
+        addCareerBtn.addEventListener("click", () => {
+            // 기존 첫 번째 경력 항목 가져오기
+            const firstCareer = document.querySelector("#section4 .career-item");
+            if (firstCareer) {
+                // 복제
+                const newCareer = firstCareer.cloneNode(true);
+
+                // 새로 추가되는 칸은 값 비우기
+                newCareer.querySelectorAll("input, textarea").forEach(el => {
+                    el.value = "";
+                });
+
+                // 설명 칸 외에는 입력/클릭 불가 처리
+                newCareer.querySelectorAll("input:not(.desc-input)").forEach(el => {
+                    el.disabled = true;
+                    el.style.pointerEvents = "none";
+                    el.style.backgroundColor = "#f5f5f5";
+                    el.style.cursor = "default";
+                });
+
+                // 삭제 버튼 이벤트 다시 바인딩
+                const delBtn = newCareer.querySelector(".career-del");
+                if (delBtn) {
+                    delBtn.addEventListener("click", () => {
+                        newCareer.remove();
+                    });
+                }
+
+                // #section4의 추가 버튼 앞에 붙이기
+                addCareerBtn.parentNode.insertBefore(newCareer, addCareerBtn);
+            }
+        });
+    }
+
+    // 처음 로드된 경력 항목에도 삭제 기능 연결
+    document.querySelectorAll("#section4 .career-item .career-del").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.target.closest(".career-item").remove();
+        });
+    });
+});
+
+
+// 경력사항 칸 //
+// 처음 로드될 때 기존 경력 항목 처리
+document.addEventListener("DOMContentLoaded", () => {
+    lockCareerInputs();
+});
+
+// 함수 정의
+function lockCareerInputs() {
+    document.querySelectorAll("#section4 .career-item input:not(.desc-input)")
+        .forEach(input => {
+            input.disabled = true;     // ✅ 입력 막기
+            input.style.pointerEvents = "none"; // ✅ 클릭 이벤트 차단
+            input.style.backgroundColor = "#f5f5f5"; // ✅ 회색 배경 (비활성화 느낌)
+            input.style.cursor = "default"; // ✅ 커서 변경
+        });
+}
+
+// 경력 추가 버튼 눌렀을 때도 적용
+document.getElementById("add-career").addEventListener("click", () => {
+    setTimeout(lockCareerInputs, 50); // DOM 추가 후 실행
+});
+
+// ===================== 포트폴리오 칸 =====================
+document.addEventListener("DOMContentLoaded", () => {
+    const addPortfolioBtn = document.getElementById("add-portfolio");
+
+    // 기존 항목 잠금
+    lockPortfolioInputs();
+
+    // + 버튼 클릭 → 새 항목 추가
+    if (addPortfolioBtn) {
+        addPortfolioBtn.addEventListener("click", () => {
+            const firstPortfolio = document.querySelector("#section5 .portfolio-item");
+            if (firstPortfolio) {
+                // 기존 항목 복제
+                const newPortfolio = firstPortfolio.cloneNode(true);
+
+                // input 값 초기화
+                newPortfolio.querySelectorAll("input").forEach(el => el.value = "");
+
+                // 삭제 버튼 이벤트 다시 바인딩
+                const delBtn = newPortfolio.querySelector(".portfolio-del");
+                if (delBtn) {
+                    delBtn.addEventListener("click", () => {
+                        newPortfolio.remove();
+                    });
+                }
+
+                // 추가 버튼 앞에 삽입
+                addPortfolioBtn.parentNode.insertBefore(newPortfolio, addPortfolioBtn);
+
+                // 새 항목도 입력 제한 적용
+                lockPortfolioInputs();
+            }
+        });
+    }
+
+    // 처음 로드 시 삭제 버튼 이벤트 바인딩
+    document.querySelectorAll("#section5 .portfolio-item .portfolio-del").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.target.closest(".portfolio-item").remove();
+        });
+    });
+});
+
+// 입력 제한 함수
+function lockPortfolioInputs() {
+    document.querySelectorAll("#section5 .portfolio-item input:not(.desc-input), #section5 .portfolio-item select, #section5 .portfolio-item .portfolio-file")
+        .forEach(el => {
+            el.disabled = true;                  // 입력 막기
+            el.style.pointerEvents = "none";     // 클릭 차단
+            el.style.backgroundColor = "#f5f5f5"; // 회색 배경
+            el.style.cursor = "default";         // 커서 변경
+        });
+}

@@ -99,7 +99,7 @@
 
                 <!-- 학력 추가 버튼 -->
                 <button type="button" class="edu-btn" id="add-edu">
-                    <span class="plus">＋</span> 학력 추가
+                    <span class="plus">＋</span>
                 </button>
             </section>
 
@@ -120,32 +120,97 @@
             </section>
 
             <!-- 경력사항 -->
-            <section class="resume-section" id="section4" data-multi-select="false">
+            <section class="resume-section" id="section4" data-multi-select="true">
                 <div class="section-header">
                     <span>4. 경력사항</span>
                     <button class="delete-btn">✕</button>
                 </div>
-                <div class="tag-list" data-single="true">
-                    <span class="tag condition">1년 이내</span>
-                    <span class="tag condition">3개월 이내</span>
-                    <span class="tag condition">6개월 이내</span>
-                    <span class="tag condition direct-input-tag">직접입력</span>
-                </div>
-                <textarea placeholder="경력 입력"></textarea>
 
-                <!-- ✅ 드롭존 추가 위치 (textarea 바로 아래) -->
-                <div class="upload-box">드래그해서 파일/항목 첨부하기</div>
+                <div class="career-item">
+                    <!-- 개별 삭제 버튼 -->
+                    <button type="button" class="career-del">✕</button>
+
+                    <!-- 근무지 + 직업 -->
+                    <div class="career-row">
+                        <input type="text" class="workplace-input" placeholder="근무지" style="flex:2;">
+                        <input type="text" class="job-input" placeholder="직업" style="flex:1; margin-left:10px;">
+                    </div>
+
+                    <!-- 개월 수 + 근무 기간(년/월) + 상태 -->
+                    <div class="career-row">
+                        <input type="text" class="months-input" placeholder="개월 수">
+
+                        <div class="date-group">
+                            <input type="text" class="year-input" placeholder="YYYY">
+                            -
+                            <input type="text" class="month-input" placeholder="MM">
+                            ~
+                            <input type="text" class="year-input" placeholder="YYYY">
+                            -
+                            <input type="text" class="month-input" placeholder="MM">
+                        </div>
+
+                        <input type="text" class="status-input" placeholder="상태">
+                    </div>
+
+                    <!-- 설명 (한 줄 input) -->
+                    <div class="career-row">
+                        <input type="text" class="desc-input" placeholder="설명" style="width:100%;">
+                    </div>
+                </div>
+
+                <!-- 경력 추가 버튼 -->
+                <button type="button" class="career-btn" id="add-career">
+                    <span class="plus">＋</span>
+                </button>
             </section>
 
             <!-- 포트폴리오 -->
-            <section class="resume-section" id="section5" data-multi-select="false">
+            <section class="resume-section" id="section5" data-multi-select="true">
                 <div class="section-header">
                     <span>5. 포트폴리오</span>
                     <button class="delete-btn">✕</button>
                 </div>
-                <textarea placeholder="포트폴리오 설명"></textarea>
-                <!-- ✅ 드롭존 추가 위치 (textarea 바로 아래) -->
-                <div class="upload-box">드래그해서 파일/항목 첨부하기</div>
+
+                <div class="portfolio-item">
+                    <!-- 개별 삭제 버튼 -->
+                    <button type="button" class="portfolio-del">✕</button>
+
+                    <!-- 프로젝트명 -->
+                    <div class="portfolio-row">
+                        <input type="text" class="portfolio-title" placeholder="프로젝트 또는 공모전명" style="flex:1;">
+                    </div>
+
+                    <!-- 파일 업로드 -->
+                    <div class="portfolio-row">
+                        <input type="file" class="portfolio-file" style="flex:1;">
+                    </div>
+
+                    <!-- 기간(년/월) + 상태 -->
+                    <div class="portfolio-row">
+                        <div class="date-group">
+                            <input type="text" class="year-input" placeholder="YYYY">
+                            -
+                            <input type="text" class="month-input" placeholder="MM">
+                            ~
+                            <input type="text" class="year-input" placeholder="YYYY">
+                            -
+                            <input type="text" class="month-input" placeholder="MM">
+                        </div>
+
+                        <input type="text" class="status-input" placeholder="상태">
+                    </div>
+
+                    <!-- 설명 -->
+                    <div class="portfolio-row">
+                        <input type="text" class="desc-input" placeholder="설명" style="width:100%;">
+                    </div>
+                </div>
+
+                <!-- 포트폴리오 추가 버튼 -->
+                <button type="button" class="portfolio-btn" id="add-portfolio">
+                    <span class="plus">＋</span>
+                </button>
             </section>
 
             <!-- 자기소개 -->
