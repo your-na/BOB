@@ -164,8 +164,8 @@
 }
 
 .apply-btn {
-    background: #a2e3a2;
-    color: grey;
+    background: #19CB13;
+    color: white;
     border: 1px solid grey;
     padding: 10px 20px;
     font-weight: bold;
@@ -372,4 +372,29 @@
     display: none !important;
 }
 
+.resume-tab {
+    display: flex;
+    justify-content: space-between; /* 제목/날짜는 왼쪽, 버튼은 오른쪽 */
+    align-items: center;
+}
+
+.resume-content {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.preview-btn {
+    margin-left: 12px;
+    padding: 5px 10px;
+    font-size: 12px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.preview-btn:hover {
+    background-color: #e0f7e9;
+}
 

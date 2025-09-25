@@ -154,11 +154,31 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.type = 'button';
             btn.className = 'resume-tab';
             btn.dataset.id = item.id;
+
+            // 이력서 제목/날짜 + 미리보기 버튼을 같이 넣음
             btn.innerHTML = `
-                <div class="resume-title">${item.title}</div>
-                <div class="resume-date">${item.date ?? ''}</div>
-            `;
-            btn.addEventListener('click', () => toggleSelect(btn));
+            <div class="resume-content">
+                <div>
+                    <div class="resume-title">${item.title}</div>
+                    <div class="resume-date">${item.date ?? ''}</div>
+                </div>
+                <button type="button" class="preview-btn">미리보기</button>
+            </div>
+        `;
+
+            // 이력서 선택 (부모 버튼)
+            btn.addEventListener('click', (e) => {
+                // 안쪽 "미리보기" 버튼 클릭은 제외
+                if (e.target.classList.contains('preview-btn')) return;
+                toggleSelect(btn);
+            });
+
+            // 미리보기 버튼 동작
+            btn.querySelector('.preview-btn').addEventListener('click', (e) => {
+                e.stopPropagation(); // 부모 선택 이벤트 막기
+                openPreviewModal(item.id, item.title); // 모달 열기
+            });
+
             listEl.appendChild(btn);
         });
     }
