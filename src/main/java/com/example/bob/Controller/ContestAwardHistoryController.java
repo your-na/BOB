@@ -1,6 +1,7 @@
 package com.example.bob.Controller;
 
 import com.example.bob.DTO.ContestAwardHistoryRequestDTO;
+import com.example.bob.DTO.ContestAwardHistoryResponseDTO;
 import com.example.bob.Entity.ContestAwardHistory;
 import com.example.bob.Entity.UserEntity;
 import com.example.bob.Repository.ContestAwardRepository;
@@ -12,8 +13,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,61 +32,59 @@ public class ContestAwardHistoryController {
         try {
             UserEntity user = userDetails.getUserEntity();
             List<ContestAwardHistory> histories = contestAwardRepository.findByUser(user);
-            return ResponseEntity.ok(histories);
+
+            // ✅ Entity → DTO 변환
+            List<ContestAwardHistoryResponseDTO> response = histories.stream()
+                    .map(ContestAwardHistoryResponseDTO::fromEntity)
+                    .toList();
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("❌ 공모전 내역 불러오기 실패: " + e.getMessage());
         }
     }
 
-    // ✅ 공모전 내역 삭제
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteContestHistory(@PathVariable Long id) {
-        try {
-            contestAwardRepository.deleteById(id);
-            return ResponseEntity.ok("삭제 성공");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("삭제 실패: " + e.getMessage());
-        }
-    }
-
-    // ✅ OCR 업로드 (수상명 / 주최기관 추출)
-    @PostMapping("/ocr")
-    public ResponseEntity<Map<String, String>> extractOcr(@RequestParam("file") MultipartFile file) {
-        try {
-            String ocrRawText = service.extractText(file);
-            String grade = service.extractGrade(ocrRawText);
-            String organizer = service.extractOrganizer(ocrRawText);
-
-            return ResponseEntity.ok(Map.of(
-                    "grade", grade,
-                    "organizer", organizer,
-                    "ocrRawText", ocrRawText
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("error", "OCR 실패: " + e.getMessage()));
-        }
-    }
-
-    // ✅ OCR → 사용자 입력(title) → 최종 저장 (개인)
     @PostMapping
-    public ResponseEntity<String> saveAward(@RequestBody ContestAwardHistoryRequestDTO dto,
-                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<?> saveAward(@RequestBody ContestAwardHistoryRequestDTO dto,
+                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
         try {
-            service.addAwardHistoryForUser(dto, userDetails.getUserEntity());
-            return ResponseEntity.ok("저장 완료");
+            ContestAwardHistory history = service.addAwardHistoryForUser(dto, userDetails.getUserEntity());
+            return ResponseEntity.ok(ContestAwardHistoryResponseDTO.fromEntity(history));
         } catch (Exception e) {
             return ResponseEntity.status(500).body("저장 실패: " + e.getMessage());
         }
     }
 
-    // ✅ 팀 단위 수상 기록 추가
-    @PostMapping("/team")
-    public ResponseEntity<?> addAwardHistoryForTeam(@RequestBody ContestAwardHistoryRequestDTO req) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateContestHistory(@PathVariable Long id,
+                                                  @RequestBody ContestAwardHistoryRequestDTO dto,
+                                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
         try {
-            service.addAwardHistoryForTeam(req);
-            return ResponseEntity.ok("팀 수상 경력이 추가되었습니다.");
+            Optional<ContestAwardHistory> optional = contestAwardRepository.findById(id);
+            if (optional.isEmpty()) {
+                return ResponseEntity.badRequest().body("존재하지 않는 내역입니다.");
+            }
+
+            ContestAwardHistory entity = optional.get();
+            UserEntity user = userDetails.getUserEntity();
+
+            if (!entity.getUser().getId().equals(user.getId())) {
+                return ResponseEntity.status(403).body("권한이 없습니다.");
+            }
+
+            // ✅ 업데이트
+            entity.setStatus(dto.getStatus());
+            entity.setStartDate(service.parseDateOrNull(dto.getStartDate()));
+            entity.setEndDate(service.parseDateOrNull(dto.getEndDate()));
+            entity.setTitle(dto.getTitle());
+            entity.setGrade(dto.getGrade());
+            entity.setOrganizer(dto.getOrganizer());
+
+            ContestAwardHistory updated = contestAwardRepository.save(entity);
+
+            return ResponseEntity.ok(ContestAwardHistoryResponseDTO.fromEntity(updated));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("팀 수상 경력 추가 중 오류: " + e.getMessage());
+            return ResponseEntity.status(500).body("수정 실패: " + e.getMessage());
         }
     }
 }

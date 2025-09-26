@@ -33,7 +33,10 @@ public class ContestAwardHistory {
     private UserEntity user;
 
     private String source;
+
+    @Column(nullable = true)
     private Long teamId;
+
     private LocalDateTime createdAt;
 
     @PrePersist

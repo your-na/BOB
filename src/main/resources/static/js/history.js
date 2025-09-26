@@ -47,83 +47,311 @@ function loadContests() {
 }
 
 
+// ✅ 공모전 OCR 모달 단계 제어
+function goContestStep(n) {
+    const steps = document.querySelectorAll("#contest-award-modal .award-step");
+    steps.forEach(s => {
+        s.style.display = (s.dataset.step === String(n)) ? "block" : "none";
+    });
+}
 
-// ✅ OCR 업로드 팝업 열기
-document.querySelector("#contest-history .add-project-btn")
-    .addEventListener("click", () => {
-        const fileInput = document.createElement("input");
-        fileInput.type = "file";
-        fileInput.accept = "image/*";
-        fileInput.click();
+// ✅ OCR 업로드 처리
+document.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById('contest-award-modal');
+    if (!modal) return; // HTML에 요소 없으면 실행 안 함
 
-        fileInput.onchange = async () => {
-            if (!fileInput.files.length) return;
-            const formData = new FormData();
-            formData.append("file", fileInput.files[0]);
+    const steps = [...modal.querySelectorAll('.award-step')];
+    const openBtn = document.querySelector('#contest-add-btn');
+    const closeBtns = modal.querySelectorAll('.award-modal-close, .award-cancel, .award-done');
+    const nextBtn = modal.querySelector('.award-next');
+    const backBtn = modal.querySelector('.award-back');
+    const confirmBtn = modal.querySelector('.award-confirm');
 
-            try {
-                // 1) OCR 요청
-                const res = await fetch("/api/contest-history/ocr", {
-                    method: "POST",
-                    headers: { [getCsrfHeader()]: getCsrfToken() },
-                    body: formData
-                });
-                const ocrResult = await res.json();
+    const fileInput = document.getElementById('contest-award-file');
+    const imgEl = document.getElementById('contest-award-image');
+    const canvas = document.getElementById('contest-award-canvas');
+    const rawTextEl = document.getElementById('contest-award-raw-text');
+    const titleInput = document.getElementById('contest-title');
+    const gradeInput = document.getElementById('contest-grade');
+    const orgInput = document.getElementById('contest-organizer');
+    const progressBar = modal.querySelector('.award-progress-bar'); // ✅ 수정됨
+    const finalMsg = document.getElementById('contest-award-final-message');
 
-                // 2) OCR 결과에서 수상/기관 추출
-                const { grade, organizer, ocrRawText } = ocrResult;
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
 
-                // 3) 사용자에게 공모전명 입력 요청
-                const title = prompt(`공모전명을 입력해주세요\n(수상: ${grade}, 주최: ${organizer})`);
+    let fileBlob = null;
+    let ocrText = '';
+    let parsed = { title: '', grade: '', organizer: '' };
 
-                if (!title) {
-                    alert("❌ 공모전명을 입력해야 저장됩니다.");
-                    return;
-                }
+    // ===== 유틸 =====
+    const goStep = (n) => steps.forEach(s => s.style.display = (s.dataset.step === String(n)) ? 'block' : 'none');
+    const open = () => { modal.style.display = 'flex'; goStep(1); reset(); };
+    const close = () => { modal.style.display = 'none'; };
+    const reset = () => {
+        fileInput.value = '';
+        nextBtn.disabled = true;
+        if (imgEl) imgEl.style.display = 'none';
+        if (canvas) canvas.style.display = 'none';
+        rawTextEl.value = '';
+        titleInput.value = '';
+        gradeInput.value = '';
+        orgInput.value = '';
+        if (progressBar) progressBar.style.width = '0%';
+        finalMsg.textContent = '처리가 완료되었습니다.';
+        ocrText = '';
+        parsed = { title: '', grade: '', organizer: '' };
+    };
 
-                // 4) 저장 요청
-                const saveRes = await fetch("/api/contest-history", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        [getCsrfHeader()]: getCsrfToken()
-                    },
-                    body: JSON.stringify({
-                        grade,
-                        organizer,
-                        ocrRawText,
-                        title,
-                        source: "certificate"
-                    })
-                });
+    // 모달 열고 닫기
+    openBtn?.addEventListener('click', open);
+    closeBtns.forEach(b => b.addEventListener('click', close));
+    backBtn?.addEventListener('click', () => goStep(1));
 
-                if (saveRes.ok) {
-                    alert("✅ 공모전 수상 경력 등록 완료");
-                    loadContests();
-                } else {
-                    alert("❌ 저장 실패");
-                }
-            } catch (err) {
-                console.error("OCR 처리 실패:", err);
-                alert("❌ OCR 처리 실패");
-            }
-        };
+    // 파일 선택되면 활성화
+    fileInput.addEventListener('change', () => {
+        nextBtn.disabled = !fileInput.files?.[0];
+        fileBlob = fileInput.files?.[0] ?? null;
     });
 
+    // OCR 실행 버튼
+    nextBtn.addEventListener('click', async () => {
+        if (!fileBlob) return;
+        goStep(2);
 
-// ✅ 파일 업로드 시 파일보기 링크 활성화
-document.addEventListener("change", function (event) {
-    if (event.target.classList.contains("file-upload")) {
-        const fileInput = event.target;
-        const fileView = fileInput.closest("td").querySelector(".file-view");
+        try {
+            const isPDF = /\.pdf$/i.test(fileBlob.name);
+            let dataURL;
+            if (isPDF) {
+                dataURL = await renderPdfFirstPageToDataURL(fileBlob);
+            } else {
+                dataURL = await readFileAsDataURL(fileBlob);
+            }
 
-        if (fileInput.files.length > 0 && fileView) {
-            fileView.style.display = "inline";
-            fileView.href = URL.createObjectURL(fileInput.files[0]);
-            fileView.textContent = "파일보기";
+            await showPreview(dataURL);
+
+            let pseudo = 0;
+            const tick = setInterval(() => {
+                pseudo = Math.min(90, pseudo + 3);
+                if (progressBar) progressBar.style.width = pseudo + '%';
+            }, 120);
+
+            ocrText = await runOCR(dataURL);
+            ocrText = normalizeKoreanForAward(ocrText);
+
+            clearInterval(tick);
+            if (progressBar) progressBar.style.width = '100%';
+
+            rawTextEl.value = ocrText.trim();
+
+            parsed = parseAward(ocrText);
+            gradeInput.value = parsed.grade || '';
+            orgInput.value = parsed.organizer || '';
+
+            goStep(3);
+        } catch (err) {
+            console.error(err);
+            finalMsg.textContent = '인식 중 오류가 발생했습니다. 파일 형식을 확인해 주세요.';
+            goStep(4);
         }
+    });
+
+    // ✅ OCR 확정 버튼 클릭 시 → 새 행 추가만 담당
+    confirmBtn.addEventListener("click", () => {
+        const title = titleInput.value.trim();
+        const grade = (parsed.grade || "").trim();
+        const organizer = (parsed.organizer || "").trim();
+
+        if (!title && !grade && !organizer) {
+            alert("인식된 정보가 없습니다. 다시 시도해 주세요.");
+            return;
+        }
+
+        const tbody = document.querySelector("#contest-history .history-table tbody");
+        const templateRow = tbody.querySelector(".new-entry-row");
+
+        const newRow = templateRow.cloneNode(true);
+        newRow.classList.remove("new-entry-row");
+        newRow.style.display = "table-row";
+
+        // OCR 결과 반영 (입력칸에 채워주기만 함)
+        newRow.querySelector(".contest-name").value = title;
+        newRow.querySelector(".contest-org").value = organizer;
+        newRow.querySelector(".contest-grade").value = grade;
+
+        // 👉 여기서는 fetch 안 함! (DB 저장은 change 이벤트에서 자동 수행됨)
+        tbody.appendChild(newRow);
+
+        finalMsg.textContent = "공모전 내역에 추가되었습니다. 나머지 항목을 입력해 주세요.";
+        goStep(4);
+    });
+
+    // ===== 파일/미리보기 =====
+    function readFileAsDataURL(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async function renderPdfFirstPageToDataURL(file) {
+        const arrayBuf = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuf }).promise;
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 2.4 });
+        const cvs = document.createElement('canvas');
+        const ctx = cvs.getContext('2d');
+        cvs.width = viewport.width;
+        cvs.height = viewport.height;
+        await page.render({ canvasContext: ctx, viewport }).promise;
+        return cvs.toDataURL('image/png');
+    }
+
+    async function showPreview(dataURL) {
+        imgEl.src = dataURL;
+        imgEl.style.display = 'block';
+        canvas.style.display = 'none';
+    }
+
+    // ===== OCR 전처리 & 실행 =====
+    async function preprocessForOcr(dataURL, targetMax = 3000) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                const W = img.naturalWidth, H = img.naturalHeight;
+                const scale = Math.max(1, targetMax / Math.max(W, H));
+                const w = Math.round(W * scale), h = Math.round(H * scale);
+
+                const c = document.createElement('canvas');
+                c.width = w; c.height = h;
+                const ctx = c.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+
+                const id = ctx.getImageData(0, 0, w, h);
+                const d = id.data;
+                for (let i = 0; i < d.length; i += 4) {
+                    const g = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+                    d[i] = d[i + 1] = d[i + 2] = g > 160 ? 255 : 0;
+                }
+                ctx.putImageData(id, 0, 0);
+                resolve(c.toDataURL('image/png'));
+            };
+            img.src = dataURL;
+        });
+    }
+
+    async function runOCR(dataURL) {
+        const prepped = await preprocessForOcr(dataURL, 3000);
+        const worker = await Tesseract.createWorker('kor', 1);
+        const { data: { text } } = await worker.recognize(prepped, 'kor+eng', {
+            tessedit_pageseg_mode: '6',
+            user_defined_dpi: '300'
+        });
+        await worker.terminate();
+        return text || '';
+    }
+
+    // ===== 텍스트 보정 & 파싱 =====
+    function normalizeKoreanForAward(t) {
+        if (!t) return '';
+        let s = t.replace(/\r/g, '').replace(/[ \t]+/g, ' ').replace(/\u00A0/g, ' ');
+        s = s.replace(/(?<=\p{Script=Hangul})\s+(?=\p{Script=Hangul})/gu, '');
+        const grades = ['대상', '최우수상', '금상', '우수상', '은상', '장려상', '동상', '특별상', '입상', '본상'];
+        for (const g of grades) {
+            const spaced = new RegExp(g.split('').join('\\s*'), 'g');
+            s = s.replace(spaced, g);
+        }
+        return s;
+    }
+
+    function parseAward(textRaw) {
+        const text = (textRaw || '').replace(/\s+\n/g, '\n').trim();
+
+        // 1. 수상 등급 찾기
+        const gradeDict = ['대상', '최우수상', '금상', '우수상', '은상', '장려상', '동상', '특별상', '입상', '본상'];
+        let grade = '';
+        for (const g of gradeDict) {
+            if (text.includes(g)) { grade = g; break; }
+        }
+
+        // 2. 주최기관 추출
+        let organizer = '';
+        const lines = text.split('\n');
+        const orgKeys = /(대학교|교육청|협회|재단|공단|주식회사|\(주\)|기업)/;
+
+        for (let i = lines.length - 1; i >= 0; i--) {
+            if (orgKeys.test(lines[i])) {
+                organizer = lines[i].trim();
+
+                // 직함 / 불필요 단어 제거
+                organizer = organizer.replace(/대표이사.*$/, '')
+                    .replace(/회장.*$/, '')
+                    .replace(/사장.*$/, '')
+                    .replace(/원장.*$/, '')
+                    .replace(/교수.*$/, '')
+                    .replace(/\s+$/, ''); // 끝 공백 제거
+                break;
+            }
+        }
+
+        return { grade, organizer };
+    }
+
+});
+
+// ✅ 공모전 자동 저장
+// ✅ 공모전 행 추가 후 자동 저장 로직
+document.addEventListener("change", async (event) => {
+    const row = event.target.closest("#contest-history tbody tr");
+    if (!row || row.classList.contains("new-entry-row")) return;
+
+    let id = row.querySelector(".delete-btn")?.dataset.id;
+
+    const data = {
+        status: row.querySelector(".status-select")?.value || "참여완료",
+        startDate: row.querySelector(".start-date")?.value,
+        endDate: row.querySelector(".end-date")?.value,
+        title: row.querySelector(".contest-name")?.value.trim(),
+        organizer: row.querySelector(".contest-org")?.value.trim(),
+        grade: row.querySelector(".contest-grade")?.value.trim()
+    };
+
+    try {
+        if (!id) {
+            // 아직 저장 안 된 신규 Row → POST
+            const res = await fetch("/api/contest-history", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    [getCsrfHeader()]: getCsrfToken()
+                },
+                body: JSON.stringify(data)
+            });
+            if (!res.ok) throw new Error("저장 실패");
+            const saved = await res.json();
+            row.querySelector(".delete-btn").dataset.id = saved.id;
+            console.log("✅ 공모전 최초 저장:", saved);
+        } else {
+            // 이미 저장된 Row → PUT
+            const res = await fetch(`/api/contest-history/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    [getCsrfHeader()]: getCsrfToken()
+                },
+                body: JSON.stringify(data)
+            });
+            if (!res.ok) throw new Error("수정 실패");
+            console.log("✅ 공모전 수정됨:", await res.json());
+        }
+    } catch (err) {
+        console.error("❌ 공모전 저장/수정 실패:", err);
     }
 });
+
+
 document.addEventListener("DOMContentLoaded", function () {
     const tabs = document.querySelectorAll(".tab-item");
     const sections = document.querySelectorAll(".history-section");
@@ -705,4 +933,88 @@ function loadJobHistories() {
             });
         });
 }
+
+// ✅ 공모전 추가 버튼 클릭 시 모달 열기
+document.addEventListener("click", function (e) {
+    const btn = e.target.closest("#contest-add-btn"); // id 기반으로 탐색
+    if (!btn) return;
+
+    console.log("✅ contest-add-btn 클릭됨");
+
+    const modal = document.getElementById("contest-award-modal");
+    if (!modal) {
+        console.error("❌ contest-award-modal 요소 없음!");
+        return;
+    }
+
+    modal.style.display = "flex"; // 모달 열기
+    goContestStep(1); // Step 1부터 시작
+});
+
+// ✅ 공모전 정정 요청 모달 처리
+(function(){
+    const corrModal = document.getElementById("award-correction-modal");
+    if (!corrModal) return;
+
+    const corrCloseBtns = corrModal.querySelectorAll(".award-correction-close, .award-correction-cancel");
+    const corrSendBtn = corrModal.querySelector(".award-correction-send");
+    const corrCurrentGrade = corrModal.querySelector("#corr-current-grade");
+    const corrCurrentOrg = corrModal.querySelector("#corr-current-org");
+    const corrRaw = corrModal.querySelector("#corr-raw-text");
+    const corrMsg = corrModal.querySelector("#corr-message");
+
+    // ✅ 정정요청 열기 버튼 (.award-correct) 눌렀을 때
+    document.addEventListener("click", function(e){
+        const btn = e.target.closest(".award-correct");
+        if (!btn) return;
+
+        corrCurrentGrade.value = document.querySelector("#contest-grade")?.value || "";
+        corrCurrentOrg.value = document.querySelector("#contest-organizer")?.value || "";
+        corrRaw.value = document.querySelector("#contest-award-raw-text")?.value || "";
+        corrMsg.value = "";
+
+        corrModal.style.display = "flex";
+    });
+
+    // 닫기
+    corrCloseBtns.forEach(b => b.addEventListener("click", () => corrModal.style.display = "none"));
+
+    // 전송
+    corrSendBtn.addEventListener("click", async () => {
+        const message = corrMsg.value.trim();
+        if (!message) {
+            alert("정정 요청 내용을 입력해주세요.");
+            return;
+        }
+        try {
+            const fd = new FormData();
+            const fileInput = document.querySelector("#contest-award-file");
+            if (fileInput?.files[0]) {
+                fd.append("file", fileInput.files[0], fileInput.files[0].name);
+            }
+            fd.append("ocrText", document.querySelector("#contest-award-raw-text")?.value || "");
+            fd.append("parsedGrade", document.querySelector("#contest-grade")?.value || "");
+            fd.append("parsedOrganizer", document.querySelector("#contest-organizer")?.value || "");
+            fd.append("message", message);
+
+            const res = await fetch("/api/contest-history/corrections", {
+                method: "POST",
+                headers: { [getCsrfHeader()]: getCsrfToken() },
+                body: fd
+            });
+            if (!res.ok) throw new Error("정정 요청 실패");
+
+            alert("정정 요청이 접수되었습니다.");
+            corrModal.style.display = "none";
+        } catch(err) {
+            console.error("❌ 정정 요청 에러:", err);
+            alert("정정 요청 중 오류가 발생했습니다.");
+        }
+    });
+})();
+
+
+
+
+
 

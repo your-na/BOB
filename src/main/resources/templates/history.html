@@ -9,6 +9,9 @@
     <!-- ✅ CSRF 토큰 메타 태그 두 개 모두 추가 -->
     <meta name="_csrf" th:content="${_csrf.token}" />
     <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
 </head>
 
 <body>
@@ -218,7 +221,70 @@
         </tbody>
     </table>
 
-    <button class="add-project-btn">+ 공모전 내역 추가 하기</button>
+    <button class="add-project-btn" type="button">+ 공모전 내역 추가 하기</button>
+</div>
+
+<!-- ✅ 공모전 추가 모달 -->
+<div id="contest-award-modal" class="award-modal-backdrop">
+    <div class="award-modal">
+        <div class="award-modal-header">
+            <h3>공모전 내역 추가</h3>
+            <button type="button" class="award-modal-close">&times;</button>
+        </div>
+
+        <div class="award-modal-body">
+            <!-- Step 1: 파일 업로드 -->
+            <div class="award-step" data-step="1">
+                <p><strong>공모전 상장 이미지를 업로드하세요.</strong></p>
+                <input id="contest-award-file" type="file" accept="image/*,.pdf"/>
+                <small>권장: JPG/PNG (PDF는 첫 페이지만 인식)</small>
+                <div class="award-actions">
+                    <button type="button" class="btn-secondary award-cancel">취소</button>
+                    <button type="button" class="btn-primary award-next" disabled>업로드 & 인식</button>
+                </div>
+            </div>
+
+            <!-- Step 2: OCR 진행 -->
+            <div class="award-step" data-step="2" style="display:none;">
+                <p><strong>상장 인식 중…</strong></p>
+                <div class="award-progress">
+                    <div class="award-progress-bar" style="width:0%;"></div>
+                </div>
+                <canvas id="contest-award-canvas" style="max-width:100%; display:none;"></canvas>
+                <img id="contest-award-image" style="max-width:100%; display:none;"/>
+                <details>
+                    <summary>추출 원문 보기</summary>
+                    <textarea id="contest-award-raw-text" readonly style="width:100%; height:120px;"></textarea>
+                </details>
+            </div>
+
+            <!-- Step 3: 결과 확인 -->
+            <div class="award-step" data-step="3" style="display:none;">
+                <p><strong>다음 정보가 확인되었습니다.</strong></p>
+                <div class="award-result">
+                    <label>공모전 제목</label>
+                    <input id="contest-title" type="text" readonly/>
+                    <label>주최기관</label>
+                    <input id="contest-organizer" type="text" readonly/>
+                    <label>수상 등급</label>
+                    <input id="contest-grade" type="text" readonly/>
+                </div>
+                <div class="award-actions">
+                    <button type="button" class="btn-secondary award-back">다시 인식</button>
+                    <button type="button" class="btn-primary award-confirm">추가하기</button>
+                    <button type="button" class="btn-secondary award-correct">정정 요청</button>
+                </div>
+            </div>
+
+            <!-- Step 4: 완료 -->
+            <div class="award-step" data-step="4" style="display:none;">
+                <p id="contest-award-final-message"><strong>처리가 완료되었습니다.</strong></p>
+                <div class="award-actions">
+                    <button type="button" class="btn-primary award-done">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- ✅ 자격증 내역 -->
