@@ -60,7 +60,6 @@ function bindDropToEducationItem(item) {
     });
 }
 
-
 // 경력 섹션 드롭 처리
 const section4 = document.getElementById("section4");
 section4.addEventListener("dragover", (e) => { e.preventDefault(); });
@@ -69,37 +68,37 @@ section4.addEventListener("drop", (e) => {
     const data = JSON.parse(e.dataTransfer.getData("application/json"));
 
     if (data.type === "JOB") {
-        // 첫 번째 경력 아이템 선택
-        const careerItem = section4.querySelector(".career-item");
-        if (careerItem) {
+        // ⬇️ 드롭된 위치 기준 career-item 선택 (없으면 첫 번째)
+        const dropTarget = e.target.closest(".career-item") || section4.querySelector(".career-item");
+        if (dropTarget) {
             // 회사명, 직업명
-            careerItem.querySelector(".workplace-input").value = data.title || "";
-            if (careerItem.querySelector(".status-input")) {
-                careerItem.querySelector(".status-input").value = data.status || "";
-            }
+            const workplace = dropTarget.querySelector(".workplace-input");
+            if (workplace) workplace.value = data.title || "";
+
+            const status = dropTarget.querySelector(".status-input");
+            if (status) status.value = data.status || "";
 
             // 시작일
             if (data.startDate) {
                 const [sy, sm] = data.startDate.split("-");
-                careerItem.querySelectorAll(".year-input")[0].value = sy;
-                careerItem.querySelectorAll(".month-input")[0].value = sm;
+                dropTarget.querySelectorAll(".year-input")[0].value = sy;
+                dropTarget.querySelectorAll(".month-input")[0].value = sm;
             }
 
             // 종료일
             if (data.endDate) {
                 const [ey, em] = data.endDate.split("-");
-                careerItem.querySelectorAll(".year-input")[1].value = ey;
-                careerItem.querySelectorAll(".month-input")[1].value = em;
+                dropTarget.querySelectorAll(".year-input")[1].value = ey;
+                dropTarget.querySelectorAll(".month-input")[1].value = em;
             }
+
             // ✅ 개월 수 자동 계산 + "개월" 붙이기
-            const monthsInput = careerItem.querySelector(".months-input");
+            const monthsInput = dropTarget.querySelector(".months-input");
             if (monthsInput && data.startDate && data.endDate) {
                 const months = calcMonths(data.startDate, data.endDate);
                 monthsInput.value = months ? `${months}개월` : "";
             }
-
         }
-
     }
 });
 
@@ -110,46 +109,42 @@ section5.addEventListener("drop", (e) => {
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData("application/json"));
 
-    if (data.type === "PROJECT") {
-        // 첫 번째 포트폴리오 아이템 선택
-        const portfolioItem = section5.querySelector(".portfolio-item");
-        if (portfolioItem) {
+    if (data.type === "PROJECT" || data.type === "CONTEST") {
+        // ⬇️ 드롭된 위치 기준 portfolio-item 선택 (없으면 첫 번째)
+        const dropTarget = e.target.closest(".portfolio-item") || section5.querySelector(".portfolio-item");
+        if (dropTarget) {
             // 프로젝트명
-            portfolioItem.querySelector(".portfolio-title").value = data.title || "";
+            const title = dropTarget.querySelector(".portfolio-title");
+            if (title) title.value = data.title || "";
 
             // ✅ 상태 (무조건 완료로 세팅)
-            if (portfolioItem.querySelector(".status-input")) {
-                portfolioItem.querySelector(".status-input").value = "완료";
-            }
+            const status = dropTarget.querySelector(".status-input");
+            if (status) status.value = "완료";
 
             // 시작일
             if (data.startDate) {
                 const [sy, sm] = data.startDate.split("-");
-                portfolioItem.querySelectorAll(".year-input")[0].value = sy;
-                portfolioItem.querySelectorAll(".month-input")[0].value = sm;
+                dropTarget.querySelectorAll(".year-input")[0].value = sy;
+                dropTarget.querySelectorAll(".month-input")[0].value = sm;
             }
 
             // 종료일
             if (data.endDate) {
                 const [ey, em] = data.endDate.split("-");
-                portfolioItem.querySelectorAll(".year-input")[1].value = ey;
-                portfolioItem.querySelectorAll(".month-input")[1].value = em;
-            }
-            const pathInput = portfolioItem.querySelector(".portfolio-file-path");
-            if (pathInput) {
-                pathInput.value = data.file || "";
+                dropTarget.querySelectorAll(".year-input")[1].value = ey;
+                dropTarget.querySelectorAll(".month-input")[1].value = em;
             }
 
-            const hiddenInput = portfolioItem.querySelector("input[name='filePath']");
-            if (hiddenInput) {
-                hiddenInput.value = data.file || "";
-            }
+            // 파일 경로
+            const pathInput = dropTarget.querySelector(".portfolio-file-path");
+            if (pathInput) pathInput.value = data.file || "";
+
+            const hiddenInput = dropTarget.querySelector("input[name='filePath']");
+            if (hiddenInput) hiddenInput.value = data.file || "";
         }
-
-
-
     }
 });
+
 
 
 /***********************
