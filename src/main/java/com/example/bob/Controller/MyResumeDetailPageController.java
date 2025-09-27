@@ -1,6 +1,7 @@
 package com.example.bob.Controller;
 
-import com.example.bob.Entity.MyResume;
+
+import com.example.bob.DTO.MyResumeDto;
 import com.example.bob.Service.MyResumeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -20,7 +21,7 @@ public class MyResumeDetailPageController {
     @GetMapping("/myresume/{id}")
     public String showMyResumeDetail(@PathVariable Long id, Model model) {
         // 👉 이력서 ID로 조회
-        MyResume resume = myResumeService.findByIdWithSections(id);
+        MyResumeDto resume = myResumeService.findByIdWithSections(id);
 
         if (resume == null) {
             // 예외 처리 (404 페이지로 넘길 수도 있음)

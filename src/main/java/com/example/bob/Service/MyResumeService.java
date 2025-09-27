@@ -166,6 +166,32 @@ public class MyResumeService {
         }
     }
 
+    /**
+     * 두 날짜 사이 개월 수 계산
+     */
+    private Integer calculateMonths(LocalDate start, LocalDate end) {
+        if (start == null || end == null) return null;
+        return (end.getYear() - start.getYear()) * 12 + (end.getMonthValue() - start.getMonthValue());
+    }
+
+    /**
+     * 드래그 아이템 Entity → DTO 변환
+     */
+    private MyResumeDragItemDto convertEntityToDto(MyResumeDragItem entity) {
+        return MyResumeDragItemDto.builder()
+                .displayText(entity.getDisplayText())
+                .filePath(entity.getFilePath())
+                .startDate(entity.getStartDate() != null ? entity.getStartDate().toString() : null)
+                .endDate(entity.getEndDate() != null ? entity.getEndDate().toString() : null)
+                .workplace(entity.getWorkplace())
+                .jobTitle(entity.getJobTitle())
+                .status(entity.getStatus())
+                .periodMonths(calculateMonths(entity.getStartDate(), entity.getEndDate())) // ✅ 개월 수 계산
+                .build();
+    }
+
+
+
 
     /**
      * 특정 사용자의 모든 이력서 목록 조회
@@ -178,7 +204,10 @@ public class MyResumeService {
     /**
      *사용자 정보 주입
      */
-    public MyResume findByIdWithSections(Long id) {
+    /**
+     * 이력서 상세 조회 (섹션 + 드래그 아이템 포함, DTO 변환)
+     */
+    public MyResumeDto findByIdWithSections(Long id) {
         log.info("🔍 이력서 상세 조회 시작 - resumeId: {}", id);
 
         MyResume resume = myResumeRepository.findByIdWithSections(id)
@@ -214,18 +243,53 @@ public class MyResumeService {
             resume.setUserPhone(user.getUserPhone());
             resume.setUserEmail(user.getUserEmail());
             resume.setRegion(user.getRegion());
-            resume.setNameHanja(user.getNameHanja()); // ✅ 한문 이름 세팅
-            resume.setNameEng(user.getNameEng());     // ✅ 영문 이름 세팅
+            resume.setNameHanja(user.getNameHanja());
+            resume.setNameEng(user.getNameEng());
             log.info("👉 DB에서 불러온 한문이름={}, 영문이름={}", user.getNameHanja(), user.getNameEng());
-
-
 
         } else {
             log.warn("⚠ 사용자 조회 실패 - userIdLogin: {}", resume.getMemberId());
         }
 
-        return resume;
+        // ✅ 섹션 + 드래그 아이템 → DTO 변환
+        List<MyResumeSectionDto> sectionDtos = resume.getSections().stream()
+                .map(sec -> MyResumeSectionDto.builder()
+                        .type(sec.getType())
+                        .title(sec.getTitle())
+                        .comment(sec.getComment())
+                        .content(sec.getContent())
+                        .multiSelect(sec.isMultiSelect())
+                        .tags(sec.getTags())
+                        .conditions(sec.getConditions())
+                        .fileNames(sec.getFileNames())
+                        .dragItems(sec.getDragItems().stream()
+                                .map(this::convertEntityToDto) // 🟢 개월 수 포함
+                                .collect(Collectors.toList()))
+                        .build()
+                )
+                .collect(Collectors.toList());
+
+        // ✅ 최종 DTO 반환
+        return MyResumeDto.builder()
+                .id(resume.getId())
+                .title(resume.getTitle())
+                .memberId(resume.getMemberId())
+                .userId(resume.getUserId())
+                .userName(resume.getUserName())
+                .profileImageUrl(resume.getProfileImageUrl())
+                .mainLanguage(resume.getMainLanguage())
+                .sex(resume.getSex())
+                .birthday(resume.getBirthday())
+                .age(resume.getAge())
+                .userPhone(resume.getUserPhone())
+                .userEmail(resume.getUserEmail())
+                .region(resume.getRegion())
+                .nameHanja(resume.getNameHanja())
+                .nameEng(resume.getNameEng())
+                .sections(sectionDtos)
+                .build();
     }
+
 
     /**
      * ✅ 로그인 사용자의 이력서를 삭제 (본인 것만 가능)

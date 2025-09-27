@@ -107,8 +107,9 @@
 </span>
 
             <span th:if="${item.startDate != null and item.endDate != null}" style="float:right; color:#888;">
-    (<span th:text="${item.startDate}"></span> ~ <span th:text="${item.endDate}"></span>)
-  </span>
+  (<span th:text="${item.startDate}"></span> ~ <span th:text="${item.endDate}"></span>
+   / <span th:text="${item.periodMonths}"></span>개월)
+</span>
           </div>
 
 

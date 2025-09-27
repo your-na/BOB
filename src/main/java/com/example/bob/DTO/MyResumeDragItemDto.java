@@ -20,6 +20,8 @@ public class MyResumeDragItemDto {
     private String workplace;
     private String jobTitle;
     private String status;
+    private Integer periodMonths; // ✅ 근속 개월 수
+
 
 
 }

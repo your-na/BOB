@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import com.example.bob.DTO.MyResumeDto;
 
 import java.io.File;
 import java.util.UUID;
@@ -52,8 +53,8 @@ public class MyResumeApiController {
      * 이력서 상세 조회 API
      */
     @GetMapping("/user/resumes/detail/{resumeId}")
-    public ResponseEntity<MyResume> getResumeDetail(@PathVariable Long resumeId) {
-        MyResume resume = myResumeService.findByIdWithSections(resumeId);
+    public ResponseEntity<MyResumeDto> getResumeDetail(@PathVariable Long resumeId) {
+        MyResumeDto resume = myResumeService.findByIdWithSections(resumeId);
         return ResponseEntity.ok(resume);
     }
 

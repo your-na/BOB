@@ -35,4 +35,6 @@ public class MyResumeDto {
     private String userPhone;
     private String userEmail;
     private String region;
+    private String nameHanja;
+    private String nameEng;
 }
