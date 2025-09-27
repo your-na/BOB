@@ -397,29 +397,46 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // ✅ 파일 업로드 (서버로 전송 후 UUID+파일명 반환)
+    async function uploadFileToServer(file) {
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await fetch("/api/myresumes/upload/resumeFiles", {
+            method: "POST",
+            headers: { [csrfHeader]: csrfToken },
+            body: formData
+        });
+
+        if (!res.ok) {
+            throw new Error("파일 업로드 실패");
+        }
+
+        return await res.text(); // 서버에서 UUID 붙인 파일명 반환
+    }
+
+
     // 저장 버튼 (개선: 상태/기간/타입 판별 보강)
-    document.querySelector(".save-btn")?.addEventListener("click", () => {
+    // ✅ 저장 버튼
+    document.querySelector(".save-btn")?.addEventListener("click", async () => {
         const title = document.getElementById("resumeTitle")?.value.trim();
         if (!title) return alert("제목을 입력해주세요!");
 
         const sectionsData = [];
 
         // 모든 섹션 반복 (경력/포폴 제외)
-        document.querySelectorAll(".resume-section").forEach(section => {
-            if (section.id === "section4" || section.id === "section5") return;
+        for (const section of document.querySelectorAll(".resume-section")) {
+            if (section.id === "section4" || section.id === "section5") continue;
 
             // 🔹 제목
             const titleSpan = section.querySelector(".section-header span");
             const titleInput = section.querySelector(".section-title-input");
-            let sectionTitle = "";
-            if (titleInput && titleInput.value.trim()) {
-                sectionTitle = titleInput.value.trim();
-            } else if (titleSpan && titleSpan.textContent.trim()) {
-                const raw = titleSpan.textContent.trim();
-                sectionTitle = raw.includes(". ") ? raw.split(". ")[1] : raw;
-            } else {
-                sectionTitle = "제목 없음";
-            }
+            let sectionTitle = titleInput?.value.trim()
+                || (titleSpan?.textContent.includes(". ") ? titleSpan.textContent.split(". ")[1] : titleSpan?.textContent.trim())
+                || "제목 없음";
 
             // 🔹 설명(comment)
             const comment = section.querySelector("#ohcomment")?.value || "";
@@ -429,89 +446,57 @@ document.addEventListener("DOMContentLoaded", () => {
             if (sectionTitle.includes("학력")) {
                 const school = section.querySelector('input[placeholder="학교명"]')?.value || '';
                 const major  = section.querySelector('input[placeholder="학과"]')?.value  || '';
-                const status =
-                    section.querySelector('.status-input')?.value ||
-                    section.querySelector('select')?.value ||
-                    '';
+                const status = section.querySelector('.status-input')?.value || section.querySelector('select')?.value || '';
 
                 let start = '', end = '';
                 const dg = section.querySelector('.date-group2');
                 if (dg) {
-                    const yInputs = dg.querySelectorAll('.year-input');
-                    const mInputs = dg.querySelectorAll('.month-input');
-                    const sy = yInputs?.[0]?.value || '';
-                    const sm = mInputs?.[0]?.value || '';
-                    const ey = yInputs?.[1]?.value || '';
-                    const em = mInputs?.[1]?.value || '';
-
-                    if (sy || ey || sm || em) {
-                        start = [sy, sm].filter(Boolean).join('-');
-                        end   = [ey, em].filter(Boolean).join('-');
-                    } else {
-                        const years = dg.querySelectorAll('select');
-                        start = years[0]?.value || '';
-                        end   = years[1]?.value || '';
-                    }
+                    const sy = dg.querySelectorAll('.year-input')?.[0]?.value || '';
+                    const sm = dg.querySelectorAll('.month-input')?.[0]?.value || '';
+                    const ey = dg.querySelectorAll('.year-input')?.[1]?.value || '';
+                    const em = dg.querySelectorAll('.month-input')?.[1]?.value || '';
+                    start = [sy, sm].filter(Boolean).join('-');
+                    end   = [ey, em].filter(Boolean).join('-');
                 }
-
                 content = `학교: ${school} / 학과: ${major} / 상태: ${status} / 기간: ${start} ~ ${end}`;
             } else {
-                const textarea = section.querySelector("textarea");
-                content = textarea ? textarea.value : "";
+                content = section.querySelector("textarea")?.value || "";
             }
 
-            // 🔹 태그 & 조건
-            const selectedConditions = [];
-            section.querySelectorAll(".tag-list .selected-tag").forEach(tag => {
-                selectedConditions.push(tag.textContent.trim());
-            });
-
-            const selectedTags = Array.from(section.querySelectorAll(".tag-list .tag-label"))
-                .map(tag => tag.textContent.trim());
-
-            const multiSelect = section.querySelector(".mode-btn.selected-tag")?.textContent.includes("⭕") || false;
-
-            // 🔹 타입 판별
-            let type = "서술형";
-            if (section.querySelector(".tag-list") || section.querySelector(".tag-input")) {
-                type = "선택형";
-            }if (section.querySelector('input.file-input[accept*="image"]')) {
-                type = "사진 첨부";
-            } else if (section.querySelector('input.file-input:not([accept*="image"])')) {
-                type = "파일 첨부";
-            }
-
-            // 🔹 파일 첨부 (파일명만 저장)
+            // 🔹 파일 업로드 (기업 구조 동일)
             let fileNames = [];
-            section.querySelectorAll("input.file-input").forEach(input => {
-                [...input.files].forEach(file => fileNames.push(file.name));
-            });
+            const fileInputs = Array.from(section.querySelectorAll("input.file-input"));
+            const files = fileInputs.flatMap(input => Array.from(input.files));
+
+            if (files.length > 0) {
+                fileNames = await Promise.all(files.map(file => uploadFileToServer(file)));
+            }
 
             // 🔹 드래그 아이템
             const dragItems = [];
             section.querySelectorAll(".uploaded-item").forEach(item => {
-                const displayText = item.textContent.replace("삭제", "").trim();
                 dragItems.push({
-                    displayText,
+                    displayText: item.textContent.replace("삭제", "").trim(),
                     filePath: item.dataset.file || null,
                     startDate: normalizeDate(item.dataset.startDate || null),
                     endDate: normalizeDate(item.dataset.endDate || null)
                 });
             });
 
-            // 최종 섹션 데이터 push
             sectionsData.push({
-                type,
+                type: section.querySelector('input.file-input[accept*="image"]') ? "사진 첨부"
+                    : section.querySelector('input.file-input') ? "파일 첨부"
+                        : "서술형",
                 title: sectionTitle,
                 comment,
                 content,
-                tags: selectedTags,
-                multiSelect,
-                conditions: selectedConditions,
+                tags: Array.from(section.querySelectorAll(".tag-list .tag-label")).map(t => t.textContent.trim()),
+                multiSelect: !!section.querySelector(".mode-btn.selected-tag"),
+                conditions: Array.from(section.querySelectorAll(".tag-list .selected-tag")).map(t => t.textContent.trim()),
                 fileNames,
                 dragItems
             });
-        });
+        }
 
         // ✅ 경력 섹션 추가 (section4)
         const jobItems = [];
@@ -614,6 +599,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.error(err);
             });
     });
+
 
 
     // 제목 인풋 Enter → span 반영

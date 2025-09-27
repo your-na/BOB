@@ -83,6 +83,12 @@
     <!-- 설명 -->
     <p th:if="${section.comment}" th:text="${section.comment}">설명</p>
 
+    <!-- ✅ 본문(내용) 공통 출력 -->
+    <div th:if="${section.content != null and section.content != ''}">
+      <p th:text="${section.content}"></p>
+    </div>
+
+
     <!-- ✅ 드래그 항목 리스트 -->
     <div th:if="${not #lists.isEmpty(section.dragItems)}">
       <ul>
@@ -90,15 +96,35 @@
           <div>
             <strong th:text="${item.displayText}">항목</strong>
             <span th:if="${item.startDate != null and item.endDate != null}" style="float:right; color:#888;">
-              (<span th:text="${item.startDate}"></span> ~ <span th:text="${item.endDate}"></span>)
-            </span>
+          (<span th:text="${item.startDate}"></span> ~ <span th:text="${item.endDate}"></span>)
+        </span>
           </div>
+
+          <!-- ✅ 파일/이미지 구분 -->
           <div th:if="${item.filePath}">
-            <a th:href="@{'/uploads/projectFiles/' + ${item.filePath}}" target="_blank">📁 파일 보기</a>
+            <!-- 이미지면 미리보기 -->
+            <div th:if="${#strings.endsWith(item.filePath, '.png') or
+                     #strings.endsWith(item.filePath, '.jpg') or
+                     #strings.endsWith(item.filePath, '.jpeg') or
+                     #strings.endsWith(item.filePath, '.gif')}">
+              <img th:src="@{'/uploads/resumeFiles/' + ${item.filePath}}"
+                   alt="첨부 이미지" style="width:150px;">
+            </div>
+
+            <!-- 그 외 확장자는 다운로드 -->
+            <div th:unless="${#strings.endsWith(item.filePath, '.png') or
+                         #strings.endsWith(item.filePath, '.jpg') or
+                         #strings.endsWith(item.filePath, '.jpeg') or
+                         #strings.endsWith(item.filePath, '.gif')}">
+              <a th:href="@{'/uploads/resumeFiles/' + ${item.filePath}}" download>
+                📄 <span th:text="${item.filePath}">파일명</span>
+              </a>
+            </div>
           </div>
         </li>
       </ul>
     </div>
+
 
     <!-- ✅ 내용 -->
     <div th:if="${section.content != null and section.content != ''}">

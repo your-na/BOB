@@ -11,8 +11,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
-
+import java.io.File;
+import java.util.UUID;
 import java.util.List;
 
 
@@ -95,6 +99,32 @@ public class MyResumeApiController {
 
         return ResponseEntity.noContent().build(); // 상태 204 반환
     }
+
+    /**
+     * ✅ 나만의 이력서 파일 업로드 API
+     */
+    @PostMapping("/upload/resumeFiles")
+    public ResponseEntity<String> uploadResumeFile(@RequestParam("file") MultipartFile file) {
+        try {
+            String uploadDir = System.getProperty("user.dir") + "/uploads/resumeFiles/";
+            File dir = new File(uploadDir);
+            if (!dir.exists()) dir.mkdirs();
+
+            String originalName = file.getOriginalFilename();
+            String extension = originalName.substring(originalName.lastIndexOf("."));
+            String uniqueName = UUID.randomUUID() + extension;
+
+            File dest = new File(dir, uniqueName);
+            file.transferTo(dest);
+
+            return ResponseEntity.ok(uniqueName); // ← 프론트에서 DB 저장할 파일명
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("파일 업로드 실패: " + e.getMessage());
+        }
+    }
+
+
 
 
 }

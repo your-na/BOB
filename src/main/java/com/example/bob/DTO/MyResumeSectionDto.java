@@ -29,4 +29,6 @@ public class MyResumeSectionDto {
 
     // ✅ [추가] 드래그 항목 목록
     private List<MyResumeDragItemDto> dragItems;
+
+    private List<String> fileNames;  // 첨부된 파일 이름들
 }

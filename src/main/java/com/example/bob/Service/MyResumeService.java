@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.example.bob.Entity.UserEntity;
 import com.example.bob.Repository.UserRepository;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+
 
 
 import java.time.LocalDate;
@@ -21,6 +24,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.time.Period;
 import java.time.YearMonth;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.File;
+import java.util.UUID;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 /**
@@ -95,6 +103,7 @@ public class MyResumeService {
                 .multiSelect(dto.isMultiSelect())
                 .tags(dto.getTags())
                 .conditions(dto.getConditions())
+                .fileNames(dto.getFileNames())
                 .build();
 
         if (dto.getDragItems() != null && !dto.getDragItems().isEmpty()) {
@@ -228,7 +237,30 @@ public class MyResumeService {
         log.info("✅ 삭제 완료");
     }
 
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadResumeFile(@RequestParam("file") MultipartFile file) {
+        try {
+            // 저장 경로 (프로젝트 루트 기준)
+            String uploadDir = System.getProperty("user.dir") + "/uploads/resumeFiles/";
+            File dir = new File(uploadDir);
+            if (!dir.exists()) dir.mkdirs();
 
+            // 원래 이름과 확장자
+            String originalName = file.getOriginalFilename();
+            String extension = originalName.substring(originalName.lastIndexOf("."));
+            String uniqueName = UUID.randomUUID() + extension;
+
+            // 실제 저장
+            File dest = new File(dir, uniqueName);
+            file.transferTo(dest);
+
+            // 저장된 파일명 반환 (DB에는 이걸 저장해야 함)
+            return ResponseEntity.ok(uniqueName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("파일 업로드 실패: " + e.getMessage());
+        }
+    }
 
 
 
