@@ -437,22 +437,32 @@ document.addEventListener("DOMContentLoaded", () => {
             // 🔹 내용(content)
             let content = "";
             if (sectionTitle.includes("학력")) {
-                const school = section.querySelector('input[placeholder="학교명"]')?.value || '';
-                const major  = section.querySelector('input[placeholder="학과"]')?.value  || '';
-                const status = section.querySelector('.status-input')?.value || section.querySelector('select')?.value || '';
+                const eduItems = section.querySelectorAll(".education-item");
+                const eduData = [];
 
-                let start = '', end = '';
-                const dg = section.querySelector('.date-group2');
-                if (dg) {
-                    const sy = dg.querySelectorAll('.year-input')?.[0]?.value || '';
-                    const sm = dg.querySelectorAll('.month-input')?.[0]?.value || '';
-                    const ey = dg.querySelectorAll('.year-input')?.[1]?.value || '';
-                    const em = dg.querySelectorAll('.month-input')?.[1]?.value || '';
-                    start = [sy, sm].filter(Boolean).join('-');
-                    end   = [ey, em].filter(Boolean).join('-');
-                }
-                content = `학교: ${school} / 학과: ${major} / 상태: ${status} / 기간: ${start} ~ ${end}`;
-            } else {
+                eduItems.forEach(item => {
+                    const school = item.querySelector('input[placeholder="학교명"]')?.value || '';
+                    const major  = item.querySelector('input[placeholder="학과"]')?.value  || '';
+                    const status = item.querySelector('.status-input')?.value || item.querySelector('select')?.value || '';
+
+                    let start = '', end = '';
+                    const yInputs = item.querySelectorAll('.year-input');
+                    const mInputs = item.querySelectorAll('.month-input');
+                    if (yInputs.length >= 2) {
+                        const sy = yInputs[0]?.value || '';
+                        const sm = mInputs[0]?.value || '';
+                        const ey = yInputs[1]?.value || '';
+                        const em = mInputs[1]?.value || '';
+                        start = [sy, sm].filter(Boolean).join('-');
+                        end   = [ey, em].filter(Boolean).join('-');
+                    }
+
+                    eduData.push(`학교: ${school} / 학과: ${major} / 상태: ${status} / 기간: ${start} ~ ${end}`);
+                });
+
+                content = eduData.join(" | "); // 여러 학력을 구분자(|)로 합치기
+            }
+            else {
                 content = section.querySelector("textarea")?.value || "";
             }
 
