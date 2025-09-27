@@ -64,6 +64,13 @@ public class MyResume {
     @Transient
     private String region;
 
+    @Transient
+    private String nameHanja;
+
+    @Transient
+    private String nameEng;
+
+
     // 섹션 추가 시 양방향 연관관계 세팅
     public void addSection(MyResumeSection section) {
         section.setResume(this);

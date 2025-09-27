@@ -211,6 +211,12 @@ public class MyResumeService {
             resume.setUserPhone(user.getUserPhone());
             resume.setUserEmail(user.getUserEmail());
             resume.setRegion(user.getRegion());
+            resume.setNameHanja(user.getNameHanja()); // ✅ 한문 이름 세팅
+            resume.setNameEng(user.getNameEng());     // ✅ 영문 이름 세팅
+            log.info("👉 DB에서 불러온 한문이름={}, 영문이름={}", user.getNameHanja(), user.getNameEng());
+
+
+
         } else {
             log.warn("⚠ 사용자 조회 실패 - userIdLogin: {}", resume.getMemberId());
         }
