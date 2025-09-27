@@ -73,7 +73,10 @@ section4.addEventListener("drop", (e) => {
         if (dropTarget) {
             // 회사명, 직업명
             const workplace = dropTarget.querySelector(".workplace-input");
-            if (workplace) workplace.value = data.title || "";
+            if (workplace) workplace.value = data.workplace || "";
+
+            const jobInput = dropTarget.querySelector(".job-input");   // ✅ 직무 입력 칸
+            if (jobInput) jobInput.value = data.jobTitle || "";
 
             const status = dropTarget.querySelector(".status-input");
             if (status) status.value = data.status || "";
@@ -516,9 +519,13 @@ document.addEventListener("DOMContentLoaded", () => {
             const em = item.querySelectorAll(".month-input")[1]?.value || "";
             const startDate = [sy, sm].filter(Boolean).join("-");
             const endDate   = [ey, em].filter(Boolean).join("-");
+            const jobTitle = item.querySelector(".job-input")?.value || "";
 
             jobItems.push({
+                workplace,
                 displayText: `${workplace} (${startDate} ~ ${endDate})`,
+                jobTitle,
+                status,
                 startDate,
                 endDate,
                 filePath: null
@@ -834,6 +841,10 @@ function setupDropBox(box) {
                 if (data.id)   item.dataset.id = data.id;
                 if (data.type) item.dataset.type = data.type;
 
+                if (data.workplace) item.dataset.workplace = data.workplace;
+                if (data.jobTitle) item.dataset.jobTitle = data.jobTitle;
+                if (data.status)   item.dataset.status   = data.status;
+
                 const del = document.createElement('span');
                 del.className = 'delete-icon';
                 del.textContent = '삭제';
@@ -934,10 +945,15 @@ function renderJobs() {
                 d.className = 'award-item';
                 d.innerHTML = `${it.workplace || '직무 없음'}<br><small>${period}</small>`;
                 makeDraggable(d, {
-                    id: it.id, type: 'JOB',
-                    title: it.workplace || '직무 없음',
-                    startDate: it.startDate, endDate: it.endDate, status: it.status
+                    id: it.id,
+                    type: 'JOB',
+                    workplace: it.workplace || '',
+                    jobTitle: it.jobTitle || '',   // ✅ 추가
+                    startDate: it.startDate,
+                    endDate: it.endDate,
+                    status: it.status
                 });
+
                 cont.appendChild(d);
             });
         })

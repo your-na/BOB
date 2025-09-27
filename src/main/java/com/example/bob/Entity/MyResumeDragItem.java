@@ -26,6 +26,12 @@ public class MyResumeDragItem {
     private LocalDate endDate;
 
     private String filePath;
+    private String workplace;   // 근무지
+    private String jobTitle;    // 직무
+    private String status;      // 상태 (재직 중 / 퇴사 등)
+
+
+
 
     // 🔗 ManyToOne (MyResumeSection과 연관)
     @ManyToOne(fetch = FetchType.LAZY)

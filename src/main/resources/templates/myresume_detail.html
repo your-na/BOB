@@ -98,11 +98,19 @@
       <ul>
         <li th:each="item : ${section.dragItems}" style="margin-bottom: 1em;">
           <div>
-            <strong th:text="${item.displayText}">항목</strong>
+            <strong th:text="${item.workplace}">근무지</strong>
+            <span th:if="${item.jobTitle != null}" style="margin-left: 10px; color:#555;">
+    (직무: <span th:text="${item.jobTitle}"></span>)
+  </span>
+            <span th:if="${item.status != null}" style="margin-left: 10px; color:#777;">
+  (상태: <span th:text="${item.status}"></span>)
+</span>
+
             <span th:if="${item.startDate != null and item.endDate != null}" style="float:right; color:#888;">
-          (<span th:text="${item.startDate}"></span> ~ <span th:text="${item.endDate}"></span>)
-        </span>
+    (<span th:text="${item.startDate}"></span> ~ <span th:text="${item.endDate}"></span>)
+  </span>
           </div>
+
 
           <!-- ✅ 드래그 항목 파일/이미지 출력 -->
           <div th:if="${item.filePath}">

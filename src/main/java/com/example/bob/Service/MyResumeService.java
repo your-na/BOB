@@ -139,6 +139,9 @@ public class MyResumeService {
                 .filePath(dto.getFilePath())
                 .startDate(parseDate(dto.getStartDate(), formatter))
                 .endDate(parseDate(dto.getEndDate(), formatter))
+                .workplace(dto.getWorkplace())
+                .jobTitle(dto.getJobTitle())
+                .status(dto.getStatus())
                 .build();
     }
 
@@ -267,6 +270,8 @@ public class MyResumeService {
             return ResponseEntity.status(500).body("파일 업로드 실패: " + e.getMessage());
         }
     }
+
+
 
 
 

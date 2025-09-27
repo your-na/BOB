@@ -16,4 +16,10 @@ public class MyResumeDragItemDto {
     private String endDate;
 
     private String filePath;
+
+    private String workplace;
+    private String jobTitle;
+    private String status;
+
+
 }
