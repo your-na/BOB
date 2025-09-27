@@ -59,6 +59,85 @@ function bindDropToEducationItem(item) {
     });
 }
 
+// 경력 섹션 드롭 처리
+const section4 = document.getElementById("section4");
+section4.addEventListener("dragover", (e) => { e.preventDefault(); });
+section4.addEventListener("drop", (e) => {
+    e.preventDefault();
+    const data = JSON.parse(e.dataTransfer.getData("application/json"));
+
+    if (data.type === "JOB") {
+        // 첫 번째 경력 아이템 선택
+        const careerItem = section4.querySelector(".career-item");
+        if (careerItem) {
+            // 회사명, 직업명
+            careerItem.querySelector(".workplace-input").value = data.title || "";
+            if (careerItem.querySelector(".status-input")) {
+                careerItem.querySelector(".status-input").value = data.status || "";
+            }
+
+            // 시작일
+            if (data.startDate) {
+                const [sy, sm] = data.startDate.split("-");
+                careerItem.querySelectorAll(".year-input")[0].value = sy;
+                careerItem.querySelectorAll(".month-input")[0].value = sm;
+            }
+
+            // 종료일
+            if (data.endDate) {
+                const [ey, em] = data.endDate.split("-");
+                careerItem.querySelectorAll(".year-input")[1].value = ey;
+                careerItem.querySelectorAll(".month-input")[1].value = em;
+            }
+        }
+        
+    }
+});
+
+// 포트폴리오 섹션 드롭 처리
+const section5 = document.getElementById("section5");
+section5.addEventListener("dragover", (e) => { e.preventDefault(); });
+section5.addEventListener("drop", (e) => {
+    e.preventDefault();
+    const data = JSON.parse(e.dataTransfer.getData("application/json"));
+
+    if (data.type === "PROJECT") {
+        // 첫 번째 포트폴리오 아이템 선택
+        const portfolioItem = section5.querySelector(".portfolio-item");
+        if (portfolioItem) {
+            // 프로젝트명
+            portfolioItem.querySelector(".portfolio-title").value = data.title || "";
+
+            // 시작일
+            if (data.startDate) {
+                const [sy, sm] = data.startDate.split("-");
+                portfolioItem.querySelectorAll(".year-input")[0].value = sy;
+                portfolioItem.querySelectorAll(".month-input")[0].value = sm;
+            }
+
+            // 종료일
+            if (data.endDate) {
+                const [ey, em] = data.endDate.split("-");
+                portfolioItem.querySelectorAll(".year-input")[1].value = ey;
+                portfolioItem.querySelectorAll(".month-input")[1].value = em;
+            }
+            const pathInput = portfolioItem.querySelector(".portfolio-file-path");
+            if (pathInput) {
+                pathInput.value = data.file || "";
+            }
+
+            const hiddenInput = portfolioItem.querySelector("input[name='filePath']");
+            if (hiddenInput) {
+                hiddenInput.value = data.file || "";
+            }
+        }
+
+
+
+    }
+});
+
+
 /***********************
  * 섹션/팝업/태그/저장 등 메인 UI
  ***********************/
