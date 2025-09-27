@@ -64,6 +64,11 @@ public class MyResumeService {
         // DB 저장
         MyResume saved = myResumeRepository.save(resume);
         log.info("✅ 이력서 저장 완료 - ID: {}, userId: {}", saved.getId(), saved.getUserId());
+        // 🟢 이 부분 추가
+        log.info("📊 저장된 섹션 개수: {}", saved.getSections().size());
+        saved.getSections().forEach(sec ->
+                log.info("➡️ 섹션 '{}' 안에 드래그아이템 {}개", sec.getTitle(), sec.getDragItems().size())
+        );
 
         return saved.getId();
     }
@@ -77,6 +82,11 @@ public class MyResumeService {
      */
     private MyResumeSection convertToEntity(MyResumeSectionDto dto) {
         log.info("📦 섹션 변환 시작 - title: {}, type: {}", dto.getTitle(), dto.getType());
+        // 🟢 이 부분 추가
+        log.info("📝 섹션 설명(comment): {}", dto.getComment());
+        log.info("📝 섹션 본문(content): {}", dto.getContent());
+        log.info("🏷️ 태그(tags): {}", dto.getTags());
+        log.info("✅ 조건(conditions): {}", dto.getConditions());
         MyResumeSection section = MyResumeSection.builder()
                 .type(dto.getType())
                 .title(dto.getTitle())
@@ -110,6 +120,10 @@ public class MyResumeService {
      */
     private MyResumeDragItem convertDragItemDtoToEntity(MyResumeDragItemDto dto) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // 🟢 로그 추가
+        log.info("📂 드래그아이템 변환 - text: {}, filePath: {}, startDate: {}, endDate: {}",
+                dto.getDisplayText(), dto.getFilePath(), dto.getStartDate(), dto.getEndDate());
 
         return MyResumeDragItem.builder()
                 .displayText(dto.getDisplayText())
