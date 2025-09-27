@@ -89,8 +89,15 @@ section4.addEventListener("drop", (e) => {
                 careerItem.querySelectorAll(".year-input")[1].value = ey;
                 careerItem.querySelectorAll(".month-input")[1].value = em;
             }
+            // ✅ 개월 수 자동 계산 + "개월" 붙이기
+            const monthsInput = careerItem.querySelector(".months-input");
+            if (monthsInput && data.startDate && data.endDate) {
+                const months = calcMonths(data.startDate, data.endDate);
+                monthsInput.value = months ? `${months}개월` : "";
+            }
+
         }
-        
+
     }
 });
 
@@ -1074,6 +1081,13 @@ function renderContestsIntoPortfolio() {
         .catch(err => console.error('공모전 로드 실패:', err));
 }
 
+// ✅ 개월 수 계산 함수 (맨 위에 추가)
+function calcMonths(startDate, endDate) {
+    if (!startDate || !endDate) return "";
+    const [sy, sm] = startDate.split("-").map(Number);
+    const [ey, em] = endDate.split("-").map(Number);
+    return (ey - sy) * 12 + (em - sm) + 1; // 종료월 포함
+}
 /***********************
  * 왼쪽 섹션 드롭 설정 (학력 자동 채움 포함)
  ***********************/
