@@ -115,6 +115,11 @@ section5.addEventListener("drop", (e) => {
             // 프로젝트명
             portfolioItem.querySelector(".portfolio-title").value = data.title || "";
 
+            // ✅ 상태 (무조건 완료로 세팅)
+            if (portfolioItem.querySelector(".status-input")) {
+                portfolioItem.querySelector(".status-input").value = "완료";
+            }
+
             // 시작일
             if (data.startDate) {
                 const [sy, sm] = data.startDate.split("-");
