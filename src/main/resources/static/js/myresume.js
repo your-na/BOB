@@ -1203,6 +1203,9 @@ window.addEventListener('DOMContentLoaded', () => {
             setText("phone", user.userPhone);
             setText("email", user.userEmail);
             setText("region", user.region);
+            // ✅ 한문 이름, 영문 이름 추가
+            document.getElementById("chinese").innerText = user.nameHanja || "-";
+            document.getElementById("english").innerText = user.nameEng || "-";
         })
         .catch(err => console.error("프로필 불러오기 실패:", err));
 
