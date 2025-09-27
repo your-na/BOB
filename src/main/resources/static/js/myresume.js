@@ -522,19 +522,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 dragItems
             });
         });
-
-        // ✅ 경력 섹션 추가 (section4)
+// ✅ 경력 섹션 추가 (section4)
         const jobItems = [];
+        let jobComment = "";
         document.querySelectorAll("#section4 .career-item").forEach(item => {
             const workplace = item.querySelector(".workplace-input")?.value || "";
             const status    = item.querySelector(".status-input")?.value || "완료";
+            const desc      = item.querySelector(".desc-input")?.value || "";  // 🔥 설명
+            if (desc) jobComment += (jobComment ? " | " : "") + desc;
+
             const sy = item.querySelectorAll(".year-input")[0]?.value || "";
             const sm = item.querySelectorAll(".month-input")[0]?.value || "";
             const ey = item.querySelectorAll(".year-input")[1]?.value || "";
             const em = item.querySelectorAll(".month-input")[1]?.value || "";
             const startDate = [sy, sm].filter(Boolean).join("-");
             const endDate   = [ey, em].filter(Boolean).join("-");
-            const months    = calcMonths(startDate, endDate);
 
             jobItems.push({
                 displayText: `${workplace} (${startDate} ~ ${endDate})`,
@@ -547,7 +549,7 @@ document.addEventListener("DOMContentLoaded", () => {
             sectionsData.push({
                 type: "JOB",
                 title: "경력사항",
-                comment: "",
+                comment: jobComment,   // ✅ 설명 저장
                 tags: [],
                 content: "",
                 multiSelect: false,
@@ -556,11 +558,16 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
+
         // ✅ 포트폴리오 섹션 추가 (section5)
         const portfolioItems = [];
+        let portfolioComment = "";
         document.querySelectorAll("#section5 .portfolio-item").forEach(item => {
             const titleInput = item.querySelector(".portfolio-title")?.value || "";
             const filePath   = item.querySelector("input[name='filePath']")?.value || "";
+            const desc       = item.querySelector(".desc-input")?.value || "";  // 🔥 설명
+            if (desc) portfolioComment += (portfolioComment ? " | " : "") + desc;
+
             const sy = item.querySelectorAll(".year-input")[0]?.value || "";
             const sm = item.querySelectorAll(".month-input")[0]?.value || "";
             const ey = item.querySelectorAll(".year-input")[1]?.value || "";
@@ -579,7 +586,7 @@ document.addEventListener("DOMContentLoaded", () => {
             sectionsData.push({
                 type: "PROJECT",
                 title: "포트폴리오",
-                comment: "",
+                comment: portfolioComment,   // ✅ 설명 저장
                 tags: [],
                 content: "",
                 multiSelect: false,
@@ -587,6 +594,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 dragItems: portfolioItems
             });
         }
+
 
         // ✅ 최종 데이터
         const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
