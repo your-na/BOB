@@ -7,6 +7,9 @@ public class UserUpdateDTO {
     private String mainLanguage;
     private String profileImageUrl;
     private String region;
+    private String nameHanja;
+    private String nameEng;
+
 
 
     // Getters and Setters
@@ -57,6 +60,23 @@ public class UserUpdateDTO {
     public void setRegion(String region) {
         this.region = region;
     }
+
+    public String getNameHanja() {
+        return nameHanja;
+    }
+
+    public void setNameHanja(String nameHanja) {
+        this.nameHanja = nameHanja;
+    }
+
+    public String getNameEng() {
+        return nameEng;
+    }
+
+    public void setNameEng(String nameEng) {
+        this.nameEng = nameEng;
+    }
+
 
 
     @Override

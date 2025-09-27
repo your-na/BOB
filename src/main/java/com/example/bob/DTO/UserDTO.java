@@ -28,6 +28,8 @@ public class UserDTO {
     private String profileImageUrl;
     private String bio;
     private String region;
+    private String nameHanja;
+    private String nameEng;
 
 
     // UserDTO(Long, String) 생성자 명시적으로 추가
@@ -50,6 +52,8 @@ public class UserDTO {
         userDTO.setSex(userEntity.getSex());
         userDTO.setMainLanguage(userEntity.getMainLanguage());
         userDTO.setBirthday(userEntity.getBirthday());
+        userDTO.setNameHanja(userEntity.getNameHanja());
+        userDTO.setNameEng(userEntity.getNameEng());
         userDTO.setUserNick(userEntity.getUserNick());
         userDTO.setRole(userEntity.getRole());
         userDTO.setProfileImageUrl(userEntity.getProfileImageUrl() != null ? userEntity.getProfileImageUrl() : "/images/user.png");
@@ -75,6 +79,8 @@ public class UserDTO {
                 .mainLanguage(userEntity.getMainLanguage())
                 .birthday(userEntity.getBirthday())
                 .region(userEntity.getRegion())
+                .nameHanja(userEntity.getNameHanja())   // 추가
+                .nameEng(userEntity.getNameEng())
                 .userNick(userEntity.getUserNick())
                 .profileImageUrl(userEntity.getProfileImageUrl() != null ? userEntity.getProfileImageUrl() : "/images/user.png")
                 .bio(userEntity.getUserBio() != null ? userEntity.getUserBio() : "소개를 작성해보세요.")

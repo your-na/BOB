@@ -111,6 +111,8 @@ public class ProfileController {
                                 @RequestParam String bio,
                                 @RequestParam("language") List<String> languages,
                                 @RequestParam("region") String region,
+                                @RequestParam(value = "nameHanja", required = false) String nameHanja,   // ✅ 추가
+                                @RequestParam(value = "nameEng", required = false) String nameEng,       // ✅ 추가
                                 @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
                                 @AuthenticationPrincipal CustomUserDetails userDetails,
                                 RedirectAttributes redirectAttributes) {
@@ -127,6 +129,9 @@ public class ProfileController {
         userUpdateDTO.setUserBio(bio);
         userUpdateDTO.setMainLanguage(String.join(",", languages));
         userUpdateDTO.setRegion(region);
+        userUpdateDTO.setNameHanja(nameHanja);  // ✅ 추가
+        userUpdateDTO.setNameEng(nameEng);      // ✅ 추가
+
 
         if (profileImage != null && !profileImage.isEmpty()) {
             try {

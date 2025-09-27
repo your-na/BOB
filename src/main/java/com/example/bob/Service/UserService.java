@@ -109,6 +109,9 @@ public class UserService implements UserDetailsService {
         userEntity.setMainLanguage(userUpdateDTO.getMainLanguage());
         userEntity.setRegion(userUpdateDTO.getRegion());
 
+        userEntity.setNameHanja(userUpdateDTO.getNameHanja());
+        userEntity.setNameEng(userUpdateDTO.getNameEng());
+
         userRepository.save(userEntity);  // 사용자 정보 저장
 
         // 변경 내역 기록

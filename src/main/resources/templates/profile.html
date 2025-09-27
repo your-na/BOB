@@ -39,11 +39,12 @@
 
             <!-- 한문 이름 -->
             <label for="name_hanja">한문 이름</label>
-            <input type="text" id="name_hanja" name="nameHanja" th:value="${user != null ? '' : ''}">
+            <input type="text" id="name_hanja" name="nameHanja" th:value="${user.nameHanja}">
 
             <!-- 영문 이름 -->
             <label for="name_eng">영문 이름</label>
-            <input type="text" id="name_eng" name="nameEng" th:value="${user != null ? '' : ''}">
+            <input type="text" id="name_eng" name="nameEng" th:value="${user.nameEng}">
+
 
             <label for="username">아이디</label>
             <input type="text" id="username" name="username" th:value="${user.userIdLogin}" readonly>
