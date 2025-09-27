@@ -44,9 +44,4 @@ public class ResumeHistoryController {
         return "resume_history";
     }
 
-
-    // 테스트용 (추후 principal.getName() 등으로 유저 정보 연동 필요)
-    private Long getUserIdFromPrincipal(Principal principal) {
-        return 1L;
-    }
 }

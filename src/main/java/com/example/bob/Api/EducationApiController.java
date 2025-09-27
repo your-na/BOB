@@ -2,10 +2,11 @@ package com.example.bob.Api;
 
 import com.example.bob.DTO.EducationSimpleDTO;
 import com.example.bob.Service.EducationService;
+import com.example.bob.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -17,15 +18,18 @@ public class EducationApiController {
 
     // ✅ 학력 정보 저장
     @PostMapping("/save")
-    public Long saveEducation(@RequestBody EducationSimpleDTO dto, Principal principal) {
-        Long userId = getUserIdFromPrincipal(principal); // 로그인 유저 ID 추출
+    public Long saveEducation(
+            @AuthenticationPrincipal UserDetailsImpl userDetails, // 🔑 로그인 사용자 정보 주입
+            @RequestBody EducationSimpleDTO dto) {
+
+        Long userId = userDetails.getUserEntity().getUserId(); // 로그인한 사용자 ID 가져오기
         return educationService.save(userId, dto);
     }
 
     // ✅ 학력 목록 조회
     @GetMapping("/list")
-    public List<EducationSimpleDTO> getEducations(Principal principal) {
-        Long userId = getUserIdFromPrincipal(principal);
+    public List<EducationSimpleDTO> getEducations(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Long userId = userDetails.getUserEntity().getUserId();
         return educationService.findByUserId(userId);
     }
 
@@ -33,10 +37,5 @@ public class EducationApiController {
     @DeleteMapping("/delete/{id}")
     public void deleteEducation(@PathVariable Long id) {
         educationService.deleteById(id);
-    }
-
-    // ✅ 테스트용 고정 ID (차후 principal에서 연동)
-    private Long getUserIdFromPrincipal(Principal principal) {
-        return 1L; // 개발 중이라 임시로 고정
     }
 }
