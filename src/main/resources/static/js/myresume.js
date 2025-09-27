@@ -1,6 +1,10 @@
 /***********************
  * 공통 유틸
  ***********************/
+
+function normalizeDate(date) {
+    return date && date.length === 7 ? date + "-01" : date;
+}
 function populateYearOptions(selectElement, year) {
     if (!selectElement || !year) return;
     const exists = Array.from(selectElement.options).some(opt => opt.value === year);
@@ -417,6 +421,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const sectionsData = [];
         document.querySelectorAll(".resume-section").forEach(section => {
+            // 🔥 경력(section4), 포트폴리오(section5)는 일반 섹션 저장에서 제외
+            if (section.id === "section4" || section.id === "section5") return;
             let sectionTitle = "";
             const titleSpan = section.querySelector(".section-header span");
             const titleInput = section.querySelector(".section-title-input");
@@ -487,6 +493,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 type = "파일 첨부";
             }
 
+
             // 드래그 아이템 수집
             const dragItems = [];
             section.querySelectorAll(".uploaded-item").forEach(item => {
@@ -498,9 +505,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 dragItems.push({
                     displayText,
                     filePath,
-                    startDate,
-                    endDate
+                    startDate: normalizeDate(startDate),
+                    endDate: normalizeDate(endDate)
                 });
+
             });
 
             sectionsData.push({
@@ -515,9 +523,72 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        // (선택) 직무 태그 사용 시 여기에 포함하고 싶다면 주석 해제
-        // const jobTags = Array.from(jobTagContainer?.querySelectorAll(".tag .tag-label") || []).map(el => el.textContent.trim());
+        // ✅ 경력 섹션 추가 (section4)
+        const jobItems = [];
+        document.querySelectorAll("#section4 .career-item").forEach(item => {
+            const workplace = item.querySelector(".workplace-input")?.value || "";
+            const status    = item.querySelector(".status-input")?.value || "완료";
+            const sy = item.querySelectorAll(".year-input")[0]?.value || "";
+            const sm = item.querySelectorAll(".month-input")[0]?.value || "";
+            const ey = item.querySelectorAll(".year-input")[1]?.value || "";
+            const em = item.querySelectorAll(".month-input")[1]?.value || "";
+            const startDate = [sy, sm].filter(Boolean).join("-");
+            const endDate   = [ey, em].filter(Boolean).join("-");
+            const months    = calcMonths(startDate, endDate);
 
+            jobItems.push({
+                displayText: `${workplace} (${startDate} ~ ${endDate})`,
+                startDate,
+                endDate,
+                filePath: null
+            });
+        });
+        if (jobItems.length > 0) {
+            sectionsData.push({
+                type: "JOB",
+                title: "경력사항",
+                comment: "",
+                tags: [],
+                content: "",
+                multiSelect: false,
+                conditions: [],
+                dragItems: jobItems
+            });
+        }
+
+        // ✅ 포트폴리오 섹션 추가 (section5)
+        const portfolioItems = [];
+        document.querySelectorAll("#section5 .portfolio-item").forEach(item => {
+            const titleInput = item.querySelector(".portfolio-title")?.value || "";
+            const filePath   = item.querySelector("input[name='filePath']")?.value || "";
+            const sy = item.querySelectorAll(".year-input")[0]?.value || "";
+            const sm = item.querySelectorAll(".month-input")[0]?.value || "";
+            const ey = item.querySelectorAll(".year-input")[1]?.value || "";
+            const em = item.querySelectorAll(".month-input")[1]?.value || "";
+            const startDate = [sy, sm].filter(Boolean).join("-");
+            const endDate   = [ey, em].filter(Boolean).join("-");
+
+            portfolioItems.push({
+                displayText: titleInput,
+                startDate,
+                endDate,
+                filePath
+            });
+        });
+        if (portfolioItems.length > 0) {
+            sectionsData.push({
+                type: "PROJECT",
+                title: "포트폴리오",
+                comment: "",
+                tags: [],
+                content: "",
+                multiSelect: false,
+                conditions: [],
+                dragItems: portfolioItems
+            });
+        }
+
+        // ✅ 최종 데이터
         const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
         const memberId = document.getElementById("memberId")?.value;
@@ -526,7 +597,6 @@ document.addEventListener("DOMContentLoaded", () => {
             title,
             memberId: memberId ? parseInt(memberId) : null,
             sections: sectionsData
-            // , jobTags
         };
 
         fetch("/api/myresumes", {

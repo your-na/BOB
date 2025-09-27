@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.time.Period;
+import java.time.YearMonth;
+
 
 /**
  * 나만의 이력서 저장 처리 서비스
@@ -122,8 +124,22 @@ public class MyResumeService {
      */
     private LocalDate parseDate(String dateStr, DateTimeFormatter formatter) {
         if (dateStr == null || dateStr.isBlank()) return null;
-        return LocalDate.parse(dateStr, formatter);
+
+        try {
+            // "yyyy-MM-dd" 형식이면 정상 파싱
+            return LocalDate.parse(dateStr, formatter);
+        } catch (Exception e) {
+            try {
+                // "yyyy-MM" 형식이면 YearMonth로 파싱 후 첫날짜로 변환
+                return YearMonth.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM"))
+                        .atDay(1); // → 2025-09-01
+            } catch (Exception ex) {
+                log.error("❌ 날짜 파싱 실패: {}", dateStr, ex);
+                return null; // 그래도 안 되면 null 처리
+            }
+        }
     }
+
 
     /**
      * 특정 사용자의 모든 이력서 목록 조회

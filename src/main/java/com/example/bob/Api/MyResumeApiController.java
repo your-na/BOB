@@ -10,10 +10,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+
 
 import java.util.List;
 
 
+
+@Slf4j
 @RestController
 @RequestMapping("/api/myresumes")
 @RequiredArgsConstructor
@@ -29,6 +33,10 @@ public class MyResumeApiController {
         // 🔐 현재 로그인 사용자 ID 가져오기
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String memberId = auth.getName(); // 로그인한 사용자 ID
+
+        log.info("💡 saveResume 요청 - 로그인한 사용자: {}", memberId);
+        log.info("💡 saveResume 요청 - 프론트에서 넘어온 memberId: {}", dto.getMemberId());
+
         dto.setMemberId(memberId);
 
         Long savedId = myResumeService.save(dto);
