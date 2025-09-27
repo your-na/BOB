@@ -104,27 +104,43 @@
         </span>
           </div>
 
-          <!-- ✅ 파일/이미지 구분 -->
+          <!-- ✅ 드래그 항목 파일/이미지 출력 -->
           <div th:if="${item.filePath}">
+
             <!-- 이미지면 미리보기 -->
             <div th:if="${#strings.endsWith(item.filePath, '.png') or
-                     #strings.endsWith(item.filePath, '.jpg') or
-                     #strings.endsWith(item.filePath, '.jpeg') or
-                     #strings.endsWith(item.filePath, '.gif')}">
+               #strings.endsWith(item.filePath, '.jpg') or
+               #strings.endsWith(item.filePath, '.jpeg') or
+               #strings.endsWith(item.filePath, '.gif')}">
+
+              <!-- 나만의 이력서 파일 경로 -->
               <img th:src="@{'/uploads/resumeFiles/' + ${item.filePath}}"
-                   alt="첨부 이미지" style="width:150px;">
+                   alt="첨부 이미지" style="width:150px; margin-right:10px;">
+
+              <!-- 프로젝트 제출 파일 경로 -->
+              <img th:src="@{'/uploads/projectFiles/' + ${item.filePath}}"
+                   alt="프로젝트 이미지" style="width:150px;">
             </div>
 
             <!-- 그 외 확장자는 다운로드 -->
             <div th:unless="${#strings.endsWith(item.filePath, '.png') or
-                         #strings.endsWith(item.filePath, '.jpg') or
-                         #strings.endsWith(item.filePath, '.jpeg') or
-                         #strings.endsWith(item.filePath, '.gif')}">
+                   #strings.endsWith(item.filePath, '.jpg') or
+                   #strings.endsWith(item.filePath, '.jpeg') or
+                   #strings.endsWith(item.filePath, '.gif')}">
+
+              <!-- 나만의 이력서 파일 -->
               <a th:href="@{'/uploads/resumeFiles/' + ${item.filePath}}" download>
-                📄 <span th:text="${item.filePath}">파일명</span>
+                📄 <span th:text="${item.filePath}">파일명</span> (이력서)
+              </a>
+              <br>
+
+              <!-- 프로젝트 제출 파일 -->
+              <a th:href="@{'/uploads/projectFiles/' + ${item.filePath}}" target="_blank">
+                📁 <span th:text="${item.filePath}">파일명</span> (프로젝트)
               </a>
             </div>
           </div>
+
         </li>
       </ul>
     </div>
