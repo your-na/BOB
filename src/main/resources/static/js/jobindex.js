@@ -101,10 +101,17 @@ document.addEventListener("DOMContentLoaded", function () {
         const modal = document.getElementById('resumeModal');
         const modalTitle = document.getElementById('modal-title');
         const confirmBtn = document.getElementById("confirm-btn");
+        const iframe = document.getElementById('previewFrame'); // 👉 미리보기 iframe 가져오기
         const jobPostId = new URLSearchParams(window.location.search).get("id");
+
+        if (!resumeId) {
+            console.error("⚠️ resumeId가 null 또는 undefined입니다.");
+            return;
+        }
 
         if (modal && modalTitle && confirmBtn) {
             modalTitle.textContent = title;
+            iframe.src = `/myresume/${resumeId}`; // 👉 나만의 이력서 상세페이지 로드
             modal.style.display = 'flex';
             confirmBtn.dataset.resumeTitle = title;
             confirmBtn.dataset.resumeId = resumeId; // ✅ resumeId 추가

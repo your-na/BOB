@@ -75,6 +75,7 @@ public class MyResumeApiController {
         // 📦 최소 정보만 담은 DTO로 변환
         List<MyResumeDto> dtos = resumes.stream()
                 .map(r -> MyResumeDto.builder()
+                        .id(r.getId())
                         .title(r.getTitle())       // 이력서 제목
                         .memberId(r.getMemberId()) // 사용자 ID
                         .build()
