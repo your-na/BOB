@@ -93,6 +93,7 @@ public class UserEntity {
         userEntity.sex = userDTO.getSex();
         userEntity.MainLanguage = userDTO.getMainLanguage();
         userEntity.Birthday = userDTO.getBirthday();
+        userEntity.region = userDTO.getRegion();
         userEntity.nameHanja = userDTO.getNameHanja();
         userEntity.nameEng = userDTO.getNameEng();
         userEntity.profileImageUrl = (userDTO.getProfileImageUrl() != null) ? userDTO.getProfileImageUrl() : "/images/user.png";
