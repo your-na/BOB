@@ -33,35 +33,33 @@ function bindDropToEducationItem(item) {
             const schoolInput = item.querySelector('input[placeholder="학교명"]');
             const majorInput  = item.querySelector('input[placeholder="학과"]');
             const statusInput = item.querySelector('.status-input');
-            const dateGroup   = item.querySelector('.date-group2');
 
-            if (schoolInput) schoolInput.value = data.schoolName || '';
-            if (majorInput)  majorInput.value  = data.majorName  || '';
-            if (statusInput) statusInput.value = data.status     || '';
+            // ✅ 덮어쓰지 말고, 빈칸일 때만 채우기
+            if (schoolInput && !schoolInput.value.trim()) schoolInput.value = data.schoolName || '';
+            if (majorInput  && !majorInput.value.trim())  majorInput.value  = data.majorName  || '';
+            if (statusInput && !statusInput.value.trim()) statusInput.value = data.status     || '';
 
-            // 🔥 payload에서 날짜 가져오기
+            // ✅ 기간 처리 (빈칸일 때만 값 넣기)
             const [sy, sm = ''] = (data.startDate || '').split('-');
             const [ey, em = ''] = (data.endDate   || '').split('-');
 
-            if (dateGroup) {
-                // 새 마크업 대응
-                const ySelects = dateGroup.querySelectorAll('.year-select');
-                const mSelects = dateGroup.querySelectorAll('.month-select');
+            const yInputs = item.querySelectorAll('.year-input');
+            const mInputs = item.querySelectorAll('.month-input');
 
-                if (ySelects.length >= 2) {
-                    if (ySelects[0]) ySelects[0].value = sy || '';
-                    if (ySelects[1]) ySelects[1].value = ey || '';
-                }
-                if (mSelects.length >= 2) {
-                    if (mSelects[0]) mSelects[0].value = sm || '';
-                    if (mSelects[1]) mSelects[1].value = em || '';
+            if (yInputs.length >= 2) {
+                if (!yInputs[0].value) yInputs[0].value = sy || '';
+                if (!yInputs[1].value) yInputs[1].value = ey || '';
+                if (mInputs.length >= 2) {
+                    if (!mInputs[0].value) mInputs[0].value = sm || '';
+                    if (!mInputs[1].value) mInputs[1].value = em || '';
                 }
             }
         } catch (err) {
-            console.error("교육 drop 파싱 오류:", err);
+            console.error("드래그드롭 파싱 오류:", err);
         }
     });
 }
+
 
 // 경력 섹션 드롭 처리
 const section4 = document.getElementById("section4");
@@ -1154,53 +1152,7 @@ function setupLeftDrops() {
     setupDropBox(document.querySelector('#section4 .upload-box'));
     setupDropBox(document.querySelector('#section5 .upload-box'));
 
-    const sec2 = document.getElementById('section2');
-    if (sec2) {
-        sec2.addEventListener('dragover', e => e.preventDefault());
-        sec2.addEventListener('drop', e => {
-            e.preventDefault();
-            const text = e.dataTransfer.getData('application/json');
-            if (!text) return;
-            try {
-                const data = JSON.parse(text);
-                if (data.type !== 'EDUCATION') return;
 
-                const schoolInput = sec2.querySelector('input[placeholder="학교명"]');
-                const majorInput  = sec2.querySelector('input[placeholder="학과"]');
-                const statusInput = sec2.querySelector('.status-input');
-                const dateGroup   = sec2.querySelector('.date-group, .date-group2');
-
-                if (schoolInput) schoolInput.value = data.schoolName || '';
-                if (majorInput)  majorInput.value  = data.majorName  || '';
-                if (statusInput) statusInput.value = data.status     || '';
-
-                const [sy, sm = ''] = (data.startDate || '').split('-');
-                const [ey, em = ''] = (data.endDate   || '').split('-');
-
-                const yInputs = dateGroup ? dateGroup.querySelectorAll('.year-input') : null;
-                const mInputs = dateGroup ? dateGroup.querySelectorAll('.month-input') : null;
-
-                if (yInputs && yInputs.length >= 2) {
-                    if (yInputs[0]) yInputs[0].value = sy || '';
-                    if (yInputs[1]) yInputs[1].value = ey || '';
-                    if (mInputs && mInputs.length >= 2) {
-                        if (mInputs[0]) mInputs[0].value = sm || '';
-                        if (mInputs[1]) mInputs[1].value = em || '';
-                    }
-                } else {
-                    const yearSelects = dateGroup ? dateGroup.querySelectorAll('select') : [];
-                    if (yearSelects[0]) {
-                        populateYearOptions(yearSelects[0], sy);
-                        yearSelects[0].value = sy || yearSelects[0].value;
-                    }
-                    if (yearSelects[1]) {
-                        populateYearOptions(yearSelects[1], ey);
-                        yearSelects[1].value = ey || yearSelects[1].value;
-                    }
-                }
-            } catch {}
-        });
-    }
 }
 
 /***********************
