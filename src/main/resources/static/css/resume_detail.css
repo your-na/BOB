@@ -162,3 +162,52 @@
     border: 1px solid #ccc;
     border-radius: 8px;
 }
+
+/* 공통 표 스타일 */
+.resume-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    font-size: 14px;
+    background-color: #fff;
+}
+
+/* 테이블 헤더 */
+.resume-table th {
+    background-color: #f4f4f4;
+    color: #333;
+    font-weight: bold;
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+/* 테이블 셀 */
+.resume-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    color: #444;
+    vertical-align: middle;
+}
+
+/* 줄무늬 효과 (가독성 향상) */
+.resume-table tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+/* 마우스 오버 효과 */
+.resume-table tbody tr:hover {
+    background-color: #f0f8ff;
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* 파일 링크 꾸미기 */
+.resume-table a {
+    color: #0066cc;
+    text-decoration: none;
+}
+
+.resume-table a:hover {
+    text-decoration: underline;
+}

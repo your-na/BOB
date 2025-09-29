@@ -1013,8 +1013,12 @@ document.addEventListener("click", function (e) {
     });
 })();
 
+    // OCR 완료 후 값 반영 시
+    document.querySelector(".contest-org").value = recognizedOrg;
+    document.querySelector(".contest-org").readOnly = true;
 
-
+    document.querySelector(".contest-grade").value = recognizedGrade;
+    document.querySelector(".contest-grade").readOnly = true;
 
 
 

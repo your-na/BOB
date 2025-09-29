@@ -90,6 +90,15 @@
     });
   });
 
+  const editButtons = document.querySelectorAll(".edit-btn");
+  editButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const resumeId = btn.getAttribute("data-id");
+      if (resumeId) {
+        window.location.href = `/myresume/edit/${resumeId}`;
+      }
+    });
+  });
 
 </script>
 

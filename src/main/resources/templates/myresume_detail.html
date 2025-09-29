@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>나만의 이력서 상세보기</title>
@@ -10,24 +9,18 @@
 <body>
 
 <!-- ✅ 헤더 삽입 -->
-<!-- 기업 사용자면 header2 삽입 -->
 <div sec:authorize="hasAuthority('COMPANY')">
   <div th:insert="~{header2 :: header}"></div>
 </div>
-
-<!-- 그 외 사용자나 비로그인 사용자는 기본 header 삽입 -->
 <div sec:authorize="!hasAuthority('COMPANY')">
   <div th:insert="~{header :: header}"></div>
 </div>
-
 
 <div class="resume-detail-container">
 
   <!-- ✅ 오른쪽 상단 버튼 -->
   <div class="resume-buttons">
     <button id="downloadBtn">다운받기</button>
-
-    <!-- 기업 사용자에게만 보이게 -->
     <div sec:authorize="hasAuthority('COMPANY')">
       <button type="button" class="nonpass-btn">❎ 불합격 처리</button>
       <button type="button" class="pass-btn">✅ 합격 처리</button>
@@ -48,9 +41,6 @@
     </div>
   </div>
 
-
-
-
   <!-- ✅ 사용자 프로필 정보 -->
   <div class="profile-row">
     <div class="photo-wrapper">
@@ -58,279 +48,170 @@
     </div>
     <div class="profile-info">
       <div class="name-skill">
-        <strong th:text="${resume.userName}">사용자 이름</strong>
-        <span class="skill" th:text="${resume.mainLanguage}">기술</span>
+        <strong th:text="${resume.userName}"></strong>
+        <span class="skill" th:text="${resume.mainLanguage}"></span>
       </div>
       <div class="info-table">
-        <div><strong>성별</strong> <span th:text="${resume.sex}">성별</span></div>
+        <div><strong>성별</strong> <span th:text="${resume.sex}"></span></div>
         <div><strong>생년월일</strong>
-          <span th:text="${resume.birthday}">YYYY-MM-DD</span>
-          (<span th:text="${resume.age}">나이</span>)
+          <span th:text="${resume.birthday}"></span>
+          (<span th:text="${resume.age}"></span>)
         </div>
-        <div><strong>전화번호</strong> <span th:text="${resume.userPhone}">전화번호</span></div>
-        <div><strong>이메일</strong> <span th:text="${resume.userEmail}">이메일</span></div>
-        <div><strong>주소</strong> <span th:text="${resume.region}">주소</span></div>
+        <div><strong>전화번호</strong> <span th:text="${resume.userPhone}"></span></div>
+        <div><strong>이메일</strong> <span th:text="${resume.userEmail}"></span></div>
+        <div><strong>주소</strong> <span th:text="${resume.region}"></span></div>
         <div><strong>한문 이름</strong> <span th:text="${resume.nameHanja}"></span></div>
         <div><strong>영문 이름</strong> <span th:text="${resume.nameEng}"></span></div>
-
-
       </div>
     </div>
   </div>
 
-  <!-- ✅ 섹션 반복 -->
-  <div th:each="section : ${resume.sections}" class="info-section">
+  <!-- ✅ 섹션 반복 (교체) -->
+  <div th:each="section : ${resume.sections}" class="info-section"
+       th:with="title=${#strings.trim(section.title)}">
 
     <!-- 섹션 제목 -->
-    <h3 th:text="${section.title}">섹션 제목</h3>
+    <h3 th:text="${title}"></h3>
 
-    <!-- 설명 -->
-    <p th:if="${section.comment}" th:text="${section.comment}">설명</p>
-
-    <!-- ✅ 본문(내용) 공통 출력 -->
-    <div th:if="${section.content != null and section.content != ''}">
-      <p th:text="${section.content}"></p>
+    <!-- ✅ 학력사항 표 -->
+    <div th:if="${title == '학력사항'}">
+      <table class="resume-table">
+        <thead>
+        <tr>
+          <th>학교</th>
+          <th>학과</th>
+          <th>상태</th>
+          <th>기간</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- dragItems가 있을 때 -->
+        <tr th:each="item : ${section.dragItems}" th:if="${not #lists.isEmpty(section.dragItems)}">
+          <!-- schoolName이 없으면 workplace로 대체 -->
+          <td th:text="${item.schoolName != null ? item.schoolName : item.workplace}"></td>
+          <!-- major가 없으면 jobTitle로 대체 -->
+          <td th:text="${item.major != null ? item.major : item.jobTitle}"></td>
+          <td th:text="${item.status}"></td>
+          <td>
+            <span th:text="${item.startDate}"></span> ~
+            <span th:text="${item.endDate}"></span>
+          </td>
+        </tr>
+        <!-- dragItems가 비어 있으면 content로 대체 렌더링 -->
+        <tr th:if="${#lists.isEmpty(section.dragItems)}">
+          <td colspan="4" th:text="${section.content != null ? section.content : '등록된 학력사항이 없습니다.'}"></td>
+        </tr>
+        </tbody>
+      </table>
     </div>
 
-
-    <!-- ✅ 드래그 항목 리스트 -->
-    <div th:if="${not #lists.isEmpty(section.dragItems)}">
-      <ul>
-        <li th:each="item : ${section.dragItems}" style="margin-bottom: 1em;">
-          <div>
-            <strong th:text="${item.workplace}">근무지</strong>
-            <span th:if="${item.jobTitle != null}" style="margin-left: 10px; color:#555;">
-    (직무: <span th:text="${item.jobTitle}"></span>)
-  </span>
-            <span th:if="${item.status != null}" style="margin-left: 10px; color:#777;">
-  (상태: <span th:text="${item.status}"></span>)
-</span>
-
-            <span th:if="${item.startDate != null and item.endDate != null}" style="float:right; color:#888;">
-  (<span th:text="${item.startDate}"></span> ~ <span th:text="${item.endDate}"></span>
-   / <span th:text="${item.periodMonths}"></span>개월)
-</span>
-          </div>
-
-
-          <!-- ✅ 드래그 항목 파일/이미지 출력 -->
-          <div th:if="${item.filePath}">
-
-            <!-- 이미지면 미리보기 -->
-            <div th:if="${#strings.endsWith(item.filePath, '.png') or
-               #strings.endsWith(item.filePath, '.jpg') or
-               #strings.endsWith(item.filePath, '.jpeg') or
-               #strings.endsWith(item.filePath, '.gif')}">
-
-              <!-- 나만의 이력서 파일 경로 -->
-              <img th:src="@{'/uploads/resumeFiles/' + ${item.filePath}}"
-                   alt="첨부 이미지" style="width:150px; margin-right:10px;">
-
-              <!-- 프로젝트 제출 파일 경로 -->
-              <img th:src="@{'/uploads/projectFiles/' + ${item.filePath}}"
-                   alt="프로젝트 이미지" style="width:150px;">
-            </div>
-
-            <!-- 그 외 확장자는 다운로드 -->
-            <div th:unless="${#strings.endsWith(item.filePath, '.png') or
-                   #strings.endsWith(item.filePath, '.jpg') or
-                   #strings.endsWith(item.filePath, '.jpeg') or
-                   #strings.endsWith(item.filePath, '.gif')}">
-
-              <!-- 나만의 이력서 파일 -->
-              <a th:href="@{'/uploads/resumeFiles/' + ${item.filePath}}" download>
-                📄 <span th:text="${item.filePath}">파일명</span> (이력서)
-              </a>
-              <br>
-
-              <!-- 프로젝트 제출 파일 -->
-              <a th:href="@{'/uploads/projectFiles/' + ${item.filePath}}" target="_blank">
-                📁 <span th:text="${item.filePath}">파일명</span> (프로젝트)
-              </a>
-            </div>
-          </div>
-
-        </li>
-      </ul>
+    <!-- ✅ 경력사항 표 -->
+    <div th:if="${title == '경력사항'}">
+      <table class="resume-table">
+        <thead>
+        <tr>
+          <th>근무지</th>
+          <th>직무</th>
+          <th>상태</th>
+          <th>기간</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${section.dragItems}" th:if="${not #lists.isEmpty(section.dragItems)}">
+          <td th:text="${item.workplace}"></td>
+          <td th:text="${item.jobTitle}"></td>
+          <td th:text="${item.status}"></td>
+          <td>
+            <span th:text="${item.startDate}"></span> ~
+            <span th:text="${item.endDate}"></span>
+            (<span th:text="${item.periodMonths}"></span>개월)
+          </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(section.dragItems)}">
+          <td colspan="4" th:text="${section.content != null ? section.content : '등록된 경력사항이 없습니다.'}"></td>
+        </tr>
+        </tbody>
+      </table>
     </div>
 
+    <!-- ✅ 포트폴리오 표 -->
+    <div th:if="${title == '포트폴리오'}">
+      <table class="resume-table">
+        <thead>
+        <tr>
+          <th>파일명</th>
+          <th>구분</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- fileNames가 있을 때 -->
+        <tr th:each="file : ${section.fileNames}" th:if="${section.fileNames != null and !section.fileNames.isEmpty()}">
+          <td>
+            <a th:href="@{'/uploads/resumeFiles/' + ${file}}" download>
+              <span th:text="${file}"></span>
+            </a>
+          </td>
+          <td>이력서</td>
+        </tr>
+        <!-- fileNames가 비면 dragItems의 filePath로 대체 -->
+        <tr th:each="item : ${section.dragItems}"
+            th:if="${(section.fileNames == null or section.fileNames.isEmpty()) and not #lists.isEmpty(section.dragItems) and item.filePath != null}">
+          <td>
+            <a th:href="@{'/uploads/resumeFiles/' + ${item.filePath}}" download>
+              <span th:text="${item.filePath}"></span>
+            </a>
+          </td>
+          <td th:text="${item.jobTitle != null ? item.jobTitle : '포트폴리오'}"></td>
+        </tr>
+        <!-- 둘 다 없으면 content 또는 안내 -->
+        <tr th:if="${(section.fileNames == null or section.fileNames.isEmpty()) and #lists.isEmpty(section.dragItems)}">
+          <td colspan="2" th:text="${section.content != null ? section.content : '등록된 포트폴리오가 없습니다.'}"></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
 
-    <!-- ✅ 내용 -->
-    <div th:if="${section.content != null and section.content != ''}">
+    <!-- ✅ 기타 섹션만 textarea 출력 -->
+    <div th:if="${section.content != null and section.content != ''
+               and title != '학력사항' and title != '경력사항' and title != '포트폴리오'}">
       <textarea readonly th:text="${section.content}"></textarea>
     </div>
 
-    <!-- ✅ 조건 태그 -->
+    <!-- ✅ 조건/태그/첨부는 기존대로 -->
     <div th:if="${section.conditions != null and !section.conditions.isEmpty()}">
       <strong>조건:</strong>
-      <span th:each="cond : ${section.conditions}" class="tag" th:text="${cond}">조건</span>
+      <span th:each="cond : ${section.conditions}" class="tag" th:text="${cond}"></span>
     </div>
 
-    <!-- ✅ 선택 태그 -->
     <div th:if="${section.tags != null and !section.tags.isEmpty()}">
       <strong>태그:</strong>
-      <span th:each="tag : ${section.tags}" class="tag" th:text="${tag}">태그</span>
+      <span th:each="tag : ${section.tags}" class="tag" th:text="${tag}"></span>
     </div>
 
-    <!-- ✅ 사진 첨부 -->
-    <div th:if="${section.fileNames != null and !section.fileNames.isEmpty() and section.type?.trim() == '사진 첨부'}">
+    <div th:if="${section.fileNames != null and !section.fileNames.isEmpty() and #strings.trim(section.type) == '사진 첨부'}">
       <div class="image-preview" th:each="img : ${section.fileNames}">
         <img th:src="@{'/uploads/resumeFiles/' + ${img}}" alt="첨부 이미지" style="width: 150px;">
       </div>
     </div>
 
-    <!-- ✅ 파일 첨부 -->
-    <div th:if="${section.fileNames != null and !section.fileNames.isEmpty() and section.type?.trim() == '파일 첨부'}" class="attachments">
+    <div th:if="${section.fileNames != null and !section.fileNames.isEmpty() and #strings.trim(section.type) == '파일 첨부'}" class="attachments">
       <div class="file-download" th:each="file : ${section.fileNames}">
         <a th:href="@{'/uploads/resumeFiles/' + ${file}}" download>
-          📄 <span th:text="${file}">파일명</span> 다운로드
+          📄 <span th:text="${file}"></span> 다운로드
         </a>
       </div>
     </div>
+  </div>
 
-  </div> <!-- end of section -->
+
+</div> <!-- end of section -->
 
 </div> <!-- end of container -->
 
-<!-- ✅ 기존 JS -->
-<script>
-  // 일반회원 정보 섹션 숨기기
-  document.addEventListener("DOMContentLoaded", () => {
-    const sections = document.querySelectorAll(".info-section");
-
-    sections.forEach((section, index) => {
-      const titleEl = section.querySelector("h3");
-      if (!titleEl) return;
-
-      const rawTitle = titleEl.textContent;
-      const normalized = rawTitle.trim().replace(/\s+/g, "").toLowerCase();
-
-      if (normalized === "일반회원정보") {
-        section.style.display = "none";
-      }
-    });
-  });
-
-  // 섹션 순서 정렬
-  document.addEventListener("DOMContentLoaded", () => {
-    const container = document.querySelector(".resume-detail-container");
-    const order = ["일반회원정보", "학력사항", "경력사항", "포트폴리오", "자기소개"];
-
-    order.forEach(title => {
-      const section = [...document.querySelectorAll(".info-section")]
-              .find(sec => sec.querySelector("h3")?.textContent.trim() === title);
-      if (section) container.appendChild(section);
-    });
-  });
-</script>
-
-<!-- ✅ PDF 변환 라이브러리 -->
+<!-- ✅ JS 외부 파일 연결 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<!-- ✅ 다운로드 버튼 기능 -->
-<script>
-  document.getElementById("downloadBtn").addEventListener("click", () => {
-    const { jsPDF } = window.jspdf;
-    const resume = document.querySelector(".resume-detail-container");
-
-    html2canvas(resume, { scale: 2 }).then(canvas => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      const imgWidth = pageWidth;
-      const imgHeight = canvas.height * pageWidth / canvas.width;
-
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      pdf.save("이력서.pdf");
-    });
-  });
-</script>
-
-<!-- ✅ 합격/불합격 처리 기능 -->
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const jobPostId = new URLSearchParams(location.search).get("jobPostId");
-    const pathParts = window.location.pathname.split("/");
-    const resumeId = pathParts[pathParts.length - 1];
-    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
-
-    // ❎ 불합격 처리
-    const nonpassBtn = document.querySelector(".nonpass-btn");
-    if (nonpassBtn) {
-      nonpassBtn.addEventListener("click", () => {
-        if (!confirm("정말 이 지원자를 불합격 처리하시겠습니까?")) return;
-
-        fetch("/api/applications/job/reject-myresume", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            [csrfHeader]: csrfToken
-          },
-          body: JSON.stringify({
-            jobPostId,
-            myResumeId: resumeId,
-            message: ""   // ✅ 빈 문자열로 고정
-          })
-        })
-                .then(res => res.ok ? res.json() : res.text().then(msg => { throw new Error(msg); }))
-                .then(data => alert("❎ " + data.message))
-                .catch(err => alert("⚠️ 불합격 처리 실패: " + err.message));
-      });
-    }
-
-
-    // ✅ 합격 처리
-    const passBtn = document.querySelector(".pass-btn");
-    const passModal = document.getElementById("passModal");
-    const submitPassBtn = document.getElementById("submitPassBtn");
-
-    if (passBtn && passModal) {
-      passBtn.addEventListener("click", () => {
-        passModal.style.display = "block";
-      });
-
-      submitPassBtn?.addEventListener("click", () => {
-        const message = document.getElementById("passMessage").value.trim();
-        if (!message) {
-          alert("메시지를 입력해 주세요.");
-          return;
-        }
-
-        fetch("/api/applications/job/pass-myresume", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            [csrfHeader]: csrfToken
-          },
-          body: JSON.stringify({ jobPostId, myResumeId: resumeId, message })
-        })
-                .then(res => res.ok ? res.json() : res.text().then(msg => { throw new Error(msg); }))
-                .then(data => {
-                  alert("✅ " + data.message);
-                  passModal.style.display = "none";
-                })
-                .catch(err => alert("⚠️ 합격 처리 실패: " + err.message));
-      });
-    }
-  });
-</script>
+<script src="/js/myresume_detail.js"></script>
 
 </body>
 </html>
