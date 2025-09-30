@@ -7,7 +7,7 @@ public record ContestTeamSimpleDTO(Long id, String teamName, String contestTitle
         return new ContestTeamSimpleDTO(
                 entity.getId(),
                 entity.getTeamName(),
-                entity.getContest().getTitle()  // ✅ 공모전 제목 추가
+                entity.getContest().getTitle()
         );
     }
 }

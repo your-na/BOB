@@ -168,17 +168,4 @@ public class SpaceController {
         return "todo_wbs2"; // 공모전 전용 WBS HTML
     }
 
-
-    @GetMapping("/todocrud/{id}")
-    public String redirectToCorrectWbs(@PathVariable Long id) {
-        if (projectService.findById(id).isPresent()) {
-            return "redirect:/todocrud/project/" + id;
-        } else if (contestTeamRepository.existsById(id)) {
-            return "redirect:/todocrud/contest/" + id;
-        } else {
-            throw new IllegalArgumentException("❌ 유효하지 않은 ID입니다: " + id);
-        }
-    }
-
-
 }

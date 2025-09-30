@@ -113,18 +113,21 @@ public class TodoController {
     }
 
     @GetMapping("/my-contest-teams")
-    public ResponseEntity<List<ContestTeamSimpleDTO>> getMyContestTeams(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<List<ContestTeamSimpleDTO>> getMyContestTeams(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         UserEntity user = userDetails.getUserEntity();
         List<ContestTeamEntity> teams = new ArrayList<>();
         teams.addAll(contestTeamService.getContestsLedByUser(user));
         teams.addAll(contestTeamService.getContestsJoinedByUser(user));
 
+        // ✅ 진행중인 팀만 필터링
         List<ContestTeamSimpleDTO> dtoList = teams.stream()
                 .map(ContestTeamSimpleDTO::from)
                 .toList();
 
         return ResponseEntity.ok(dtoList);
     }
+
 
     @GetMapping("/members")
     public ResponseEntity<?> getWorkspaceMembers(@RequestParam String workspace,
@@ -164,12 +167,19 @@ public class TodoController {
     }
 
     @GetMapping("/my-projects")
-    public ResponseEntity<List<ProjectDTO>> getMyProjects(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<List<ProjectDTO>> getMyProjects(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         UserEntity user = userDetails.getUserEntity();
         List<ProjectDTO> created = projectService.getCreatedProjects(user);
         List<ProjectDTO> joined = projectService.getJoinedProjects(user);
-        created.addAll(joined);
-        return ResponseEntity.ok(created);
-    }
 
+        created.addAll(joined);
+
+        // ✅ 진행중인 프로젝트만 반환
+        List<ProjectDTO> filtered = created.stream()
+                .filter(proj -> "진행중".equals(proj.getStatus()))
+                .toList();
+
+        return ResponseEntity.ok(filtered);
+    }
 }
