@@ -98,8 +98,11 @@
           </td>
         </tr>
         <!-- dragItems가 비어 있으면 content로 대체 렌더링 -->
-        <tr th:if="${#lists.isEmpty(section.dragItems)}">
-          <td colspan="4" th:text="${section.content != null ? section.content : '등록된 학력사항이 없습니다.'}"></td>
+        <tr th:if="${#lists.isEmpty(section.dragItems)} and ${section.content != null}">
+          <td th:text="${#strings.arraySplit(section.content, '/')[0]?.replace('학교:', '').trim()}"></td>
+          <td th:text="${#strings.arraySplit(section.content, '/')[1]?.replace('학과:', '').trim()}"></td>
+          <td th:text="${#strings.arraySplit(section.content, '/')[2]?.replace('상태:', '').trim()}"></td>
+          <td th:text="${#strings.arraySplit(section.content, '/')[3]?.replace('기간:', '').trim()}"></td>
         </tr>
         </tbody>
       </table>
