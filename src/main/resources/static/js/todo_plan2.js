@@ -23,7 +23,11 @@ document.addEventListener("DOMContentLoaded", function () {
             if (text === "홈") {
                 window.location.href = `/contesthome/${teamId}`;
             } else if (text === "WBS") {
+<<<<<<< HEAD
                 window.location.href = `/todocrud//contest/${teamId}`;
+=======
+                window.location.href = `/todocrud/contest/${teamId}`;
+>>>>>>> kbw
             }
         });
     });
