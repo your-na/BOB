@@ -1155,11 +1155,21 @@ document.addEventListener("DOMContentLoaded", () => {
  ***********************/
 function bindTabs() {
     document.querySelectorAll('#tab-list .tab').forEach(tab => {
+        // 도움말 툴팁 추가
+        tab.setAttribute("title", "더블클릭 시 경력 내역 페이지로 이동합니다.");
+
+        // 기본: 클릭하면 탭 활성화
         tab.addEventListener('click', () => {
             activateTab(tab.dataset.tab);
         });
+
+        // 추가: 더블클릭하면 /resumehistory 이동
+        tab.addEventListener('dblclick', () => {
+            window.location.href = "/resumehistory";
+        });
     });
 }
+
 
 /***********************
  * 페이지 초기화
