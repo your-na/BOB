@@ -21,6 +21,7 @@ public class    TodoService {
     private final TodoRepository todoRepository;
     private final Logger logger = LoggerFactory.getLogger(TodoService.class);
     private final ProjectService projectService;
+    private final ContestTeamService contestTeamService;
 
     // 할 일 저장 메서드
     public TodoEntity save(TodoRequestDto dto, UserEntity user, boolean isHost) {
@@ -28,7 +29,8 @@ public class    TodoService {
                 dto.getAssignee(),
                 dto.getWorkspace(),
                 user.getUserNick(),
-                isHost
+                isHost,
+                null
         );
 
         TodoEntity todo = TodoEntity.builder()
@@ -87,16 +89,32 @@ public class    TodoService {
     }
 
     // 담당자 처리 메서드
-    private String resolveAssignee(String selectedAssignee, String workspace, String currentUserNick, boolean isHost) {
+    private String resolveAssignee(String selectedAssignee,
+                                   String workspace,
+                                   String currentUserNick,
+                                   boolean isHost,
+                                   ContestTeamEntity contestTeam) {
         if (!isHost) {
             return currentUserNick;
         }
 
         if ("공동".equals(selectedAssignee)) {
-            List<String> allNicknames = projectService.getProjectMemberNicknames(workspace);
-            if (!allNicknames.contains(currentUserNick)) {
-                allNicknames.add(currentUserNick);
+            List<String> allNicknames;
+
+            if (contestTeam != null) {
+                // ✅ 공모전 팀원 목록
+                allNicknames = contestTeamService.getAcceptedMemberNicks(contestTeam);
+                if (!allNicknames.contains(contestTeam.getCreatedBy())) {
+                    allNicknames.add(contestTeam.getCreatedBy());
+                }
+            } else {
+                // ✅ 프로젝트 팀원 목록
+                allNicknames = projectService.getProjectMemberNicknames(workspace);
+                if (!allNicknames.contains(currentUserNick)) {
+                    allNicknames.add(currentUserNick);
+                }
             }
+
             return String.join(",", allNicknames);
         } else if ("나".equals(selectedAssignee)) {
             return currentUserNick;
@@ -104,6 +122,7 @@ public class    TodoService {
             return selectedAssignee;
         }
     }
+
 
     // workspace 값에 따라 type을 설정하는 메서드
     private String resolveType(String workspace) {
@@ -130,7 +149,8 @@ public class    TodoService {
                 dto.getAssignee(),
                 dto.getWorkspace(),
                 user.getUserNick(),
-                isHost
+                isHost,
+                team
         );
 
         TodoEntity todo = TodoEntity.builder()

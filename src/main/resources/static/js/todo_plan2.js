@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (text === "홈") {
                 window.location.href = `/contesthome/${teamId}`;
             } else if (text === "WBS") {
-                window.location.href = `/todocrud/${teamId}`;
+                window.location.href = `/todocrud//contest/${teamId}`;
             }
         });
     });
@@ -184,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
             type: selected === "개인" ? "개인" : (
                 selectedGroupLabel === "공모전 팀" ? "공모전" : "프로젝트"
             ),
-            targetId: selectedGroupLabel === "공모전 팀" ? window.teamId : null
+            targetId: selectedGroupLabel === "공모전 팀" ? selectedOption.dataset.teamId : null
         };
 
         fetch("/api/todos", {
@@ -234,6 +234,7 @@ function loadTeamSpaces() {
                     const option = document.createElement("option");
                     option.value = team.teamName;
                     option.textContent = team.contestTitle;
+                    option.dataset.teamId = team.id;
                     group.appendChild(option);
                 });
                 spaceSelect.appendChild(group);
