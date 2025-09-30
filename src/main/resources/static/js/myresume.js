@@ -1,6 +1,21 @@
 /***********************
  * 공통 유틸
  ***********************/
+// 안내 문구 삽입 함수
+function appendEditHint(container) {
+    if (!container) return;
+    if (!container.querySelector(".edit-hint")) {
+        const hint = document.createElement("p");
+        hint.className = "edit-hint";
+        hint.textContent = "※ 드래그 전, 항목을 더블클릭하면 수정할 수 있습니다.";
+        hint.style.fontSize = "11px";
+        hint.style.color = "#777";
+        hint.style.margin = "6px 0";
+        hint.style.textAlign = "left";
+        container.prepend(hint); // 항상 맨 위에 표시
+    }
+}
+
 
 function normalizeDate(date) {
     return date && date.length === 7 ? date + "-01" : date;
@@ -903,6 +918,9 @@ function makeDraggable(div, payload) {
     });
 }
 
+/***********************
+ * 프로젝트/공모전 카드 렌더링
+ ***********************/
 function renderProjects() {
     return fetch('/api/user/resumes/projects')
         .then(res => res.json())
@@ -916,13 +934,22 @@ function renderProjects() {
                 const d = document.createElement('div');
                 d.className = 'award-item';
                 d.innerHTML = `${p.title}<br><small>${p.submittedDate || ''}</small>`;
-                makeDraggable(d, {
-                    id: p.id, type: 'PROJECT',
+                // ✅ dataset 보강
+                Object.assign(d.dataset, {
+                    type: 'PROJECT',
+                    id: p.id,
+                    title: p.title || "",
+                    desc: p.desc || "",
                     file: (p.filePath || '').replace(/^\/?download\//, ''),
-                    title: p.title, startDate: p.startDate || '', endDate: p.endDate || ''
+                    startDate: p.startDate || "",
+                    endDate: p.endDate || ""
                 });
+                makeDraggable(d, d.dataset);
                 cont.appendChild(d);
             });
+
+            // 안내 문구 추가
+            appendEditHint(cont);
         })
         .catch(err => console.error('프로젝트 로드 실패:', err));
 }
@@ -944,25 +971,26 @@ function renderJobs() {
                 const d = document.createElement('div');
                 d.className = 'award-item';
                 d.innerHTML = `${it.workplace || '직무 없음'}<br><small>${period}</small>`;
-                makeDraggable(d, {
-                    id: it.id,
+                // ✅ dataset 보강
+                Object.assign(d.dataset, {
                     type: 'JOB',
-                    workplace: it.workplace || '',
-                    jobTitle: it.jobTitle || '',   // ✅ 추가
-                    startDate: it.startDate,
-                    endDate: it.endDate,
-                    status: it.status
+                    id: it.id,
+                    workplace: it.workplace || "",
+                    jobTitle: it.jobTitle || "",
+                    status: it.status || "",
+                    startDate: it.startDate || "",
+                    endDate: it.endDate || ""
                 });
-
+                makeDraggable(d, d.dataset);
                 cont.appendChild(d);
             });
+
+            // 안내 문구 추가
+            appendEditHint(cont);
         })
         .catch(err => console.error('구직 이력 로드 실패:', err));
 }
 
-/***********************
- * 학력 탭 렌더링 (상태=텍스트, 연/월 input)
- ***********************/
 function renderEducations() {
     return fetch('/api/education-history/list')
         .then(res => res.json())
@@ -971,7 +999,6 @@ function renderEducations() {
             if (!cont) return;
             cont.innerHTML = '';
 
-            // 기존 학력 데이터
             if (list && list.length > 0) {
                 list.forEach(edu => {
                     const fmt = d => d?.replace(/-/g, '.');
@@ -986,31 +1013,33 @@ function renderEducations() {
                     const d = document.createElement('div');
                     d.className = 'award-item';
                     d.innerHTML = `${edu.schoolName}<br><small>${line2}</small>`;
-                    makeDraggable(d, {
+                    // ✅ dataset 보강
+                    Object.assign(d.dataset, {
                         type: 'EDUCATION',
-                        schoolName: edu.schoolName,
-                        majorName: edu.majorName,
-                        status: edu.status,
-                        startDate: edu.startDate,
-                        endDate: edu.endDate
+                        schoolName: edu.schoolName || "",
+                        majorName: edu.majorName || "",
+                        status: edu.status || "",
+                        startDate: edu.startDate || "",
+                        endDate: edu.endDate || ""
                     });
+                    makeDraggable(d, d.dataset);
                     cont.appendChild(d);
                 });
+
+                // 안내 문구 추가
+                appendEditHint(cont);
             }
 
-            // 추가 버튼
+            // ➕ 버튼 그대로 유지
             const addBtn = document.createElement('button');
             addBtn.className = 'add-school-btn';
             addBtn.textContent = '＋';
-
-            // 버튼 래퍼
             const addBtnWrapper = document.createElement('div');
             addBtnWrapper.style.display = 'flex';
             addBtnWrapper.style.justifyContent = 'center';
             addBtnWrapper.appendChild(addBtn);
             cont.appendChild(addBtnWrapper);
 
-            // 클릭 시 인라인 입력칸
             addBtn.onclick = () => {
                 const eduBox = document.createElement('div');
                 eduBox.className = 'award-item editable';
@@ -1022,114 +1051,45 @@ function renderEducations() {
                         <option value="재학">재학</option>
                         <option value="졸업">졸업</option>
                         <option value="휴학">휴학</option>
-                        
-                        
                         <option value="중퇴">중퇴</option>
                     </select>
                     <div class="date-group2">
-                      <!-- 시작 연도 -->
-                      <div class="date-item">
-                        <input class="year-select" placeholder="YYYY" maxlength="4"/>
-                        <select class="month-select">
-                          <option value="">월</option>
-                          <option value="01">1</option>
-                          <option value="02">2</option>
-                          <option value="03">3</option>
-                          <option value="04">4</option>
-                          <option value="05">5</option>
-                          <option value="06">6</option>
-                          <option value="07">7</option>
-                          <option value="08">8</option>
-                          <option value="09">9</option>
-                          <option value="10">10</option>
-                          <option value="11">11</option>
-                          <option value="12">12</option>
-                        </select>
-                        
-                        <div class="tilde">~</div>
-                      </div>
-                    
-
-                    
-                      <!-- 종료 연도 -->
-                      <div class="date-item2">
-                        <input class="year-select" placeholder="YYYY" maxlength="4"/>
-                        <select class="month-select">
-                          <option value="">월</option>
-                          <option value="01">1</option>
-                          <option value="02">2</option>
-                          <option value="03">3</option>
-                          <option value="04">4</option>
-                          <option value="05">5</option>
-                          <option value="06">6</option>
-                          <option value="07">7</option>
-                          <option value="08">8</option>
-                          <option value="09">9</option>
-                          <option value="10">10</option>
-                          <option value="11">11</option>
-                          <option value="12">12</option>
-                        </select>
-                      </div>
+                        <input type="month" class="start-date">
+                        ~
+                        <input type="month" class="end-date">
                     </div>
-
                 `;
 
-                // Enter → 확정
                 eduBox.addEventListener("keydown", (e) => {
                     if (e.key === "Enter") {
                         e.preventDefault();
-
                         const school = eduBox.querySelector(".school-input").value.trim();
-                        const major  = eduBox.querySelector(".major-input").value.trim();
-                        const status = eduBox.querySelector(".status-input").value.trim();
-                        // 시작 연도/월
-                        const sy = eduBox.querySelector(".year-input, .year-select")?.value || '';
-                        const sm = eduBox.querySelector(".month-input, .month-select")?.value || '';
-
-                        // 종료 연도/월
-                        const ey = eduBox.querySelectorAll(".year-input, .year-select")?.[1]?.value || '';
-                        const em = eduBox.querySelectorAll(".month-input, .month-select")?.[1]?.value || '';
-
-                        const startYear = [sy, sm].filter(Boolean).join('-');
-                        const endYear   = [ey, em].filter(Boolean).join('-');
-
+                        const major = eduBox.querySelector(".major-input").value.trim();
+                        const status = eduBox.querySelector(".status-input").value;
+                        const start = eduBox.querySelector(".start-date").value;
+                        const end = eduBox.querySelector(".end-date").value;
 
                         if (!school) {
                             alert("학교명을 입력하세요!");
                             return;
                         }
 
-                        let dateText = "";
-                        if (startYear && endYear) {
-                            dateText = `${startYear.replace(/-/g, '.')} ~ ${endYear.replace(/-/g, '.')}`;
-                        } else if (startYear) {
-                            dateText = `${startYear.replace(/-/g, '.')} ~`;
-                        } else if (endYear) {
-                            dateText = `~ ${endYear.replace(/-/g, '.')}`;
-                        }
-
                         let line2 = "";
-                        if (status === "재학") {
-                            line2 = `재학 ${dateText} 학과 ${major}`;
-                        } else if (status === "졸업") {
-                            line2 = `졸업 ${dateText} 학과 ${major}`;
-                        } else if (status) {
-                            line2 = `${status} ${dateText} 학과 ${major}`;
-                        } else {
-                            line2 = `${dateText} 학과 ${major}`;
-                        }
-
+                        if (status === "재학") line2 = `재학 ${start} ~ 학과 ${major}`;
+                        else if (status === "졸업") line2 = `졸업 ${start} ~ ${end} 학과 ${major}`;
+                        else line2 = `${status} ${start} ~ ${end} 학과 ${major}`;
 
                         eduBox.className = "award-item";
                         eduBox.innerHTML = `${school}<br><small>${line2}</small>`;
-                        makeDraggable(eduBox, {
-                            type: 'EDUCATION',
+                        Object.assign(eduBox.dataset, {
+                            type: "EDUCATION",
                             schoolName: school,
                             majorName: major,
                             status: status,
-                            startDate: startYear,
-                            endDate: endYear
+                            startDate: start,
+                            endDate: end
                         });
+                        makeDraggable(eduBox, eduBox.dataset);
                     }
                 });
 
@@ -1139,9 +1099,6 @@ function renderEducations() {
         .catch(err => console.error('학력 로드 실패:', err));
 }
 
-/***********************
- * 공모전 → 포폴에 같이 표시(선택)
- ***********************/
 function renderContestsIntoPortfolio() {
     return fetch('/api/user/resumes/contests')
         .then(res => res.json())
@@ -1152,12 +1109,22 @@ function renderContestsIntoPortfolio() {
                 const d = document.createElement('div');
                 d.className = 'award-item';
                 d.innerHTML = `${c.title}<br><small>${c.date || ''}</small>`;
-                makeDraggable(d, { id: c.id, type: 'CONTEST', file: c.filePath || '', title: c.title });
+                // ✅ dataset 보강
+                Object.assign(d.dataset, {
+                    type: 'CONTEST',
+                    id: c.id,
+                    title: c.title || "",
+                    file: c.filePath || "",
+                    startDate: c.startDate || "",
+                    endDate: c.endDate || ""
+                });
+                makeDraggable(d, d.dataset);
                 cont.appendChild(d);
             });
         })
         .catch(err => console.error('공모전 로드 실패:', err));
 }
+
 
 // ✅ 개월 수 계산 함수 (맨 위에 추가)
 function calcMonths(startDate, endDate) {
@@ -1188,11 +1155,21 @@ document.addEventListener("DOMContentLoaded", () => {
  ***********************/
 function bindTabs() {
     document.querySelectorAll('#tab-list .tab').forEach(tab => {
+        // 도움말 툴팁 추가
+        tab.setAttribute("title", "더블클릭 시 경력 내역 페이지로 이동합니다.");
+
+        // 기본: 클릭하면 탭 활성화
         tab.addEventListener('click', () => {
             activateTab(tab.dataset.tab);
         });
+
+        // 추가: 더블클릭하면 /resumehistory 이동
+        tab.addEventListener('dblclick', () => {
+            window.location.href = "/resumehistory";
+        });
     });
 }
+
 
 /***********************
  * 페이지 초기화
@@ -1541,4 +1518,120 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(lockEducationInputs, 50); // 새 학력 항목 추가 후에도 잠금 적용
         });
     }
+});
+
+/***********************
+ * 공통 카드 인라인 수정 (award-item)
+ ***********************/
+document.addEventListener("dblclick", (e) => {
+    const card = e.target.closest(".award-item");
+    if (!card) return;
+    if (card.classList.contains("editing")) return;
+
+    const parent = card.closest(".tab-content");
+    const type = parent?.dataset.content;
+
+    const data = { ...card.dataset };
+    card.classList.add("editing");
+
+    if (type === "school") {
+        card.innerHTML = `
+            <input type="text" class="edit-school" value="${data.schoolName||""}">
+            <input type="text" class="edit-major" value="${data.majorName||""}">
+            <select class="edit-status">
+                <option value="">상태 선택</option>
+                <option value="재학" ${data.status==="재학"?"selected":""}>재학</option>
+                <option value="졸업" ${data.status==="졸업"?"selected":""}>졸업</option>
+                <option value="휴학" ${data.status==="휴학"?"selected":""}>휴학</option>
+                <option value="중퇴" ${data.status==="중퇴"?"selected":""}>중퇴</option>
+            </select>
+            <div class="edit-dates">
+                <input type="month" class="edit-start" value="${data.startDate||""}">
+                ~
+                <input type="month" class="edit-end" value="${data.endDate||""}">
+            </div>
+        `;
+    }
+    else if (type === "job") {
+        card.innerHTML = `
+            <input type="text" class="edit-workplace" value="${data.workplace||""}">
+            <input type="text" class="edit-jobtitle" value="${data.jobTitle||""}">
+            <select class="edit-status">
+                <option value="">상태 선택</option>
+                <option value="재직" ${data.status==="재직"?"selected":""}>재직</option>
+                <option value="퇴직" ${data.status==="퇴직"?"selected":""}>퇴직</option>
+            </select>
+            <div class="edit-dates">
+                <input type="month" class="edit-start" value="${data.startDate||""}">
+                ~
+                <input type="month" class="edit-end" value="${data.endDate||""}">
+            </div>
+        `;
+    }
+    else if (type === "portfolio") {
+        card.innerHTML = `
+            <input type="text" class="edit-title" value="${data.title||""}">
+            <input type="text" class="edit-desc" value="${data.desc||""}">
+            <div class="edit-dates">
+                <input type="month" class="edit-start" value="${data.startDate||""}">
+                ~
+                <input type="month" class="edit-end" value="${data.endDate||""}">
+            </div>
+        `;
+    }
+    else if (type === "cert") {
+        card.innerHTML = `
+            <input type="text" class="edit-cert" value="${data.certName||""}">
+            <input type="text" class="edit-agency" value="${data.agency||""}">
+            <input type="month" class="edit-date" value="${data.startDate||""}">
+        `;
+    }
+
+    const finishEdit = () => {
+        if (type === "school") {
+            const school = card.querySelector(".edit-school").value.trim();
+            const major = card.querySelector(".edit-major").value.trim();
+            const status = card.querySelector(".edit-status").value;
+            const start = card.querySelector(".edit-start").value;
+            const end = card.querySelector(".edit-end").value;
+            card.innerHTML = `${school}<br><small>${status} ${start} ~ ${end} 학과 ${major}</small>`;
+            Object.assign(card.dataset, { type:"EDUCATION", schoolName:school, majorName:major, status, startDate:start, endDate:end });
+        }
+        else if (type === "job") {
+            const work = card.querySelector(".edit-workplace").value.trim();
+            const job = card.querySelector(".edit-jobtitle").value.trim();
+            const status = card.querySelector(".edit-status").value;
+            const start = card.querySelector(".edit-start").value;
+            const end = card.querySelector(".edit-end").value;
+            const period = status==="재직"? `재직: ${start} ~` : `퇴직: ${start} ~ ${end}`;
+            card.innerHTML = `${work} - ${job}<br><small>${period}</small>`;
+            Object.assign(card.dataset, { type:"JOB", workplace:work, jobTitle:job, status, startDate:start, endDate:end });
+        }
+        else if (type === "portfolio") {
+            const title = card.querySelector(".edit-title").value.trim();
+            const desc = card.querySelector(".edit-desc").value.trim();
+            const start = card.querySelector(".edit-start").value;
+            const end = card.querySelector(".edit-end").value;
+            card.innerHTML = `${title}<br><small>${start} ~ ${end} / ${desc}</small>`;
+            Object.assign(card.dataset, { type:"PROJECT", title, desc, startDate:start, endDate:end });
+        }
+        else if (type === "cert") {
+            const cert = card.querySelector(".edit-cert").value.trim();
+            const agency = card.querySelector(".edit-agency").value.trim();
+            const date = card.querySelector(".edit-date").value;
+            card.innerHTML = `${cert}<br><small>${agency} / ${date}</small>`;
+            Object.assign(card.dataset, { type:"CERT", certName:cert, agency, startDate:date });
+        }
+        makeDraggable(card, card.dataset);
+        card.classList.remove("editing");
+    };
+
+    card.querySelectorAll("input, select").forEach(el => {
+        el.addEventListener("blur", () => setTimeout(() => {
+            if (!card.contains(document.activeElement)) finishEdit();
+        }, 100));
+        el.addEventListener("keydown", ev => {
+            if (ev.key === "Enter") { ev.preventDefault(); finishEdit(); }
+        });
+    });
 });

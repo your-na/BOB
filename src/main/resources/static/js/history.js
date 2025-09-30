@@ -170,21 +170,33 @@ document.addEventListener("DOMContentLoaded", () => {
         const tbody = document.querySelector("#contest-history .history-table tbody");
         const templateRow = tbody.querySelector(".new-entry-row");
 
-        const newRow = templateRow.cloneNode(true);
-        newRow.classList.remove("new-entry-row");
-        newRow.style.display = "table-row";
+        // ✅ 새 출력용 행 생성
+        const row = document.createElement("tr");
+        row.innerHTML = `
+        <td>-</td>
+        <td>
+          <select class="status-select">
+            <option value="참여중">참여중</option>
+            <option value="참여완료" selected>참여완료</option>
+          </select>
+        </td>
+        <td><input type="date" class="start-date"></td>
+        <td><input type="date" class="end-date"></td>
+        <td>
+            <span>${title}</span><br/>
+            <small>${organizer}</small>
+        </td>
+        <td>${grade}</td>
+        <td><button class="delete-btn">삭제</button></td>
+    `;
 
-        // OCR 결과 반영 (입력칸에 채워주기만 함)
-        newRow.querySelector(".contest-name").value = title;
-        newRow.querySelector(".contest-org").value = organizer;
-        newRow.querySelector(".contest-grade").value = grade;
+        // ✅ 입력용 템플릿 앞에 삽입
+        tbody.insertBefore(row, templateRow);
 
-        // 👉 여기서는 fetch 안 함! (DB 저장은 change 이벤트에서 자동 수행됨)
-        tbody.appendChild(newRow);
-
-        finalMsg.textContent = "공모전 내역에 추가되었습니다. 나머지 항목을 입력해 주세요.";
+        finalMsg.textContent = "공모전 내역에 추가되었습니다. 필요한 날짜를 입력해 주세요.";
         goStep(4);
     });
+
 
     // ===== 파일/미리보기 =====
     function readFileAsDataURL(file) {
