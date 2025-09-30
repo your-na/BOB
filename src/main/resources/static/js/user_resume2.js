@@ -202,57 +202,7 @@ function addDeleteFunction(button) {
     });
 }
 
-// ✅ 5. 추가 버튼 클릭 시 복제
-const addBtn = document.querySelector(".edu-btn"); // 버튼 클래스
-const list = document.getElementById("education-list");
-const firstItem = list.querySelector(".education-item");
 
-addBtn.addEventListener("click", () => {
-    const clone = firstItem.cloneNode(true);
-
-    // input/select 초기화
-    clone.querySelectorAll("input, select").forEach(el => {
-        el.value = "";
-    });
-
-    // select 초기화
-    const startYear = clone.querySelector(".start-year");
-    const startMonth = clone.querySelector(".start-month");
-    const endYear = clone.querySelector(".end-year");
-    const endMonth = clone.querySelector(".end-month");
-
-    startYear.innerHTML = "";
-    startMonth.innerHTML = "";
-    endYear.innerHTML = "";
-    endMonth.innerHTML = "";
-
-    createYearOptions(startYear);
-    createMonthOptions(startMonth);
-    createYearOptions(endYear);
-    createMonthOptions(endMonth);
-
-    // X 버튼 연결
-    const deleteBtn = clone.querySelector(".del-btn");
-    addDeleteFunction(deleteBtn);
-
-
-    // 상태 이벤트 연결
-    setupStatusListener(clone);
-
-    // 간격 추가
-    clone.style.marginTop = "10px";
-
-    list.appendChild(clone);
-});
-
-// ✅ 6. 초기 항목 세팅
-createYearOptions(firstItem.querySelector(".start-year"));
-createMonthOptions(firstItem.querySelector(".start-month"));
-createYearOptions(firstItem.querySelector(".end-year"));
-createMonthOptions(firstItem.querySelector(".end-month"));
-setupStatusListener(firstItem);
-const deleteBtn = firstItem.querySelector(".del-btn");
-addDeleteFunction(deleteBtn);
 
 // ✅ 학력사항 드롭 처리
 document.addEventListener("DOMContentLoaded", () => {
@@ -547,149 +497,55 @@ redirectCancel.addEventListener('click', () => {
     redirectModal.style.display = "none";
 });
 
-// ✅ 학력사항 섹션을 동적으로 렌더링하는 함수
+
+// ✅ 학력사항 섹션을 동적으로 렌더링하는 함수 (간단 & 원하는 입력폼 스타일)
 function renderEducationSection(section, number) {
     const sectionBox = document.createElement("section");
-    sectionBox.className = "section-box";
+    sectionBox.className = "resume-section";
+    sectionBox.id = `section${number}`;
+    sectionBox.dataset.multiSelect = section.multiSelect;
 
-    const conditionText = [];
-
-// ✅ 학력사항일 경우엔 multiSelect 조건은 제목에 안 넣고, 오직 조건만 넣기
-    if (section.title !== '학력사항') {
-        if (section.multiSelect) conditionText.push("복수선택 가능");
-        if (!section.multiSelect && section.type === "선택형") conditionText.push("단일선택");
-    }
-
-// 공통: 조건은 항상 포함
-    conditionText.push(...section.conditions);
-
-// 조건이 있을 경우에만 괄호 붙이기
-    const title = conditionText.length > 0
-        ? `${section.title}(${conditionText.join(", ")})`
-        : section.title;
-
-
-    const sectionTitle = document.createElement("div");
-    sectionTitle.className = "section-title";
-    sectionTitle.innerHTML = `
-        <div class="number">${number}.</div>
-        <div class="title-content">
-            <h3>${title}</h3>
-            <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+    // 🔹 섹션 헤더
+    sectionBox.innerHTML = `
+        <div class="section-header">
+            <span>${number}. ${section.title}</span>
+            <button class="delete-btn">✕</button>
         </div>
     `;
 
-    const eduList = document.createElement("div");
-    eduList.id = "education-list";
-    console.log("✅ education-list 생성됨:", eduList);  // << 확인용 콘솔
+    // 🔹 기본 학력 입력 아이템 1개 생성
+    const eduItem = document.createElement("div");
+    sectionBox.className = "section-box";
+    eduItem.innerHTML = `
+        <button type="button" class="edu-del">✕</button>
 
-    const formGroup = document.createElement("div");
-    formGroup.className = "form-group education-item";
-    formGroup.innerHTML = `
-        <input type="text" placeholder="학교명">
-        <input type="text" placeholder="학과명">
-        <select class="edu-status">
-            <option disabled selected>상태</option>
-            <option value="재학">재학</option>
-            <option value="졸업">졸업</option>
-        </select>
-        <select class="start-year"></select>
-        <select class="start-month"></select>
-        <span class="tilde">~</span>
-        <select class="end-year"></select>
-        <select class="end-month"></select>
-        <button type="button" class="del-btn">✖</button>
+        <!-- 1줄: 학교명 + 학과 -->
+        <div class="edu-row">
+            <input type="text" class="school-input" placeholder="학교명">
+            <input type="text" class="major-input" placeholder="학과">
+        </div>
+
+        <!-- 2줄: 기간 + 상태 -->
+        <div class="edu-row">
+            <div class="date-group">
+                <input type="text" class="year-input" placeholder="YYYY">
+                -
+                <input type="text" class="month-input" placeholder="MM">
+                ~
+                <input type="text" class="year-input" placeholder="YYYY">
+                -
+                <input type="text" class="month-input" placeholder="MM">
+            </div>
+            <input type="text" class="status-input" placeholder="상태">
+        </div>
     `;
 
-    createYearOptions(formGroup.querySelector(".start-year"));
-    createMonthOptions(formGroup.querySelector(".start-month"));
-    createYearOptions(formGroup.querySelector(".end-year"));
-    createMonthOptions(formGroup.querySelector(".end-month"));
-    setupStatusListener(formGroup);
-    addDeleteFunction(formGroup.querySelector(".del-btn"));
-
-    eduList.appendChild(formGroup);
-
-    const addBtn = document.createElement("button");
-    addBtn.className = "edu-btn";
-    addBtn.innerHTML = `<span class="plus">＋</span> 추가하기`;
-    addBtn.addEventListener("click", () => {
-        const clone = formGroup.cloneNode(true);
-        clone.querySelectorAll("input, select").forEach(el => el.value = "");
-        createYearOptions(clone.querySelector(".start-year"));
-        createMonthOptions(clone.querySelector(".start-month"));
-        createYearOptions(clone.querySelector(".end-year"));
-        createMonthOptions(clone.querySelector(".end-month"));
-        setupStatusListener(clone);
-        addDeleteFunction(clone.querySelector(".del-btn"));
-        clone.style.marginTop = "10px";
-        eduList.appendChild(clone);
-    });
-
-    sectionBox.appendChild(sectionTitle);
-    sectionBox.appendChild(eduList);
-    sectionBox.appendChild(addBtn);
-
-    setupDropBox(eduList);
-
-    // ✅ educationList에 drop 이벤트 직접 연결
-    eduList.addEventListener("dragover", e => {
-        e.preventDefault();
-    });
-
-    eduList.addEventListener("drop", e => {
-        e.preventDefault();
-
-        const data = e.dataTransfer.getData("application/json");
-        if (!data) return;
-
-        let json;
-        try {
-            json = JSON.parse(data);
-        } catch {
-            return;
-        }
-
-        if (json.type !== "EDUCATION") return;
-
-        const firstItem = eduList.querySelector(".education-item");
-        if (!firstItem) return;
-
-        const startYear = firstItem.querySelector(".start-year");
-        const startMonth = firstItem.querySelector(".start-month");
-        const endYear = firstItem.querySelector(".end-year");
-        const endMonth = firstItem.querySelector(".end-month");
-
-        if (startYear.options.length === 0) createYearOptions(startYear);
-        if (startMonth.options.length === 0) createMonthOptions(startMonth);
-        if (endYear.options.length === 0) createYearOptions(endYear);
-        if (endMonth.options.length === 0) createMonthOptions(endMonth);
-
-        firstItem.querySelector("input[placeholder='학교명']").value = json.schoolName || "";
-        firstItem.querySelector("input[placeholder='학과명']").value = json.majorName || "";
-        firstItem.querySelector(".edu-status").value = json.status || "";
-
-        const [startY, startM] = (json.startDate || "").split("-");
-        const [endY, endM] = (json.endDate || "").split("-");
-
-        firstItem.querySelector(".start-year").value = startY || "";
-        firstItem.querySelector(".start-month").value = startM || "";
-        firstItem.querySelector(".end-year").value = endY || "";
-        firstItem.querySelector(".end-month").value = endM || "";
-
-        setupStatusListener(firstItem);
-    });
-
-    console.log("📦 setupDropBox 호출 완료:", eduList);  // << 확인용 콘솔
-
-    sectionBox.dataset.coSectionId = section.id;
-    sectionBox.dataset.title = section.title;
-    sectionBox.dataset.type = section.type;
-
-    console.log("🎓 최종 sectionBox 생성 완료:", sectionBox);  // << 최종 확인용 콘솔
+    // 🔹 섹션에 아이템 추가
+    sectionBox.appendChild(eduItem);
 
     return sectionBox;
 }
+
 // ✅ 희망직무 섹션을 동적으로 렌더링하는 함수
 function renderJobSection(section, number) {
     const sectionBox = document.createElement("section");
@@ -736,79 +592,103 @@ function renderCareerSection(section, number) {
     const sectionBox = document.createElement("section");
     sectionBox.className = "section-box";
 
-    // multiSelect는 경력사항엔 표시 안 함
-    const conditionText = [...section.conditions];
-    const title = conditionText.length > 0
-        ? `${section.title}(${conditionText.join(", ")})`
-        : section.title;
-
     const sectionTitle = document.createElement("div");
     sectionTitle.className = "section-title";
     sectionTitle.innerHTML = `
         <div class="number">${number}.</div>
         <div class="title-content">
-            <h3>${title}</h3>
+            <h3>${section.title}</h3>
             <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
         </div>
     `;
 
-    const textarea = document.createElement("textarea");
-    textarea.placeholder = "경력 입력";
+    const careerItem = document.createElement("div");
+    careerItem.className = "career-item";
+    careerItem.innerHTML = `
+        <button type="button" class="career-del">✕</button>
+        <div class="career-row">
+            <input type="text" class="company-input" placeholder="회사명">
+            <input type="text" class="job-input" placeholder="직무">
+        </div>
+        <div class="career-row">
+            <div class="date-group">
+                <input type="text" class="year-input" placeholder="YYYY">
+                -
+                <input type="text" class="month-input" placeholder="MM">
+                ~
+                <input type="text" class="year-input" placeholder="YYYY">
+                -
+                <input type="text" class="month-input" placeholder="MM">
+            </div>
+            <input type="text" class="status-input" placeholder="재직/퇴사">
+        </div>
+    `;
 
-    const uploadBox = document.createElement("div");
-    uploadBox.className = "upload-box";
-    uploadBox.textContent = "드래그해서 파일 첨부하기";
-
-    setupDropBox(uploadBox);
     sectionBox.appendChild(sectionTitle);
-    sectionBox.appendChild(textarea);
-    sectionBox.appendChild(uploadBox);
+    sectionBox.appendChild(careerItem);
+
+    const addBtn = document.createElement("button");
+    addBtn.className = "career-btn";
+    addBtn.innerHTML = `<span class="plus">＋</span>`;
+    addBtn.addEventListener("click", () => {
+        const clone = careerItem.cloneNode(true);
+        clone.querySelectorAll("input").forEach(el => el.value = "");
+        sectionBox.appendChild(clone);
+    });
+
+    sectionBox.appendChild(addBtn);
 
     sectionBox.dataset.coSectionId = section.id;
-    sectionBox.dataset.title = section.title;
-    sectionBox.dataset.type = section.type;
-
     return sectionBox;
 }
+
 
 // ✅ 포트폴리오 섹션을 동적으로 렌더링하는 함수
 function renderPortfolioSection(section, number) {
     const sectionBox = document.createElement("section");
     sectionBox.className = "section-box";
 
-    const conditionText = [...section.conditions]; // 복수선택 제외
-    const title = conditionText.length > 0
-        ? `${section.title}(${conditionText.join(", ")})`
-        : section.title;
-
     const sectionTitle = document.createElement("div");
     sectionTitle.className = "section-title";
     sectionTitle.innerHTML = `
         <div class="number">${number}.</div>
         <div class="title-content">
-            <h3>${title}</h3>
+            <h3>${section.title}</h3>
             <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
         </div>
     `;
 
-    const textarea = document.createElement("textarea");
-    textarea.placeholder = "설명 입력";
+    const portfolioItem = document.createElement("div");
+    portfolioItem.className = "portfolio-item";
+    portfolioItem.innerHTML = `
+        <button type="button" class="portfolio-del">✕</button>
+        <div class="portfolio-row">
+            <input type="text" class="title-input" placeholder="프로젝트명">
+            <input type="text" class="desc-input" placeholder="설명">
+        </div>
+        <div class="portfolio-row">
+            <input type="file" class="file-input">
+        </div>
+    `;
 
-    const uploadBox = document.createElement("div");
-    uploadBox.className = "upload-box";
-    uploadBox.textContent = "드래그해서 파일 첨부하기";
-
-    setupDropBox(uploadBox);
     sectionBox.appendChild(sectionTitle);
-    sectionBox.appendChild(textarea);
-    sectionBox.appendChild(uploadBox);
+    sectionBox.appendChild(portfolioItem);
+
+    const addBtn = document.createElement("button");
+    addBtn.className = "portfolio-btn";
+    addBtn.innerHTML = `<span class="plus">＋</span>`;
+    addBtn.addEventListener("click", () => {
+        const clone = portfolioItem.cloneNode(true);
+        clone.querySelectorAll("input").forEach(el => el.value = "");
+        sectionBox.appendChild(clone);
+    });
+
+    sectionBox.appendChild(addBtn);
 
     sectionBox.dataset.coSectionId = section.id;
-    sectionBox.dataset.title = section.title;
-    sectionBox.dataset.type = section.type;
-
     return sectionBox;
 }
+
 
 // ✅ 자기소개 섹션 렌더링 함수
 function renderSelfIntroSection(section, number) {
