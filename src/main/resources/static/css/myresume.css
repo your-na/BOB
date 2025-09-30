@@ -1039,3 +1039,41 @@ textarea {
     font-weight: bold;
     text-align: left;
 }
+
+/*                      */
+/*     여기서부터 수정     */
+/*                      */
+
+/* 카드 수정 모드 */
+.award-item.editing {
+    border: 1px dashed #19CB13;   /* 연한 초록 테두리 → 수정중임을 표시 */
+    background: #fefefe;
+}
+
+/* 인라인 편집 input */
+.award-item.editing input,
+.award-item.editing textarea {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    font-family: inherit;
+    color: inherit;
+    padding: 2px 4px;
+    box-sizing: border-box;
+    border-bottom: 1px solid #ccc;  /* 밑줄만 살짝 */
+    border-radius: 0;
+}
+
+/* textarea는 높이 자동 */
+.award-item.editing textarea {
+    resize: none;
+    min-height: 40px;
+}
+
+.edit-hint {
+    font-size: 11px;
+    color: #777;
+    margin: 0 0 6px 2px;
+}
