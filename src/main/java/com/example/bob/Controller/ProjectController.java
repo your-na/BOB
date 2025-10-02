@@ -130,17 +130,23 @@ public class ProjectController {
         // ✅ 좋아요 수 가져오기
         int likesCount = project.getLikes();
 
+        // ✅ 현재 참여자 수 계산 (승인된 인원만 카운트할 수도 있음)
+        int currentParticipants = (int) project.getUserProjects().stream()
+                .filter(up -> !"신청중".equals(up.getStatus())) // 신청중 제외
+                .count();
+        project.setCurrentParticipants(currentParticipants);
+
+        // ✅ 모델에 담기
         model.addAttribute("today", today);
         model.addAttribute("goal", project.getGoal());
         model.addAttribute("project", project);
-        model.addAttribute("isOwner", project.getCreatedBy().equals(userDetails.getUserNick())); // 로그인한 사용자가 작성자인지 체크
-
-        // ✅ 좋아요 상태와 수 모델에 추가
+        model.addAttribute("isOwner", project.getCreatedBy().equals(userDetails.getUserNick()));
         model.addAttribute("isLiked", isLiked);
         model.addAttribute("likesCount", likesCount);
 
         return "postproject";
     }
+
 
 
     // 프로젝트 삭제 API

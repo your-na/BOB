@@ -100,8 +100,7 @@
             <td th:text="${project.likes}">0</td>
             <!-- 동적으로 모집 인원 표시 -->
             <td>
-                <span th:text="${project.currentParticipants}">0</span>/
-                <span th:text="${project.recruitmentCount}">0</span>
+                <span th:text="(${project.currentParticipants} + 1) + '/' + ${project.recruitmentCount}"></span>
             </td>
             <td th:text="${project.status}">모집중</td>
         </tr>
