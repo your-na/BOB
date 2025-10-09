@@ -497,25 +497,30 @@ redirectCancel.addEventListener('click', () => {
     redirectModal.style.display = "none";
 });
 
-
-// ✅ 학력사항 섹션을 동적으로 렌더링하는 함수 (간단 & 원하는 입력폼 스타일)
+// ✅ 학력사항 섹션을 동적으로 렌더링하는 함수 (드롭 이벤트 호환 버전)
 function renderEducationSection(section, number) {
     const sectionBox = document.createElement("section");
-    sectionBox.className = "resume-section";
-    sectionBox.id = `section${number}`;
-    sectionBox.dataset.multiSelect = section.multiSelect;
+    sectionBox.className = "section-box"; // ✅ 한 번만 선언
+    sectionBox.dataset.coSectionId = section.id;
 
-    // 🔹 섹션 헤더
-    sectionBox.innerHTML = `
-        <div class="section-header">
-            <span>${number}. ${section.title}</span>
-            <button class="delete-btn">✕</button>
+    // 🔹 섹션 제목
+    const sectionTitle = document.createElement("div");
+    sectionTitle.className = "section-title";
+    sectionTitle.innerHTML = `
+        <div class="number">${number}.</div>
+        <div class="title-content">
+            <h3>${section.title}</h3>
+            <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
         </div>
     `;
 
-    // 🔹 기본 학력 입력 아이템 1개 생성
+    // ✅ 드롭 이벤트 대상 영역 (.edu-box)
+    const eduBox = document.createElement("div");
+    eduBox.className = "edu-box";
+
+    // 🔹 기본 학력 입력칸
     const eduItem = document.createElement("div");
-    sectionBox.className = "section-box";
+    eduItem.className = "education-item";
     eduItem.innerHTML = `
         <button type="button" class="edu-del">✕</button>
 
@@ -540,11 +545,13 @@ function renderEducationSection(section, number) {
         </div>
     `;
 
-    // 🔹 섹션에 아이템 추가
-    sectionBox.appendChild(eduItem);
+    eduBox.appendChild(eduItem);
+    sectionBox.appendChild(sectionTitle);
+    sectionBox.appendChild(eduBox);
 
     return sectionBox;
 }
+
 
 // ✅ 희망직무 섹션을 동적으로 렌더링하는 함수
 function renderJobSection(section, number) {
@@ -1261,9 +1268,78 @@ window.addEventListener('DOMContentLoaded', () => {
                     const submitWrapper = document.querySelector('.submit-wrapper');
                     leftContent.insertBefore(rendered, submitWrapper);
                 }
-
-
             });
+
+            // ✅ 섹션 렌더링이 모두 끝난 뒤 drop 이벤트 등록
+            console.log("✅ 모든 섹션 렌더링 완료, 드롭 이벤트 등록 시작");
+
+            document.querySelectorAll(".section-box").forEach(section => {
+                const title = section.querySelector("h3")?.textContent || "";
+                if (title.includes("학력")) {
+                    // ✅ 학력 입력 영역 내부에서 드롭 이벤트를 잡기
+                    const dropTarget = section.querySelector(".edu-box") || section;
+                    console.log("🎯 [EDU] 학력 섹션에 drop 이벤트 등록됨", dropTarget);
+
+                    // 드래그 허용
+                    dropTarget.addEventListener("dragover", e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    });
+
+                    // 실제 드롭 처리
+                    dropTarget.addEventListener("drop", e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log("🔥 drop 이벤트 감지됨!");
+
+                        const data = e.dataTransfer.getData("application/json");
+                        if (!data) {
+                            console.log("⚠️ data 없음");
+                            return;
+                        }
+
+                        let json;
+                        try {
+                            json = JSON.parse(data);
+                        } catch {
+                            console.log("⚠️ JSON 파싱 실패");
+                            return;
+                        }
+
+                        if (json.type !== "EDUCATION") {
+                            console.log("⚠️ EDUCATION 타입 아님, 무시됨");
+                            return;
+                        }
+
+                        console.log("📦 [EDU] 받은 데이터:", json);
+
+                        // ✅ 학력 입력칸 찾아 값 넣기
+                        const schoolInput = section.querySelector("input[placeholder='학교명']");
+                        const majorInput = section.querySelector("input[placeholder='학과']");
+                        const statusInput = section.querySelector("input[placeholder='상태']") || section.querySelector(".status-input");
+                        const yearInputs = section.querySelectorAll("input[placeholder='YYYY']");
+                        const monthInputs = section.querySelectorAll("input[placeholder='MM']");
+
+                        const [startY, startM] = (json.startDate || "").split("-");
+                        const [endY, endM] = (json.endDate || "").split("-");
+
+                        if (schoolInput) schoolInput.value = json.schoolName || "";
+                        if (majorInput) majorInput.value = json.majorName || "";
+                        if (statusInput) statusInput.value = json.status || "";
+                        if (yearInputs.length >= 2) {
+                            yearInputs[0].value = startY || "";
+                            yearInputs[1].value = endY || "";
+                        }
+                        if (monthInputs.length >= 2) {
+                            monthInputs[0].value = startM || "";
+                            monthInputs[1].value = endM || "";
+                        }
+
+                        console.log("✅ 학력 정보 자동입력 완료!");
+                    });
+                }
+            });
+
 
 
             // ✅ 공고 정보 동적 렌더링
