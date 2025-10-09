@@ -593,12 +593,13 @@ function renderJobSection(section, number) {
 
     return sectionBox;
 }
-
-// ✅ 경력사항 섹션을 동적으로 렌더링하는 함수
+// ✅ 경력사항 섹션을 동적으로 렌더링하는 함수 (드롭 이벤트 대응)
 function renderCareerSection(section, number) {
     const sectionBox = document.createElement("section");
     sectionBox.className = "section-box";
+    sectionBox.dataset.coSectionId = section.id;
 
+    // 🔹 섹션 제목
     const sectionTitle = document.createElement("div");
     sectionTitle.className = "section-title";
     sectionTitle.innerHTML = `
@@ -609,14 +610,23 @@ function renderCareerSection(section, number) {
         </div>
     `;
 
+    // ✅ 드롭 이벤트 대상 (.career-box)
+    const careerBox = document.createElement("div");
+    careerBox.className = "career-box";
+
+    // 🔹 기본 경력 입력칸
     const careerItem = document.createElement("div");
     careerItem.className = "career-item";
     careerItem.innerHTML = `
         <button type="button" class="career-del">✕</button>
+
+        <!-- 1줄: 회사명 + 직무 -->
         <div class="career-row">
             <input type="text" class="company-input" placeholder="회사명">
             <input type="text" class="job-input" placeholder="직무">
         </div>
+
+        <!-- 2줄: 기간 + 상태 -->
         <div class="career-row">
             <div class="date-group">
                 <input type="text" class="year-input" placeholder="YYYY">
@@ -631,30 +641,33 @@ function renderCareerSection(section, number) {
         </div>
     `;
 
-    sectionBox.appendChild(sectionTitle);
-    sectionBox.appendChild(careerItem);
-
+    // ✅ 추가 버튼
     const addBtn = document.createElement("button");
     addBtn.className = "career-btn";
     addBtn.innerHTML = `<span class="plus">＋</span>`;
     addBtn.addEventListener("click", () => {
         const clone = careerItem.cloneNode(true);
         clone.querySelectorAll("input").forEach(el => el.value = "");
-        sectionBox.appendChild(clone);
+        careerBox.appendChild(clone);
     });
 
+    // ✅ 구성 정리
+    careerBox.appendChild(careerItem);
+    sectionBox.appendChild(sectionTitle);
+    sectionBox.appendChild(careerBox);
     sectionBox.appendChild(addBtn);
 
-    sectionBox.dataset.coSectionId = section.id;
     return sectionBox;
 }
 
 
-// ✅ 포트폴리오 섹션을 동적으로 렌더링하는 함수
+// ✅ 포트폴리오 섹션을 동적으로 렌더링하는 함수 (드롭 이벤트 대응)
 function renderPortfolioSection(section, number) {
     const sectionBox = document.createElement("section");
     sectionBox.className = "section-box";
+    sectionBox.dataset.coSectionId = section.id;
 
+    // 🔹 섹션 제목
     const sectionTitle = document.createElement("div");
     sectionTitle.className = "section-title";
     sectionTitle.innerHTML = `
@@ -665,36 +678,49 @@ function renderPortfolioSection(section, number) {
         </div>
     `;
 
+    // ✅ 드롭 이벤트 대상 (.portfolio-box)
+    const portfolioBox = document.createElement("div");
+    portfolioBox.className = "portfolio-box";
+
+    // 🔹 기본 포트폴리오 입력칸
     const portfolioItem = document.createElement("div");
     portfolioItem.className = "portfolio-item";
     portfolioItem.innerHTML = `
         <button type="button" class="portfolio-del">✕</button>
+
+        <!-- 프로젝트명 + 설명 -->
         <div class="portfolio-row">
             <input type="text" class="title-input" placeholder="프로젝트명">
-            <input type="text" class="desc-input" placeholder="설명">
         </div>
+        <div class="portfolio-row">
+            <textarea class="desc-input" placeholder="설명"></textarea>
+        </div>
+
+        <!-- 파일 업로드 -->
         <div class="portfolio-row">
             <input type="file" class="file-input">
         </div>
     `;
 
-    sectionBox.appendChild(sectionTitle);
-    sectionBox.appendChild(portfolioItem);
-
+    // 🔹 추가 버튼
     const addBtn = document.createElement("button");
     addBtn.className = "portfolio-btn";
     addBtn.innerHTML = `<span class="plus">＋</span>`;
     addBtn.addEventListener("click", () => {
         const clone = portfolioItem.cloneNode(true);
-        clone.querySelectorAll("input").forEach(el => el.value = "");
-        sectionBox.appendChild(clone);
+        clone.querySelectorAll("input, textarea").forEach(el => el.value = "");
+        portfolioBox.appendChild(clone);
     });
 
+    // ✅ 구성 정리
+    portfolioBox.appendChild(portfolioItem);
+    sectionBox.appendChild(sectionTitle);
+    sectionBox.appendChild(portfolioBox);
     sectionBox.appendChild(addBtn);
 
-    sectionBox.dataset.coSectionId = section.id;
     return sectionBox;
 }
+
 
 
 // ✅ 자기소개 섹션 렌더링 함수
@@ -1081,8 +1107,12 @@ window.addEventListener('DOMContentLoaded', () => {
                     periodText = `퇴직: ${start} ~ ${end}`;
                 }
 
-                // 🔧 화면에 표시될 내용
-                div.innerHTML = `${item.jobTitle || "직무 없음"}<br><small>${periodText}</small>`;
+                div.innerHTML = `
+    ${item.workplace || item.companyName || item.company || "회사명 없음"}<br>
+    <small>${item.jobTitle ? item.jobTitle + " · " : ""}${periodText}</small>
+`;
+
+
 
                 // 🔧 드래그 속성 추가
                 div.setAttribute("draggable", true);
@@ -1093,10 +1123,12 @@ window.addEventListener('DOMContentLoaded', () => {
                         id: item.id,
                         type: "JOB", // 드래그 타입 구분
                         title: item.jobTitle || "직무 없음",
+                        companyName: item.workplace || item.companyName || item.company || "", // ✅ 추가
                         startDate: item.startDate,
                         endDate: item.endDate,
                         status: item.status
                     });
+
                     e.dataTransfer.setData("application/json", dragData);
                 });
 
@@ -1338,8 +1370,100 @@ window.addEventListener('DOMContentLoaded', () => {
                         console.log("✅ 학력 정보 자동입력 완료!");
                     });
                 }
-            });
+                // 🔹 경력 (JOB)
+                else if (title.includes("경력")) {
+                    const dropTarget = section.querySelector(".career-box") || section;
+                    console.log("🎯 [JOB] 경력 섹션에 drop 이벤트 등록됨", dropTarget);
 
+                    dropTarget.addEventListener("dragover", e => e.preventDefault());
+                    dropTarget.addEventListener("drop", e => {
+                        e.preventDefault();
+                        console.log("🔥 [JOB] drop 이벤트 감지됨!");
+
+                        const data = e.dataTransfer.getData("application/json");
+                        if (!data) {
+                            console.warn("⚠️ [JOB] 드래그 데이터 없음");
+                            return;
+                        }
+
+                        let json;
+                        try {
+                            json = JSON.parse(data);
+                        } catch (err) {
+                            console.error("❌ [JOB] JSON 파싱 실패:", err);
+                            return;
+                        }
+
+                        if (json.type !== "JOB") {
+                            console.log("🚫 [JOB] type이 JOB 아님:", json.type);
+                            return;
+                        }
+
+                        console.log("📦 [JOB] 받은 데이터:", json);
+
+                        // ✅ 입력 필드 찾기
+                        const companyInput = section.querySelector("input[placeholder='회사명']");
+                        const jobInput = section.querySelector("input[placeholder='직무']");
+                        const statusInput = section.querySelector("input[placeholder='재직/퇴사']") || section.querySelector(".status-input");
+
+                        // ✅ 날짜 입력칸
+                        const yearInputs = section.querySelectorAll("input[placeholder='YYYY']");
+                        const monthInputs = section.querySelectorAll("input[placeholder='MM']");
+
+                        // ✅ 날짜 파싱
+                        const [startY, startM] = (json.startDate || json.jobStart || "").split("-");
+                        const [endY, endM] = (json.endDate || json.jobEnd || "").split("-");
+
+                        console.log("📆 추출된 날짜:", { startY, startM, endY, endM });
+
+                        // ✅ 값 자동 입력 (항상 새 값으로 덮어쓰기)
+                        if (companyInput) companyInput.value = json.companyName || json.workplace || "";
+                        if (jobInput) jobInput.value = json.jobTitle || json.title || "";
+                        if (statusInput) statusInput.value = json.status || "";
+
+                        if (yearInputs.length >= 2) {
+                            yearInputs[0].value = startY || "";
+                            yearInputs[1].value = endY || "";
+                        }
+                        if (monthInputs.length >= 2) {
+                            monthInputs[0].value = startM || "";
+                            monthInputs[1].value = endM || "";
+                        }
+
+                        console.log("✅ 경력 정보 자동입력 완료 (기존 값 갱신됨)!");
+                    });
+                }
+
+
+                // 🔹 포트폴리오 (PROJECT)
+                else if (title.includes("포트폴리오") || title.includes("프로젝트")) {
+                    const dropTarget = section.querySelector(".portfolio-box") || section;
+                    console.log("🎯 [PROJECT] 포트폴리오 섹션에 drop 이벤트 등록됨", dropTarget);
+
+                    dropTarget.addEventListener("dragover", e => e.preventDefault());
+                    dropTarget.addEventListener("drop", e => {
+                        e.preventDefault();
+                        console.log("🔥 [PROJECT] drop 이벤트 감지됨!");
+
+                        const data = e.dataTransfer.getData("application/json");
+                        if (!data) return;
+
+                        const json = JSON.parse(data);
+                        if (json.type !== "PROJECT") return;
+
+                        console.log("📦 [PROJECT] 받은 데이터:", json);
+
+                        const titleInput = section.querySelector("input[placeholder='프로젝트명']");
+                        const descInput = section.querySelector("textarea[placeholder='설명']");
+
+                        if (titleInput) titleInput.value = json.title || "";
+                        if (descInput) descInput.value = json.description || "";
+
+                        console.log("✅ 포트폴리오 정보 자동입력 완료!");
+                    });
+                }
+
+            });
 
 
             // ✅ 공고 정보 동적 렌더링
