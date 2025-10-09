@@ -661,7 +661,7 @@ function renderCareerSection(section, number) {
 }
 
 
-// ✅ 포트폴리오 섹션을 동적으로 렌더링하는 함수 (드롭 이벤트 대응)
+// ✅ 포트폴리오 섹션을 동적으로 렌더링하는 함수 (날짜·상태·파일경로 포함 + 드롭 대응)
 function renderPortfolioSection(section, number) {
     const sectionBox = document.createElement("section");
     sectionBox.className = "section-box";
@@ -678,27 +678,45 @@ function renderPortfolioSection(section, number) {
         </div>
     `;
 
-    // ✅ 드롭 이벤트 대상 (.portfolio-box)
+    // ✅ 드롭 이벤트 대상
     const portfolioBox = document.createElement("div");
     portfolioBox.className = "portfolio-box";
 
-    // 🔹 기본 포트폴리오 입력칸
+    // 🔹 기본 포트폴리오 입력칸 (프로젝트명, 기간, 상태, 설명, 파일)
     const portfolioItem = document.createElement("div");
     portfolioItem.className = "portfolio-item";
     portfolioItem.innerHTML = `
         <button type="button" class="portfolio-del">✕</button>
 
-        <!-- 프로젝트명 + 설명 -->
+        <!-- 프로젝트명 -->
         <div class="portfolio-row">
-            <input type="text" class="title-input" placeholder="프로젝트명">
-        </div>
-        <div class="portfolio-row">
-            <textarea class="desc-input" placeholder="설명"></textarea>
+            <input type="text" class="portfolio-title" placeholder="프로젝트 또는 공모전명" style="flex:1;">
         </div>
 
-        <!-- 파일 업로드 -->
+        <!-- 파일 경로 -->
         <div class="portfolio-row">
-            <input type="file" class="file-input">
+            <input type="text" class="portfolio-file-path" placeholder="드래그된 파일 경로" readonly>
+            <input type="hidden" name="filePath">
+        </div>
+
+        <!-- 기간(년/월) + 상태 -->
+        <div class="portfolio-row">
+            <div class="date-group">
+                <input type="text" class="year-input" placeholder="YYYY">
+                -
+                <input type="text" class="month-input" placeholder="MM">
+                ~
+                <input type="text" class="year-input" placeholder="YYYY">
+                -
+                <input type="text" class="month-input" placeholder="MM">
+            </div>
+
+            <input type="text" class="status-input" placeholder="상태">
+        </div>
+
+        <!-- 설명 -->
+        <div class="portfolio-row">
+            <input type="text" class="desc-input" placeholder="설명" style="width:100%;">
         </div>
     `;
 
@@ -720,6 +738,7 @@ function renderPortfolioSection(section, number) {
 
     return sectionBox;
 }
+
 
 
 
@@ -1434,8 +1453,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     });
                 }
 
-
-                // 🔹 포트폴리오 (PROJECT)
+// 🔹 포트폴리오 (PROJECT)
                 else if (title.includes("포트폴리오") || title.includes("프로젝트")) {
                     const dropTarget = section.querySelector(".portfolio-box") || section;
                     console.log("🎯 [PROJECT] 포트폴리오 섹션에 drop 이벤트 등록됨", dropTarget);
@@ -1448,21 +1466,67 @@ window.addEventListener('DOMContentLoaded', () => {
                         const data = e.dataTransfer.getData("application/json");
                         if (!data) return;
 
-                        const json = JSON.parse(data);
-                        if (json.type !== "PROJECT") return;
+                        let json;
+                        try {
+                            json = JSON.parse(data);
+                        } catch (err) {
+                            console.error("❌ [PROJECT] JSON 파싱 실패:", err);
+                            return;
+                        }
+
+                        if (json.type !== "PROJECT" && json.type !== "CONTEST") return;
 
                         console.log("📦 [PROJECT] 받은 데이터:", json);
 
-                        const titleInput = section.querySelector("input[placeholder='프로젝트명']");
-                        const descInput = section.querySelector("textarea[placeholder='설명']");
+                        // ✅ 입력칸 찾기 (다양한 기업 양식 대응)
+                        const titleInput =
+                            section.querySelector("input[placeholder*='프로젝트']") ||
+                            section.querySelector("input[placeholder*='공모전']") ||
+                            section.querySelector(".portfolio-title");
 
-                        if (titleInput) titleInput.value = json.title || "";
+                        const descInput =
+                            section.querySelector("textarea[placeholder*='설명']") ||
+                            section.querySelector("input[placeholder*='설명']") ||
+                            section.querySelector(".desc-input");
+
+                        const statusInput =
+                            section.querySelector("input[placeholder*='상태']") ||
+                            section.querySelector(".status-input");
+
+                        const filePathInput =
+                            section.querySelector("input[placeholder*='파일']") ||
+                            section.querySelector(".portfolio-file-path");
+
+                        const hiddenFileInput =
+                            section.querySelector("input[name='filePath']");
+
+                        const yearInputs = section.querySelectorAll("input[placeholder='YYYY']");
+                        const monthInputs = section.querySelectorAll("input[placeholder='MM']");
+
+                        // ✅ 날짜 분리
+                        const [startY, startM] = (json.startDate || "").split("-");
+                        const [endY, endM] = (json.endDate || "").split("-");
+
+                        // ✅ 값 입력
+                        if (titleInput) titleInput.value = json.projectName || json.title || "";
                         if (descInput) descInput.value = json.description || "";
+                        if (statusInput) statusInput.value = json.status || "완료";
+                        if (filePathInput) filePathInput.value = json.file || json.filePath || json.fileUrl || "";
+                        if (hiddenFileInput) hiddenFileInput.value = json.file || json.filePath || json.fileUrl || "";
+
+                        if (yearInputs.length >= 2) {
+                            yearInputs[0].value = startY || "";
+                            yearInputs[1].value = endY || "";
+                        }
+                        if (monthInputs.length >= 2) {
+                            monthInputs[0].value = startM || "";
+                            monthInputs[1].value = endM || "";
+                        }
 
                         console.log("✅ 포트폴리오 정보 자동입력 완료!");
                     });
                 }
-
+                
             });
 
 
