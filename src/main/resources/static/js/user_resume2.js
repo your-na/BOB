@@ -1080,6 +1080,8 @@ window.addEventListener('DOMContentLoaded', () => {
             document.getElementById("phone").textContent = user.userPhone || "";
             document.getElementById("email").textContent = user.userEmail || "";
             document.getElementById("region").textContent = user.region || "";
+            document.getElementById("chinese").innerText = user.nameHanja || "-";
+            document.getElementById("english").innerText = user.nameEng || "-";
 
         })
         .catch(err => console.error("내 정보 불러오기 실패:", err));
