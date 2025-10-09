@@ -1060,6 +1060,69 @@ function renderEducations() {
                     </div>
                 `;
 
+                eduBox.addEventListener("keydown", async (e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        const school = eduBox.querySelector(".school-input").value.trim();
+                        const major = eduBox.querySelector(".major-input").value.trim();
+                        const status = eduBox.querySelector(".status-input").value;
+                        const start = eduBox.querySelector(".start-date").value;
+                        const end = eduBox.querySelector(".end-date").value;
+
+                        if (!school) {
+                            alert("학교명을 입력하세요!");
+                            return;
+                        }
+
+                        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+                        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+                        try {
+                            // ✅ DB 저장 요청
+                            const res = await fetch("/api/education-history/save", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    [csrfHeader]: csrfToken
+                                },
+                                body: JSON.stringify({
+                                    schoolName: school,
+                                    majorName: major,
+                                    status: status,
+                                    startDate: start,
+                                    endDate: end
+                                })
+                            });
+
+                            if (!res.ok) throw new Error("저장 실패");
+                            const savedId = await res.json();
+
+                            // ✅ UI 업데이트
+                            let line2 = "";
+                            if (status === "재학") line2 = `재학 ${start} ~ 학과 ${major}`;
+                            else if (status === "졸업") line2 = `졸업 ${start} ~ ${end} 학과 ${major}`;
+                            else line2 = `${status} ${start} ~ ${end} 학과 ${major}`;
+
+                            eduBox.className = "award-item";
+                            eduBox.innerHTML = `${school}<br><small>${line2}</small>`;
+                            Object.assign(eduBox.dataset, {
+                                type: "EDUCATION",
+                                id: savedId,
+                                schoolName: school,
+                                majorName: major,
+                                status,
+                                startDate: start,
+                                endDate: end
+                            });
+                            makeDraggable(eduBox, eduBox.dataset);
+                        } catch (err) {
+                            alert("DB 저장 중 오류 발생");
+                            console.error(err);
+                        }
+                    }
+                });
+
+
                 eduBox.addEventListener("keydown", (e) => {
                     if (e.key === "Enter") {
                         e.preventDefault();
