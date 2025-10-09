@@ -626,6 +626,8 @@ function renderCareerSection(section, number) {
     sectionBox.className = "section-box";
     sectionBox.dataset.coSectionId = section.id;
 
+    sectionBox.dataset.title = section.title;
+
     // 🔹 섹션 제목
     const sectionTitle = document.createElement("div");
     sectionTitle.className = "section-title";
@@ -1703,6 +1705,42 @@ function togglePreview() {
             section.educations = educations;
         }
 
+        // ✅ 경력사항 처리 (JobHistoryDTO와 완벽 매칭)
+        if (box.querySelector("h3")?.textContent.includes("경력")) {  // 🔥 경력 섹션에서만 실행
+            const careerBox = box.querySelector(".career-box");
+            if (careerBox) {
+                const careers = [];
+                const items = careerBox.querySelectorAll(".career-item");
+
+                items.forEach(item => {
+                    const yearInputs = item.querySelectorAll("input[placeholder='YYYY']");
+                    const monthInputs = item.querySelectorAll("input[placeholder='MM']");
+
+                    const startYear = yearInputs[0]?.value || "";
+                    const startMonth = monthInputs[0]?.value || "";
+                    const endYear = yearInputs[1]?.value || "";
+                    const endMonth = monthInputs[1]?.value || "";
+
+                    const startDate = (startYear && startMonth)
+                        ? `${startYear}-${startMonth.padStart(2, "0")}-01`
+                        : null;
+                    const endDate = (endYear && endMonth)
+                        ? `${endYear}-${endMonth.padStart(2, "0")}-01`
+                        : null;
+
+                    careers.push({
+                        workplace: item.querySelector(".company-input")?.value || "",
+                        jobTitle: item.querySelector(".job-input")?.value || "",
+                        status: item.querySelector(".status-input")?.value || "",
+                        startDate: startDate,
+                        endDate: endDate
+                    });
+                });
+
+                section.careers = careers;
+            }
+        }
+
 
         // ✅ 드래그 항목 처리 → 꼭 여기에 넣어야 합니다!
         const draggedDivs = box.querySelectorAll(".uploaded-item");
@@ -1735,8 +1773,9 @@ function togglePreview() {
             );
         }
 
-
-
+        // ✅ 여기 로그 추가
+        console.log("🧩 PREVIEW: section.title =", section.title);
+        console.log("🧩 PREVIEW: section.careers =", section.careers);
         sections.push(section);
     });
     // ✅ 모든 업로드 완료 후 preview 요청

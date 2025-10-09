@@ -167,6 +167,8 @@ public class ResumeController {
             dtoSection.setEducations(section.getEducations());
             dtoSection.setSelectedTags(section.getSelectedTags());
             dtoSection.setDragItems(section.getDragItems());
+            dtoSection.setCareers(section.getCareers());
+
 
 
             // ✅ 핵심: uploadedFileName이 있고, 기존 fileNames가 null 또는 비어있으면 대체해줌

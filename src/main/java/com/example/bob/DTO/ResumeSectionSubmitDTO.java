@@ -15,6 +15,7 @@ public class ResumeSectionSubmitDTO {
     private String uploadedFileName;    // 파일 또는 사진 첨부 섹션일 경우 업로드된 파일명.
     private List<String> fileNames; // ✅ 여러 개의 파일 저장용
     private List<ResumeDragItemDTO> dragItems;
+    private List<JobHistoryDTO> careers;
 
     /**
      * 학력사항 섹션일 경우에만 채워지는 필드.
