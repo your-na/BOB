@@ -497,10 +497,10 @@ redirectCancel.addEventListener('click', () => {
     redirectModal.style.display = "none";
 });
 
-// ✅ 학력사항 섹션을 동적으로 렌더링하는 함수 (드롭 이벤트 호환 버전)
+// ✅ 학력사항 섹션을 동적으로 렌더링하는 함수 (추가 버튼 + 드래그 호환)
 function renderEducationSection(section, number) {
     const sectionBox = document.createElement("section");
-    sectionBox.className = "section-box"; // ✅ 한 번만 선언
+    sectionBox.className = "section-box";
     sectionBox.dataset.coSectionId = section.id;
 
     // 🔹 섹션 제목
@@ -514,13 +514,13 @@ function renderEducationSection(section, number) {
         </div>
     `;
 
-    // ✅ 드롭 이벤트 대상 영역 (.edu-box)
+    // ✅ 드롭 이벤트 대상 박스 (.edu-box)
     const eduBox = document.createElement("div");
     eduBox.className = "edu-box";
 
     // 🔹 기본 학력 입력칸
     const eduItem = document.createElement("div");
-    eduItem.className = "education-item";
+    eduItem.className = "edu-item"; // ✅ class 이름 통일 (drop 이벤트용)
     eduItem.innerHTML = `
         <button type="button" class="edu-del">✕</button>
 
@@ -545,12 +545,36 @@ function renderEducationSection(section, number) {
         </div>
     `;
 
+    // ✅ 추가 버튼
+    const addBtn = document.createElement("button");
+    addBtn.className = "edu-btn";
+    addBtn.innerHTML = `<span class="plus">＋</span>`;
+
+    // ✅ 클릭 시 새로운 학력 항목 추가
+    addBtn.addEventListener("click", () => {
+        const clone = eduItem.cloneNode(true);
+        clone.querySelectorAll("input").forEach(el => (el.value = ""));
+        eduBox.appendChild(clone);
+        console.log("✨ [EDU] 새 학력 항목 추가됨");
+
+        // ✅ 새 항목에도 드롭 이벤트 자동 연결
+        setTimeout(() => {
+            if (typeof attachEduDropEvent === "function") {
+                attachEduDropEvent(clone);
+                console.log("✨ [EDU] 새 항목에도 drop 이벤트 등록 완료");
+            }
+        }, 100);
+    });
+
+    // ✅ 전체 구성
     eduBox.appendChild(eduItem);
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(eduBox);
+    sectionBox.appendChild(addBtn);
 
     return sectionBox;
 }
+
 
 
 // ✅ 희망직무 섹션을 동적으로 렌더링하는 함수
@@ -1329,133 +1353,179 @@ window.addEventListener('DOMContentLoaded', () => {
 
             document.querySelectorAll(".section-box").forEach(section => {
                 const title = section.querySelector("h3")?.textContent || "";
+
+                // 🔹 학력 (EDUCATION)
                 if (title.includes("학력")) {
-                    // ✅ 학력 입력 영역 내부에서 드롭 이벤트를 잡기
-                    const dropTarget = section.querySelector(".edu-box") || section;
-                    console.log("🎯 [EDU] 학력 섹션에 drop 이벤트 등록됨", dropTarget);
+                    console.log("🎯 [EDU] 학력 섹션에 drop 이벤트 등록 준비");
 
-                    // 드래그 허용
-                    dropTarget.addEventListener("dragover", e => {
-                        e.preventDefault();
-                        e.stopPropagation();
+                    // ✅ 개별 학력 아이템에 drop 이벤트 등록 함수
+                    const attachEduDropEvent = (item) => {
+                        item.addEventListener("dragover", e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        });
+
+                        item.addEventListener("drop", e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log("🔥 [EDU] 개별 학력 item drop 감지됨!");
+
+                            const data = e.dataTransfer.getData("application/json");
+                            if (!data) {
+                                console.warn("⚠️ [EDU] 드래그 데이터 없음");
+                                return;
+                            }
+
+                            let json;
+                            try {
+                                json = JSON.parse(data);
+                            } catch {
+                                console.warn("⚠️ [EDU] JSON 파싱 실패");
+                                return;
+                            }
+
+                            if (json.type !== "EDUCATION") {
+                                console.log("🚫 [EDU] type이 EDUCATION 아님:", json.type);
+                                return;
+                            }
+
+                            console.log("📦 [EDU] 받은 데이터:", json);
+
+                            // ✅ 현재 item 내부의 input만 찾기
+                            const schoolInput = item.querySelector("input[placeholder='학교명']") || item.querySelector(".school-input");
+                            const majorInput = item.querySelector("input[placeholder='학과']") || item.querySelector(".major-input");
+                            const statusInput = item.querySelector("input[placeholder='상태']") || item.querySelector(".status-input");
+                            const yearInputs = item.querySelectorAll("input[placeholder='YYYY']");
+                            const monthInputs = item.querySelectorAll("input[placeholder='MM']");
+
+                            const [startY, startM] = (json.startDate || "").split("-");
+                            const [endY, endM] = (json.endDate || "").split("-");
+
+                            // ✅ 값 입력
+                            if (schoolInput) schoolInput.value = json.schoolName || "";
+                            if (majorInput) majorInput.value = json.majorName || "";
+                            if (statusInput) statusInput.value = json.status || "졸업";
+                            if (yearInputs.length >= 2) {
+                                yearInputs[0].value = startY || "";
+                                yearInputs[1].value = endY || "";
+                            }
+                            if (monthInputs.length >= 2) {
+                                monthInputs[0].value = startM || "";
+                                monthInputs[1].value = endM || "";
+                            }
+
+                            console.log("✅ [EDU] 학력 정보 자동입력 완료!");
+                        });
+                    };
+
+                    // ✅ 이미 존재하는 학력 항목들에 이벤트 등록
+                    section.querySelectorAll(".edu-item, .edu-box, .resume-section").forEach(item => {
+                        attachEduDropEvent(item);
                     });
 
-                    // 실제 드롭 처리
-                    dropTarget.addEventListener("drop", e => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log("🔥 drop 이벤트 감지됨!");
-
-                        const data = e.dataTransfer.getData("application/json");
-                        if (!data) {
-                            console.log("⚠️ data 없음");
-                            return;
-                        }
-
-                        let json;
-                        try {
-                            json = JSON.parse(data);
-                        } catch {
-                            console.log("⚠️ JSON 파싱 실패");
-                            return;
-                        }
-
-                        if (json.type !== "EDUCATION") {
-                            console.log("⚠️ EDUCATION 타입 아님, 무시됨");
-                            return;
-                        }
-
-                        console.log("📦 [EDU] 받은 데이터:", json);
-
-                        // ✅ 학력 입력칸 찾아 값 넣기
-                        const schoolInput = section.querySelector("input[placeholder='학교명']");
-                        const majorInput = section.querySelector("input[placeholder='학과']");
-                        const statusInput = section.querySelector("input[placeholder='상태']") || section.querySelector(".status-input");
-                        const yearInputs = section.querySelectorAll("input[placeholder='YYYY']");
-                        const monthInputs = section.querySelectorAll("input[placeholder='MM']");
-
-                        const [startY, startM] = (json.startDate || "").split("-");
-                        const [endY, endM] = (json.endDate || "").split("-");
-
-                        if (schoolInput) schoolInput.value = json.schoolName || "";
-                        if (majorInput) majorInput.value = json.majorName || "";
-                        if (statusInput) statusInput.value = json.status || "";
-                        if (yearInputs.length >= 2) {
-                            yearInputs[0].value = startY || "";
-                            yearInputs[1].value = endY || "";
-                        }
-                        if (monthInputs.length >= 2) {
-                            monthInputs[0].value = startM || "";
-                            monthInputs[1].value = endM || "";
-                        }
-
-                        console.log("✅ 학력 정보 자동입력 완료!");
-                    });
+                    // ✅ 추가 버튼 클릭 시 새로 생긴 항목에도 자동 등록
+                    const addBtn = section.querySelector(".edu-btn");
+                    if (addBtn) {
+                        addBtn.addEventListener("click", () => {
+                            setTimeout(() => {
+                                const newItem = section.querySelector(".edu-item:last-child, .edu-box:last-child");
+                                if (newItem) {
+                                    attachEduDropEvent(newItem);
+                                    console.log("✨ [EDU] 새로 추가된 학력 item에도 drop 이벤트 연결 완료");
+                                }
+                            }, 100);
+                        });
+                    }
                 }
+
+
+
                 // 🔹 경력 (JOB)
                 else if (title.includes("경력")) {
-                    const dropTarget = section.querySelector(".career-box") || section;
-                    console.log("🎯 [JOB] 경력 섹션에 drop 이벤트 등록됨", dropTarget);
+                    console.log("🎯 [JOB] 경력 섹션에 drop 이벤트 등록 준비");
 
-                    dropTarget.addEventListener("dragover", e => e.preventDefault());
-                    dropTarget.addEventListener("drop", e => {
-                        e.preventDefault();
-                        console.log("🔥 [JOB] drop 이벤트 감지됨!");
+                    // ✅ 개별 경력 item에 드롭 이벤트 등록하는 함수
+                    const attachCareerDropEvent = (item) => {
+                        item.addEventListener("dragover", e => e.preventDefault());
+                        item.addEventListener("drop", e => {
+                            e.preventDefault();
+                            console.log("🔥 [JOB] 개별 career-item drop 감지됨!");
 
-                        const data = e.dataTransfer.getData("application/json");
-                        if (!data) {
-                            console.warn("⚠️ [JOB] 드래그 데이터 없음");
-                            return;
-                        }
+                            const data = e.dataTransfer.getData("application/json");
+                            if (!data) {
+                                console.warn("⚠️ [JOB] 드래그 데이터 없음");
+                                return;
+                            }
 
-                        let json;
-                        try {
-                            json = JSON.parse(data);
-                        } catch (err) {
-                            console.error("❌ [JOB] JSON 파싱 실패:", err);
-                            return;
-                        }
+                            let json;
+                            try {
+                                json = JSON.parse(data);
+                            } catch (err) {
+                                console.error("❌ [JOB] JSON 파싱 실패:", err);
+                                return;
+                            }
 
-                        if (json.type !== "JOB") {
-                            console.log("🚫 [JOB] type이 JOB 아님:", json.type);
-                            return;
-                        }
+                            if (json.type !== "JOB") {
+                                console.log("🚫 [JOB] type이 JOB 아님:", json.type);
+                                return;
+                            }
 
-                        console.log("📦 [JOB] 받은 데이터:", json);
+                            console.log("📦 [JOB] 받은 데이터:", json);
 
-                        // ✅ 입력 필드 찾기
-                        const companyInput = section.querySelector("input[placeholder='회사명']");
-                        const jobInput = section.querySelector("input[placeholder='직무']");
-                        const statusInput = section.querySelector("input[placeholder='재직/퇴사']") || section.querySelector(".status-input");
+                            // ✅ 현재 아이템 내의 입력칸만 찾기
+                            const companyInput = item.querySelector("input[placeholder='회사명']") || item.querySelector(".company-input");
+                            const jobInput = item.querySelector("input[placeholder='직무']") || item.querySelector(".job-input");
+                            const statusInput = item.querySelector("input[placeholder='재직/퇴사']") || item.querySelector(".status-input");
 
-                        // ✅ 날짜 입력칸
-                        const yearInputs = section.querySelectorAll("input[placeholder='YYYY']");
-                        const monthInputs = section.querySelectorAll("input[placeholder='MM']");
+                            const yearInputs = item.querySelectorAll("input[placeholder='YYYY']");
+                            const monthInputs = item.querySelectorAll("input[placeholder='MM']");
 
-                        // ✅ 날짜 파싱
-                        const [startY, startM] = (json.startDate || json.jobStart || "").split("-");
-                        const [endY, endM] = (json.endDate || json.jobEnd || "").split("-");
+                            // ✅ 날짜 파싱
+                            const [startY, startM] = (json.startDate || json.jobStart || "").split("-");
+                            const [endY, endM] = (json.endDate || json.jobEnd || "").split("-");
 
-                        console.log("📆 추출된 날짜:", { startY, startM, endY, endM });
+                            console.log("📆 추출된 날짜:", { startY, startM, endY, endM });
 
-                        // ✅ 값 자동 입력 (항상 새 값으로 덮어쓰기)
-                        if (companyInput) companyInput.value = json.companyName || json.workplace || "";
-                        if (jobInput) jobInput.value = json.jobTitle || json.title || "";
-                        if (statusInput) statusInput.value = json.status || "";
+                            // ✅ 값 입력
+                            if (companyInput) companyInput.value = json.companyName || json.workplace || "";
+                            if (jobInput) jobInput.value = json.jobTitle || json.title || "";
+                            if (statusInput) statusInput.value = json.status || "퇴사";
 
-                        if (yearInputs.length >= 2) {
-                            yearInputs[0].value = startY || "";
-                            yearInputs[1].value = endY || "";
-                        }
-                        if (monthInputs.length >= 2) {
-                            monthInputs[0].value = startM || "";
-                            monthInputs[1].value = endM || "";
-                        }
+                            if (yearInputs.length >= 2) {
+                                yearInputs[0].value = startY || "";
+                                yearInputs[1].value = endY || "";
+                            }
+                            if (monthInputs.length >= 2) {
+                                monthInputs[0].value = startM || "";
+                                monthInputs[1].value = endM || "";
+                            }
 
-                        console.log("✅ 경력 정보 자동입력 완료 (기존 값 갱신됨)!");
+                            console.log("✅ [JOB] 경력 정보 자동입력 완료!");
+                        });
+                    };
+
+                    // ✅ 이미 렌더된 모든 career-item에 이벤트 등록
+                    section.querySelectorAll(".career-item").forEach(item => {
+                        attachCareerDropEvent(item);
                     });
+
+                    // ✅ 새로 추가되는 항목에도 자동 등록
+                    const addBtn = section.querySelector(".career-btn");
+                    if (addBtn) {
+                        addBtn.addEventListener("click", () => {
+                            setTimeout(() => {
+                                const newItem = section.querySelector(".career-item:last-child");
+                                if (newItem) {
+                                    attachCareerDropEvent(newItem);
+                                    console.log("✨ [JOB] 새로 추가된 career-item에도 drop 이벤트 연결 완료");
+                                }
+                            }, 100);
+                        });
+                    }
                 }
-// 🔹 포트폴리오 (PROJECT)
+
+
+                // 🔹 포트폴리오 (PROJECT)
                 else if (title.includes("포트폴리오") || title.includes("프로젝트")) {
                     console.log("🎯 [PROJECT] 포트폴리오 섹션에 drop 이벤트 등록 준비");
 
