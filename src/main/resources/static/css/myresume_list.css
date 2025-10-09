@@ -106,3 +106,16 @@ body {
 .resume-buttons button:hover {
     opacity: 0.9;
 }
+
+.empty-resume {
+    text-align: center;
+    margin-top: 120px;
+    color: #666;
+    font-size: 17px;
+    line-height: 1.8;
+}
+
+.empty-resume p {
+    margin-bottom: 20px;
+    font-weight: 500;
+}
