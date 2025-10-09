@@ -43,7 +43,7 @@ public class CompanyEntity {
 
     // 기업 로고는 내정보 페이지에서 수정
     @Column(length = 255)
-    private String coImageUrl = "/images/user.png"; // 기본 이미지 경로
+    private String coImageUrl = "/images/profile.png"; // 기본 이미지 경로
 
     // 회원가입 일자
     @Column(name = "created_at")
@@ -70,7 +70,7 @@ public class CompanyEntity {
         companyEntity.coNick = companyDTO.getCoNick(); // 기업명
         companyEntity.coPhone = companyDTO.getCoPhone();
         companyEntity.coNum = companyDTO.getCoNum(); // 사업자 등록 번호
-        companyEntity.coImageUrl =  (companyDTO.getCoImageUrl() != null) ? companyDTO.getCoImageUrl() : "/images/user.png";
+        companyEntity.coImageUrl =  (companyDTO.getCoImageUrl() != null) ? companyDTO.getCoImageUrl() : "/images/profile.png";
         companyEntity.createdAt = (companyDTO.getCreatedAt() != null) ? companyDTO.getCreatedAt() : LocalDateTime.now();
 
         return companyEntity;

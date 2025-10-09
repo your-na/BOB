@@ -1251,7 +1251,7 @@ window.addEventListener('DOMContentLoaded', () => {
         .then(res => res.json())
         .then(user => {
             const img = document.getElementById("profileImage");
-            if (img) img.src = user.profileImageUrl || "/images/user.png";
+            if (img) img.src = user.profileImageUrl || "/images/profile.png";
             const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v || ""; };
             setText("userName", user.userName || "이름 없음");
             setText("mainLanguage", user.mainLanguage);

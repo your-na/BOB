@@ -142,16 +142,24 @@
                 .then(comments => {
                     commentList.innerHTML = "";
                     comments.forEach(c => {
-                        // ✅ 프로젝트 작성자와 댓글 작성자 비교
                         const isPostOwner = (c.writer === document.querySelector(".meta1").textContent.trim());
 
                         const div = document.createElement("div");
                         div.classList.add("comment-item");
+
+                        // ✅ 프로필 이미지 (없을 경우 기본 이미지 사용)
+                        const profileImg = c.profileImageUrl ? c.profileImageUrl : '/images/profile.png';
+
                         div.innerHTML = `
-                    <strong class="comment-writer">${c.writer}</strong>
-                    ${isPostOwner ? '<span class="comment-label">작성자</span>' : ''}
-                    <p class="comment-text">${c.content}</p>
-                    <span class="comment-date">${new Date(c.createdAt).toLocaleString()}</span>
+                    <img class="comment-avatar" src="${profileImg}" alt="프로필">
+                    <div class="comment-body">
+                        <div class="comment-header">
+                            <span class="comment-writer">${c.writer}</span>
+                            ${isPostOwner ? '<span class="comment-label">작성자</span>' : ''}
+                            <span class="comment-date">${new Date(c.createdAt).toLocaleString()}</span>
+                        </div>
+                        <p class="comment-text">${c.content}</p>
+                    </div>
                 `;
                         commentList.appendChild(div);
                     });
@@ -160,7 +168,7 @@
         }
 
 
-        // 댓글 등록 이벤트
+// 댓글 등록 이벤트
         commentForm.addEventListener("submit", e => {
             e.preventDefault();
             const text = commentInput.value.trim();
@@ -176,23 +184,29 @@
             })
                 .then(res => res.json())
                 .then(c => {
-                    // ✅ 프로젝트 작성자와 비교
                     const projectWriter = document.querySelector(".meta1").textContent.trim();
                     const isPostOwner = (c.writer === projectWriter);
+                    const profileImg = c.profileImageUrl ? c.profileImageUrl : '/images/profile.png';
 
                     const div = document.createElement("div");
                     div.classList.add("comment-item");
                     div.innerHTML = `
-                <strong class="comment-writer">${c.writer}</strong>
-                ${isPostOwner ? '<span class="comment-label">작성자</span>' : ''}
-                <p class="comment-text">${c.content}</p>
-                <span class="comment-date">${new Date(c.createdAt).toLocaleString()}</span>
+                <img class="comment-avatar" src="${profileImg}" alt="프로필">
+                <div class="comment-body">
+                    <div class="comment-header">
+                        <span class="comment-writer">${c.writer}</span>
+                        ${isPostOwner ? '<span class="comment-label">작성자</span>' : ''}
+                        <span class="comment-date">${new Date(c.createdAt).toLocaleString()}</span>
+                    </div>
+                    <p class="comment-text">${c.content}</p>
+                </div>
             `;
                     commentList.appendChild(div);
                     commentInput.value = "";
                 })
                 .catch(err => console.error("❌ 댓글 작성 실패:", err));
         });
+
 
 
         // 페이지 로드 시 기존 댓글 불러오기

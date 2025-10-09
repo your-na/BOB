@@ -1072,7 +1072,7 @@ window.addEventListener('DOMContentLoaded', () => {
         .then(user => {
             if (!user) return;
 
-            document.getElementById("profileImage").src = user.profileImageUrl || "/images/user.png";
+            document.getElementById("profileImage").src = user.profileImageUrl || "/images/profile.png";
             document.getElementById("userName").textContent = user.userName || "이름 없음";
             document.getElementById("mainLanguage").textContent = user.mainLanguage || "";
             document.getElementById("sex").textContent = user.sex || "";

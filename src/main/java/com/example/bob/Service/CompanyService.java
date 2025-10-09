@@ -50,7 +50,7 @@ public class CompanyService{
         companyDTO.setCoPwd(passwordEncoder.encode(companyDTO.getCoPwd()));
 
         if (companyDTO.getCoImageUrl() == null){
-            companyDTO.setCoImageUrl("images/user.png");
+            companyDTO.setCoImageUrl("images/profile.png");
         }
         if (companyDTO.getCoBio() == null){
             companyDTO.setCoBio("소개를 작성해보세요.");

@@ -56,7 +56,7 @@ public class UserDTO {
         userDTO.setNameEng(userEntity.getNameEng());
         userDTO.setUserNick(userEntity.getUserNick());
         userDTO.setRole(userEntity.getRole());
-        userDTO.setProfileImageUrl(userEntity.getProfileImageUrl() != null ? userEntity.getProfileImageUrl() : "/images/user.png");
+        userDTO.setProfileImageUrl(userEntity.getProfileImageUrl() != null ? userEntity.getProfileImageUrl() : "/images/profile.png");
         userDTO.setBio(userEntity.getUserBio() != null ? userEntity.getUserBio() : "소개를 작성해보세요.");
         userDTO.setAccountCreatedAt(userEntity.getAccountCreatedAt() != null ? userEntity.getAccountCreatedAt() : LocalDateTime.now());
 
@@ -82,7 +82,7 @@ public class UserDTO {
                 .nameHanja(userEntity.getNameHanja())   // 추가
                 .nameEng(userEntity.getNameEng())
                 .userNick(userEntity.getUserNick())
-                .profileImageUrl(userEntity.getProfileImageUrl() != null ? userEntity.getProfileImageUrl() : "/images/user.png")
+                .profileImageUrl(userEntity.getProfileImageUrl() != null ? userEntity.getProfileImageUrl() : "/images/profile.png")
                 .bio(userEntity.getUserBio() != null ? userEntity.getUserBio() : "소개를 작성해보세요.")
                 .accountCreatedAt(userEntity.getAccountCreatedAt() != null ? userEntity.getAccountCreatedAt() : LocalDateTime.now())
                 .build();

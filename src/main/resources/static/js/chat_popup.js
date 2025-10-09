@@ -40,7 +40,7 @@ function renderChatRooms(rooms) {
 
         const profileDiv = document.createElement("div");
         profileDiv.className = "profile";
-        let imageUrl = room.opponentProfileUrl || "/images/user.png";
+        let imageUrl = room.opponentProfileUrl || "/images/profile.png";
         if (!imageUrl.startsWith("/")) imageUrl = "/" + imageUrl;
         profileDiv.style.backgroundImage = `url('${imageUrl}')`;
 
@@ -199,7 +199,7 @@ function renderSelectedUsers() {
         `;
 
         const img = document.createElement("img");
-        img.src = user.avatar || "/images/user.png";
+        img.src = user.avatar || "/images/profile.png";
         img.alt = "profile";
         img.style.width = "24px";
         img.style.height = "24px";
@@ -404,7 +404,7 @@ function renderUserList(users) {
         const disabled = isGroupMode ? "" : (selectedUsers.length >= 1 && !isChecked ? "disabled" : "");
 
         item.innerHTML = `
-            <img src="${user.avatar || "/images/user.png"}" alt="avatar" class="user-avatar">
+            <img src="${user.avatar || "/images/profile.png"}" alt="avatar" class="user-avatar">
             <span>${user.nickname}</span>
             <input type="checkbox" value="${user.id}" ${isChecked ? "checked" : ""} ${disabled} onchange="toggleUserSelect(this)">
         `;

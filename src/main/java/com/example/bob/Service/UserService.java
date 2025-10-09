@@ -74,7 +74,7 @@ public class UserService implements UserDetailsService {
         userDTO.setPwd(passwordEncoder.encode(userDTO.getPwd()));
 
         if (userDTO.getProfileImageUrl() == null) {
-            userDTO.setProfileImageUrl("/images/user.png");
+            userDTO.setProfileImageUrl("/images/profile.png");
         }
         if (userDTO.getBio() == null) {
             userDTO.setBio("소개를 작성해보세요.");
@@ -171,7 +171,7 @@ public class UserService implements UserDetailsService {
         String oldProfileImageUrl = userEntity.getProfileImageUrl();
 
         // 기존 이미지 삭제
-        if (oldProfileImageUrl != null && !oldProfileImageUrl.equals("/images/user.png")) {
+        if (oldProfileImageUrl != null && !oldProfileImageUrl.equals("/images/profile.png")) {
             deleteExistingProfileImage(oldProfileImageUrl);
         }
 
@@ -182,7 +182,7 @@ public class UserService implements UserDetailsService {
     }
 
     private void deleteExistingProfileImage(String profileImageUrl) {
-        if (profileImageUrl != null && !profileImageUrl.equals("/images/user.png")) {
+        if (profileImageUrl != null && !profileImageUrl.equals("/images/profile.png")) {
             Path existingFilePath = Paths.get(uploadDir, profileImageUrl.replace("uploads/profileImages/", ""));
             try {
                 Files.deleteIfExists(existingFilePath);

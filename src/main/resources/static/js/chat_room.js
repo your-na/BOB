@@ -12,7 +12,7 @@ const opponentNick = chatType === "group"
     ? document.querySelector("meta[name='room-name']")?.content || "그룹채팅"
     : document.querySelector("meta[name='opponent-nick']")?.content || "상대";
 
-const opponentProfileUrl = "/" + (document.querySelector("meta[name='opponent-profile-url']")?.content || "/images/user.png").replace(/^\/?/, "");
+const opponentProfileUrl = "/" + (document.querySelector("meta[name='opponent-profile-url']")?.content || "/images/profile.png").replace(/^\/?/, "");
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (chatType === "group") {
                 const key = String(senderIdOrName);
-                const senderInfo = userMap?.[key] || { nick: `유저#${key}`, image: "/images/user.png" };
+                const senderInfo = userMap?.[key] || { nick: `유저#${key}`, image: "/images/profile.png" };
                 profileImg.src = "/" + senderInfo.image.replace(/^\/?/, "");
                 nicknameSpan.textContent = senderInfo.nick;
             } else {

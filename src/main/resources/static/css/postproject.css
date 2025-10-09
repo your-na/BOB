@@ -190,23 +190,82 @@
     color: grey;
 }
 
-
-
+/* ===== 댓글 목록 전체 ===== */
 .comment-list {
-    margin-top: 15px;
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
+/* ===== 개별 댓글 ===== */
 .comment-item {
-    padding: 8px 10px;
-    border-bottom: 1px solid #ddd;
-    font-size: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #fff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    transition: background 0.2s ease;
 }
 
-.comment-writer {
-    color: #333;
-    font-weight: bold;
-    margin-right: 6px;
+.comment-item:hover {
+    background: #fafafa;
 }
+
+/* ===== 프로필 이미지 ===== */
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #ddd;
+    flex-shrink: 0;
+    object-fit: cover;
+}
+
+/* ===== 댓글 본문 영역 ===== */
+.comment-body {
+    flex: 1;
+}
+
+/* ===== 작성자 이름 ===== */
+.comment-writer {
+    font-weight: 600;
+    color: #222;
+    font-size: 15px;
+    margin-right: 5px;
+}
+
+/* ===== 작성일 ===== */
+.comment-date {
+    font-size: 12px;
+    color: #999;
+}
+
+/* ===== "작성자" 라벨 ===== */
+.comment-label {
+    background-color: #2fd12f;
+    color: #fff;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 4px;
+}
+
+/* ===== 댓글 내용 ===== */
 .comment-text {
-    color: #555;
+    margin-top: 6px;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* ===== 멘션 스타일 ===== */
+.comment-text span.mention {
+    color: #000;
+    background: #f2f2f2;
+    font-weight: 600;
+    padding: 2px 4px;
+    border-radius: 4px;
 }
