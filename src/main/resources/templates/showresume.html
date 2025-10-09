@@ -82,6 +82,17 @@
                   </div>
               </div>
 
+              <!-- ✅ 프로젝트 / 공모전 미리보기 -->
+              <div th:if="${section.portfolios != null and #lists.size(section.portfolios) > 0}">
+                  <div th:each="pf : ${section.portfolios}">
+                      <span th:text="|${pf.startDate} ~ ${pf.endDate} ${pf.title}|"></span>
+                      <span th:if="${pf.filePath != null and pf.filePath != ''}">
+      <a th:href="@{'/uploads/projectFiles/' + ${pf.filePath}}" target="_blank">📁 파일 보기</a>
+    </span>
+                      <br>
+                  </div>
+              </div>
+
 
 
               <!-- 사진 첨부 -->

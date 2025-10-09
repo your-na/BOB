@@ -1741,6 +1741,46 @@ function togglePreview() {
             }
         }
 
+        // ✅ 포트폴리오 섹션 처리 (PROJECT / CONTEST 구분)
+        const portfolioBox = box.querySelector(".portfolio-box");
+        if (portfolioBox) {
+            const portfolios = [];
+            const items = portfolioBox.querySelectorAll(".portfolio-item");
+
+            items.forEach(item => {
+                const yearInputs = item.querySelectorAll("input[placeholder='YYYY']");
+                const monthInputs = item.querySelectorAll("input[placeholder='MM']");
+
+                const startYear = yearInputs[0]?.value || "";
+                const startMonth = monthInputs[0]?.value || "";
+                const endYear = yearInputs[1]?.value || "";
+                const endMonth = monthInputs[1]?.value || "";
+
+                const startDate = (startYear && startMonth)
+                    ? `${startYear}-${startMonth.padStart(2, "0")}-01`
+                    : null;
+                const endDate = (endYear && endMonth)
+                    ? `${endYear}-${endMonth.padStart(2, "0")}-01`
+                    : null;
+
+                portfolios.push({
+                    type: item.dataset.type || "PROJECT",  // dataset.type 설정해두면 여기 자동 반영됨
+                    title: item.querySelector(".portfolio-title")?.value || "",
+                    description: item.querySelector(".desc-input")?.value || "",
+                    status: item.querySelector(".status-input")?.value || "",
+                    filePath: item.querySelector(".portfolio-file-path")?.value ||
+                        item.querySelector("input[name='filePath']")?.value || null,
+                    startDate,
+                    endDate
+                });
+            });
+
+            if (portfolios.length > 0) {
+                section.portfolios = portfolios;
+            }
+        }
+
+
 
         // ✅ 드래그 항목 처리 → 꼭 여기에 넣어야 합니다!
         const draggedDivs = box.querySelectorAll(".uploaded-item");
@@ -1774,8 +1814,8 @@ function togglePreview() {
         }
 
         // ✅ 여기 로그 추가
-        console.log("🧩 PREVIEW: section.title =", section.title);
-        console.log("🧩 PREVIEW: section.careers =", section.careers);
+        console.log("🧩 PREVIEW: section.portfolios =", section.portfolios);
+        if (portfolioBox) section.title = "포트폴리오";
         sections.push(section);
     });
     // ✅ 모든 업로드 완료 후 preview 요청

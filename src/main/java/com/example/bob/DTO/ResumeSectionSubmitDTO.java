@@ -16,6 +16,7 @@ public class ResumeSectionSubmitDTO {
     private List<String> fileNames; // ✅ 여러 개의 파일 저장용
     private List<ResumeDragItemDTO> dragItems;
     private List<JobHistoryDTO> careers;
+    private List<PortfolioItemDTO> portfolios;
 
     /**
      * 학력사항 섹션일 경우에만 채워지는 필드.
