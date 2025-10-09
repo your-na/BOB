@@ -189,3 +189,24 @@
     text-decoration: none;
     color: grey;
 }
+
+
+
+.comment-list {
+    margin-top: 15px;
+}
+
+.comment-item {
+    padding: 8px 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.comment-writer {
+    color: #333;
+    font-weight: bold;
+    margin-right: 6px;
+}
+.comment-text {
+    color: #555;
+}
