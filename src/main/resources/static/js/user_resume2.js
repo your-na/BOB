@@ -728,6 +728,9 @@ function renderPortfolioSection(section, number) {
         const clone = portfolioItem.cloneNode(true);
         clone.querySelectorAll("input, textarea").forEach(el => el.value = "");
         portfolioBox.appendChild(clone);
+
+        // ✅ 새로 추가된 항목에도 드롭 이벤트 연결
+        attachPortfolioDropEvent(clone);
     });
 
     // ✅ 구성 정리
@@ -1452,80 +1455,99 @@ window.addEventListener('DOMContentLoaded', () => {
                         console.log("✅ 경력 정보 자동입력 완료 (기존 값 갱신됨)!");
                     });
                 }
-
 // 🔹 포트폴리오 (PROJECT)
                 else if (title.includes("포트폴리오") || title.includes("프로젝트")) {
-                    const dropTarget = section.querySelector(".portfolio-box") || section;
-                    console.log("🎯 [PROJECT] 포트폴리오 섹션에 drop 이벤트 등록됨", dropTarget);
+                    console.log("🎯 [PROJECT] 포트폴리오 섹션에 drop 이벤트 등록 준비");
 
-                    dropTarget.addEventListener("dragover", e => e.preventDefault());
-                    dropTarget.addEventListener("drop", e => {
-                        e.preventDefault();
-                        console.log("🔥 [PROJECT] drop 이벤트 감지됨!");
+                    // ✅ 드롭 이벤트 등록 함수 (개별 item용)
+                    const attachPortfolioDropEvent = (item) => {
+                        item.addEventListener("dragover", e => e.preventDefault());
+                        item.addEventListener("drop", e => {
+                            e.preventDefault();
+                            console.log("🔥 [PROJECT] 개별 포트폴리오 item drop 감지됨!");
 
-                        const data = e.dataTransfer.getData("application/json");
-                        if (!data) return;
+                            const data = e.dataTransfer.getData("application/json");
+                            if (!data) return;
 
-                        let json;
-                        try {
-                            json = JSON.parse(data);
-                        } catch (err) {
-                            console.error("❌ [PROJECT] JSON 파싱 실패:", err);
-                            return;
-                        }
+                            let json;
+                            try {
+                                json = JSON.parse(data);
+                            } catch (err) {
+                                console.error("❌ [PROJECT] JSON 파싱 실패:", err);
+                                return;
+                            }
 
-                        if (json.type !== "PROJECT" && json.type !== "CONTEST") return;
+                            if (json.type !== "PROJECT" && json.type !== "CONTEST") return;
 
-                        console.log("📦 [PROJECT] 받은 데이터:", json);
+                            console.log("📦 [PROJECT] 받은 데이터:", json);
 
-                        // ✅ 입력칸 찾기 (다양한 기업 양식 대응)
-                        const titleInput =
-                            section.querySelector("input[placeholder*='프로젝트']") ||
-                            section.querySelector("input[placeholder*='공모전']") ||
-                            section.querySelector(".portfolio-title");
+                            // ✅ 현재 item 내부의 입력칸 찾기
+                            const titleInput =
+                                item.querySelector("input[placeholder*='프로젝트']") ||
+                                item.querySelector("input[placeholder*='공모전']") ||
+                                item.querySelector(".portfolio-title");
 
-                        const descInput =
-                            section.querySelector("textarea[placeholder*='설명']") ||
-                            section.querySelector("input[placeholder*='설명']") ||
-                            section.querySelector(".desc-input");
+                            const descInput =
+                                item.querySelector("textarea[placeholder*='설명']") ||
+                                item.querySelector("input[placeholder*='설명']") ||
+                                item.querySelector(".desc-input");
 
-                        const statusInput =
-                            section.querySelector("input[placeholder*='상태']") ||
-                            section.querySelector(".status-input");
+                            const statusInput =
+                                item.querySelector("input[placeholder*='상태']") ||
+                                item.querySelector(".status-input");
 
-                        const filePathInput =
-                            section.querySelector("input[placeholder*='파일']") ||
-                            section.querySelector(".portfolio-file-path");
+                            const filePathInput =
+                                item.querySelector("input[placeholder*='파일']") ||
+                                item.querySelector(".portfolio-file-path");
 
-                        const hiddenFileInput =
-                            section.querySelector("input[name='filePath']");
+                            const hiddenFileInput =
+                                item.querySelector("input[name='filePath']");
 
-                        const yearInputs = section.querySelectorAll("input[placeholder='YYYY']");
-                        const monthInputs = section.querySelectorAll("input[placeholder='MM']");
+                            const yearInputs = item.querySelectorAll("input[placeholder='YYYY']");
+                            const monthInputs = item.querySelectorAll("input[placeholder='MM']");
 
-                        // ✅ 날짜 분리
-                        const [startY, startM] = (json.startDate || "").split("-");
-                        const [endY, endM] = (json.endDate || "").split("-");
+                            const [startY, startM] = (json.startDate || "").split("-");
+                            const [endY, endM] = (json.endDate || "").split("-");
 
-                        // ✅ 값 입력
-                        if (titleInput) titleInput.value = json.projectName || json.title || "";
-                        if (descInput) descInput.value = json.description || "";
-                        if (statusInput) statusInput.value = json.status || "완료";
-                        if (filePathInput) filePathInput.value = json.file || json.filePath || json.fileUrl || "";
-                        if (hiddenFileInput) hiddenFileInput.value = json.file || json.filePath || json.fileUrl || "";
+                            if (titleInput) titleInput.value = json.projectName || json.title || "";
+                            if (descInput) descInput.value = json.description || "";
+                            if (statusInput) statusInput.value = json.status || "완료";
+                            if (filePathInput) filePathInput.value = json.file || json.filePath || json.fileUrl || "";
+                            if (hiddenFileInput) hiddenFileInput.value = json.file || json.filePath || json.fileUrl || "";
 
-                        if (yearInputs.length >= 2) {
-                            yearInputs[0].value = startY || "";
-                            yearInputs[1].value = endY || "";
-                        }
-                        if (monthInputs.length >= 2) {
-                            monthInputs[0].value = startM || "";
-                            monthInputs[1].value = endM || "";
-                        }
+                            if (yearInputs.length >= 2) {
+                                yearInputs[0].value = startY || "";
+                                yearInputs[1].value = endY || "";
+                            }
+                            if (monthInputs.length >= 2) {
+                                monthInputs[0].value = startM || "";
+                                monthInputs[1].value = endM || "";
+                            }
 
-                        console.log("✅ 포트폴리오 정보 자동입력 완료!");
+                            console.log("✅ [PROJECT] 포트폴리오 정보 자동입력 완료!");
+                        });
+                    };
+
+                    // ✅ 기존에 렌더링된 모든 포트폴리오 아이템에 이벤트 연결
+                    section.querySelectorAll(".portfolio-item").forEach(item => {
+                        attachPortfolioDropEvent(item);
                     });
+
+                    // ✅ 새로 추가되는 항목에도 자동 연결
+                    const addBtn = section.querySelector(".portfolio-btn");
+                    if (addBtn) {
+                        addBtn.addEventListener("click", () => {
+                            setTimeout(() => {
+                                const newItem = section.querySelector(".portfolio-item:last-child");
+                                if (newItem) {
+                                    attachPortfolioDropEvent(newItem);
+                                    console.log("✨ [PROJECT] 새로 추가된 포트폴리오 item에도 drop 이벤트 연결 완료");
+                                }
+                            }, 100);
+                        });
+                    }
                 }
+
                 
             });
 
