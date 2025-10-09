@@ -1016,6 +1016,7 @@ function renderEducations() {
                     // ✅ dataset 보강
                     Object.assign(d.dataset, {
                         type: 'EDUCATION',
+                        id: edu.id,
                         schoolName: edu.schoolName || "",
                         majorName: edu.majorName || "",
                         status: edu.status || "",
@@ -1609,9 +1610,10 @@ document.addEventListener("dblclick", (e) => {
                 <option value="중퇴" ${data.status==="중퇴"?"selected":""}>중퇴</option>
             </select>
             <div class="edit-dates">
-                <input type="month" class="edit-start" value="${data.startDate||""}">
-                ~
-                <input type="month" class="edit-end" value="${data.endDate||""}">
+               <input type="month" class="edit-start" value="${data.startDate ? data.startDate.slice(0,7) : ""}">
+~
+<input type="month" class="edit-end" value="${data.endDate ? data.endDate.slice(0,7) : ""}">
+
             </div>
         `;
     }
@@ -1657,9 +1659,50 @@ document.addEventListener("dblclick", (e) => {
             const status = card.querySelector(".edit-status").value;
             const start = card.querySelector(".edit-start").value;
             const end = card.querySelector(".edit-end").value;
-            card.innerHTML = `${school}<br><small>${status} ${start} ~ ${end} 학과 ${major}</small>`;
-            Object.assign(card.dataset, { type:"EDUCATION", schoolName:school, majorName:major, status, startDate:start, endDate:end });
+
+            // ✅ DB 저장 요청
+            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+            fetch("/api/education-history/save", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify({
+                    id: card.dataset.id || null, // 기존 항목이면 id 포함
+                    schoolName: school,
+                    majorName: major,
+                    status,
+                    startDate: start,
+                    endDate: end
+                })
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error("저장 실패");
+                    return res.json();
+                })
+                .then(savedId => {
+                    card.innerHTML = `${school}<br><small>${status} ${start} ~ ${end} 학과 ${major}</small>`;
+                    Object.assign(card.dataset, {
+                        type: "EDUCATION",
+                        id: savedId, // ✅ 새로 받은 id 반영
+                        schoolName: school,
+                        majorName: major,
+                        status,
+                        startDate: start,
+                        endDate: end
+                    });
+                    makeDraggable(card, card.dataset);
+                    card.classList.remove("editing");
+                })
+                .catch(err => {
+                    alert("수정 저장 중 오류 발생");
+                    console.error(err);
+                });
         }
+
         else if (type === "job") {
             const work = card.querySelector(".edit-workplace").value.trim();
             const job = card.querySelector(".edit-jobtitle").value.trim();

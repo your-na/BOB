@@ -13,9 +13,12 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EducationSimpleDTO {
+    private Long id;
     private String schoolName;  // 학교명
     private String majorName;   // ✅ 학과명 추가
     private String status;      // 재학 / 졸업
     private String startDate;   // yyyy-MM-dd 형식
     private String endDate;     // yyyy-MM-dd 형식
+
+
 }
