@@ -11,6 +11,28 @@ public class ResumeSectionDTO {
     private List<String> tags;        // 선택지로 쓸 태그
     private List<String> conditions;
 
+
+    private List<JobHistoryDTO> careers;   // ✅ 경력사항 리스트 추가
+
+    public List<JobHistoryDTO> getCareers() {
+        return careers;
+    }
+    public void setCareers(List<JobHistoryDTO> careers) {
+        this.careers = careers;
+    }
+
+    // ✅ ResumeSectionDTO.java 에 추가
+    private List<PortfolioItemDTO> portfolios;
+
+    public List<PortfolioItemDTO> getPortfolios() {
+        return portfolios;
+    }
+    public void setPortfolios(List<PortfolioItemDTO> portfolios) {
+        this.portfolios = portfolios;
+    }
+
+
+
     // Getter / Setter
 
     public Long getId() {

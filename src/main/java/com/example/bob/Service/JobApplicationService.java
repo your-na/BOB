@@ -47,18 +47,38 @@ public class JobApplicationService {
         System.out.println("📄 [SERVICE] 지원 내역 수: " + applications.size());
 
         return applications.stream()
-                .filter(app -> app.getJobPost() != null && app.getJobPost().getCompany() != null) // 💡 삭제된 공고 제외
+                .filter(app -> app.getJobPost() != null && app.getJobPost().getCompany() != null)
                 .map(application -> {
                     JobApplicationDTO dto = new JobApplicationDTO();
-                    dto.setAppliedDate(new SimpleDateFormat("yyyy.MM.dd").format(application.getResume().getSubmittedAt()));
+
+                    // ✅ 이 부분 추가: resume / myResume 둘 다 대응
+                    if (application.getResume() != null) {
+                        // 기존 기업용 이력서
+                        dto.setAppliedDate(
+                                new SimpleDateFormat("yyyy.MM.dd")
+                                        .format(application.getResume().getSubmittedAt())
+                        );
+                    } else if (application.getMyResume() != null) {
+                        // 내가 만든 이력서(MyResume)
+                        dto.setAppliedDate(
+                                new SimpleDateFormat("yyyy.MM.dd")
+                                        .format(application.getAppliedAt())
+                        );
+                    } else {
+                        dto.setAppliedDate("-");
+                    }
+
+                    // ✅ 나머지 동일
                     dto.setJobTitle(application.getJobPost().getTitle());
                     dto.setCompanyIntro(application.getJobPost().getCompany().getCoBio());
-                    dto.setStatus(application.getStatus().name()); // Enum to String
+                    dto.setStatus(application.getStatus().name());
                     dto.setJobPostId(application.getJobPost().getId());
                     dto.setApplicationId(application.getId());
+
                     return dto;
                 })
                 .collect(Collectors.toList());
+
     }
 
 

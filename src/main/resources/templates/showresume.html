@@ -75,7 +75,27 @@
               </div>
             </div>
 
-            <!-- 사진 첨부 -->
+              <!-- ✅ 임시 문자열 표시용 -->
+              <div th:if="${section.careers != null and #lists.size(section.careers) > 0}">
+                  <div th:each="career : ${section.careers}">
+                      <span th:text="|${career.startDate} ~ ${career.endDate} ${career.workplace} ${career.jobTitle} ${career.status}|"></span><br>
+                  </div>
+              </div>
+
+              <!-- ✅ 프로젝트 / 공모전 미리보기 -->
+              <div th:if="${section.portfolios != null and #lists.size(section.portfolios) > 0}">
+                  <div th:each="pf : ${section.portfolios}">
+                      <span th:text="|${pf.startDate} ~ ${pf.endDate} ${pf.title}|"></span>
+                      <span th:if="${pf.filePath != null and pf.filePath != ''}">
+      <a th:href="@{'/uploads/projectFiles/' + ${pf.filePath}}" target="_blank">📁 파일 보기</a>
+    </span>
+                      <br>
+                  </div>
+              </div>
+
+
+
+              <!-- 사진 첨부 -->
             <div th:if="${section.fileNames != null and not #lists.isEmpty(section.fileNames) and section.type == '사진 첨부'}">
               <div class="image-preview" th:each="img : ${section.fileNames}">
                   <img th:src="@{|/uploads/resumeFiles/${img}|}"

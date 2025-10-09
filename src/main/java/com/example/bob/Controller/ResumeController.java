@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.util.UUID;
 import jakarta.servlet.http.HttpSession;
+import java.time.LocalDate;
+
 
 
 
@@ -167,14 +169,43 @@ public class ResumeController {
             dtoSection.setEducations(section.getEducations());
             dtoSection.setSelectedTags(section.getSelectedTags());
             dtoSection.setDragItems(section.getDragItems());
+            dtoSection.setCareers(section.getCareers());
+            dtoSection.setPortfolios(section.getPortfolios());
 
 
-            // ✅ 핵심: uploadedFileName이 있고, 기존 fileNames가 null 또는 비어있으면 대체해줌
+            // ✅ 파일명 처리 (기존 로직 유지)
             if ((section.getFileNames() == null || section.getFileNames().isEmpty()) &&
                     section.getUploadedFileName() != null && !section.getUploadedFileName().isEmpty()) {
                 dtoSection.setFileNames(List.of(section.getUploadedFileName()));
             } else {
                 dtoSection.setFileNames(section.getFileNames());
+            }
+
+            // ✅ PROJECT / CONTEST 항목을 portfolios로 변환
+            List<PortfolioItemDTO> portfolios = new ArrayList<>();
+            if (section.getDragItems() != null) {
+                for (ResumeDragItemDTO item : section.getDragItems()) {
+                    if (item.getItemType() == null) continue;
+
+                    String type = item.getItemType().toUpperCase();
+                    if (!type.equals("PROJECT") && !type.equals("CONTEST")) continue;
+
+                    PortfolioItemDTO pf = PortfolioItemDTO.builder()
+                            .type(type)
+                            .title(item.getDisplayText())       // 화면에 보이던 제목
+                            .description(null)                  // 설명은 필요 시 확장
+                            .status(null)
+                            .filePath(item.getFilePath())
+                            .startDate(parseDateSafe(item.getStartDate()))
+                            .endDate(parseDateSafe(item.getEndDate()))
+                            .build();
+
+                    portfolios.add(pf);
+                }
+            }
+
+            if (!portfolios.isEmpty()) {
+                dtoSection.setPortfolios(portfolios);
             }
 
             sections.add(dtoSection);
@@ -184,6 +215,17 @@ public class ResumeController {
         session.setAttribute("previewResume", dto);
         return ResponseEntity.ok("미리보기 저장 완료");
     }
+
+    // ✅ 안전한 날짜 변환 함수
+    private LocalDate parseDateSafe(String date) {
+        if (date == null || date.isBlank()) return null;
+        try {
+            return LocalDate.parse(date); // yyyy-MM-dd 형식
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
 
 
