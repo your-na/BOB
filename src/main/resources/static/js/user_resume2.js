@@ -503,6 +503,9 @@ function renderEducationSection(section, number) {
     sectionBox.className = "section-box";
     sectionBox.dataset.coSectionId = section.id;
 
+    // ✅ 제목 저장 (미리보기용)
+    sectionBox.dataset.title = section.title;
+
     // 🔹 섹션 제목
     const sectionTitle = document.createElement("div");
     sectionTitle.className = "section-title";
@@ -1677,25 +1680,29 @@ function togglePreview() {
             selectedTags
         };
 
-        // ✅ 학력사항 처리 추가
-        const eduList = box.querySelector("#education-list");
-        if (eduList) {
+        // ✅ 학력사항 처리 (최신 구조 대응)
+        const eduBox = box.querySelector(".edu-box");
+        if (eduBox) {
             const educations = [];
-            const items = eduList.querySelectorAll(".education-item");
+            const items = eduBox.querySelectorAll(".edu-item");
             items.forEach(item => {
+                const yearInputs = item.querySelectorAll("input[placeholder='YYYY']");
+                const monthInputs = item.querySelectorAll("input[placeholder='MM']");
+
                 educations.push({
-                    schoolName: item.querySelector("input[placeholder='학교명']").value,
-                    majorName: item.querySelector("input[placeholder='학과명']").value,
-                    status: item.querySelector(".edu-status").value,
-                    startYear: item.querySelector(".start-year").value,
-                    startMonth: item.querySelector(".start-month").value,
-                    endYear: item.querySelector(".end-year").value,
-                    endMonth: item.querySelector(".end-month").value
+                    schoolName: item.querySelector(".school-input")?.value || "",
+                    majorName: item.querySelector(".major-input")?.value || "",
+                    status: item.querySelector(".status-input")?.value || "",
+                    startYear: yearInputs[0]?.value || "",
+                    startMonth: monthInputs[0]?.value || "",
+                    endYear: yearInputs[1]?.value || "",
+                    endMonth: monthInputs[1]?.value || ""
                 });
             });
 
             section.educations = educations;
         }
+
 
         // ✅ 드래그 항목 처리 → 꼭 여기에 넣어야 합니다!
         const draggedDivs = box.querySelectorAll(".uploaded-item");
