@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>프로젝트 목록</title>
+  <link rel="stylesheet" href="/css/jjimproject.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<main class="container">
+  <h2 class="page-title">찜한 프로젝트</h2>
+
+  <div class="project-table-wrapper">
+    <table class="project-table">
+      <thead>
+      <tr>
+        <th>프로젝트명</th>
+        <th>생성자</th>
+        <th>모집 기간</th>
+        <th>진행 일정</th>
+        <th>조회수</th>
+        <th>좋아요</th>
+        <th>모집 인원</th>
+        <th>현황</th>
+      </tr>
+      </thead>
+      <tbody id="jjimProjectList">
+      <!-- 찜한 프로젝트 목록이 여기에 JS로 동적 렌더링됨 -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 페이지네이션 -->
+  <div class="pagination">
+    <button class="page-btn prev">〈</button>
+    <span class="current-page">1</span>
+    <button class="page-btn next">〉</button>
+  </div>
+</main>
+
+<script src="/js/jjimproject.js"></script>
+</body>
+</html>
