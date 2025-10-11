@@ -837,34 +837,75 @@ confirmBtn.addEventListener("click", () => {
 
 
 
-        // ✅ 학력사항인 경우, education 정보 수집
-        if (box.querySelector("#education-list")) {
-            const educationItems = box.querySelectorAll(".education-item");
+        // ✅ [FIX] 학력사항 (새 구조: .edu-box / .edu-item) 수집
+        const eduBox = box.querySelector(".edu-box");
+        if (eduBox) {
             const educations = [];
+            const items = eduBox.querySelectorAll(".edu-item");
+            items.forEach(item => {
+                const yearInputs = item.querySelectorAll("input[placeholder='YYYY']");
+                const monthInputs = item.querySelectorAll("input[placeholder='MM']");
 
-            educationItems.forEach(item => {
                 educations.push({
-                    schoolName: item.querySelector("input[placeholder='학교명']").value,
-                    majorName: item.querySelector("input[placeholder='학과명']").value,
-                    status: item.querySelector(".edu-status").value,
-                    startYear: item.querySelector(".start-year").value,
-                    startMonth: item.querySelector(".start-month").value,
-                    endYear: item.querySelector(".end-year").value,
-                    endMonth: item.querySelector(".end-month").value
+                    schoolName: item.querySelector(".school-input")?.value || "",
+                    majorName: item.querySelector(".major-input")?.value || "",
+                    status: item.querySelector(".status-input")?.value || "",
+                    startYear: yearInputs[0]?.value || "",
+                    startMonth: monthInputs[0]?.value || "",
+                    endYear: yearInputs[1]?.value || "",
+                    endMonth: monthInputs[1]?.value || ""
                 });
             });
 
-            section.educations = educations;  // ✅ 핵심: section에 추가
+            section.educations = educations;
         }
 
-        sections.push(section);
+
+        // ✅ 경력사항 수집 (JobHistoryDTO와 매핑)
+        const careerBox = box.querySelector(".career-box");
+        if (careerBox) {
+            const careers = [];
+            const items = careerBox.querySelectorAll(".career-item");
+
+            items.forEach(item => {
+                const yearInputs = item.querySelectorAll("input[placeholder='YYYY']");
+                const monthInputs = item.querySelectorAll("input[placeholder='MM']");
+
+                const startYear = yearInputs[0]?.value || "";
+                const startMonth = monthInputs[0]?.value || "";
+                const endYear   = yearInputs[1]?.value || "";
+                const endMonth  = monthInputs[1]?.value || "";
+
+                const startDate = (startYear && startMonth)
+                    ? `${startYear}-${startMonth.padStart(2, "0")}-01`
+                    : null;
+                const endDate = (endYear && endMonth)
+                    ? `${endYear}-${endMonth.padStart(2, "0")}-01`
+                    : null;
+
+                careers.push({
+                    workplace: item.querySelector(".company-input")?.value || "",
+                    jobTitle:  item.querySelector(".job-input")?.value || "",
+                    status:    item.querySelector(".status-input")?.value || "",
+                    startDate,
+                    endDate
+                });
+            });
+
+            if (careers.length > 0) {
+                section.careers = careers; // ← 서버로 보낼 섹션에 경력 붙이기
+            }
+        }
 
         uploadPromises.push(
             uploadPromise.then(() => {
                 section.uploadedFileName = uploadedFileName;
             })
         );
+        sections.push(section);
     });
+
+
 
 // ✅ 모든 업로드 끝나고 서버에 제출
     Promise.all(uploadPromises)

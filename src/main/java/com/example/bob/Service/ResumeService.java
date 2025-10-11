@@ -9,6 +9,8 @@ import com.example.bob.DTO.EducationDTO;
 import com.example.bob.DTO.ResumeDetailDTO;
 import com.example.bob.DTO.ResumeDetailSectionDTO;
 import com.example.bob.DTO.ResumeDragItemDTO;
+import com.example.bob.DTO.JobHistoryDTO;
+
 
 
 
@@ -25,7 +27,7 @@ import com.example.bob.Entity.JobApplicationEntity;
 import com.example.bob.Entity.JobApplicationStatus;
 import com.example.bob.Entity.CoJobPostEntity;
 import com.example.bob.Entity.ProjectHistoryEntity;
-
+import com.example.bob.Entity.ResumeCareerEntity;
 
 import com.example.bob.Repository.CoResumeRepository;
 import com.example.bob.Repository.CoResumeSectionRepository;
@@ -37,6 +39,8 @@ import com.example.bob.Repository.ResumeFileRepository;
 import com.example.bob.Repository.ResumeDragItemRepository;
 import com.example.bob.Repository.CoJobPostRepository;
 import com.example.bob.Repository.JobApplicationRepository;
+import com.example.bob.Repository.ResumeCareerRepository;
+
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +95,9 @@ public class ResumeService {
 
     @Autowired
     private com.example.bob.Repository.ProjectHistoryRepository projectHistoryRepository;
+
+    @Autowired
+    private ResumeCareerRepository resumeCareerRepository;
 
 
 
@@ -235,6 +242,41 @@ public class ResumeService {
                 }
             }
         }
+
+        // 5-2️⃣ 경력 저장
+        for (ResumeSectionSubmitDTO dto : request.getSections()) {
+            if (dto.getCareers() != null && !dto.getCareers().isEmpty()) {
+                ResumeSectionEntity targetSection = sectionEntities.stream()
+                        .filter(sec -> sec.getCoSection().getId().equals(dto.getCoSectionId()))
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("매칭되는 섹션이 없습니다."));
+
+                dto.getCareers().forEach(careerDTO -> {
+                    ResumeCareerEntity career = new ResumeCareerEntity();
+                    career.setResumeSection(targetSection);
+
+                    // ✅ JobHistoryDTO 기준 필드 매핑
+                    career.setCompanyName(careerDTO.getWorkplace()); // 회사명
+                    career.setPosition(careerDTO.getJobTitle());     // 직무명
+                    career.setStatus(careerDTO.getStatus());         // 재직/퇴사 상태
+
+                    // ✅ LocalDate → 연/월 분리 저장
+                    if (careerDTO.getStartDate() != null) {
+                        career.setStartYear(String.valueOf(careerDTO.getStartDate().getYear()));
+                        career.setStartMonth(String.format("%02d", careerDTO.getStartDate().getMonthValue()));
+                    }
+
+                    if (careerDTO.getEndDate() != null) {
+                        career.setEndYear(String.valueOf(careerDTO.getEndDate().getYear()));
+                        career.setEndMonth(String.format("%02d", careerDTO.getEndDate().getMonthValue()));
+                    }
+
+                    resumeCareerRepository.save(career);
+                });
+            }
+        }
+
+
 
         // 6️⃣ 파일 첨부 저장
         for (ResumeSectionSubmitDTO dto : request.getSections()) {
