@@ -488,3 +488,33 @@ textarea {
     background: #00b800;
     color: white;
 }
+
+/* ✅ 빈 데이터 안내 (디자인 통일) */
+.empty-content {
+    padding: 50px 20px;
+    text-align: center;
+    color: #333;
+    border-top: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 0 0 20px 20px; /* 탭 아래 모서리 부드럽게 */
+}
+
+.no-data-text {
+    font-size: 16px;
+    margin-bottom: 12px;
+    color: #444;
+    font-weight: 500;
+}
+
+.view-link {
+    font-size: 14px;
+    font-weight: bold;
+    color: #19CB13;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+.view-link:hover {
+    color: #0ea30e;
+}

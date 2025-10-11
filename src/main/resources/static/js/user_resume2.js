@@ -1,3 +1,36 @@
+/***********************
+ * 공통 유틸
+ ***********************/
+// 안내 문구 삽입 함수
+function appendEditHint(container) {
+    if (!container) return;
+    if (!container.querySelector(".edit-hint")) {
+        const hint = document.createElement("p");
+        hint.className = "edit-hint";
+        hint.textContent = "※ 드래그 전, 항목을 더블클릭하면 수정할 수 있습니다.";
+        hint.style.fontSize = "11px";
+        hint.style.color = "#777";
+        hint.style.margin = "6px 0";
+        hint.style.textAlign = "left";
+        container.prepend(hint); // 항상 맨 위에 표시
+    }
+}
+
+
+function normalizeDate(date) {
+    return date && date.length === 7 ? date + "-01" : date;
+}
+function populateYearOptions(selectElement, year) {
+    if (!selectElement || !year) return;
+    const exists = Array.from(selectElement.options).some(opt => opt.value === year);
+    if (!exists) {
+        const opt = document.createElement("option");
+        opt.value = year;
+        opt.textContent = year;
+        selectElement.appendChild(opt);
+    }
+}
+
 // ✅ 파일을 서버에 업로드하고 저장된 파일명을 반환하는 함수
 async function uploadFileToServer(file) {
     const formData = new FormData();
@@ -201,6 +234,432 @@ function addDeleteFunction(button) {
         }
     });
 }
+
+/***********************
+ * 탭 바인딩
+ ***********************/
+/***********************
+ * 탭 전환 및 빈 화면 안내
+ ***********************/
+function activateTab(tabName) {
+    document.querySelectorAll('#tab-list .tab').forEach(t => t.classList.remove('active'));
+    const activeTab = document.querySelector(`#tab-list .tab[data-tab="${tabName}"]`);
+    if (activeTab) activeTab.classList.add('active');
+
+    let isEmpty = true;
+    document.querySelectorAll('.tab-content').forEach(c => {
+        const show = c.dataset.content === tabName;
+        c.style.display = show ? 'block' : 'none';
+        if (show) {
+            isEmpty = c.querySelectorAll(".award-item").length === 0;
+        }
+    });
+
+    const empty = document.querySelector('.empty-content[data-content="empty"]');
+    if (empty) empty.style.display = isEmpty ? 'block' : 'none';
+}
+
+/***********************
+ * 우측 패널 데이터 로딩
+ ***********************/
+function makeDraggable(div, payload) {
+    div.setAttribute('draggable', 'true');
+    div.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('application/json', JSON.stringify(payload));
+    });
+}
+
+/***********************
+ * 프로젝트/공모전 카드 렌더링
+ ***********************/
+function renderProjects() {
+    return fetch('/api/user/resumes/projects')
+        .then(res => res.json())
+        .then(projects => {
+            const cont = document.querySelector('.tab-content[data-content="portfolio"]');
+            if (!cont) return;
+            cont.innerHTML = '';
+            if (!projects || projects.length === 0) return;
+
+            projects.forEach(p => {
+                const d = document.createElement('div');
+                d.className = 'award-item';
+                d.innerHTML = `${p.title}<br><small>${p.submittedDate || ''}</small>`;
+                // ✅ dataset 보강
+                Object.assign(d.dataset, {
+                    type: 'PROJECT',
+                    id: p.id,
+                    title: p.title || "",
+                    desc: p.desc || "",
+                    file: (p.filePath || '').replace(/^\/?download\//, ''),
+                    startDate: p.startDate || "",
+                    endDate: p.endDate || ""
+                });
+                makeDraggable(d, d.dataset);
+                cont.appendChild(d);
+            });
+
+            // 안내 문구 추가
+            appendEditHint(cont);
+        })
+        .catch(err => console.error('프로젝트 로드 실패:', err));
+}
+
+/***********************
+ * 경력 카드 렌더링
+ ***********************/
+function renderJobs() {
+    return fetch('/api/job-history')
+        .then(res => res.json())
+        .then(list => {
+            const cont = document.querySelector('.tab-content[data-content="job"]');
+            if (!cont) return;
+            cont.innerHTML = '';
+            if (!list || list.length === 0) return;
+
+            list.forEach(it => {
+                const start = it.startDate?.replace(/-/g, '.') || '';
+                const end = it.endDate?.replace(/-/g, '.') || '';
+                const period = it.status === '재직' ? `재직: ${start} ~` : `퇴직: ${start} ~ ${end}`;
+
+                const d = document.createElement('div');
+                d.className = 'award-item';
+                d.innerHTML = `${it.workplace || '직무 없음'}<br><small>${period}</small>`;
+                // ✅ dataset 보강
+                Object.assign(d.dataset, {
+                    type: 'JOB',
+                    id: it.id,
+                    workplace: it.workplace || "",
+                    jobTitle: it.jobTitle || "",
+                    status: it.status || "",
+                    startDate: it.startDate || "",
+                    endDate: it.endDate || ""
+                });
+                makeDraggable(d, d.dataset);
+                cont.appendChild(d);
+            });
+
+            // 안내 문구 추가
+            appendEditHint(cont);
+        })
+        .catch(err => console.error('구직 이력 로드 실패:', err));
+}
+
+/***********************
+ * 학력 카드 렌더링
+ ***********************/
+function renderEducations() {
+    return fetch('/api/education-history/list')
+        .then(res => res.json())
+        .then(list => {
+            const cont = document.querySelector('.tab-content[data-content="school"]');
+            if (!cont) return;
+            cont.innerHTML = '';
+
+            if (list && list.length > 0) {
+                list.forEach(edu => {
+                    const fmt = d => d?.replace(/-/g, '.');
+                    let line2 = '';
+                    if (edu.status === '재학')
+                        line2 = `재학 ${fmt(edu.startDate)} 학과 ${edu.majorName || ''}`;
+                    else if (edu.status === '졸업')
+                        line2 = `졸업 ${fmt(edu.startDate)} ~ ${fmt(edu.endDate)} 학과 ${edu.majorName || ''}`;
+                    else
+                        line2 = `${edu.status || ''} 학과 ${edu.majorName || ''}`;
+
+                    const d = document.createElement('div');
+                    d.className = 'award-item';
+                    d.innerHTML = `${edu.schoolName}<br><small>${line2}</small>`;
+                    // ✅ dataset 보강
+                    Object.assign(d.dataset, {
+                        type: 'EDUCATION',
+                        id: edu.id,
+                        schoolName: edu.schoolName || "",
+                        majorName: edu.majorName || "",
+                        status: edu.status || "",
+                        startDate: edu.startDate || "",
+                        endDate: edu.endDate || ""
+                    });
+                    makeDraggable(d, d.dataset);
+                    cont.appendChild(d);
+                });
+
+                // 안내 문구 추가
+                appendEditHint(cont);
+            }
+
+            // ➕ 버튼 그대로 유지
+            const addBtn = document.createElement('button');
+            addBtn.className = 'add-school-btn';
+            addBtn.textContent = '＋';
+            const addBtnWrapper = document.createElement('div');
+            addBtnWrapper.style.display = 'flex';
+            addBtnWrapper.style.justifyContent = 'center';
+            addBtnWrapper.appendChild(addBtn);
+            cont.appendChild(addBtnWrapper);
+
+            addBtn.onclick = () => {
+                const eduBox = document.createElement('div');
+                eduBox.className = 'award-item editable';
+                eduBox.innerHTML = `
+                    <input type="text" class="school-input" placeholder="학교명">
+                    <input type="text" class="major-input" placeholder="학과">
+                    <select class="status-input">
+                        <option value="">상태 선택</option>
+                        <option value="재학">재학</option>
+                        <option value="졸업">졸업</option>
+                        <option value="휴학">휴학</option>
+                        <option value="중퇴">중퇴</option>
+                    </select>
+                    <div class="date-group2">
+                        <input type="month" class="start-date">
+                        ~
+                        <input type="month" class="end-date">
+                    </div>
+                `;
+
+                eduBox.addEventListener("keydown", async (e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        const school = eduBox.querySelector(".school-input").value.trim();
+                        const major = eduBox.querySelector(".major-input").value.trim();
+                        const status = eduBox.querySelector(".status-input").value;
+                        const start = eduBox.querySelector(".start-date").value;
+                        const end = eduBox.querySelector(".end-date").value;
+
+                        if (!school) {
+                            alert("학교명을 입력하세요!");
+                            return;
+                        }
+
+                        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+                        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+                        try {
+                            // ✅ DB 저장 요청
+                            const res = await fetch("/api/education-history/save", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    [csrfHeader]: csrfToken
+                                },
+                                body: JSON.stringify({
+                                    schoolName: school,
+                                    majorName: major,
+                                    status: status,
+                                    startDate: start,
+                                    endDate: end
+                                })
+                            });
+
+                            if (!res.ok) throw new Error("저장 실패");
+                            const savedId = await res.json();
+
+                            // ✅ UI 업데이트
+                            let line2 = "";
+                            if (status === "재학") line2 = `재학 ${start} ~ 학과 ${major}`;
+                            else if (status === "졸업") line2 = `졸업 ${start} ~ ${end} 학과 ${major}`;
+                            else line2 = `${status} ${start} ~ ${end} 학과 ${major}`;
+
+                            eduBox.className = "award-item";
+                            eduBox.innerHTML = `${school}<br><small>${line2}</small>`;
+                            Object.assign(eduBox.dataset, {
+                                type: "EDUCATION",
+                                id: savedId,
+                                schoolName: school,
+                                majorName: major,
+                                status,
+                                startDate: start,
+                                endDate: end
+                            });
+                            makeDraggable(eduBox, eduBox.dataset);
+                        } catch (err) {
+                            alert("DB 저장 중 오류 발생");
+                            console.error(err);
+                        }
+                    }
+                });
+
+
+                eduBox.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        const school = eduBox.querySelector(".school-input").value.trim();
+                        const major = eduBox.querySelector(".major-input").value.trim();
+                        const status = eduBox.querySelector(".status-input").value;
+                        const start = eduBox.querySelector(".start-date").value;
+                        const end = eduBox.querySelector(".end-date").value;
+
+                        if (!school) {
+                            alert("학교명을 입력하세요!");
+                            return;
+                        }
+
+                        let line2 = "";
+                        if (status === "재학") line2 = `재학 ${start} ~ 학과 ${major}`;
+                        else if (status === "졸업") line2 = `졸업 ${start} ~ ${end} 학과 ${major}`;
+                        else line2 = `${status} ${start} ~ ${end} 학과 ${major}`;
+
+                        eduBox.className = "award-item";
+                        eduBox.innerHTML = `${school}<br><small>${line2}</small>`;
+                        Object.assign(eduBox.dataset, {
+                            type: "EDUCATION",
+                            schoolName: school,
+                            majorName: major,
+                            status: status,
+                            startDate: start,
+                            endDate: end
+                        });
+                        makeDraggable(eduBox, eduBox.dataset);
+                    }
+                });
+
+                cont.insertBefore(eduBox, addBtnWrapper);
+            };
+        })
+        .catch(err => console.error('학력 로드 실패:', err));
+}
+
+// ✅ 페이지 로드 완료 후 실행
+document.addEventListener("DOMContentLoaded", () => {
+    renderEducations();
+    renderProjects();
+    renderJobs();
+});
+
+function renderContestsIntoPortfolio() {
+    return fetch('/api/user/resumes/contests')
+        .then(res => res.json())
+        .then(list => {
+            const cont = document.querySelector('.tab-content[data-content="portfolio"]');
+            if (!cont || !list) return;
+            list.forEach(c => {
+                const d = document.createElement('div');
+                d.className = 'award-item';
+                d.innerHTML = `${c.title}<br><small>${c.date || ''}</small>`;
+                // ✅ dataset 보강
+                Object.assign(d.dataset, {
+                    type: 'CONTEST',
+                    id: c.id,
+                    title: c.title || "",
+                    file: c.filePath || "",
+                    startDate: c.startDate || "",
+                    endDate: c.endDate || ""
+                });
+                makeDraggable(d, d.dataset);
+                cont.appendChild(d);
+            });
+        })
+        .catch(err => console.error('공모전 로드 실패:', err));
+}
+
+
+// ✅ 개월 수 계산 함수 (맨 위에 추가)
+function calcMonths(startDate, endDate) {
+    if (!startDate || !endDate) return "";
+    const [sy, sm] = startDate.split("-").map(Number);
+    const [ey, em] = endDate.split("-").map(Number);
+    return (ey - sy) * 12 + (em - sm) + 1; // 종료월 포함
+}
+/***********************
+ * 왼쪽 섹션 드롭 설정 (학력 자동 채움 포함)
+ ***********************/
+function setupLeftDrops() {
+    setupDropBox(document.querySelector('#section4 .upload-box'));
+    setupDropBox(document.querySelector('#section5 .upload-box'));
+
+
+}
+
+/***********************
+ * 초기 education-item 드롭 바인딩
+ ***********************/
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('.education-item').forEach(item => {
+        if (typeof bindDropToEducationItem === "function") {
+            bindDropToEducationItem(item);
+        }
+    });
+});
+
+
+/***********************
+ * 탭 바인딩
+ ***********************/
+function bindTabs() {
+    document.querySelectorAll('#tab-list .tab').forEach(tab => {
+        // 도움말 툴팁 추가
+        tab.setAttribute("title", "더블클릭 시 경력 내역 페이지로 이동합니다.");
+
+        // 기본: 클릭하면 탭 활성화
+        tab.addEventListener('click', () => {
+            activateTab(tab.dataset.tab);
+        });
+
+        // 추가: 더블클릭하면 /resumehistory 이동
+        tab.addEventListener('dblclick', () => {
+            window.location.href = "/resumehistory";
+        });
+    });
+}
+
+/***********************
+ * 박스 선택 하이라이트
+ ***********************/
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('.resume-section, .section-box').forEach(box => {
+        box.addEventListener('click', () => {
+            document.querySelectorAll('.resume-section, .section-box').forEach(b => b.classList.remove('selected'));
+            box.classList.add('selected');
+        });
+    });
+});
+
+/***********************
+ * 학력 섹션: + 추가 및 삭제 바인딩
+ ***********************/
+document.addEventListener("DOMContentLoaded", () => {
+    const addEduBtn = document.getElementById("add-edu");
+    const section2 = document.getElementById("section2");
+
+    if (addEduBtn && section2) {
+        addEduBtn.addEventListener("click", () => {
+            const firstItem = section2.querySelector(".education-item");
+            if (firstItem) {
+                const clone = firstItem.cloneNode(true);
+                clone.querySelectorAll("input, select").forEach(el => el.value = "");
+                const delBtn = clone.querySelector(".edu-del");
+                if (delBtn) {
+                    delBtn.addEventListener("click", () => clone.remove());
+                }
+                section2.insertBefore(clone, addEduBtn);
+                bindDropToEducationItem(clone);
+            }
+        });
+    }
+
+    document.querySelectorAll(".edu-del").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.target.closest(".education-item").remove();
+        });
+    });
+});
+
+// ✅ 페이지 로드 시 자동 탭 활성화
+document.addEventListener("DOMContentLoaded", async() => {
+    bindTabs();
+
+    // ✅ 먼저 데이터 렌더링
+    await renderEducations();
+    await renderProjects();
+    await renderJobs();
+
+    // 기본 탭 자동 활성화 (예: school)
+    const defaultTab = document.querySelector(".tab.active") || document.querySelector(".tab[data-tab='school']");
+    if (defaultTab) {
+        activateTab(defaultTab.dataset.tab);
+    }
+});
 
 
 
@@ -456,28 +915,6 @@ confirmBtn.addEventListener("click", () => {
 });
 
 
-// ✅ 탭 클릭 시 콘텐츠 보여주고, 데이터 없을 경우 안내 메시지 처리
-document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', function () {
-        const tabName = this.dataset.tab;
-
-        // 활성화 표시
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
-
-        // 해당 내용만 표시
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.style.display = content.dataset.content === tabName ? 'block' : 'none';
-        });
-
-        // 데이터 없을 때 empty-content 표시
-        const targetContent = document.querySelector(`.tab-content[data-content="${tabName}"]`);
-        const isEmpty = !targetContent || targetContent.children.length === 0;
-
-        document.querySelector('.empty-content').style.display = isEmpty ? 'block' : 'none';
-    });
-});
-
 // ✅ 내 정보 화살표 클릭 시 프로필 페이지 이동
 const arrowToggle = document.querySelector('.arrow-toggle');
 arrowToggle.addEventListener('click', () => {
@@ -568,6 +1005,7 @@ function renderEducationSection(section, number) {
             }
         }, 100);
     });
+
 
     // ✅ 전체 구성
     eduBox.appendChild(eduItem);
@@ -1063,6 +1501,10 @@ window.addEventListener('DOMContentLoaded', () => {
     const tabName = defaultTab.dataset.tab;
     const targetContent = document.querySelector(`.tab-content[data-content="${tabName}"]`);
     const isEmpty = !targetContent || targetContent.children.length === 0;
+    const emptyBox = document.querySelector('.empty-content');
+    if (emptyBox) {
+        emptyBox.style.display = isEmpty ? 'block' : 'none';
+    }
 
     document.querySelector('.empty-content').style.display = isEmpty ? 'block' : 'none';
 
@@ -1086,191 +1528,6 @@ window.addEventListener('DOMContentLoaded', () => {
         })
         .catch(err => console.error("내 정보 불러오기 실패:", err));
 
-    // ✅ 사용자 완료 프로젝트 목록 불러오기 (오른쪽 경력 및 포트폴리오 탭에 표시)
-    fetch("/api/user/resumes/projects")
-
-        .then(res => res.json())
-        .then(projects => {
-            const container = document.querySelector(".tab-content[data-content='portfolio']"); // ✅ portfolio 탭으로 수정
-            container.innerHTML = ""; // ✅ 기존 하드코딩된 우따따 프로젝트 삭제
-            if (!projects || projects.length === 0) return;
-
-            // 수정된 코드 - 기존 "우따따 만들기 프로젝트"와 동일한 마크업
-            projects.forEach(project => {
-                const div = document.createElement("div");
-                div.className = "award-item";
-                div.innerHTML = `
-        ${project.title}<br>
-        <small>${project.submittedDate}</small>
-    `;
-
-                // ✅ 여기 추가: 드래그된 항목에 필요한 데이터 속성 심기
-                div.dataset.id = project.id;
-                div.dataset.type = "PROJECT"; // 고정값이지만 명시
-                div.dataset.file = project.filePath || "";
-
-                // ✅ 드래그 시 JSON 형태로 전체 정보 담아서 전송
-                div.setAttribute('draggable', true);
-                div.addEventListener('dragstart', e => {
-                    const dragData = JSON.stringify({
-                        id: project.id,
-                        type: "PROJECT",
-                        file: project.filePath?.replace(/^\/?download\//, ""),
-                        title: project.title,
-                        startDate: project.startDate || "",
-                        endDate: project.endDate || ""
-                    });
-
-                    console.log("📦 dragData filePath:", project.filePath); // ✅ 추가
-                    console.log("📦 전체 dragData:", dragData);              // ✅ 추가
-                    e.dataTransfer.setData("application/json", dragData);
-                });
-
-
-
-                container.appendChild(div);
-            });
-        })
-        .catch(err => console.error("프로젝트 불러오기 실패:", err));
-
-
-    // ✅ 구직 내역 불러오기 (오른쪽 award 탭에 출력)
-    fetch("/api/job-history")
-        .then(res => res.json())
-        .then(histories => {
-            console.log("🔥 받아온 구직 이력:", histories);  // 이거 추가!
-            const container = document.querySelector(".tab-content[data-content='job']");
-            container.innerHTML = "";
-
-
-
-            if (!histories || histories.length === 0) return;
-
-            histories.forEach(item => {
-                const div = document.createElement("div");
-                div.className = "award-item";
-
-                const start = item.startDate?.replace(/-/g, ".") || "";
-                const end = item.endDate?.replace(/-/g, ".") || "";
-
-                let periodText = "";
-                if (item.status === "재직") {
-                    periodText = `재직: ${start} ~`;
-                } else {
-                    periodText = `퇴직: ${start} ~ ${end}`;
-                }
-
-                div.innerHTML = `
-    ${item.workplace || item.companyName || item.company || "회사명 없음"}<br>
-    <small>${item.jobTitle ? item.jobTitle + " · " : ""}${periodText}</small>
-`;
-
-
-
-                // 🔧 드래그 속성 추가
-                div.setAttribute("draggable", true);
-
-                // 🔧 드래그 시작 시 데이터 설정
-                div.addEventListener("dragstart", e => {
-                    const dragData = JSON.stringify({
-                        id: item.id,
-                        type: "JOB", // 드래그 타입 구분
-                        title: item.jobTitle || "직무 없음",
-                        companyName: item.workplace || item.companyName || item.company || "", // ✅ 추가
-                        startDate: item.startDate,
-                        endDate: item.endDate,
-                        status: item.status
-                    });
-
-                    e.dataTransfer.setData("application/json", dragData);
-                });
-
-                container.appendChild(div);
-            });
-        })
-        .catch(err => console.error("구직 내역 불러오기 실패:", err));
-
-    // ✅ 학력사항 목록 불러오기
-    fetch("/api/education-history/list")
-        .then(res => res.json())
-        .then(educations => {
-            const container = document.querySelector(`.tab-content[data-content='school']`);
-            container.innerHTML = "";
-
-            educations.forEach(edu => {
-                const div = document.createElement("div");
-                div.className = "award-item";
-
-                // 날짜 포맷 (yyyy-mm-dd → yyyy.mm.dd)
-                const format = (date) => date?.replace(/-/g, ".");
-
-                // 상태에 따라 출력 문장 분기
-                let line2 = "";
-                if (edu.status === "재학") {
-                    line2 = `재학 ${format(edu.startDate)} 학과 ${edu.majorName || ""}`;
-                } else if (edu.status === "졸업") {
-                    line2 = `졸업 ${format(edu.startDate)} ~ ${format(edu.endDate)} 학과 ${edu.majorName || ""}`;
-                } else {
-                    line2 = `${edu.status || ""} 학과 ${edu.majorName || ""}`;
-                }
-
-                // HTML 구성
-                div.innerHTML = `${edu.schoolName}<br><small>${line2}</small>`;
-
-                // ✅ 드래그 가능하게 설정
-                div.setAttribute("draggable", true);
-
-                // ✅ dragstart 이벤트로 학력 데이터를 JSON으로 설정
-                div.addEventListener("dragstart", e => {
-                    const dragData = JSON.stringify({
-                        type: "EDUCATION",   // 학력 데이터임을 구분
-                        schoolName: edu.schoolName,
-                        majorName: edu.majorName,
-                        status: edu.status,
-                        startDate: edu.startDate,
-                        endDate: edu.endDate
-                    });
-                    console.log("🎒 드래그 데이터:", dragData);
-                    e.dataTransfer.setData("application/json", dragData);
-                });
-
-                container.appendChild(div);
-            });
-        })
-        .catch(err => console.error("학력 불러오기 실패:", err));
-
-
-
-
-    // ✅ 📌 여기 공모전 fetch 넣기 – 프로젝트 fetch 밖으로!
-    fetch("/api/user/resumes/contests")
-        .then(res => res.json())
-        .then(contests => {
-            const container = document.querySelector(".tab-content[data-content='22']");
-            container.innerHTML = "";
-            contests.forEach(contest => {
-                const div = document.createElement("div");
-                div.className = "award-item";
-                div.textContent = `${contest.title}\n${contest.date}`;
-                div.dataset.id = contest.id;
-                div.dataset.type = "CONTEST";
-                div.dataset.file = contest.filePath || "";
-
-                div.setAttribute("draggable", true);
-                div.addEventListener("dragstart", e => {
-                    const data = JSON.stringify({
-                        id: contest.id,
-                        type: "CONTEST",
-                        file: contest.filePath,
-                        title: contest.title
-                    });
-                    e.dataTransfer.setData("application/json", data);
-                });
-
-                container.appendChild(div);
-            });
-        })
-        .catch(err => console.error("공모전 불러오기 실패:", err));
 
     // ✅ 드래그 가능한 항목 설정
     document.querySelectorAll('.award-item').forEach(item => {
@@ -1841,4 +2098,3 @@ function togglePreview() {
         document.getElementById("resumePreviewFrame").src = "/showresume";
     });
 }
-
