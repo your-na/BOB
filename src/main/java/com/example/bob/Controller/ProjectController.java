@@ -587,6 +587,11 @@ public class ProjectController {
         return "todo_add";
     }
 
+    @GetMapping("/jjimproject")
+    public String jjimprojectPage() {
+        return "jjimproject";
+    }
+
 
 }
 
