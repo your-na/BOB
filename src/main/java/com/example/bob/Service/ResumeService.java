@@ -28,6 +28,7 @@ import com.example.bob.Entity.JobApplicationStatus;
 import com.example.bob.Entity.CoJobPostEntity;
 import com.example.bob.Entity.ProjectHistoryEntity;
 import com.example.bob.Entity.ResumeCareerEntity;
+import com.example.bob.Entity.ResumePortfolioEntity;
 
 import com.example.bob.Repository.CoResumeRepository;
 import com.example.bob.Repository.CoResumeSectionRepository;
@@ -40,6 +41,8 @@ import com.example.bob.Repository.ResumeDragItemRepository;
 import com.example.bob.Repository.CoJobPostRepository;
 import com.example.bob.Repository.JobApplicationRepository;
 import com.example.bob.Repository.ResumeCareerRepository;
+import com.example.bob.Repository.ResumePortfolioRepository;
+import com.example.bob.Repository.ContestHistoryRepository;
 
 
 
@@ -98,6 +101,13 @@ public class ResumeService {
 
     @Autowired
     private ResumeCareerRepository resumeCareerRepository;
+
+    @Autowired
+    private ResumePortfolioRepository resumePortfolioRepository;
+
+    @Autowired
+    private ContestHistoryRepository contestHistoryRepository;
+
 
 
 
@@ -313,7 +323,72 @@ public class ResumeService {
 
 
                     resumeDragItemRepository.save(drag);
+
+                    // ✅ [2️⃣ 추가] 포트폴리오 저장 (PROJECT / CONTEST 구분)
+                    if ("PROJECT".equalsIgnoreCase(dragDTO.getItemType())) {
+                        userProjectRepository.findById(dragDTO.getReferenceId()).ifPresent(project -> {
+                            ResumePortfolioEntity pf = new ResumePortfolioEntity();
+                            pf.setResumeSection(targetSection);
+                            pf.setType("PROJECT");
+                            pf.setTitle(project.getProject().getTitle());
+                            pf.setStatus("완료");
+                            pf.setSubmittedFile(project.getSubmittedFileName());
+
+                            if (project.getProject().getStartDate() != null) {
+                                pf.setStartYear(String.valueOf(project.getProject().getStartDate().getYear()));
+                                pf.setStartMonth(String.format("%02d", project.getProject().getStartDate().getMonthValue()));
+                            }
+                            if (project.getProject().getEndDate() != null) {
+                                pf.setEndYear(String.valueOf(project.getProject().getEndDate().getYear()));
+                                pf.setEndMonth(String.format("%02d", project.getProject().getEndDate().getMonthValue()));
+                            }
+
+                            resumePortfolioRepository.save(pf);
+                        });
+                    }
+
+
+                    else if ("CONTEST".equalsIgnoreCase(dragDTO.getItemType())) {
+                        contestHistoryRepository.findById(dragDTO.getReferenceId()).ifPresent(contest -> {
+                            ResumePortfolioEntity pf = new ResumePortfolioEntity();
+                            pf.setResumeSection(targetSection);
+                            pf.setType("CONTEST");
+                            pf.setTitle(contest.getTitle());
+                            pf.setStatus(contest.getStatus());
+
+                            if (contest.getStartDate() != null) {
+                                pf.setStartYear(String.valueOf(contest.getStartDate().getYear()));
+                                pf.setStartMonth(String.format("%02d", contest.getStartDate().getMonthValue()));
+                            }
+                            if (contest.getEndDate() != null) {
+                                pf.setEndYear(String.valueOf(contest.getEndDate().getYear()));
+                                pf.setEndMonth(String.format("%02d", contest.getEndDate().getMonthValue()));
+                            }
+
+                            resumePortfolioRepository.save(pf);
+                        });
+                    }
+
                 });
+                System.out.println("📦 [DEBUG] 드래그 항목 감지됨: " + dto.getDragItems().size());
+
+                dto.getDragItems().forEach(dragDTO -> {
+                    System.out.println("➡️ [DEBUG] 드래그 DTO 타입: " + dragDTO.getItemType() +
+                            ", referenceId: " + dragDTO.getReferenceId() +
+                            ", displayText: " + dragDTO.getDisplayText() +
+                            ", filePath: " + dragDTO.getFilePath());
+
+                    ResumeDragItemEntity drag = new ResumeDragItemEntity();
+                    drag.setSection(targetSection);
+                    drag.setItemType(dragDTO.getItemType());
+                    drag.setReferenceId(dragDTO.getReferenceId());
+                    drag.setDisplayText(dragDTO.getDisplayText());
+                    drag.setFilePath(dragDTO.getFilePath());
+
+                    resumeDragItemRepository.save(drag);
+                    System.out.println("💾 [DEBUG] 저장 완료됨 → ID: " + drag.getId());
+                });
+
             }
         }
 

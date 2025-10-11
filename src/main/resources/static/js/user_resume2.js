@@ -131,6 +131,10 @@ function setupDropBox(box) {
 
             item.textContent = displayText;
 
+            // ✅ 🔥 바로 여기에 추가!
+            item.dataset.type = json.type || "PROJECT";
+
+
             // ✅ 드래그 항목 속성 주입
             item.dataset.id = json.id;
             item.dataset.type = json.type;
@@ -265,18 +269,26 @@ function activateTab(tabName) {
 function makeDraggable(div, payload) {
     div.setAttribute('draggable', 'true');
     div.addEventListener('dragstart', e => {
-        e.dataTransfer.setData('application/json', JSON.stringify(payload));
+        const itemType = div.dataset.type || "PROJECT"; // 기본값은 "PROJECT"
+        const file = div.dataset.file || "";
+
+        e.dataTransfer.setData('application/json', JSON.stringify({
+            ...payload,
+            type: itemType,
+            file: file
+        }));
     });
+
 }
 
 /***********************
- * 프로젝트/공모전 카드 렌더링
+ * 프로젝트 렌더링
  ***********************/
 function renderProjects() {
     return fetch('/api/user/resumes/projects')
         .then(res => res.json())
         .then(projects => {
-            const cont = document.querySelector('.tab-content[data-content="portfolio"]');
+            const cont = document.querySelector('.tab-content[data-content="project"]');
             if (!cont) return;
             cont.innerHTML = '';
             if (!projects || projects.length === 0) return;
@@ -676,6 +688,12 @@ document.addEventListener("DOMContentLoaded", () => {
     educationList.addEventListener("drop", e => {
         e.preventDefault();
 
+        dropZone.addEventListener("drop", function (e) {
+            e.preventDefault(); // ✅ 반드시 있어야 함
+            console.log("📦 drop 이벤트 실행됨"); // 이거 먼저 확인!
+        });
+
+
         const data = e.dataTransfer.getData("application/json");
         if (!data) return;
 
@@ -902,6 +920,48 @@ confirmBtn.addEventListener("click", () => {
                 section.uploadedFileName = uploadedFileName;
             })
         );
+        // ✅ 포트폴리오 섹션 수집 (PortfolioItemDTO 매핑)
+        const portfolioBox = box.querySelector(".portfolio-box");
+        if (portfolioBox) {
+            const portfolios = [];
+            const items = portfolioBox.querySelectorAll(".portfolio-item");
+
+            items.forEach(item => {
+                const yearInputs = item.querySelectorAll("input[placeholder='YYYY']");
+                const monthInputs = item.querySelectorAll("input[placeholder='MM']");
+
+                const startYear = yearInputs[0]?.value || "";
+                const startMonth = monthInputs[0]?.value || "";
+                const endYear = yearInputs[1]?.value || "";
+                const endMonth = monthInputs[1]?.value || "";
+
+                const startDate = (startYear && startMonth)
+                    ? `${startYear}-${startMonth.padStart(2, "0")}-01`
+                    : null;
+                const endDate = (endYear && endMonth)
+                    ? `${endYear}-${endMonth.padStart(2, "0")}-01`
+                    : null;
+
+                portfolios.push({
+                    type: item.dataset.type || "PROJECT", // PROJECT 또는 CONTEST
+                    title: item.querySelector(".portfolio-title")?.value || "",
+                    description: item.querySelector(".desc-input")?.value || "",
+                    status: item.querySelector(".status-input")?.value || "",
+                    filePath: item.querySelector(".portfolio-file-path")?.value ||
+                        item.querySelector("input[name='filePath']")?.value || null,
+                    startDate,
+                    endDate
+                });
+            });
+
+            if (portfolios.length > 0) {
+                section.portfolios = portfolios; // ✅ PortfolioItemDTO 리스트로 백엔드에 전송
+            }
+        }
+         // ✅ 드래그 아이템 로그 확인 (이 부분 추가!)
+        console.log("📦 현재 섹션 ID:", section.coSectionId);
+        console.log("🎯 section.dragItems:", section.dragItems);
+
         sections.push(section);
     });
 
@@ -1245,6 +1305,13 @@ function renderPortfolioSection(section, number) {
     portfolioBox.appendChild(portfolioItem);
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(portfolioBox);
+
+    // ✅ 여기에 아래 코드 추가!!
+    const hiddenUploadBox = document.createElement("div");
+    hiddenUploadBox.className = "upload-box";
+    hiddenUploadBox.style.display = "none";
+    sectionBox.appendChild(hiddenUploadBox);
+
     sectionBox.appendChild(addBtn);
 
     return sectionBox;
@@ -1900,6 +1967,36 @@ window.addEventListener('DOMContentLoaded', () => {
                             }
 
                             console.log("✅ [PROJECT] 포트폴리오 정보 자동입력 완료!");
+
+                            // ✅ [PROJECT] 포트폴리오 정보 자동입력 완료!  아래에 추가했던 코드 부분 교체
+                            let sectionBox = e.target.closest(".section-box");
+                            if (!sectionBox) {
+                                // 🔁 이벤트 버블링 때문에 e.currentTarget(드롭 이벤트 등록된 요소)에서 찾기
+                                sectionBox = e.currentTarget.closest(".section-box");
+                            }
+                            const sectionId = sectionBox?.getAttribute("data-section-id");
+                            console.log("📦 저장용 섹션 ID:", sectionId);
+
+                            if (sectionId) {
+                                const section = sections.find(sec => sec.id == sectionId);
+                                if (section) {
+                                    if (!section.dragItems) section.dragItems = [];
+                                    section.dragItems.push({
+                                        itemType: "PROJECT",
+                                        referenceId: data.referenceId,
+                                        displayText: data.displayText,
+                                        filePath: data.filePath,
+                                        startDate: data.startDate,
+                                        endDate: data.endDate
+                                    });
+                                    console.log("💾 [PROJECT] dragItems에 저장 완료:", section.dragItems);
+                                } else {
+                                    console.warn("⚠️ 해당 ID의 섹션을 찾을 수 없습니다:", sectionId);
+                                }
+                            } else {
+                                console.warn("⚠️ 섹션 ID를 찾을 수 없습니다. DOM 구조 확인 필요.");
+                            }
+
                         });
                     };
 
