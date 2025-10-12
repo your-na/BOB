@@ -918,14 +918,15 @@ function makeDraggable(div, payload) {
     });
 }
 
+
 /***********************
- * 프로젝트/공모전 카드 렌더링
+ * 프로젝트 카드 렌더링
  ***********************/
 function renderProjects() {
     return fetch('/api/user/resumes/projects')
         .then(res => res.json())
         .then(projects => {
-            const cont = document.querySelector('.tab-content[data-content="portfolio"]');
+            const cont = document.querySelector('.tab-content[data-content="project"]');
             if (!cont) return;
             cont.innerHTML = '';
             if (!projects || projects.length === 0) return;
@@ -953,6 +954,40 @@ function renderProjects() {
         })
         .catch(err => console.error('프로젝트 로드 실패:', err));
 }
+
+
+// ============================
+// ⚠️ 공모전 렌더링 (추후 구현 예정)
+//
+// function renderContestsIntoPortfolio() {
+//     return fetch('/api/user/resumes/contests')
+//         .then(res => res.json())
+//         .then(list => {
+//            const cont = document.querySelector('.tab-content[data-content="contest"]');
+//             if (!cont || !list) return;
+//             list.forEach(c => {
+//                 const d = document.createElement('div');
+//                 d.className = 'award-item';
+//                 d.innerHTML = `${c.title}<br><small>${c.date || ''}</small>`;
+//                 // ✅ dataset 보강
+//                 Object.assign(d.dataset, {
+//                     type: 'CONTEST',
+//                     id: c.id,
+//                     title: c.title || "",
+//                     file: c.filePath || "",
+//                     startDate: c.startDate || "",
+//                     endDate: c.endDate || ""
+//                 });
+//                 makeDraggable(d, d.dataset);
+//                 cont.appendChild(d);
+//             });
+//         })
+//         .catch(err => console.error('공모전 로드 실패:', err));
+// }
+// - dataset.type = "CONTEST" 로 설정 예정
+// - 나중에 makeDraggable()과 appendEditHint() 그대로 사용 가능
+// ============================
+
 
 function renderJobs() {
     return fetch('/api/job-history')
@@ -1163,32 +1198,6 @@ function renderEducations() {
         .catch(err => console.error('학력 로드 실패:', err));
 }
 
-function renderContestsIntoPortfolio() {
-    return fetch('/api/user/resumes/contests')
-        .then(res => res.json())
-        .then(list => {
-            const cont = document.querySelector('.tab-content[data-content="portfolio"]');
-            if (!cont || !list) return;
-            list.forEach(c => {
-                const d = document.createElement('div');
-                d.className = 'award-item';
-                d.innerHTML = `${c.title}<br><small>${c.date || ''}</small>`;
-                // ✅ dataset 보강
-                Object.assign(d.dataset, {
-                    type: 'CONTEST',
-                    id: c.id,
-                    title: c.title || "",
-                    file: c.filePath || "",
-                    startDate: c.startDate || "",
-                    endDate: c.endDate || ""
-                });
-                makeDraggable(d, d.dataset);
-                cont.appendChild(d);
-            });
-        })
-        .catch(err => console.error('공모전 로드 실패:', err));
-}
-
 
 // ✅ 개월 수 계산 함수 (맨 위에 추가)
 function calcMonths(startDate, endDate) {
@@ -1271,7 +1280,7 @@ window.addEventListener('DOMContentLoaded', () => {
         renderProjects(),
         renderJobs(),
         renderEducations(),
-        // renderContestsIntoPortfolio()
+        // renderContests()
     ]).then(() => {
         activateTab('school');
     });

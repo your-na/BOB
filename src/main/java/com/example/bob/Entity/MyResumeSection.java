@@ -25,7 +25,7 @@ public class MyResumeSection {
     @ToString.Exclude // ✅ 무한 참조 방지!
     private MyResume resume; // 어떤 이력서에 속하는지
 
-    private String type; // 선택형, 서술형, 사진 첨부 등
+    private String type; // 선택형, 서술형, 프젝, 공모전
     private String title; // 섹션 제목
     private String comment; // 설명 문구
     private String content; // 본문 입력 내용
