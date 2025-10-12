@@ -28,9 +28,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     // 최근 특정 기간 내 로그인한 일반 회원 수
     long countByRoleAndLastLoginAtAfter(String role, LocalDateTime since);
 
-
-
-
-
-
+    // ✅ 닉네임, 이름, 지역, 자기소개 중 하나라도 검색어 포함
+    List<UserEntity> findByUserNickContainingIgnoreCaseOrUserNameContainingIgnoreCaseOrRegionContainingIgnoreCaseOrUserBioContainingIgnoreCase(
+            String userNick, String userName, String region, String userBio
+    );
 }

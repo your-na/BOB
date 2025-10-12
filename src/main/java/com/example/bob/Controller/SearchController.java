@@ -1,24 +1,46 @@
 package com.example.bob.Controller;
 
+import com.example.bob.Entity.ContestEntity;
+import com.example.bob.Entity.ProjectEntity;
+import com.example.bob.Entity.UserEntity;
+import com.example.bob.Service.ContestService;
+import com.example.bob.Service.ProjectService;
+import com.example.bob.Service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Controller
+@RequiredArgsConstructor
 public class SearchController {
+
+    private final ContestService contestService;
+    private final ProjectService projectService;
+    private final UserService userService;
 
     @GetMapping("/search")
     public String searchResult(@RequestParam("kw") String keyword, Model model) {
-        // TODO: 여기에서 실제 검색 로직을 추가하세요.
-        // 예: 공모전, 프로젝트, 게시글, 프로필에서 keyword 포함 여부로 필터링 등
+        List<ContestEntity> contests = contestService.search(keyword);
+        List<ProjectEntity> projects = projectService.search(keyword);
+        List<UserEntity> profiles = userService.search(keyword);
+        // 게시글은 아직 미구현
 
         model.addAttribute("kw", keyword);
-        // model.addAttribute("contests", contestService.search(keyword));
-        // model.addAttribute("projects", projectService.search(keyword));
-        // model.addAttribute("posts", postService.search(keyword));
-        // model.addAttribute("profiles", profileService.search(keyword));
+        model.addAttribute("contests", contests != null ? contests : List.of());
+        model.addAttribute("projects", projects != null ? projects : List.of());
+        model.addAttribute("profiles", profiles != null ? profiles : List.of());
+        model.addAttribute("posts", List.of());
+        model.addAttribute("totalResults",
+                (contests != null ? contests.size() : 0) +
+                        (projects != null ? projects.size() : 0) +
+                        (profiles != null ? profiles.size() : 0)
+        );
 
-        return "search_result"; // templates/search_result.html
+        return "search_result";
     }
+
 }

@@ -739,5 +739,10 @@ public class ProjectService {
         return projectRepository.findAllActiveProjectsPaged(pageable)
                 .map(this::convertToDTO);
     }
+
+    // ✅ 프로젝트 검색
+    public List<ProjectEntity> search(String keyword) {
+        return projectRepository.findByTitleContainingIgnoreCase(keyword);
+    }
 }
 

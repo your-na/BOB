@@ -226,4 +226,11 @@ public class UserService implements UserDetailsService {
         userRepository.deleteById(userId);
     }
 
+    // ✅ 프로필 검색 기능
+    public List<UserEntity> search(String keyword) {
+        return userRepository
+                .findByUserNickContainingIgnoreCaseOrUserNameContainingIgnoreCaseOrRegionContainingIgnoreCaseOrUserBioContainingIgnoreCase(
+                        keyword, keyword, keyword, keyword
+                );
+    }
 }

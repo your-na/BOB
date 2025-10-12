@@ -287,4 +287,10 @@ public class ContestService {
         return alreadyNotified || stillPending;
     }
 
+    //웹페이지 내 전체 검색 관련
+    // ✅ 공모전 검색 기능
+    public List<ContestEntity> search(String keyword) {
+        return contestRepository.findByTitleContainingIgnoreCaseAndIsDeletedFalse(keyword);
+    }
+
 }

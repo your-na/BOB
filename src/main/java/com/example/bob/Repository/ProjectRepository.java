@@ -28,6 +28,8 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     @Query("SELECT p FROM ProjectEntity p WHERE p.status != '완료' ORDER BY p.id DESC")
     Page<ProjectEntity> findAllActiveProjectsPaged(Pageable pageable);
 
+    //웹사이트 내 전체 검색 관련 코드ㅎㅅㅎ
+    List<ProjectEntity> findByTitleContainingIgnoreCase(String keyword);
 
 }
 
