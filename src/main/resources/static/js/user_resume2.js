@@ -1,3 +1,4 @@
+let sections = [];
 /***********************
  * 공통 유틸
  ***********************/
@@ -1039,7 +1040,8 @@ redirectCancel.addEventListener('click', () => {
 function renderEducationSection(section, number) {
     const sectionBox = document.createElement("section");
     sectionBox.className = "section-box";
-    sectionBox.dataset.coSectionId = section.id;
+    sectionBox.dataset.sectionId = section.id;     // ✅ 이걸 추가!
+    sectionBox.dataset.coSectionId = section.id;   // ✅ 기존 것도 유지 (기업 섹션용)
 
     // ✅ 제목 저장 (미리보기용)
     sectionBox.dataset.title = section.title;
@@ -1123,6 +1125,9 @@ function renderEducationSection(section, number) {
 function renderJobSection(section, number) {
     const sectionBox = document.createElement("section");
     sectionBox.className = "section-box";
+    sectionBox.dataset.sectionId = section.id;     // ✅ 이걸 추가!
+    sectionBox.dataset.coSectionId = section.id;   // ✅ 기존 것도 유지 (기업 섹션용)
+
 
     const conditionText = [];
     if (section.multiSelect) conditionText.push("복수선택 가능");
@@ -1163,7 +1168,9 @@ function renderJobSection(section, number) {
 function renderCareerSection(section, number) {
     const sectionBox = document.createElement("section");
     sectionBox.className = "section-box";
-    sectionBox.dataset.coSectionId = section.id;
+    sectionBox.dataset.sectionId = section.id;     // ✅ 이걸 추가!
+    sectionBox.dataset.coSectionId = section.id;   // ✅ 기존 것도 유지 (기업 섹션용)
+
 
     sectionBox.dataset.title = section.title;
 
@@ -1233,7 +1240,9 @@ function renderCareerSection(section, number) {
 function renderPortfolioSection(section, number) {
     const sectionBox = document.createElement("section");
     sectionBox.className = "section-box";
-    sectionBox.dataset.coSectionId = section.id;
+    sectionBox.dataset.sectionId = section.id;     // ✅ 이걸 추가!
+    sectionBox.dataset.coSectionId = section.id;   // ✅ 기존 것도 유지 (기업 섹션용)
+
 
     // 🔹 섹션 제목
     const sectionTitle = document.createElement("div");
@@ -1324,6 +1333,9 @@ function renderPortfolioSection(section, number) {
 function renderSelfIntroSection(section, number) {
     const sectionBox = document.createElement("section");
     sectionBox.className = "section-box";
+    sectionBox.dataset.sectionId = section.id;     // ✅ 이걸 추가!
+    sectionBox.dataset.coSectionId = section.id;   // ✅ 기존 것도 유지 (기업 섹션용)
+
 
     // 복수선택 여부 제외하고 조건만 괄호에 넣음
     const conditionText = [...section.conditions];
@@ -1379,6 +1391,9 @@ function renderSelfIntroSection(section, number) {
 function renderSelectSection(section, number) {
     const sectionBox = document.createElement("section");
     sectionBox.className = "section-box";
+    sectionBox.dataset.sectionId = section.id;     // ✅ 이걸 추가!
+    sectionBox.dataset.coSectionId = section.id;   // ✅ 기존 것도 유지 (기업 섹션용)
+
 
     const conditionText = [];
     if (!section.multiSelect && section.type === "선택형") conditionText.push("단일선택");
@@ -1419,6 +1434,9 @@ function renderSelectSection(section, number) {
 function renderDescriptiveSection(section, number) {
     const sectionBox = document.createElement("section");
     sectionBox.className = "section-box";
+    sectionBox.dataset.sectionId = section.id;     // ✅ 이걸 추가!
+    sectionBox.dataset.coSectionId = section.id;   // ✅ 기존 것도 유지 (기업 섹션용)
+
 
     const conditionText = [...section.conditions];  // 복수선택 안 넣음
     const title = conditionText.length > 0
@@ -1463,6 +1481,9 @@ function renderPhotoSection(section, number) {
     // section-box 생성
     const sectionBox = document.createElement("section");
     sectionBox.className = "section-box";
+    sectionBox.dataset.sectionId = section.id;     // ✅ 이걸 추가!
+    sectionBox.dataset.coSectionId = section.id;   // ✅ 기존 것도 유지 (기업 섹션용)
+
 
     // 조건 텍스트(복수선택은 제외하고 조건만 사용)
     const conditionText = [...section.conditions];
@@ -1533,6 +1554,9 @@ function renderPhotoSection(section, number) {
 function renderFileSection(section, number) {
     const sectionBox = document.createElement("section");
     sectionBox.className = "section-box";
+    sectionBox.dataset.sectionId = section.id;     // ✅ 이걸 추가!
+    sectionBox.dataset.coSectionId = section.id;   // ✅ 기존 것도 유지 (기업 섹션용)
+
 
     // 조건 텍스트 (복수선택은 포함 안 함)
     const conditionText = [...section.conditions];
@@ -1918,6 +1942,9 @@ window.addEventListener('DOMContentLoaded', () => {
                                 console.error("❌ [PROJECT] JSON 파싱 실패:", err);
                                 return;
                             }
+                            // ✅ 디버깅용 로그 (추가)
+                            console.log("🎯 [PROJECT] 드롭된 데이터 전체:", json);
+
 
                             if (json.type !== "PROJECT" && json.type !== "CONTEST") return;
 
@@ -1954,8 +1981,10 @@ window.addEventListener('DOMContentLoaded', () => {
                             if (titleInput) titleInput.value = json.projectName || json.title || "";
                             if (descInput) descInput.value = json.description || "";
                             if (statusInput) statusInput.value = json.status || "완료";
-                            if (filePathInput) filePathInput.value = json.file || json.filePath || json.fileUrl || "";
-                            if (hiddenFileInput) hiddenFileInput.value = json.file || json.filePath || json.fileUrl || "";
+                            const filePathValue = json.filePath || json.fileUrl || json.file || "";
+                            if (filePathInput) filePathInput.value = filePathValue;
+                            if (hiddenFileInput) hiddenFileInput.value = filePathValue;
+
 
                             if (yearInputs.length >= 2) {
                                 yearInputs[0].value = startY || "";

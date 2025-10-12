@@ -10,6 +10,8 @@ import com.example.bob.DTO.ResumeDetailDTO;
 import com.example.bob.DTO.ResumeDetailSectionDTO;
 import com.example.bob.DTO.ResumeDragItemDTO;
 import com.example.bob.DTO.JobHistoryDTO;
+import com.example.bob.DTO.PortfolioItemDTO;
+
 
 
 
@@ -391,6 +393,39 @@ public class ResumeService {
 
             }
         }
+        // 7-2️⃣ 포트폴리오 수동 입력(또는 드래그된 데이터) 저장
+        for (ResumeSectionSubmitDTO dto : request.getSections()) {
+            if (dto.getPortfolios() != null && !dto.getPortfolios().isEmpty()) {
+                ResumeSectionEntity targetSection = sectionEntities.stream()
+                        .filter(sec -> sec.getCoSection().getId().equals(dto.getCoSectionId()))
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("매칭되는 섹션이 없습니다."));
+
+                for (PortfolioItemDTO pfDTO : dto.getPortfolios()) {
+                    ResumePortfolioEntity pf = new ResumePortfolioEntity();
+                    pf.setResumeSection(targetSection);
+                    pf.setType(pfDTO.getType());
+                    pf.setTitle(pfDTO.getTitle());
+                    pf.setDescription(pfDTO.getDescription());
+                    pf.setStatus(pfDTO.getStatus());
+                    pf.setFilePath(pfDTO.getFilePath());
+
+                    // LocalDate → 연/월 분리 저장
+                    if (pfDTO.getStartDate() != null) {
+                        pf.setStartYear(String.valueOf(pfDTO.getStartDate().getYear()));
+                        pf.setStartMonth(String.format("%02d", pfDTO.getStartDate().getMonthValue()));
+                    }
+                    if (pfDTO.getEndDate() != null) {
+                        pf.setEndYear(String.valueOf(pfDTO.getEndDate().getYear()));
+                        pf.setEndMonth(String.format("%02d", pfDTO.getEndDate().getMonthValue()));
+                    }
+
+                    resumePortfolioRepository.save(pf);
+                }
+            }
+        }
+
+
 
         // 8️⃣ 지원 내역 저장 (JobApplicationEntity)
         JobApplicationEntity application = JobApplicationEntity.builder()
