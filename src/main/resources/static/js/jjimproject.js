@@ -1,53 +1,50 @@
 document.addEventListener("DOMContentLoaded", () => {
     const tableBody = document.getElementById("jjimProjectList");
 
-    // ✅ 현재는 백엔드 연동 전이므로 더미 데이터로 표시
-    const jjimProjects = [
-        {
-            name: "AI 이미지 분석 프로젝트",
-            creator: "김민지",
-            recruitPeriod: "D-2",
-            progress: "2025-10-05 ~ 2025-10-20",
-            views: 12,
-            likes: 3,
-            members: "2/3",
-            status: "진행중"
-        },
-        {
-            name: "헬스케어 앱 프론트 개발",
-            creator: "서유진",
-            recruitPeriod: "D-5",
-            progress: "2025-10-10 ~ 2025-11-01",
-            views: 8,
-            likes: 5,
-            members: "1/2",
-            status: "진행중"
-        },
-        {
-            name: "ChatGPT API 활용 서비스",
-            creator: "박민서",
-            recruitPeriod: "D-7",
-            progress: "2025-10-08 ~ 2025-11-05",
-            views: 5,
-            likes: 7,
-            members: "3/3",
-            status: "진행중"
-        }
-    ];
+    // ✅ 실제 서버 API 호출
+    fetch("/api/jjim-projects")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("서버 응답 실패");
+            }
+            return response.json();
+        })
+        .then(jjimProjects => {
+            // ✅ 데이터 받아와서 테이블에 표시
+            jjimProjects.forEach(project => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${project.title}</td>
+                    <td>${project.createdBy}</td>
+                    <td>${project.recruitmentStartDate} ~ ${project.recruitmentEndDate}</td>
+                    <td>${project.startDate} ~ ${project.endDate}</td>
+                    <td>${project.views}</td>
+                    <td>${project.likes}</td>
+                    <td>${project.currentParticipants}/${project.recruitmentCount}</td>
+                    <td class="status-active">${project.status}</td>
+                `;
 
-    // ✅ 테이블 생성
-    jjimProjects.forEach(project => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-      <td>${project.name}</td>
-      <td>${project.creator}</td>
-      <td>${project.recruitPeriod}</td>
-      <td>${project.progress}</td>
-      <td>${project.views}</td>
-      <td>${project.likes}</td>
-      <td>${project.members}</td>
-      <td class="status-active">${project.status}</td>
-    `;
-        tableBody.appendChild(row);
-    });
+                // ✅ 📍 여기 추가: 행 클릭 시 상세보기 페이지로 이동
+                row.style.cursor = "pointer"; // 마우스 커서 변경
+                row.addEventListener("click", () => {
+                    window.location.href = `/postproject/${project.id}`;
+                });
+
+                // ✅ 테이블에 추가
+                tableBody.appendChild(row);
+            });
+
+            // 🔃 비어있을 경우 메시지 표시
+            if (jjimProjects.length === 0) {
+                const emptyRow = document.createElement("tr");
+                emptyRow.innerHTML = `<td colspan="8" style="text-align:center;">찜한 프로젝트가 없습니다.</td>`;
+                tableBody.appendChild(emptyRow);
+            }
+        })
+        .catch(error => {
+            console.error("찜한 프로젝트 불러오기 실패:", error);
+            const errorRow = document.createElement("tr");
+            errorRow.innerHTML = `<td colspan="8" style="text-align:center; color:red;">프로젝트를 불러오는 중 오류가 발생했습니다.</td>`;
+            tableBody.appendChild(errorRow);
+        });
 });

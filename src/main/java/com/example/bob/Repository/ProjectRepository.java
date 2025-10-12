@@ -31,6 +31,10 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     //웹사이트 내 전체 검색 관련 코드ㅎㅅㅎ
     List<ProjectEntity> findByTitleContainingIgnoreCase(String keyword);
 
+    // ✅ 특정 유저가 찜한 프로젝트 조회
+    List<ProjectEntity> findByLikedUsersContaining(Long userId);
+
+
 }
 
 
