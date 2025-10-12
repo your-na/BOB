@@ -142,7 +142,9 @@
       <table class="resume-table">
         <thead>
         <tr>
+          <th>제목</th>
           <th>파일명</th>
+          <th>기간</th>
           <th>구분</th>
         </tr>
         </thead>
@@ -159,12 +161,24 @@
         <!-- fileNames가 비면 dragItems의 filePath로 대체 -->
         <tr th:each="item : ${section.dragItems}"
             th:if="${(section.fileNames == null or section.fileNames.isEmpty()) and not #lists.isEmpty(section.dragItems) and item.filePath != null}">
+          <!-- 제목 -->
+          <td th:text="${item.displayText != null ? item.displayText : '-'}"></td>
+
+
           <td>
             <a th:href="@{'/uploads/resumeFiles/' + ${item.filePath}}" download>
               <span th:text="${item.filePath}"></span>
             </a>
           </td>
-          <td th:text="${item.jobTitle != null ? item.jobTitle : '포트폴리오'}"></td>
+          <td>
+            <span th:text="${item.startDate}"></span> ~
+            <span th:text="${item.endDate}"></span>
+          </td>
+          <td>
+            <span th:text="${section.type == 'CONTEST' ? '공모전' : '프로젝트'}"></span>
+            <span th:if="${item.displayText != null and item.displayText != ''}">
+  </span>
+          </td>
         </tr>
         <!-- 둘 다 없으면 content 또는 안내 -->
         <tr th:if="${(section.fileNames == null or section.fileNames.isEmpty()) and #lists.isEmpty(section.dragItems)}">
