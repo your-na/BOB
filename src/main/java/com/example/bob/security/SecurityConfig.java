@@ -60,6 +60,9 @@ public class SecurityConfig {
                         .frameOptions(frameOptions -> frameOptions.sameOrigin()) // ✅ iframe 허용 설정
                 )
                 .authorizeHttpRequests(authz -> authz
+                        // ✅ 로그아웃 상태에서도 공모전/프로젝트/채용공고 목록을 볼 수 있도록 허용
+                        .requestMatchers("/api/contest/latest", "/api/cojobs", "/project/api").permitAll()
+
                         .requestMatchers("/", "/main", "/css/**", "/js/**", "/images/**", "/static/**", "/project", "/project/api","/contest", "/app/**", "/topic/**", "/user/me","/api/user/resumes/cancel","/api/user/**","/resume/**","/resume/detail","/api/user/resumes/detail").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/login", "/sign").permitAll()
