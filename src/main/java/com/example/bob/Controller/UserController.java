@@ -259,4 +259,7 @@ public class UserController {
         return "profile_view";
     }
 
+    @GetMapping("/jjimnotice")
+    public String jjimnoticeform() {return "jjimnotice";}
+
 }

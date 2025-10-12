@@ -1,0 +1,113 @@
+.jjim-page {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #fff; /* 전체 흰색 */
+    margin: 0;
+    padding: 0;
+}
+
+/* 페이지 컨테이너 */
+.container {
+    max-width: 1100px;
+    margin: 150px auto;
+    padding: 0 20px;
+}
+
+/* 페이지 상단 제목 + 정렬버튼 영역 */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #222;
+    padding-bottom: 10px;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* 정렬 버튼 */
+.sort-options {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sort-btn {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: #777;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.sort-btn:hover {
+    color: #000;
+}
+
+.sort-btn.active {
+    color: #000;
+    font-weight: 600;
+}
+
+.divider {
+    color: #ccc;
+    font-weight: 300;
+}
+
+/* 카드 레이아웃 */
+.notice-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.notice-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    padding: 20px;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.notice-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.notice-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #222;
+}
+
+.notice-company {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.notice-phone {
+    font-size: 0.95rem;
+    color: #777;
+    margin-bottom: 15px;
+}
+
+.notice-d-day {
+    display: inline-block;
+    background-color: #19CB13;
+    color: #fff;
+    font-weight: 700;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.9rem;
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+}
