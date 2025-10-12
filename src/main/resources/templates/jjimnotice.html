@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>찜한 공고</title>
+  <link rel="stylesheet" href="/css/jjimnotice.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<div class="jjim-page">
+  <main class="container">
+    <div class="page-header">
+      <h1 class="page-title">찜한 공고</h1>
+      <div class="sort-options">
+        <button class="sort-btn active">최신순</button>
+        <span class="divider">|</span>
+        <button class="sort-btn">마감순</button>
+      </div>
+    </div>
+
+    <section class="notice-list">
+      <div class="notice-card">
+        <h2 class="notice-title">웹 프론트엔드 개발자 모집</h2>
+        <p class="notice-company">삼성전자</p>
+        <p class="notice-phone">☎ 02-1234-5678</p>
+        <div class="notice-d-day">D-3</div>
+      </div>
+
+      <div class="notice-card">
+        <h2 class="notice-title">기계설계 엔지니어 채용</h2>
+        <p class="notice-company">현대자동차</p>
+        <p class="notice-phone">☎ 031-987-6543</p>
+        <div class="notice-d-day">D-5</div>
+      </div>
+
+      <div class="notice-card">
+        <h2 class="notice-title">데이터 분석가 채용</h2>
+        <p class="notice-company">카카오</p>
+        <p class="notice-phone">☎ 02-4321-8765</p>
+        <div class="notice-d-day">D-7</div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>
