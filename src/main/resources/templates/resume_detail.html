@@ -128,6 +128,7 @@
 
       <!-- ✅ 포트폴리오 리스트 -->
       <div th:if="${section.portfolios != null and #lists.size(section.portfolios) > 0}">
+        <h4>📁 포트폴리오</h4>
         <div th:each="portfolio : ${section.portfolios}">
           <p>
             <strong th:text="${portfolio.title}">프로젝트명</strong>
@@ -140,9 +141,9 @@
             <!-- 설명 -->
             <span th:text="${portfolio.description}"></span><br>
 
-            <!-- 파일 다운로드 링크 -->
+            <!-- ✅ 파일 보기 (projectFiles 기준) -->
             <a th:if="${portfolio.filePath != null}"
-               th:href="@{${portfolio.filePath}}"
+               th:href="@{'/uploads/projectFiles/' + ${portfolio.filePath}}"
                target="_blank">📎 파일 보기</a>
 
             <!-- 제출된 파일 -->
@@ -152,7 +153,6 @@
           </p>
         </div>
       </div>
-
 
 
 
