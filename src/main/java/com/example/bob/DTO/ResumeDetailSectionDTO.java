@@ -16,7 +16,10 @@ public class ResumeDetailSectionDTO {
     private List<String> tags;
     private List<EducationDTO> educations;               // 학력 리스트
     private List<String> fileNames;                         // 첨부 파일명
-    private List<ResumeDragItemDTO> dragItems;           // 드래그 항목들
+    private List<ResumeDragItemDTO> dragItems;
+    private List<JobHistoryDTO> careers;  // ✅ 추가: 경력 리스트
+    private List<PortfolioItemDTO> portfolios;
+    // ✅ 추가: 포트폴리오 리스트
 
     // Getter / Setter
     public Long getId() { return id; }
@@ -55,4 +58,19 @@ public class ResumeDetailSectionDTO {
 
     public List<ResumeDragItemDTO> getDragItems() { return dragItems; }
     public void setDragItems(List<ResumeDragItemDTO> dragItems) { this.dragItems = dragItems; }
+
+    public List<JobHistoryDTO> getCareers() {
+        return careers;
+    }
+    public void setCareers(List<JobHistoryDTO> careers) {
+        this.careers = careers;
+    }
+
+    public List<PortfolioItemDTO> getPortfolios() {
+        return portfolios;
+    }
+    public void setPortfolios(List<PortfolioItemDTO> portfolios) {
+        this.portfolios = portfolios;
+    }
+
 }

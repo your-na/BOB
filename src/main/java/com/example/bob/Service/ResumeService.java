@@ -496,6 +496,88 @@ public class ResumeService {
             }).collect(Collectors.toList());
             s.setEducations(eduDTOs);
 
+
+            // ✅ 경력
+            List<ResumeCareerEntity> careerEntities = resumeCareerRepository.findByResumeSection(section);
+            List<JobHistoryDTO> careerDTOs = careerEntities.stream().map(c -> {
+                JobHistoryDTO cdto = new JobHistoryDTO();
+                cdto.setId(c.getId());
+                cdto.setStatus(c.getStatus());
+                cdto.setWorkplace(c.getCompanyName());
+                cdto.setJobTitle(c.getPosition());
+
+                // 🔹 startYear / startMonth → LocalDate 변환
+                if (c.getStartYear() != null && c.getStartMonth() != null) {
+                    try {
+                        cdto.setStartDate(LocalDate.of(
+                                Integer.parseInt(c.getStartYear()),
+                                Integer.parseInt(c.getStartMonth()),
+                                1
+                        ));
+                    } catch (Exception e) {
+                        cdto.setStartDate(null);
+                    }
+                }
+
+                // 🔹 endYear / endMonth → LocalDate 변환
+                if (c.getEndYear() != null && c.getEndMonth() != null) {
+                    try {
+                        cdto.setEndDate(LocalDate.of(
+                                Integer.parseInt(c.getEndYear()),
+                                Integer.parseInt(c.getEndMonth()),
+                                1
+                        ));
+                    } catch (Exception e) {
+                        cdto.setEndDate(null);
+                    }
+                }
+
+                return cdto;
+            }).collect(Collectors.toList());
+            s.setCareers(careerDTOs);
+
+
+            // ✅ 포트폴리오
+            List<ResumePortfolioEntity> pfEntities = resumePortfolioRepository.findByResumeSection(section);
+            List<PortfolioItemDTO> pfDTOs = pfEntities.stream().map(p -> {
+                PortfolioItemDTO pdto = new PortfolioItemDTO();
+                pdto.setType(p.getType());
+                pdto.setTitle(p.getTitle());
+                pdto.setStatus(p.getStatus());
+                pdto.setFilePath(p.getFilePath());
+                pdto.setDescription(p.getDescription());
+                pdto.setSubmittedFile(p.getSubmittedFile());
+
+                // 🔹 기간 변환
+                if (p.getStartYear() != null && p.getStartMonth() != null) {
+                    try {
+                        pdto.setStartDate(LocalDate.of(
+                                Integer.parseInt(p.getStartYear()),
+                                Integer.parseInt(p.getStartMonth()),
+                                1
+                        ));
+                    } catch (Exception e) {
+                        pdto.setStartDate(null);
+                    }
+                }
+
+                if (p.getEndYear() != null && p.getEndMonth() != null) {
+                    try {
+                        pdto.setEndDate(LocalDate.of(
+                                Integer.parseInt(p.getEndYear()),
+                                Integer.parseInt(p.getEndMonth()),
+                                1
+                        ));
+                    } catch (Exception e) {
+                        pdto.setEndDate(null);
+                    }
+                }
+
+                return pdto;
+            }).collect(Collectors.toList());
+            s.setPortfolios(pfDTOs);
+
+
             // ✅ 첨부 파일 리스트 처리
             List<ResumeFileEntity> fileEntities = resumeFileRepository.findByResumeSection(section);
             if (!fileEntities.isEmpty()) {

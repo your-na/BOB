@@ -12,32 +12,23 @@
 </head>
 <body>
 <!-- header -->
-<!-- ✅ 기업 사용자면 header2 삽입 -->
 <div sec:authorize="hasAuthority('COMPANY')">
   <div th:insert="~{header2 :: header}"></div>
 </div>
 
-<!-- ✅ 그 외 사용자나 비로그인 사용자는 기본 header 삽입 -->
 <div sec:authorize="!hasAuthority('COMPANY')">
   <div th:insert="~{header :: header}"></div>
 </div>
 
-
 <form>
   <div class="resume-detail-container">
 
-    <!-- 트리뷰 버튼 -->
-    <!-- <button type="button" id="treeViewBtn">🌳 트리뷰로 보기</button>-->
-
-
     <!-- 수정/삭제 버튼 -->
     <div class="resume-buttons">
-      <!-- 일반 사용자에게만 보이게 -->
       <div sec:authorize="!hasAuthority('COMPANY')">
         <button class="delete-btn">지원 취소하기</button>
       </div>
 
-      <!-- 기업 사용자에게만 보이게 -->
       <div sec:authorize="hasAuthority('COMPANY')">
         <button type="button" class="nonpass-btn">❎ 불합격 처리</button>
         <button type="button" class="pass-btn">✅ 합격 처리</button>
@@ -52,13 +43,11 @@
         <p>지원자에게 전달할 메시지를 입력해 주세요.</p>
         <textarea id="passMessage" placeholder="예: 귀하의 지원을 축하드립니다!"></textarea>
         <div class="modal-actions">
-          <button id="submitPassBtn" type="button">확인</button> <!-- 🔥 핵심 수정 -->
+          <button id="submitPassBtn" type="button">확인</button>
           <button onclick="closePassModal()">취소</button>
         </div>
       </div>
     </div>
-
-
 
     <!-- 프로필 정보 -->
     <div class="profile-row">
@@ -83,62 +72,40 @@
       </div>
     </div>
 
-
-    <!-- 트리뷰 영역 -->
-    <div id="treeViewContainer" style="display: none;">
-      <ul id="treeRoot"></ul>
-    </div>
-
     <!-- 본문 영역 -->
     <div th:each="section : ${resume.sections}" class="info-section">
       <strong th:text="${section.title}">섹션 제목</strong>
 
-
-
-      <!-- ✅ 드래그 항목이 있으면 content 출력 안 함 -->
+      <!-- ✅ 드래그 항목 -->
       <div th:if="${not #lists.isEmpty(section.dragItems)}">
         <ul>
           <li th:each="item : ${section.dragItems}" style="margin-bottom: 1em;">
-
-            <!-- ✅ 항목 전체 블록 정렬 -->
             <div style="margin-left: 15px;">
-              <!-- 제목 -->
-              <div>
-                <strong th:text="${item.displayText}">항목</strong>
-              </div>
-
-              <!-- 날짜 -->
+              <div><strong th:text="${item.displayText}">항목</strong></div>
               <div th:if="${item.startDate != null and item.endDate != null}" style="color: #444;">
                 <span th:text="|(${item.startDate} ~ ${item.endDate})|"></span>
               </div>
-
-              <!-- 파일 링크 -->
               <div th:if="${item.filePath != null}">
                 <a th:href="@{'/uploads/projectFiles/' + ${item.filePath}}" target="_blank">📁 파일 보기</a>
               </div>
             </div>
-
           </li>
         </ul>
       </div>
 
-
-
-
-      <!-- ✅ dragItems 없고, content 있을 때만 출력 -->
+      <!-- ✅ content -->
       <div th:if="${#lists.isEmpty(section.dragItems) and section.content != null and section.content != ''}">
         <textarea th:if="${section.title == '자기소개'}" readonly th:text="${section.content}">자기소개</textarea>
         <p th:if="${section.title != '자기소개'}" th:text="${section.content}"></p>
       </div>
 
-      <!-- ✅ 선택형 태그 (경력사항/포트폴리오 제외) -->
+      <!-- ✅ 태그 -->
       <div th:if="${section.selectedTags != null
             and #lists.size(section.selectedTags) > 0
             and section.title != '경력사항'
             and section.title != '포트폴리오'}">
         <span th:each="tag : ${section.selectedTags}" class="tag" th:text="${tag}">태그</span>
       </div>
-
 
       <!-- ✅ 학력 리스트 -->
       <div th:if="${section.educations != null and #lists.size(section.educations) > 0}">
@@ -147,14 +114,56 @@
         </div>
       </div>
 
-      <!-- ✅ 사진 첨부 미리보기 -->
+      <!-- ✅ 경력 리스트 -->
+      <div th:if="${section.careers != null and #lists.size(section.careers) > 0}">
+        <div th:each="career : ${section.careers}">
+          <p>
+            <strong th:text="${career.workplace}">회사명</strong> |
+            <span th:text="${career.jobTitle}">직무명</span> |
+            <span th:text="${career.status}">상태</span><br>
+            <small th:text="|${#temporals.format(career.startDate, 'yyyy.MM.dd')} ~ ${#temporals.format(career.endDate, 'yyyy.MM.dd')}|"></small>
+          </p>
+        </div>
+      </div>
+
+      <!-- ✅ 포트폴리오 리스트 -->
+      <div th:if="${section.portfolios != null and #lists.size(section.portfolios) > 0}">
+        <div th:each="portfolio : ${section.portfolios}">
+          <p>
+            <strong th:text="${portfolio.title}">프로젝트명</strong>
+            <span th:text="| (${portfolio.type}) |"></span>
+            <span th:text="${portfolio.status}">상태</span><br>
+
+            <!-- 기간 출력 -->
+            <small th:text="|${portfolio.startDate} ~ ${portfolio.endDate}|"></small><br>
+
+            <!-- 설명 -->
+            <span th:text="${portfolio.description}"></span><br>
+
+            <!-- 파일 다운로드 링크 -->
+            <a th:if="${portfolio.filePath != null}"
+               th:href="@{${portfolio.filePath}}"
+               target="_blank">📎 파일 보기</a>
+
+            <!-- 제출된 파일 -->
+            <span th:if="${portfolio.submittedFile != null}">
+        제출파일: <span th:text="${portfolio.submittedFile}"></span>
+      </span>
+          </p>
+        </div>
+      </div>
+
+
+
+
+      <!-- ✅ 사진 첨부 -->
       <div th:if="${not #lists.isEmpty(section.fileNames) and section.type?.trim() == '사진 첨부'}">
         <div class="image-preview" th:each="imgName : ${section.fileNames}">
           <img th:src="@{'/uploads/resumeFiles/' + ${imgName}}" alt="첨부 이미지">
         </div>
       </div>
 
-      <!-- ✅ 파일 다운로드 링크 -->
+      <!-- ✅ 파일 첨부 -->
       <div th:if="${not #lists.isEmpty(section.fileNames) and section.type?.trim() == '파일 첨부'}" class="attachments">
         <div class="file-download" th:each="fileName : ${section.fileNames}">
           <a th:href="@{'/uploads/resumeFiles/' + ${fileName}}" download>

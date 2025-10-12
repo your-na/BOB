@@ -17,6 +17,8 @@ public class PortfolioItemDTO {
     private String description;  // (있으면) 설명/비고
     private String status;       // 완료/수상 등
     private String filePath;     // 파일 경로
+    private String submittedFile;
+
 
 
     private LocalDate startDate; // yyyy-MM-01 형태로 매핑됨

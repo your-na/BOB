@@ -1,5 +1,5 @@
 package com.example.bob.Entity;
-
+//이거 값 들어가는 건 없음
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
