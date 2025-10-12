@@ -4,7 +4,7 @@
 .resume-container {
     display: flex;
     max-width: 1200px;
-    margin: 100px auto;  /* 딱 알맞게 조금 더 내림 */
+    margin: 100px auto;
     gap: 30px;
     padding: 0 20px;
     font-family: 'Noto Sans KR', sans-serif;
@@ -15,13 +15,13 @@
     flex: 3;
 }
 
-/* 전체 오른쪽 고정 영역 */
+/* 오른쪽 고정 영역 */
 .right-content {
     position: sticky;
     top: 100px;
     flex: 1;
-    min-width: 350px;                /* ✅ 너비 넓힘 */
-    max-width: 560px;                /* ✅ 필요시 최대값도 지정 */
+    min-width: 350px;
+    max-width: 560px;
     height: fit-content;
     border: 1px solid #ccc;
     border-radius: 20px;
@@ -36,45 +36,40 @@
     padding: 16px 20px 12px 20px;
     border-radius: 20px 20px 0 0;
 }
-
 .tab-header h3 {
     margin: 0;
     font-size: 18px;
-    font-weight: 800; /* 더 두껍게! */
+    font-weight: 800;
     color: #1C4C1C;
 }
 
-/* 탭 영역 (배경 흰색) */
+/* 탭 영역 */
 .tab-menu {
     background-color: #fff;
     padding: 10px 20px 0 20px;
 }
-
 #tab-list {
     display: flex;
     flex-wrap: nowrap;
     gap: 15px;
 }
+
+/* 제목 영역 */
 .resume-title {
-    border-top: 6px solid #19CB13;       /* 더 두꺼운 초록색 상단 선 */
-    border-left: 1px solid black;        /* 좌측 검정 테두리 */
-    border-right: 1px solid black;       /* 우측 검정 테두리 */
-    border-bottom: 1px solid black;      /* 하단 검정 테두리 */
+    border-top: 6px solid #19CB13;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
     padding: 20px;
-    border-radius: 0 0 15px 15px;        /* 아래만 둥글게 */
+    border-radius: 0 0 15px 15px;
     background-color: #fff;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);  /* 더 강한 입체감 */
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
     margin-bottom: 20px;
 }
+.resume-title h2 { margin: 0; }
+.resume-title small { color: #999; }
 
-.resume-title h2 {
-    margin: 0;
-}
-
-.resume-title small {
-    color: #999;
-}
-
+/* 박스 공통 */
 .section-box {
     border: 1px solid #a9a9a9;
     border-radius: 10px;
@@ -82,6 +77,7 @@
     margin-bottom: 20px;
     transition: border-color 0.3s ease;
 }
+.section-box.active { border: 2px solid #0ED700; }
 
 .section-desc {
     font-size: 13px;
@@ -90,40 +86,21 @@
     margin-bottom: 15px;
 }
 
-/* 선택됐을 때 테두리 색상 강조 */
-.section-box.active {
-    border: 2px solid #0ED700;
-}
-
-.section-box h3 {
-    margin-top: 0;
-    margin-bottom: 0;
-    color: green;
-}
-
-.red {
-    color: red;
-    font-size: 14px;
-}
-
-/* 내 정보 - 사용자 프로필 */
+/* 내 정보 */
 .user-info {
     display: flex;
     align-items: flex-start;
     gap: 15px;
 }
-
 .user-info img {
     width: 80px;
     height: 80px;
     border-radius: 50%;
     object-fit: cover;
 }
+.user-detail p { margin: 5px 0; }
 
-.user-detail p {
-    margin: 5px 0;
-}
-
+/* 입력 그룹 */
 .form-group {
     display: flex;
     flex-wrap: wrap;
@@ -131,13 +108,13 @@
     align-items: center;
     position: relative;
 }
-
 .form-group input,
 .form-group select {
     padding: 8px;
     font-size: 14px;
 }
 
+/* 기본 버튼 */
 .form-group button {
     padding: 8px 12px;
     background: #008000;
@@ -147,13 +124,7 @@
     cursor: pointer;
 }
 
-/* 희망직무 */
-label {
-    display: block;
-    margin: 5px 0;
-}
-
-/* 텍스트 입력 및 업로드 영역 */
+/* 텍스트 영역 */
 textarea {
     width: 100%;
     height: 80px;
@@ -163,6 +134,7 @@ textarea {
     margin-top: 10px;
 }
 
+/* 업로드 박스 */
 .upload-box {
     border: 1px dashed #ccc;
     text-align: center;
@@ -172,14 +144,13 @@ textarea {
     border-radius: 10px;
 }
 
-/* 오른쪽 탭 메뉴 */
+/* 탭 메뉴 */
 .tab-menu h3 {
     margin: 0;
     font-size: 18px;
     font-weight: bold;
     color: #1C4C1C;
 }
-
 .tab-menu ul {
     display: flex;
     gap: 12px;
@@ -187,7 +158,6 @@ textarea {
     padding: 0;
     margin: 0;
 }
-
 .tab-menu li {
     cursor: pointer;
     font-size: 14px;
@@ -196,21 +166,14 @@ textarea {
     border-bottom: 2px solid transparent;
     transition: all 0.2s;
 }
-
 .tab-menu li.active {
     font-weight: bold;
     color: #0ED700;
     border-bottom: 2px solid #0ED700;
 }
 
-/* 수상 리스트 */
-.award-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 20px;
-}
-
+/* 수상 */
+.award-list { display: flex; flex-direction: column; gap: 12px; padding: 20px; }
 .award-item {
     border: 1px solid #000;
     border-radius: 10px;
@@ -219,302 +182,205 @@ textarea {
     box-shadow: 1px 1px 6px rgba(0,0,0,0.1);
     margin-bottom: 12px;
 }
+.award-item small { display: block; margin-top: 4px; color: #888; }
 
-.award-item small {
-    display: block;
-    margin-top: 4px;
-    color: #888;
-}
-
-/* HTML/CSS 강조 색상 */
-.skill {
-    color: #19CB13;
-    font-weight: bold;
-}
-
-/* 항목명만 굵게, 내용은 얇게 유지 */
-.user-detail strong {
-    font-weight: bold;
-    margin-right: 5px;
-}
-
+/* 섹션 타이틀 */
 .section-title {
     display: flex;
-    align-items: baseline;     /* ← 텍스트 기준선 맞춤 */
-    gap: 4px;                   /* ← 간격 줄이기 */
+    align-items: baseline;
+    gap: 4px;
     margin-bottom: 10px;
 }
-
 .section-title .number {
     font-size: 20px;
     font-weight: bold;
     color: #19CB13;
-    min-width: 20px;            /* ← 줄이고 */
-    text-align: left;           /* ← 숫자 너무 오른쪽 붙는 거 방지 */
-    line-height: 1.2;           /* 높이도 살짝 정돈 */
+    min-width: 20px;
+    text-align: left;
+    line-height: 1.2;
 }
-
 .section-title .title-content h3 {
     margin: 0;
     font-size: 18px;
     font-weight: bold;
-    color: #000;  /* ← 검정색으로 고정! */
+    color: #000;
 }
-
 .section-title .section-desc {
     font-size: 13px;
     color: #666;
     margin: 2px 0 10px 0;
 }
 
-.edu-btn {
+/* ✅ 학력/경력/포트폴리오 공통 구조 */
+.section-box[data-title="학력사항"],
+.resume-section#section4,
+.section-box[data-title="포트폴리오"] {
+    border: 1.5px solid #ddd;
+    border-radius: 12px;
+    padding: 20px;
+    background-color: #fff;
+    margin-bottom: 30px;
+}
+.edu-item,
+.career-item,
+.portfolio-item {
+    background-color: #f9f9f9;
+    border: 1.5px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    margin-bottom: 15px;
+}
+.edu-del,
+.career-del,
+.portfolio-del,
+.delete-btn {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #999;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.edu-del:hover,
+.career-del:hover,
+.portfolio-del:hover,
+.delete-btn:hover { color: #333; }
+
+.edu-row,
+.career-row,
+.portfolio-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+/* input 공통 */
+.edu-row input,
+.career-row input,
+.portfolio-row input {
+    border: 1.5px solid #ddd;
+    border-radius: 25px;
+    background-color: #f5f5f5;
+    padding: 10px 15px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s ease;
+    flex: 0 0 auto;
+}
+.edu-row input:focus,
+.career-row input:focus,
+.portfolio-row input:focus {
+    background-color: #fff;
+    border-color: #00b140;
+    box-shadow: 0 0 4px rgba(0, 177, 64, 0.25);
+}
+
+.year-input, .month-input {
+    width: 70px;
+    text-align: center;
+}
+.status-input {
+    width: 100px;
+    max-width: 120px;
+}
+.school-input,
+.major-input,
+.workplace-input,
+.job-input,
+.portfolio-title-input,
+.portfolio-file-path {
+    flex: 1;
+    min-width: 180px;
+}
+.desc-input,
+.portfolio-desc-input { width: 100%; }
+
+/* ✅ 새 플러스 버튼 디자인 (.add-school-btn 기반) */
+/* ✅ 플러스 버튼 중앙 정렬 */
+.edu-btn,
+.career-btn,
+.portfolio-btn {
     background-color: #ffffff;
-    color: black;
+    color: #000;
     font-weight: bold;
-    font-size: 12px;
-    padding: 4px 8px;
+    font-size: 13px;
+    padding: 6px 12px;
+    border: 1px solid #6a6a6a;
+    border-radius: 999px;
+    display: flex;                /* 가운데 정렬용으로 inline-flex → flex로 변경 */
+    justify-content: center;      /* 가로 중앙 */
+    align-items: center;          /* 세로 중앙 */
+    gap: 6px;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    margin: 15px auto 0;          /* auto로 좌우 중앙 배치 */
+}
+
+.edu-btn:hover,
+.career-btn:hover,
+.portfolio-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+    background-color: #f9f9f9;
+}
+
+.edu-btn .plus,
+.career-btn .plus,
+.portfolio-btn .plus {
+    font-size: 16px;
+    font-weight: bold;
+    color: #00b140;
+}
+/* 학력, 경력, 포트폴리오 입력칸 전부 입력 불가 처리 */
+.edu-row input,
+.career-row input,
+.portfolio-row input {
+    pointer-events: none;   /* 클릭 불가 */
+    background-color: #eee; /* 회색 처리 */
+    color: #555;
+}
+
+.sub-btn {
+    background-color: #00d10f; /* 선명한 초록색 */
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.sub-btn:hover {
+    background-color: #00b50d; /* 살짝 어두운 초록색 */
+}
+
+.add-school-btn {
+    background-color: #ffffff;
+    color: #000;
+    font-weight: bold;
+    font-size: 13px;
+    padding: 6px 12px;
     border: 1px solid #6a6a6a;
     border-radius: 999px;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
     cursor: pointer;
     transition: all 0.2s ease-in-out;
+    margin-top: 10px;
 }
 
-.edu-btn .plus {
-    color: #19CB13;
-    font-size: 20px;
-}
-
-.edu-btn:hover{
+.add-school-btn:hover {
     transform: translateY(-1px);
     box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
-}
-
-.education-item {
-    margin-bottom: 10px;
-}
-
-/* 삭제 버튼 스타일 */
-.form-group .del-btn {
-    background: none;
-    border: none;
-    font-size: 18px;
-    color: #000000;
-    cursor: pointer;
-    margin-left: 5px;
-}
-
-.form-group .del-btn:hover {
-    transform: translateY(-1px);
-}
-
-.arrow-toggle {
-    margin-left: auto;            /* 오른쪽 끝으로 보내기 */
-    font-size: 20px;
-    font-weight: bold;
-    color: #1C4C1C;
-    cursor: pointer;
-}
-
-.sub-wrapper {
-    text-align: right;
-    margin-top: 20px;
-    margin-bottom: 40px;
-}
-
-.sub-btn {
-    background-color: #19CB13;
-    color: white;
-    font-weight: bold;
-    font-size: 14px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
-    transition: all 0.2s ease-in-out;
-    margin-left: 380px;
-}
-
-.sub-btn:hover {
-    background-color: #0ea30e;
-}
-
-.char-count {
-    text-align: right;
-    font-size: 13px;
-    margin-top: 4px;
-    color: #666;
-}
-.char-count.warning {
-    color: red;
-    font-weight: bold;
-}
-
-/* 모달 전체 배경 */
-.modal {
-    display: none; /* 처음엔 숨김 */
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background-color: rgba(0, 0, 0, 0.4);
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-}
-
-/* 모달 내부 */
-.modal-content {
-    background: white;
-    padding: 30px;
-    border: 1px solid #000;
-    border-radius: 8px;
-    text-align: center;
-    width: 400px;
-}
-
-.modal-title {
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.modal-desc {
-    font-size: 14px;
-    color: red;
-    margin-bottom: 20px;
-}
-
-.modal-btns {
-    display: flex;
-    justify-content: space-around;
-}
-
-.modal-btns button {
-    padding: 8px 20px;
-    border: 1px solid #666;
-    border-radius: 6px;
-    background: white;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-/* ✅ 데이터 없을 때 안내 스타일 */
-.empty-content {
-    padding: 50px 20px;
-    text-align: center;
-    color: #333;
-    border-top: 1px solid #ccc;
-}
-
-.no-data-text {
-    font-size: 15px;
-    margin-bottom: 10px;
-}
-
-.view-link {
-    font-size: 14px;
-    font-weight: bold;
-    color: #0c0c0c;
-    cursor: pointer;
-    text-decoration: underline;
-}
-
-.view-link:hover {
-    color: #19CB13;
-}
-/* ✅ 사진 업로드 래퍼: 버튼과 파일명을 감싸는 컨테이너(임시) */
-.file-upload-wrapper {
-    margin-top: 10px;  /* 위 요소와의 간격 */
-}
-
-/* ✅ 파일 선택 버튼 스타일 (임시)*/
-.file-label {
-    padding: 8px 12px;           /* 내부 여백 (위아래 8px, 좌우 12px) */
-    background-color: #4CAF50;   /* 초록색 배경 */
-    color: white;                /* 흰색 글씨 */
-    border-radius: 4px;          /* 모서리 둥글게 */
-    cursor: pointer;             /* 마우스를 올렸을 때 포인터 커서 */
-}
-
-/* ✅ 선택된 파일 이름 표시 영역(임시) */
-.file-name {
-    margin-left: 10px;  /* 버튼과의 간격 */
-    font-size: 0.9em;    /* 기본보다 조금 작은 글씨 */
-    color: #555;         /* 어두운 회색 텍스트 */
-}
-
-/* 파일 들어가는 부분 (임시) */
-.uploaded-item {
-    margin-top: 5px;              /* 위 요소와의 간격을 위해 위쪽 여백 추가 */
-    padding: 6px 15px; /* 내부 텍스트와 테두리 사이 여백 */
-    background: #d1d1d1;          /* 연한 회색 배경으로 가시성 높임 */
-    border: 1px solid #2c2c2c;       /* 연한 테두리로 구분 */
-    border-radius: 4px;           /* 모서리를 살짝 둥글게 */
-    font-size: 14px;              /* 글자 크기 설정 */
-    color: #3a3a3a;
-    display: flex;                 /* ✅ 핵심: Flexbox 사용 */
-    justify-content: space-between; /* ✅ 좌우 정렬 */
-    padding-right: 15px;   /* ✅ 끝에서 약간 띄움 */
-}
-
-.uploaded-item .delete-icon {
-    margin-left: 10px;  /* 간격만 유지 */
-    cursor: pointer;
-    color: #5a5a5a;
-    font-size: 12px;
-}
-
-.uploaded-item .delete-icon:hover {
-    color: red;
-}
-
-.preview-button {
-    background: white;
-    border: 2px solid #00b800;
-    color: #00b800;
-    font-weight: bold;
-    border-radius: 6px;
-    padding: 8px 14px;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-}
-.preview-button:hover {
-    background: #00b800;
-    color: white;
-}
-
-/* ✅ 빈 데이터 안내 (디자인 통일) */
-.empty-content {
-    padding: 50px 20px;
-    text-align: center;
-    color: #333;
-    border-top: 1px solid #ccc;
-    background-color: #fff;
-    border-radius: 0 0 20px 20px; /* 탭 아래 모서리 부드럽게 */
-}
-
-.no-data-text {
-    font-size: 16px;
-    margin-bottom: 12px;
-    color: #444;
-    font-weight: 500;
-}
-
-.view-link {
-    font-size: 14px;
-    font-weight: bold;
-    color: #19CB13;
-    cursor: pointer;
-    text-decoration: underline;
-    transition: color 0.2s ease;
-}
-
-.view-link:hover {
-    color: #0ea30e;
+    background-color: #f9f9f9;
 }

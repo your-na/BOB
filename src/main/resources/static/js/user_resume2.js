@@ -2265,3 +2265,17 @@ function togglePreview() {
         document.getElementById("resumePreviewFrame").src = "/showresume";
     });
 }
+document.addEventListener("DOMContentLoaded", () => {
+    disableAllInputs();
+
+    // 동적으로 새 항목 추가 시에도 자동으로 비활성화되도록 MutationObserver 사용
+    const observer = new MutationObserver(() => disableAllInputs());
+    observer.observe(document.body, { childList: true, subtree: true });
+});
+
+function disableAllInputs() {
+    document.querySelectorAll('.edu-row input, .career-row input, .portfolio-row input').forEach(el => {
+        el.disabled = true;
+        el.style.backgroundColor = '#eee';
+    });
+}
