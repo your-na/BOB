@@ -867,6 +867,15 @@ confirmBtn.addEventListener("click", () => {
             uploadedFileName: null // 나중에 주입
         };
 
+        // ✅ 이 부분에 추가
+        const textareas = box.querySelectorAll("textarea");
+        if (textareas.length > 0) {
+            section.content = Array.from(textareas)
+                .map(t => t.value.trim())
+                .filter(v => v !== "")
+                .join("\n\n"); // 줄바꿈 두 번으로 구분
+        }
+
         // ✅ 드래그된 항목 수집
         const draggedDivs = box.querySelectorAll(".uploaded-item");
         if (draggedDivs.length > 0) {
