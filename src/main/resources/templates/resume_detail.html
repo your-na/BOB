@@ -109,22 +109,36 @@
 
       <!-- ✅ 학력 리스트 -->
       <div th:if="${section.educations != null and #lists.size(section.educations) > 0}">
-        <div th:each="edu : ${section.educations}">
-          <span th:text="|${edu.startYear}.${edu.startMonth} ~ ${edu.endYear}.${edu.endMonth} ${edu.schoolName} ${edu.majorName} ${edu.status}|"></span><br>
+        <div th:each="edu : ${section.educations}" class="edu-block">
+    <span class="edu-line"
+          th:text="|${edu.startYear}.${edu.startMonth} ~ ${edu.endYear}.${edu.endMonth} ${edu.schoolName} ${edu.majorName} ${edu.status}|">
+    </span>
+          <p class="edu-desc"
+             th:if="${section.content != null and section.content != ''}"
+             th:text="${section.content}">
+          </p>
         </div>
       </div>
 
+
       <!-- ✅ 경력 리스트 -->
       <div th:if="${section.careers != null and #lists.size(section.careers) > 0}">
-        <div th:each="career : ${section.careers}">
-          <p>
+        <div th:each="career : ${section.careers}" class="career-block">
+          <p class="career-line">
             <strong th:text="${career.workplace}">회사명</strong> |
             <span th:text="${career.jobTitle}">직무명</span> |
             <span th:text="${career.status}">상태</span><br>
             <small th:text="|${#temporals.format(career.startDate, 'yyyy.MM.dd')} ~ ${#temporals.format(career.endDate, 'yyyy.MM.dd')}|"></small>
           </p>
+
+          <!-- ✅ 설명 표시 -->
+          <p class="career-desc"
+             th:if="${section.content != null and section.content != ''}"
+             th:text="${section.content}">
+          </p>
         </div>
       </div>
+
 
       <!-- ✅ 포트폴리오 리스트 -->
       <div th:if="${section.portfolios != null and #lists.size(section.portfolios) > 0}">

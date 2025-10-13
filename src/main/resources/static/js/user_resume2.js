@@ -867,6 +867,15 @@ confirmBtn.addEventListener("click", () => {
             uploadedFileName: null // 나중에 주입
         };
 
+        // ✅ 이 부분에 추가
+        const textareas = box.querySelectorAll("textarea");
+        if (textareas.length > 0) {
+            content = [...textareas]
+                .map(t => t.value.trim())
+                .filter(v => v.length > 0)
+                .join("###"); // 여러 줄 구분자
+        }
+
         // ✅ 드래그된 항목 수집
         const draggedDivs = box.querySelectorAll(".uploaded-item");
         if (draggedDivs.length > 0) {
@@ -1080,7 +1089,7 @@ function renderEducationSection(section, number) {
     <div class="number">${number}.</div>
     <div class="title-content">
       <h3>${section.title}</h3>
-      <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+      <p class="section-desc">${section.comment || "기업에서 쓴 설명입력 칸 입니다."}</p>
     </div>
   `;
 
@@ -1209,7 +1218,7 @@ function renderJobSection(section, number) {
         <div class="number">${number}.</div>
         <div class="title-content">
             <h3>${title}</h3>
-            <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+            <p class="section-desc">${section.comment || "기업이 작성한 설명 칸 입니다."}</p>
         </div>
     `;
 
@@ -1246,7 +1255,7 @@ function renderCareerSection(section, number) {
         <div class="number">${number}.</div>
         <div class="title-content">
             <h3>${section.title}</h3>
-            <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+            <p class="section-desc">${section.comment || "기업이 작성한 설명 칸 입니다."}</p>
         </div>
     `;
 
@@ -1292,6 +1301,15 @@ function renderCareerSection(section, number) {
         item.appendChild(row1);
         item.appendChild(row2);
 
+        // ✅ 각 경력 항목마다 설명 textarea 추가
+        const descRow = document.createElement("div");
+        descRow.className = "career-row";
+        const descTextarea = document.createElement("textarea");
+        descTextarea.className = "career-desc";
+        descTextarea.placeholder = "경력사항 관련 설명 입력";
+        descRow.appendChild(descTextarea);
+        item.appendChild(descRow);
+
         return item;
     };
 
@@ -1306,6 +1324,7 @@ function renderCareerSection(section, number) {
         clone.querySelectorAll("input").forEach(el => el.value = "");
         careerBox.appendChild(clone);
     });
+
 
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(careerBox);
@@ -1331,7 +1350,7 @@ function renderPortfolioSection(section, number) {
         <div class="number">${number}.</div>
         <div class="title-content">
             <h3>${section.title}</h3>
-            <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+            <p class="section-desc">${section.comment || "기업이 작성한 설명 칸 입니다.."}</p>
         </div>
     `;
 
@@ -1430,7 +1449,7 @@ function renderSelfIntroSection(section, number) {
         <div class="number">${number}.</div>
         <div class="title-content">
             <h3>${title}</h3>
-            <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+            <p class="section-desc">${section.comment || "기업이 작성한 설명 칸 입니다.."}</p>
         </div>
     `;
 
@@ -1488,7 +1507,7 @@ function renderSelectSection(section, number) {
     <div class="number">${number}.</div>
     <div class="title-content">
       <h3>${title}</h3>
-      <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+      <p class="section-desc">${section.comment || "기업이 작성한 설명 칸 입니다."}</p>
     </div>
   `;
 
@@ -1529,7 +1548,7 @@ function renderDescriptiveSection(section, number) {
     <div class="number">${number}.</div>
     <div class="title-content">
       <h3>${title}</h3>
-      <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+      <p class="section-desc">${section.comment || "기업이 작성한 설명 칸 입니다."}</p>
     </div>
   `;
 
@@ -1578,7 +1597,7 @@ function renderPhotoSection(section, number) {
     <div class="number">${number}.</div>
     <div class="title-content">
       <h3>${title}</h3>
-      <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+      <p class="section-desc">${section.comment || "기업이 작성한 설명 칸 입니다."}</p>
     </div>
   `;
 
@@ -1651,7 +1670,7 @@ function renderFileSection(section, number) {
       <div class="number">${number}.</div>
       <div class="title-content">
         <h3>${title}</h3>
-        <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+        <p class="section-desc">${section.comment || "기업이 작성한 설명 칸 입니다."}</p>
       </div>
     `;
 
@@ -2179,8 +2198,17 @@ function togglePreview() {
         const title = box.dataset.title || "제목 없음";     // ✅ title 속성
         const type = box.dataset.type || "서술형";          // ✅ type 속성
 
-        const textarea = box.querySelector("textarea");
-        const content = textarea ? textarea.value.trim() : "";
+        // ✅ 섹션 내 모든 textarea 내용 합치기
+        const textareas = box.querySelectorAll("textarea");
+        let content = "";
+
+        if (textareas.length > 0) {
+            content = [...textareas]
+                .map(t => t.value.trim())
+                .filter(v => v.length > 0)
+                .join("\n"); // 줄바꿈 기준으로 연결
+        }
+
 
         const selectedTags = [...box.querySelectorAll("input[type=checkbox]:checked, input[type=radio]:checked")]
             .map(input => input.parentElement.textContent.trim());
