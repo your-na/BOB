@@ -87,4 +87,21 @@ public class ContestAwardHistoryController {
             return ResponseEntity.status(500).body("수정 실패: " + e.getMessage());
         }
     }
+
+    @GetMapping("/resume-view")
+    public ResponseEntity<?> getContestHistoriesForResumeView(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            UserEntity user = userDetails.getUserEntity();
+            List<ContestAwardHistory> histories = contestAwardRepository.findByUser(user);
+
+            List<ContestAwardHistoryResponseDTO> response = histories.stream()
+                    .map(ContestAwardHistoryResponseDTO::fromEntity)
+                    .toList();
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("❌ 공모전 내역 조회 실패: " + e.getMessage());
+        }
+    }
 }

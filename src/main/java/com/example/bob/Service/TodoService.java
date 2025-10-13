@@ -158,7 +158,7 @@ public class    TodoService {
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
                 .assignee(assigneeProcessed)
-                .workspace(team.getTeamName())  // 팀 이름을 workspace로 저장
+                .workspace(team.getTeamName())
                 .completed(false)
                 .type("공모전")
                 .targetId(team.getId())

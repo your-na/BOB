@@ -538,32 +538,61 @@ document.addEventListener("DOMContentLoaded", () => {
     renderEducations();
     renderProjects();
     renderJobs();
+    renderContestsIntoPortfolio();
 });
 
 function renderContestsIntoPortfolio() {
-    return fetch('/api/user/resumes/contests')
-        .then(res => res.json())
+    return fetch('/api/contest-history/resume-view', {
+        credentials: "include" // 로그인 세션 포함
+    })
+        .then(res => {
+            if (!res.ok) throw new Error("공모전 데이터 로드 실패");
+            return res.json();
+        })
         .then(list => {
-            const cont = document.querySelector('.tab-content[data-content="portfolio"]');
-            if (!cont || !list) return;
+            const cont = document.querySelector('.tab-content[data-content="contest"]');
+            if (!cont) return;
+            cont.innerHTML = ""; // 기존 내용 초기화
+
+            if (!list || list.length === 0) {
+                const empty = document.createElement('p');
+                empty.textContent = "참여한 공모전이 없습니다.";
+                cont.appendChild(empty);
+                return;
+            }
+
             list.forEach(c => {
-                const d = document.createElement('div');
-                d.className = 'award-item';
-                d.innerHTML = `${c.title}<br><small>${c.date || ''}</small>`;
-                // ✅ dataset 보강
+                const start = c.startDate ? c.startDate.replace(/-/g, ".") : "";
+                const end = c.endDate ? c.endDate.replace(/-/g, ".") : "";
+                const period = start && end ? `${start} ~ ${end}` : start || "";
+
+                // ✅ HTML 구성
+                const d = document.createElement("div");
+                d.className = "award-item";
+                d.innerHTML = `
+                    <strong>${c.title || "공모전명 없음"}</strong><br>
+                    <small>${c.organizer || "주최기관 미상"}</small><br>
+                    <span style="color:#0077cc; font-weight:bold;">🏆 ${c.grade || "참여"}</span><br>
+                    <small>${period}</small>
+                `;
+
+                // ✅ dataset 설정 (드래그용)
                 Object.assign(d.dataset, {
-                    type: 'CONTEST',
+                    type: "CONTEST",
                     id: c.id,
                     title: c.title || "",
-                    file: c.filePath || "",
+                    grade: c.grade || "",
                     startDate: c.startDate || "",
-                    endDate: c.endDate || ""
+                    endDate: c.endDate || "",
+                    organizer: c.organizer || "",
+                    status: c.status || ""
                 });
+
                 makeDraggable(d, d.dataset);
                 cont.appendChild(d);
             });
         })
-        .catch(err => console.error('공모전 로드 실패:', err));
+        .catch(err => console.error("공모전 로드 실패:", err));
 }
 
 
@@ -666,6 +695,7 @@ document.addEventListener("DOMContentLoaded", async() => {
     await renderEducations();
     await renderProjects();
     await renderJobs();
+    await renderContestsIntoPortfolio();
 
     // 기본 탭 자동 활성화 (예: school)
     const defaultTab = document.querySelector(".tab.active") || document.querySelector(".tab[data-tab='school']");
@@ -1981,10 +2011,15 @@ window.addEventListener('DOMContentLoaded', () => {
                             if (titleInput) titleInput.value = json.projectName || json.title || "";
                             if (descInput) descInput.value = json.description || "";
                             if (statusInput) statusInput.value = json.status || "완료";
-                            const filePathValue = json.filePath || json.fileUrl || json.file || "";
-                            if (filePathInput) filePathInput.value = filePathValue;
-                            if (hiddenFileInput) hiddenFileInput.value = filePathValue;
-
+                            if (json.type === "CONTEST") {
+                                const gradeText = json.grade ? `🏆 ${json.grade}` : "참여";
+                                if (filePathInput) filePathInput.value = gradeText;
+                                if (hiddenFileInput) hiddenFileInput.value = gradeText;
+                            } else {
+                                const filePathValue = json.filePath || json.fileUrl || json.file || "";
+                                if (filePathInput) filePathInput.value = filePathValue;
+                                if (hiddenFileInput) hiddenFileInput.value = filePathValue;
+                            }
 
                             if (yearInputs.length >= 2) {
                                 yearInputs[0].value = startY || "";

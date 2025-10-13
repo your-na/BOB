@@ -83,6 +83,24 @@ public class ContestHistoryService {
         }
     }
 
+    // ✅ 로그인한 사용자의 공모전 이력 전체 조회
+    @Transactional(readOnly = true)
+    public List<ContestAwardHistory> getContestAwardsByUser(UserEntity user) {
+        return contestAwardRepository.findByUser(user);
+    }
+
+    // ✅ 공모전 단건 조회 (상세 보기용, 필요 시)
+    @Transactional(readOnly = true)
+    public ContestAwardHistory getContestAwardById(Long id, UserEntity user) {
+        ContestAwardHistory award = contestAwardRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 공모전 이력이 없습니다."));
+        if (!award.getUser().equals(user)) {
+            throw new IllegalArgumentException("본인 이력만 조회할 수 있습니다.");
+        }
+        return award;
+    }
+
+
     // ✅ OCR 관련 (임시)
     public String extractText(MultipartFile file) {
         return "OCR_RAW_TEXT_SAMPLE";
