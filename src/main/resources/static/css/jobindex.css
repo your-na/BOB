@@ -398,3 +398,16 @@
     background-color: #e0f7e9;
 }
 
+/* ✅ 이력서 미리보기 모달 전용 스타일 */
+.preview-modal {
+    width: 90vw;           /* 화면 가로의 90% */
+    height: 90vh;          /* 화면 세로의 90% */
+    max-width: 1400px;     /* 너무 커지지 않게 최대 제한 */
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
