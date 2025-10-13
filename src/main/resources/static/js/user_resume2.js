@@ -846,7 +846,7 @@ confirmBtn.addEventListener("click", () => {
 
 
         const textarea = box.querySelector("textarea");
-        const content = textarea ? textarea.value.trim() : "";
+        let content = textarea ? textarea.value.trim() : "";
 
         const fileInput = box.querySelector("input[type=file]");
         let uploadedFileName = null;
