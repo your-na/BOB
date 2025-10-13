@@ -1144,8 +1144,17 @@ function renderEducationSection(section, number) {
             row2.appendChild(statusInput);
         }
 
+        // ✅ 설명란 추가 (항목별)
+        const descRow = document.createElement("div");
+        descRow.className = "edu-row";
+        const descTextarea = document.createElement("textarea");
+        descTextarea.className = "edu-desc";
+        descTextarea.placeholder = "학력사항 관련 설명 입력";
+        descRow.appendChild(descTextarea);
+
         eduItem.appendChild(row1);
         eduItem.appendChild(row2);
+        eduItem.appendChild(descRow);
 
         // 삭제 버튼 동작
         eduItem.querySelector(".edu-del").addEventListener("click", () => {
@@ -1177,21 +1186,11 @@ function renderEducationSection(section, number) {
             }
         }, 100);
     });
-    // ✅ 설명(comment) input 항상 추가
-    // ✅ 설명(comment) input 항상 추가
-    const commentInput = document.createElement("textarea");
-    commentInput.className = "section-comment-input";
-    commentInput.placeholder = "학력사항 관련 설명 입력"; // 구직자용 설명
-    commentInput.value = ""; // 기업 설명(section.comment)을 제거
-
-
-
 
     // ✅ 조립
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(eduBox);
     sectionBox.appendChild(addBtn);
-    sectionBox.appendChild(commentInput);
 
     return sectionBox;
 }
@@ -1302,6 +1301,15 @@ function renderCareerSection(section, number) {
         item.appendChild(row1);
         item.appendChild(row2);
 
+        // ✅ 각 경력 항목마다 설명 textarea 추가
+        const descRow = document.createElement("div");
+        descRow.className = "career-row";
+        const descTextarea = document.createElement("textarea");
+        descTextarea.className = "career-desc";
+        descTextarea.placeholder = "경력사항 관련 설명 입력";
+        descRow.appendChild(descTextarea);
+        item.appendChild(descRow);
+
         return item;
     };
 
@@ -1317,17 +1325,10 @@ function renderCareerSection(section, number) {
         careerBox.appendChild(clone);
     });
 
-// ✅ 설명(comment) input 항상 추가
-    const commentInput = document.createElement("textarea");
-    commentInput.className = "section-comment-input";
-    commentInput.placeholder = "경력사항 관련 설명 입력"; // 구직자용 설명
-    commentInput.value = ""; // 기업 설명(section.comment)을 제거
-
 
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(careerBox);
     sectionBox.appendChild(addBtn);
-    sectionBox.appendChild(commentInput);
 
     return sectionBox;
 }
