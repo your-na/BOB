@@ -2198,8 +2198,17 @@ function togglePreview() {
         const title = box.dataset.title || "제목 없음";     // ✅ title 속성
         const type = box.dataset.type || "서술형";          // ✅ type 속성
 
-        const textarea = box.querySelector("textarea");
-        const content = textarea ? textarea.value.trim() : "";
+        // ✅ 섹션 내 모든 textarea 내용 합치기
+        const textareas = box.querySelectorAll("textarea");
+        let content = "";
+
+        if (textareas.length > 0) {
+            content = [...textareas]
+                .map(t => t.value.trim())
+                .filter(v => v.length > 0)
+                .join("\n"); // 줄바꿈 기준으로 연결
+        }
+
 
         const selectedTags = [...box.querySelectorAll("input[type=checkbox]:checked, input[type=radio]:checked")]
             .map(input => input.parentElement.textContent.trim());
