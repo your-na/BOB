@@ -1080,7 +1080,7 @@ function renderEducationSection(section, number) {
     <div class="number">${number}.</div>
     <div class="title-content">
       <h3>${section.title}</h3>
-      <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+      <p class="section-desc">${section.comment || "기업에서 쓴 설명입력 칸 입니다."}</p>
     </div>
   `;
 
@@ -1177,11 +1177,21 @@ function renderEducationSection(section, number) {
             }
         }, 100);
     });
+    // ✅ 설명(comment) input 항상 추가
+    // ✅ 설명(comment) input 항상 추가
+    const commentInput = document.createElement("textarea");
+    commentInput.className = "section-comment-input";
+    commentInput.placeholder = "학력사항 관련 설명 입력"; // 구직자용 설명
+    commentInput.value = ""; // 기업 설명(section.comment)을 제거
+
+
+
 
     // ✅ 조립
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(eduBox);
     sectionBox.appendChild(addBtn);
+    sectionBox.appendChild(commentInput);
 
     return sectionBox;
 }
@@ -1209,7 +1219,7 @@ function renderJobSection(section, number) {
         <div class="number">${number}.</div>
         <div class="title-content">
             <h3>${title}</h3>
-            <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+            <p class="section-desc">${section.comment || "기업이 작성한 설명 칸 입니다."}</p>
         </div>
     `;
 
@@ -1246,7 +1256,7 @@ function renderCareerSection(section, number) {
         <div class="number">${number}.</div>
         <div class="title-content">
             <h3>${section.title}</h3>
-            <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+            <p class="section-desc">${section.comment || "기업이 작성한 설명 칸 입니다."}</p>
         </div>
     `;
 
@@ -1307,9 +1317,17 @@ function renderCareerSection(section, number) {
         careerBox.appendChild(clone);
     });
 
+// ✅ 설명(comment) input 항상 추가
+    const commentInput = document.createElement("textarea");
+    commentInput.className = "section-comment-input";
+    commentInput.placeholder = "경력사항 관련 설명 입력"; // 구직자용 설명
+    commentInput.value = ""; // 기업 설명(section.comment)을 제거
+
+
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(careerBox);
     sectionBox.appendChild(addBtn);
+    sectionBox.appendChild(commentInput);
 
     return sectionBox;
 }
@@ -1331,7 +1349,7 @@ function renderPortfolioSection(section, number) {
         <div class="number">${number}.</div>
         <div class="title-content">
             <h3>${section.title}</h3>
-            <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+            <p class="section-desc">${section.comment || "기업이 작성한 설명 칸 입니다.."}</p>
         </div>
     `;
 
@@ -1430,7 +1448,7 @@ function renderSelfIntroSection(section, number) {
         <div class="number">${number}.</div>
         <div class="title-content">
             <h3>${title}</h3>
-            <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+            <p class="section-desc">${section.comment || "기업이 작성한 설명 칸 입니다.."}</p>
         </div>
     `;
 
@@ -1488,7 +1506,7 @@ function renderSelectSection(section, number) {
     <div class="number">${number}.</div>
     <div class="title-content">
       <h3>${title}</h3>
-      <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+      <p class="section-desc">${section.comment || "기업이 작성한 설명 칸 입니다."}</p>
     </div>
   `;
 
@@ -1529,7 +1547,7 @@ function renderDescriptiveSection(section, number) {
     <div class="number">${number}.</div>
     <div class="title-content">
       <h3>${title}</h3>
-      <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+      <p class="section-desc">${section.comment || "기업이 작성한 설명 칸 입니다."}</p>
     </div>
   `;
 
@@ -1578,7 +1596,7 @@ function renderPhotoSection(section, number) {
     <div class="number">${number}.</div>
     <div class="title-content">
       <h3>${title}</h3>
-      <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+      <p class="section-desc">${section.comment || "기업이 작성한 설명 칸 입니다."}</p>
     </div>
   `;
 
@@ -1651,7 +1669,7 @@ function renderFileSection(section, number) {
       <div class="number">${number}.</div>
       <div class="title-content">
         <h3>${title}</h3>
-        <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+        <p class="section-desc">${section.comment || "기업이 작성한 설명 칸 입니다."}</p>
       </div>
     `;
 
