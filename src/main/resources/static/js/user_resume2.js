@@ -1066,82 +1066,119 @@ redirectCancel.addEventListener('click', () => {
     redirectModal.style.display = "none";
 });
 
-// ✅ 학력사항 섹션을 동적으로 렌더링하는 함수 (추가 버튼 + 드래그 호환)
+// ✅ 학력사항 섹션을 동적으로 렌더링하는 함수 (조건 기반 + 추가 버튼)
 function renderEducationSection(section, number) {
     const sectionBox = document.createElement("section");
     sectionBox.className = "section-box";
-    sectionBox.dataset.sectionId = section.id;     // ✅ 이걸 추가!
-    sectionBox.dataset.coSectionId = section.id;   // ✅ 기존 것도 유지 (기업 섹션용)
-
-    // ✅ 제목 저장 (미리보기용)
+    sectionBox.dataset.sectionId = section.id;
+    sectionBox.dataset.coSectionId = section.id;
     sectionBox.dataset.title = section.title;
 
-    // 🔹 섹션 제목
     const sectionTitle = document.createElement("div");
     sectionTitle.className = "section-title";
     sectionTitle.innerHTML = `
-        <div class="number">${number}.</div>
-        <div class="title-content">
-            <h3>${section.title}</h3>
-            <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
-        </div>
-    `;
+    <div class="number">${number}.</div>
+    <div class="title-content">
+      <h3>${section.title}</h3>
+      <p class="section-desc">${section.comment || "구직자 설명입력 칸 입니다."}</p>
+    </div>
+  `;
 
-    // ✅ 드롭 이벤트 대상 박스 (.edu-box)
+    // ✅ 조건 불러오기
+    const allowed = section.conditions || [];
+
+    // ✅ 드롭 대상 박스 (.edu-box)
     const eduBox = document.createElement("div");
     eduBox.className = "edu-box";
 
-    // 🔹 기본 학력 입력칸
-    const eduItem = document.createElement("div");
-    eduItem.className = "edu-item"; // ✅ class 이름 통일 (drop 이벤트용)
-    eduItem.innerHTML = `
-        <button type="button" class="edu-del">✕</button>
+    // ✅ 학력 아이템 생성 함수
+    const createEduItem = () => {
+        const eduItem = document.createElement("div");
+        eduItem.className = "edu-item";
+        eduItem.innerHTML = `<button type="button" class="edu-del">✕</button>`;
 
-        <!-- 1줄: 학교명 + 학과 -->
-        <div class="edu-row">
-            <input type="text" class="school-input" placeholder="학교명">
-            <input type="text" class="major-input" placeholder="학과">
-        </div>
+        // 첫 번째 줄 (학교명 / 학과)
+        const row1 = document.createElement("div");
+        row1.className = "edu-row";
 
-        <!-- 2줄: 기간 + 상태 -->
-        <div class="edu-row">
-            <div class="date-group">
-                <input type="text" class="year-input" placeholder="YYYY">
-                -
-                <input type="text" class="month-input" placeholder="MM">
-                ~
-                <input type="text" class="year-input" placeholder="YYYY">
-                -
-                <input type="text" class="month-input" placeholder="MM">
-            </div>
-            <input type="text" class="status-input" placeholder="상태">
-        </div>
-    `;
+        if (allowed.includes("학교명")) {
+            const schoolInput = document.createElement("input");
+            schoolInput.type = "text";
+            schoolInput.className = "school-input";
+            schoolInput.placeholder = "학교명";
+            row1.appendChild(schoolInput);
+        }
+
+        if (allowed.includes("학과")) {
+            const majorInput = document.createElement("input");
+            majorInput.type = "text";
+            majorInput.className = "major-input";
+            majorInput.placeholder = "학과";
+            row1.appendChild(majorInput);
+        }
+
+        // 두 번째 줄 (기간 / 상태)
+        const row2 = document.createElement("div");
+        row2.className = "edu-row";
+
+        if (allowed.includes("기간")) {
+            const dateGroup = document.createElement("div");
+            dateGroup.className = "date-group";
+            dateGroup.innerHTML = `
+        <input type="text" class="year-input" placeholder="YYYY">
+        -
+        <input type="text" class="month-input" placeholder="MM">
+        ~
+        <input type="text" class="year-input" placeholder="YYYY">
+        -
+        <input type="text" class="month-input" placeholder="MM">
+      `;
+            row2.appendChild(dateGroup);
+        }
+
+        if (allowed.includes("상태")) {
+            const statusInput = document.createElement("input");
+            statusInput.type = "text";
+            statusInput.className = "status-input";
+            statusInput.placeholder = "상태";
+            row2.appendChild(statusInput);
+        }
+
+        eduItem.appendChild(row1);
+        eduItem.appendChild(row2);
+
+        // 삭제 버튼 동작
+        eduItem.querySelector(".edu-del").addEventListener("click", () => {
+            eduItem.remove();
+        });
+
+        return eduItem;
+    };
+
+    // ✅ 기본 항목 1개 추가
+    const firstItem = createEduItem();
+    eduBox.appendChild(firstItem);
 
     // ✅ 추가 버튼
     const addBtn = document.createElement("button");
     addBtn.className = "edu-btn";
     addBtn.innerHTML = `<span class="plus">＋</span>`;
 
-    // ✅ 클릭 시 새로운 학력 항목 추가
     addBtn.addEventListener("click", () => {
-        const clone = eduItem.cloneNode(true);
-        clone.querySelectorAll("input").forEach(el => (el.value = ""));
-        eduBox.appendChild(clone);
+        const newItem = createEduItem();
+        eduBox.appendChild(newItem);
         console.log("✨ [EDU] 새 학력 항목 추가됨");
 
-        // ✅ 새 항목에도 드롭 이벤트 자동 연결
+        // ✅ drop 이벤트 재등록
         setTimeout(() => {
             if (typeof attachEduDropEvent === "function") {
-                attachEduDropEvent(clone);
-                console.log("✨ [EDU] 새 항목에도 drop 이벤트 등록 완료");
+                attachEduDropEvent(newItem);
+                console.log("✨ [EDU] 새 항목 drop 이벤트 등록 완료");
             }
         }, 100);
     });
 
-
-    // ✅ 전체 구성
-    eduBox.appendChild(eduItem);
+    // ✅ 조립
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(eduBox);
     sectionBox.appendChild(addBtn);
