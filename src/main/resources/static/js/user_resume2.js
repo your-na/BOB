@@ -870,10 +870,10 @@ confirmBtn.addEventListener("click", () => {
         // ✅ 이 부분에 추가
         const textareas = box.querySelectorAll("textarea");
         if (textareas.length > 0) {
-            section.content = Array.from(textareas)
+            content = [...textareas]
                 .map(t => t.value.trim())
-                .filter(v => v !== "")
-                .join("\n\n"); // 줄바꿈 두 번으로 구분
+                .filter(v => v.length > 0)
+                .join("###"); // 여러 줄 구분자
         }
 
         // ✅ 드래그된 항목 수집
@@ -1153,17 +1153,8 @@ function renderEducationSection(section, number) {
             row2.appendChild(statusInput);
         }
 
-        // ✅ 설명란 추가 (항목별)
-        const descRow = document.createElement("div");
-        descRow.className = "edu-row";
-        const descTextarea = document.createElement("textarea");
-        descTextarea.className = "edu-desc";
-        descTextarea.placeholder = "학력사항 관련 설명 입력";
-        descRow.appendChild(descTextarea);
-
         eduItem.appendChild(row1);
         eduItem.appendChild(row2);
-        eduItem.appendChild(descRow);
 
         // 삭제 버튼 동작
         eduItem.querySelector(".edu-del").addEventListener("click", () => {
