@@ -325,9 +325,19 @@ document.addEventListener("change", async (event) => {
         status: row.querySelector(".status-select")?.value || "참여완료",
         startDate: row.querySelector(".start-date")?.value,
         endDate: row.querySelector(".end-date")?.value,
-        title: row.querySelector(".contest-name")?.value.trim(),
-        organizer: row.querySelector(".contest-org")?.value.trim(),
-        grade: row.querySelector(".contest-grade")?.value.trim()
+        // title: row.querySelector(".contest-name")?.value.trim(),
+        // organizer: row.querySelector(".contest-org")?.value.trim(),
+        // grade: row.querySelector(".contest-grade")?.value.trim()
+        title:
+            row.querySelector(".contest-name")?.value?.trim() ||
+            row.querySelector("td:nth-child(5) span")?.textContent?.trim() || "",
+        organizer:
+            row.querySelector(".contest-org")?.value?.trim() ||
+            row.querySelector("td:nth-child(5) small")?.textContent?.trim() || "",
+        grade:
+            row.querySelector(".contest-grade")?.value?.trim() ||
+            row.querySelector("td:nth-child(6)")?.textContent?.trim() || ""
+
     };
 
     try {
@@ -1025,12 +1035,12 @@ document.addEventListener("click", function (e) {
     });
 })();
 
-    // OCR 완료 후 값 반영 시
-    document.querySelector(".contest-org").value = recognizedOrg;
-    document.querySelector(".contest-org").readOnly = true;
+// OCR 완료 후 값 반영 시
+document.querySelector(".contest-org").value = recognizedOrg;
+document.querySelector(".contest-org").readOnly = true;
 
-    document.querySelector(".contest-grade").value = recognizedGrade;
-    document.querySelector(".contest-grade").readOnly = true;
+document.querySelector(".contest-grade").value = recognizedGrade;
+document.querySelector(".contest-grade").readOnly = true;
 
 
 

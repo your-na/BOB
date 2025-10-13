@@ -393,3 +393,66 @@ textarea {
     color: #000 !important;
     cursor: text !important;
 }
+
+/* 모달 전체 배경 */
+.modal {
+    display: none; /* 처음엔 숨김 */
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+/* 모달 내부 */
+.modal-content {
+    background: white;
+    padding: 30px;
+    border: 1px solid #000;
+    border-radius: 8px;
+    text-align: center;
+    width: 400px;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.modal-desc {
+    font-size: 14px;
+    color: red;
+    margin-bottom: 20px;
+}
+
+.modal-btns {
+    display: flex;
+    justify-content: space-around;
+}
+
+.modal-btns button {
+    padding: 8px 20px;
+    border: 1px solid #666;
+    border-radius: 6px;
+    background: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* ✅ 데이터 없을 때 안내 스타일 */
+.empty-content {
+    padding: 50px 20px;
+    text-align: center;
+    color: #333;
+    border-top: 1px solid #ccc;
+}
+
+.no-data-text {
+    font-size: 15px;
+    margin-bottom: 10px;
+}
