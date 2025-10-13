@@ -1231,17 +1231,15 @@ function renderJobSection(section, number) {
 
     return sectionBox;
 }
+
 // ✅ 경력사항 섹션을 동적으로 렌더링하는 함수 (드롭 이벤트 대응)
 function renderCareerSection(section, number) {
     const sectionBox = document.createElement("section");
     sectionBox.className = "section-box";
-    sectionBox.dataset.sectionId = section.id;     // ✅ 이걸 추가!
-    sectionBox.dataset.coSectionId = section.id;   // ✅ 기존 것도 유지 (기업 섹션용)
-
-
+    sectionBox.dataset.sectionId = section.id;
+    sectionBox.dataset.coSectionId = section.id;
     sectionBox.dataset.title = section.title;
 
-    // 🔹 섹션 제목
     const sectionTitle = document.createElement("div");
     sectionTitle.className = "section-title";
     sectionTitle.innerHTML = `
@@ -1252,55 +1250,70 @@ function renderCareerSection(section, number) {
         </div>
     `;
 
-    // ✅ 드롭 이벤트 대상 (.career-box)
     const careerBox = document.createElement("div");
     careerBox.className = "career-box";
 
-    // 🔹 기본 경력 입력칸
-    const careerItem = document.createElement("div");
-    careerItem.className = "career-item";
-    careerItem.innerHTML = `
-        <button type="button" class="career-del">✕</button>
+    const createCareerItem = () => {
+        const item = document.createElement("div");
+        item.className = "career-item";
 
-        <!-- 1줄: 회사명 + 직무 -->
-        <div class="career-row">
-            <input type="text" class="company-input" placeholder="회사명">
-            <input type="text" class="job-input" placeholder="직무">
-        </div>
+        item.innerHTML = `<button type="button" class="career-del">✕</button>`;
 
-        <!-- 2줄: 기간 + 상태 -->
-        <div class="career-row">
-            <div class="date-group">
-                <input type="text" class="year-input" placeholder="YYYY">
-                -
-                <input type="text" class="month-input" placeholder="MM">
-                ~
-                <input type="text" class="year-input" placeholder="YYYY">
-                -
-                <input type="text" class="month-input" placeholder="MM">
-            </div>
-            <input type="text" class="status-input" placeholder="재직/퇴사">
-        </div>
-    `;
+        // 1줄: 회사명, 직무
+        const row1 = document.createElement("div");
+        row1.className = "career-row";
+        if (section.conditions.includes("회사명")) {
+            row1.innerHTML += `<input type="text" class="company-input" placeholder="회사명">`;
+        }
+        if (section.conditions.includes("직무")) {
+            row1.innerHTML += `<input type="text" class="job-input" placeholder="직무">`;
+        }
 
-    // ✅ 추가 버튼
+        // 2줄: 기간, 상태
+        const row2 = document.createElement("div");
+        row2.className = "career-row";
+        if (section.conditions.includes("근무 개월수") || section.conditions.includes("기간")) {
+            row2.innerHTML += `
+                <div class="date-group">
+                    <input type="text" class="year-input" placeholder="YYYY">
+                    -
+                    <input type="text" class="month-input" placeholder="MM">
+                    ~
+                    <input type="text" class="year-input" placeholder="YYYY">
+                    -
+                    <input type="text" class="month-input" placeholder="MM">
+                </div>
+            `;
+        }
+        if (section.conditions.includes("상태")) {
+            row2.innerHTML += `<input type="text" class="status-input" placeholder="재직/퇴사">`;
+        }
+
+        item.appendChild(row1);
+        item.appendChild(row2);
+
+        return item;
+    };
+
+    const careerItem = createCareerItem();
+    careerBox.appendChild(careerItem);
+
     const addBtn = document.createElement("button");
     addBtn.className = "career-btn";
     addBtn.innerHTML = `<span class="plus">＋</span>`;
     addBtn.addEventListener("click", () => {
-        const clone = careerItem.cloneNode(true);
+        const clone = createCareerItem();
         clone.querySelectorAll("input").forEach(el => el.value = "");
         careerBox.appendChild(clone);
     });
 
-    // ✅ 구성 정리
-    careerBox.appendChild(careerItem);
     sectionBox.appendChild(sectionTitle);
     sectionBox.appendChild(careerBox);
     sectionBox.appendChild(addBtn);
 
     return sectionBox;
 }
+
 
 
 // ✅ 포트폴리오 섹션을 동적으로 렌더링하는 함수 (날짜·상태·파일경로 포함 + 드롭 대응)
