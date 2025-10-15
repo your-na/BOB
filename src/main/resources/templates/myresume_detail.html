@@ -87,9 +87,7 @@
         <tbody>
         <!-- dragItems가 있을 때 -->
         <tr th:each="item : ${section.dragItems}" th:if="${not #lists.isEmpty(section.dragItems)}">
-          <!-- schoolName이 없으면 workplace로 대체 -->
           <td th:text="${item.schoolName != null ? item.schoolName : item.workplace}"></td>
-          <!-- major가 없으면 jobTitle로 대체 -->
           <td th:text="${item.major != null ? item.major : item.jobTitle}"></td>
           <td th:text="${item.status}"></td>
           <td>
@@ -97,12 +95,14 @@
             <span th:text="${item.endDate}"></span>
           </td>
         </tr>
-        <!-- dragItems가 비어 있으면 content로 대체 렌더링 -->
-        <tr th:if="${#lists.isEmpty(section.dragItems)} and ${section.content != null}">
-          <td th:text="${#strings.arraySplit(section.content, '/')[0]?.replace('학교:', '').trim()}"></td>
-          <td th:text="${#strings.arraySplit(section.content, '/')[1]?.replace('학과:', '').trim()}"></td>
-          <td th:text="${#strings.arraySplit(section.content, '/')[2]?.replace('상태:', '').trim()}"></td>
-          <td th:text="${#strings.arraySplit(section.content, '/')[3]?.replace('기간:', '').trim()}"></td>
+
+        <!-- dragItems가 비어 있고, content에 여러 학력이 들어 있는 경우 -->
+        <tr th:each="line : ${#strings.arraySplit(section.content, '\\|')}"
+            th:if="${#lists.isEmpty(section.dragItems)} and ${section.content != null}">
+          <td th:text="${#strings.arraySplit(line, '/')[0]?.replace('학교:', '').trim()}"></td>
+          <td th:text="${#strings.arraySplit(line, '/')[1]?.replace('학과:', '').trim()}"></td>
+          <td th:text="${#strings.arraySplit(line, '/')[2]?.replace('상태:', '').trim()}"></td>
+          <td th:text="${#strings.arraySplit(line, '/')[3]?.replace('기간:', '').trim()}"></td>
         </tr>
         </tbody>
       </table>
