@@ -155,10 +155,17 @@ section5.addEventListener("drop", (e) => {
 
             // 파일 경로
             const pathInput = dropTarget.querySelector(".portfolio-file-path");
-            if (pathInput) pathInput.value = data.file || "";
-
             const hiddenInput = dropTarget.querySelector("input[name='filePath']");
-            if (hiddenInput) hiddenInput.value = data.file || "";
+
+            if (data.type === "CONTEST") {
+                const gradeText = data.grade ? `🏆 ${data.grade}` : "참여";
+                if (pathInput) pathInput.value = gradeText;
+                if (hiddenInput) hiddenInput.value = gradeText;
+            } else {
+                const fileName = data.file || "";
+                if (pathInput) pathInput.value = fileName;
+                if (hiddenInput) hiddenInput.value = fileName;
+            }
         }
     }
 });
@@ -956,37 +963,61 @@ function renderProjects() {
 }
 
 
-// ============================
-// ⚠️ 공모전 렌더링 (추후 구현 예정)
-//
-// function renderContestsIntoPortfolio() {
-//     return fetch('/api/user/resumes/contests')
-//         .then(res => res.json())
-//         .then(list => {
-//            const cont = document.querySelector('.tab-content[data-content="contest"]');
-//             if (!cont || !list) return;
-//             list.forEach(c => {
-//                 const d = document.createElement('div');
-//                 d.className = 'award-item';
-//                 d.innerHTML = `${c.title}<br><small>${c.date || ''}</small>`;
-//                 // ✅ dataset 보강
-//                 Object.assign(d.dataset, {
-//                     type: 'CONTEST',
-//                     id: c.id,
-//                     title: c.title || "",
-//                     file: c.filePath || "",
-//                     startDate: c.startDate || "",
-//                     endDate: c.endDate || ""
-//                 });
-//                 makeDraggable(d, d.dataset);
-//                 cont.appendChild(d);
-//             });
-//         })
-//         .catch(err => console.error('공모전 로드 실패:', err));
-// }
-// - dataset.type = "CONTEST" 로 설정 예정
-// - 나중에 makeDraggable()과 appendEditHint() 그대로 사용 가능
-// ============================
+
+function renderContestsIntoPortfolio() {
+    return fetch('/api/contest-history/resume-view',{
+        credentials: "include"
+    })
+        .then(res => {
+            if (!res.ok) throw new Error("공모전 데이터 로드 실패");
+            return res.json();
+        })
+        .then(list => {
+            const cont = document.querySelector('.tab-content[data-content="contest"]');
+            if (!cont || !list) return;
+            cont.innerHTML = "";
+
+            if (!list || list.length === 0) {
+                const empty = document.createElement('p');
+                empty.textContent = "참여한 공모전이 없습니다.";
+                cont.appendChild(empty);
+                return;
+            }
+
+            list.forEach(c => {
+                const start = c.startDate ? c.startDate.replace(/-/g, ".") : "";
+                const end = c.endDate ? c.endDate.replace(/-/g, ".") : "";
+                const period = start && end ? `${start} ~ ${end}` : start || "";
+
+                const d = document.createElement('div');
+                d.className = 'award-item';
+                d.innerHTML = `
+                    <strong>${c.title || "공모전명 없음"}</strong><br>
+                    <small>${c.organizer || "주최기관 미상"}</small><br>
+                    <span style="color:#0077cc; font-weight:bold;">🏆 ${c.grade || "참여"}</span><br>
+                    <small>${period}</small>
+                `;
+
+                Object.assign(d.dataset, {
+                    type: 'CONTEST',
+                    id: c.id,
+                    title: c.title || "",
+                    grade: c.grade || "",
+                    startDate: c.startDate || "",
+                    endDate: c.endDate || "",
+                    organizer: c.status || "",
+                    status: c.status || ""
+                });
+
+                makeDraggable(d, d.dataset);
+                cont.appendChild(d);
+            });
+
+            appendEditHint(cont);
+        })
+        .catch(err => console.error('공모전 로드 실패:', err));
+}
+
 
 
 function renderJobs() {
@@ -1280,7 +1311,7 @@ window.addEventListener('DOMContentLoaded', () => {
         renderProjects(),
         renderJobs(),
         renderEducations(),
-        // renderContests()
+        renderContestsIntoPortfolio()
     ]).then(() => {
         activateTab('school');
     });
