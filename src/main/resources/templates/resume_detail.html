@@ -107,68 +107,79 @@
         <span th:each="tag : ${section.selectedTags}" class="tag" th:text="${tag}">태그</span>
       </div>
 
-      <!-- ✅ 학력 리스트 -->
-      <div th:if="${section.educations != null and #lists.size(section.educations) > 0}">
-        <div th:each="edu : ${section.educations}" class="edu-block">
-    <span class="edu-line"
-          th:text="|${edu.startYear}.${edu.startMonth} ~ ${edu.endYear}.${edu.endMonth} ${edu.schoolName} ${edu.majorName} ${edu.status}|">
-    </span>
-          <p class="edu-desc"
-             th:if="${section.content != null and section.content != ''}"
-             th:text="${section.content}">
-          </p>
-        </div>
+      <!-- ✅ 학력사항 -->
+      <div th:if="${section.title == '학력사항'}">
+        <h3>학력사항</h3>
+        <table class="detail-table">
+          <thead>
+          <tr>
+            <th>학교</th>
+            <th>학과</th>
+            <th>상태</th>
+            <th>기간</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="edu : ${section.educations}">
+            <td th:text="${edu.schoolName}">학교명</td>
+            <td th:text="${edu.majorName}">학과</td>
+            <td th:text="${edu.status}">상태</td>
+            <td th:text="|${edu.startYear}.${edu.startMonth} ~ ${edu.endYear}.${edu.endMonth}|">기간</td>
+          </tr>
+          </tbody>
+        </table>
       </div>
 
-
-      <!-- ✅ 경력 리스트 -->
-      <div th:if="${section.careers != null and #lists.size(section.careers) > 0}">
-        <div th:each="career : ${section.careers}" class="career-block">
-          <p class="career-line">
-            <strong th:text="${career.workplace}">회사명</strong> |
-            <span th:text="${career.jobTitle}">직무명</span> |
-            <span th:text="${career.status}">상태</span><br>
-            <small th:text="|${#temporals.format(career.startDate, 'yyyy.MM.dd')} ~ ${#temporals.format(career.endDate, 'yyyy.MM.dd')}|"></small>
-          </p>
-
-          <!-- ✅ 설명 표시 -->
-          <p class="career-desc"
-             th:if="${section.content != null and section.content != ''}"
-             th:text="${section.content}">
-          </p>
-        </div>
+      <!-- ✅ 경력사항 -->
+      <div th:if="${section.title == '경력사항'}">
+        <h3>경력사항</h3>
+        <table class="detail-table">
+          <thead>
+          <tr>
+            <th>근무지</th>
+            <th>직무</th>
+            <th>상태</th>
+            <th>기간</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="career : ${section.careers}">
+            <td th:text="${career.workplace}">근무지</td>
+            <td th:text="${career.jobTitle}">직무</td>
+            <td th:text="${career.status}">상태</td>
+            <td th:text="|${#temporals.format(career.startDate, 'yyyy-MM-dd')} ~ ${#temporals.format(career.endDate, 'yyyy-MM-dd')}|">기간</td>
+          </tr>
+          </tbody>
+        </table>
       </div>
 
-
-      <!-- ✅ 포트폴리오 리스트 -->
-      <div th:if="${section.portfolios != null and #lists.size(section.portfolios) > 0}">
-        <h4>📁 포트폴리오</h4>
-        <div th:each="portfolio : ${section.portfolios}">
-          <p>
-            <strong th:text="${portfolio.title}">프로젝트명</strong>
-            <span th:text="| (${portfolio.type}) |"></span>
-            <span th:text="${portfolio.status}">상태</span><br>
-
-            <!-- 기간 출력 -->
-            <small th:text="|${portfolio.startDate} ~ ${portfolio.endDate}|"></small><br>
-
-            <!-- 설명 -->
-            <span th:text="${portfolio.description}"></span><br>
-
-            <!-- ✅ 파일 보기 (projectFiles 기준) -->
-            <a th:if="${portfolio.filePath != null}"
-               th:href="@{'/uploads/projectFiles/' + ${portfolio.filePath}}"
-               target="_blank">📎 파일 보기</a>
-
-            <!-- 제출된 파일 -->
-            <span th:if="${portfolio.submittedFile != null}">
-        제출파일: <span th:text="${portfolio.submittedFile}"></span>
-      </span>
-          </p>
-        </div>
+      <!-- ✅ 포트폴리오 -->
+      <div th:if="${section.title == '포트폴리오'}">
+        <h3>포트폴리오</h3>
+        <table class="detail-table">
+          <thead>
+          <tr>
+            <th>제목</th>
+            <th>파일명</th>
+            <th>기간</th>
+            <th>구분</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="portfolio : ${section.portfolios}">
+            <td th:text="${portfolio.title}">제목</td>
+            <td>
+              <a th:if="${portfolio.filePath != null}"
+                 th:href="@{'/uploads/projectFiles/' + ${portfolio.filePath}}"
+                 th:text="${portfolio.filePath}"
+                 target="_blank">파일보기</a>
+            </td>
+            <td th:text="|${portfolio.startDate} ~ ${portfolio.endDate}|">기간</td>
+            <td th:text="${portfolio.type}">프로젝트</td>
+          </tr>
+          </tbody>
+        </table>
       </div>
-
-
 
       <!-- ✅ 사진 첨부 -->
       <div th:if="${not #lists.isEmpty(section.fileNames) and section.type?.trim() == '사진 첨부'}">
