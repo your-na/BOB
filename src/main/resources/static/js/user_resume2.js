@@ -941,25 +941,39 @@ confirmBtn.addEventListener("click", () => {
                     ? `${endYear}-${endMonth.padStart(2, "0")}-01`
                     : null;
 
+                // ✅ 여러 설명칸 내용 합쳐서 저장
+                const descs = Array.from(item.querySelectorAll(".career-desc"))
+                    .map(el => el.value.trim())
+                    .filter(v => v.length > 0)
+                    .join(" / ");
+
                 careers.push({
                     workplace: item.querySelector(".company-input")?.value || "",
                     jobTitle:  item.querySelector(".job-input")?.value || "",
                     status:    item.querySelector(".status-input")?.value || "",
+                    description: descs,
                     startDate,
                     endDate
                 });
             });
 
             if (careers.length > 0) {
-                section.careers = careers; // ← 서버로 보낼 섹션에 경력 붙이기
+                section.careers = careers;
+                // ✅ 전체 설명도 section.content에 저장 (ResumeSectionEntity.content용)
+                section.content = careers
+                    .map(c => c.description)
+                    .filter(v => v && v.trim().length > 0)
+                    .join(" / ");
             }
         }
 
+// ✅ 파일 업로드 결과 연결
         uploadPromises.push(
             uploadPromise.then(() => {
                 section.uploadedFileName = uploadedFileName;
             })
         );
+
 
 // ✅ 포트폴리오 섹션 수집 (PortfolioItemDTO 매핑)
         const portfolioBox = box.querySelector(".portfolio-box");
