@@ -960,7 +960,8 @@ confirmBtn.addEventListener("click", () => {
                 section.uploadedFileName = uploadedFileName;
             })
         );
-        // ✅ 포트폴리오 섹션 수집 (PortfolioItemDTO 매핑)
+
+// ✅ 포트폴리오 섹션 수집 (PortfolioItemDTO 매핑)
         const portfolioBox = box.querySelector(".portfolio-box");
         if (portfolioBox) {
             const portfolios = [];
@@ -982,10 +983,16 @@ confirmBtn.addEventListener("click", () => {
                     ? `${endYear}-${endMonth.padStart(2, "0")}-01`
                     : null;
 
+                // ✅ 여러 설명칸(desc-input)을 합쳐 한 줄로 저장
+                const descs = Array.from(item.querySelectorAll(".desc-input"))
+                    .map(el => el.value.trim())
+                    .filter(v => v.length > 0)
+                    .join(" / ");
+
                 portfolios.push({
                     type: item.dataset.type || "PROJECT", // PROJECT 또는 CONTEST
                     title: item.querySelector(".portfolio-title")?.value || "",
-                    description: item.querySelector(".desc-input")?.value || "",
+                    description: descs, // ✅ 수정된 부분
                     status: item.querySelector(".status-input")?.value || "",
                     filePath: item.querySelector(".portfolio-file-path")?.value ||
                         item.querySelector("input[name='filePath']")?.value || null,
@@ -996,14 +1003,25 @@ confirmBtn.addEventListener("click", () => {
 
             if (portfolios.length > 0) {
                 section.portfolios = portfolios; // ✅ PortfolioItemDTO 리스트로 백엔드에 전송
+
+                // ✅ 포트폴리오 설명을 합쳐서 section.content에도 저장
+                const combinedPortfolioDesc = portfolios
+                    .map(p => p.description)
+                    .filter(v => v && v.trim().length > 0)
+                    .join(" / ");
+                section.content = combinedPortfolioDesc;
             }
         }
-         // ✅ 드래그 아이템 로그 확인 (이 부분 추가!)
+
+// ✅ 디버그용 로그
         console.log("📦 현재 섹션 ID:", section.coSectionId);
         console.log("🎯 section.dragItems:", section.dragItems);
+        console.log("🧾 경력 섹션 확인:", section.careers); // ✅ 여기 추가!
 
         sections.push(section);
+
     });
+
 
 
 
@@ -2270,6 +2288,7 @@ function togglePreview() {
                     careers.push({
                         workplace: item.querySelector(".company-input")?.value || "",
                         jobTitle: item.querySelector(".job-input")?.value || "",
+                        description: item.querySelector(".desc-input")?.value || "",
                         status: item.querySelector(".status-input")?.value || "",
                         startDate: startDate,
                         endDate: endDate
