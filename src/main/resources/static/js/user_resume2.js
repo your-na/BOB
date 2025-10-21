@@ -1391,9 +1391,9 @@ function renderPortfolioSection(section, number) {
         </div>
 
         <!-- 설명 -->
-        <div class="portfolio-row">
-            <input type="text" class="desc-input" placeholder="설명" style="width:100%;">
-        </div>
+       <div class="portfolio-row">
+         <textarea class="desc-input" placeholder="설명" style="width:100%;"></textarea>
+      </div>
     `;
 
     // 🔹 추가 버튼
