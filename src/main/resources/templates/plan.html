@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>SPACE</title>
@@ -8,59 +8,82 @@
 <body>
 
 <div class="modal-header">
-    <span>SPACE</span>
+    <span class="title">SPACE</span>
     <span class="close-btn" onclick="window.close();">&times;</span>
 </div>
 
+<!-- ✅ 필터 영역 -->
+<div class="filter-bar">
+    <label>
+        <input type="radio" name="filter" value="all" checked> 전체
+    </label>
+    <label>
+        <input type="radio" name="filter" value="project"> 프로젝트
+    </label>
+    <label>
+        <input type="radio" name="filter" value="contest"> 공모전
+    </label>
+</div>
+
 <ul class="plan-list">
-    <!-- 주최한 프로젝트 목록 (상태가 "완료", "신청중", "거절됨"이 아닌 프로젝트만 표시) -->
-    <div>
+
+    <!-- ✅ 프로젝트 -->
+    <div class="plan-section project">
         <h3>주최한 프로젝트</h3>
-        <li th:each="project : ${createdProjects}" th:if="${project.status != '완료' and project.status != '신청중' and project.status != '거절됨'}">
-            <a th:href="@{/todohome/{id}(id=${project.id})}" th:text="${project.title}" class="protitle">프로젝트 제목</a>
+        <li th:each="project : ${createdProjects}"
+            th:if="${project.status != '완료' and project.status != '신청중' and project.status != '거절됨'}">
+            <a th:href="@{/todohome/{id}(id=${project.id})}"
+               th:text="${project.title}"
+               class="protitle">프로젝트 제목</a>
         </li>
-    </div>
 
-    <!-- 참여한 프로젝트 목록 (상태가 "완료", "신청중", "거절됨"이 아닌 프로젝트만 표시) -->
-    <div>
         <h3>참여한 프로젝트</h3>
-        <li th:each="project : ${joinedProjects}" th:if="${project.status != '완료' and project.status != '신청중' and project.status != '거절됨'}">
-            <a th:href="@{/todohome/{id}(id=${project.id})}" th:text="${project.title}" class="protitle">프로젝트 제목</a>
+        <li th:each="project : ${joinedProjects}"
+            th:if="${project.status != '완료' and project.status != '신청중' and project.status != '거절됨'}">
+            <a th:href="@{/todohome/{id}(id=${project.id})}"
+               th:text="${project.title}"
+               class="protitle">프로젝트 제목</a>
         </li>
     </div>
 
-    <!-- 팀장 공모전 -->
-    <div>
+    <!-- ✅ 공모전 -->
+    <div class="plan-section contest">
         <h3>팀장 공모전</h3>
         <li th:each="team : ${leaderContests}"
             th:if="${team != null and team.status != '완료' and team.status != '신청중' and team.status != '거절됨'}">
             <a th:href="@{/contesthome/{id}(id=${team.id})}"
-               th:text="${team.contest.title}" class="protitle">공모전 제목</a>
+               th:text="${team.contest.title}"
+               class="protitle">공모전 제목</a>
         </li>
-    </div>
 
-    <!-- 참여 공모전 -->
-    <div>
         <h3>참여 공모전</h3>
         <li th:each="team : ${joinedContests}"
             th:if="${team != null and team.status != '완료' and team.status != '신청중' and team.status != '거절됨'}">
             <a th:href="@{/contesthome/{id}(id=${team.id})}"
-               th:text="${team.contest.title}" class="protitle">공모전 제목</a>
+               th:text="${team.contest.title}"
+               class="protitle">공모전 제목</a>
         </li>
     </div>
 
 </ul>
 
 <script>
-    function toggleStar(element) {
-        if (element.innerHTML === "★") {
-            element.innerHTML = "☆"; // 빈 별
-            element.style.color = "gray";
-        } else {
-            element.innerHTML = "★"; // 채운 별
-            element.style.color = "gold";
-        }
-    }
+    document.addEventListener("DOMContentLoaded", () => {
+        const filters = document.querySelectorAll('input[name="filter"]');
+        const sections = document.querySelectorAll(".plan-section");
+
+        filters.forEach(filter => {
+            filter.addEventListener("change", () => {
+                const value = filter.value;
+
+                sections.forEach(section => {
+                    section.style.display =
+                        value === "all" ? "block" :
+                            section.classList.contains(value) ? "block" : "none";
+                });
+            });
+        });
+    });
 </script>
 
 </body>
