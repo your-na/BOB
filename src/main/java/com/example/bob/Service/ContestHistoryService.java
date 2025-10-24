@@ -30,9 +30,9 @@ public class ContestHistoryService {
         ContestTeamEntity team = contestTeamRepository.findById(req.getTeamId())
                 .orElseThrow(() -> new IllegalArgumentException("Team not found"));
 
-        // 👉 DTO에서 받은 문자열 날짜 사용
-        LocalDate startDate = parseDateOrNull(req.getStartDate());
-        LocalDate endDate   = parseDateOrNull(req.getEndDate());
+        // 시작일: 팀 생성일, 종료일: 제출한 오늘 날짜
+        LocalDate startDate = team.getCreatedAt();
+        LocalDate endDate = LocalDate.now();
 
         List<UserEntity> members = team.getMembers().stream()
                 .map(ContestTeamMemberEntity::getUser)

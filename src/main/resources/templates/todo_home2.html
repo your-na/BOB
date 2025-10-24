@@ -147,10 +147,16 @@
             <div class="award-step" data-step="3" style="display:none;">
                 <p><strong>다음 정보를 확인했습니다. 수상 경력에 추가하시겠습니까?</strong></p>
                 <div class="award-result">
-                    <label>수상 등급</label>
-                    <input id="award-grade" type="text" readonly/>
+                    <label>공모전 제목</label>
+                    <input id="contest-title" type="text" readonly/>
                     <label>주최기관</label>
-                    <input id="award-organizer" type="text" readonly/>
+                    <input id="contest-organizer" type="text" readonly/>
+                    <label>수상 등급</label>
+                    <input id="contest-grade" type="text" readonly/>
+                    <label>시작일</label>
+                    <input id="contest-start" type="date" readonly/>
+                    <label>종료일</label>
+                    <input id="contest-end" type="date" readonly/>
                 </div>
                 <div class="award-actions">
                     <button type="button" class="btn-secondary award-back">다시 인식</button>
@@ -209,6 +215,8 @@
     let teamId = /*[[${team.id}]]*/ 0;
     let csrfToken = /*[['${_csrf.token}']]*/ '';
     let csrfHeader = /*[['${_csrf.headerName}']]*/ '';
+
+    const teamCreatedAt = /*[[${team.createdAt}]]*/ '';
 </script>
 
 
@@ -447,8 +455,8 @@
         const canvas = document.getElementById('award-canvas');
         const imgEl = document.getElementById('award-image');
         const rawTextEl = document.getElementById('award-raw-text');
-        const gradeInput = document.getElementById('award-grade');
-        const orgInput = document.getElementById('award-organizer');
+        const gradeInput = document.getElementById('contest-grade');
+        const orgInput = document.getElementById('contest-organizer');
         const progressBar = modal.querySelector('.award-progress-bar');
         const finalMsg = document.getElementById('award-final-message');
 
@@ -665,6 +673,19 @@
                 lockReadOnlyInput(gradeInput, () => parsed.grade || '');
                 lockReadOnlyInput(orgInput,   () => parsed.organizer || '');
 
+                // ✅ OCR 결과 표시 후 자동 입력
+                document.getElementById('contest-title').value =
+                    document.getElementById('project-name')?.innerText?.trim() || '공모전';
+
+                // ✅ 날짜 자동 세팅
+                const startInput = document.getElementById('contest-start');
+                const endInput = document.getElementById('contest-end');
+                const today = new Date();
+                const todayStr = today.toISOString().split('T')[0];
+                startInput.value = teamCreatedAt || todayStr;
+                endInput.value = todayStr;
+
+
                 goStep(3);
             }catch(err){
                 console.error(err);
@@ -677,6 +698,7 @@
         confirmBtn.addEventListener('click', async () => {
             const grade = (parsed.grade || '').trim();
             const organizer = (parsed.organizer || '').trim();
+            const title = document.querySelector('#contest-title')?.value?.trim() || '공모전';
 
             if(!grade && !organizer){
                 alert('인식된 정보가 없습니다. 다시 시도해 주세요.');
@@ -684,14 +706,25 @@
             }
 
             try{
-                const body = { grade, organizer, source: 'certificate', teamId, ocrRawText: ocrText };
-                const res = await fetch('/api/contest-history', {
+                const body = {
+                    title,
+                    grade,
+                    organizer,
+                    ocrRawText: ocrText,
+                    source: 'certificate',
+                    status: '참여완료',
+                    teamId,
+                    startDate: null,
+                    endDate: null
+                };
+                const res = await fetch('/api/contest-history/team', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         ...(csrfHeader && csrfToken ? { [csrfHeader]: csrfToken } : {})
                     },
-                    body: JSON.stringify(body)
+                    body: JSON.stringify(body),
+                    credentials: 'include'
                 });
 
                 if(!res.ok) throw new Error('수상 경력 추가 실패');

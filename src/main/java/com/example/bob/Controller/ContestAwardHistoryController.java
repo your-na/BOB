@@ -55,6 +55,22 @@ public class ContestAwardHistoryController {
         }
     }
 
+    @PostMapping("/team")
+    public ResponseEntity<?> saveAwardForTeam(@RequestBody ContestAwardHistoryRequestDTO dto) {
+        try {
+            List<ContestAwardHistory> saved = service.addAwardHistoryForTeam(dto);
+
+            // ✅ 모든 팀원에게 저장된 기록을 DTO로 변환
+            List<ContestAwardHistoryResponseDTO> response = saved.stream()
+                    .map(ContestAwardHistoryResponseDTO::fromEntity)
+                    .toList();
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("팀 수상 내역 저장 실패: " + e.getMessage());
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateContestHistory(@PathVariable Long id,
                                                   @RequestBody ContestAwardHistoryRequestDTO dto,
