@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="right">
                 <button class="open-menu-btn" onclick="toggleMenu(this)">⋯</button>
                 <ul class="dropdown-menu">
-                   <li onclick="viewDetail(${item.jobPostId})">지원내역</li>
+                 <li onclick="viewDetail(${item.jobPostId}, ${item.resumeId || null}, ${item.myResumeId || null})">지원내역</li>
                    <li onclick="cancelApply(${item.jobPostId})">지원취소</li>
                    <li onclick="hideItem(${item.applicationId})">숨기기</li>
                   <!-- <li onclick="previewResume(${item.resumeId || item.id})">이력서 보기</li> -->
@@ -161,12 +161,19 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("rejected-count").textContent = statusCounts.rejected;
     }
 
-    
 
-    window.viewDetail = function (jobPostId) {
-        if (!jobPostId) return;
-        location.href = `/resume/detail?jobPostId=${jobPostId}`;
+
+    window.viewDetail = function (jobPostId, resumeId, myResumeId) {
+        if (myResumeId) {
+            window.location.href = `/myresume/${myResumeId}`;
+        } else if (resumeId) {
+            window.location.href = `/resume/detail?jobPostId=${jobPostId}`;
+        } else {
+            alert("이력서 정보가 없습니다.");
+        }
     };
+
+
 
     window.cancelApply = function (jobPostId) {
         if (!confirm("정말 지원을 취소하시겠습니까?")) return;

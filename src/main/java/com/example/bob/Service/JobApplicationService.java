@@ -75,6 +75,15 @@ public class JobApplicationService {
                     dto.setJobPostId(application.getJobPost().getId());
                     dto.setApplicationId(application.getId());
 
+                    // ✅ ✅ 여기에 추가하세요 (가장 중요!)
+                    if (application.getResume() != null) {
+                        dto.setResumeId(application.getResume().getId());     // 기업용 이력서
+                    }
+
+                    if (application.getMyResume() != null) {
+                        dto.setMyResumeId(application.getMyResume().getId()); // 회원용 이력서
+                    }
+
                     return dto;
                 })
                 .collect(Collectors.toList());
