@@ -256,6 +256,35 @@ document.addEventListener("DOMContentLoaded", () => {
         const title = document.getElementById("resumeTitle")?.value.trim();
         if (!title) return alert("제목을 입력해주세요!");
 
+        // ✅ [추가 부분] 각 섹션의 선택 항목 검사
+        // ✅ 선택형 섹션 검사 (사용자 생성 태그 제외)
+        let hasUnselectedSection = false;
+
+        document.querySelectorAll(".resume-section").forEach(section => {
+            // tag-list가 하나라도 있는 섹션만 검사
+            const tagLists = section.querySelectorAll(".tag-list");
+            if (tagLists.length > 0) {
+                tagLists.forEach(list => {
+                    // 기본 제공 condition 태그만 검사 (사용자 추가 태그 제외)
+                    const defaultTags = list.querySelectorAll(".tag.condition");
+                    if (defaultTags.length > 0) {
+                        const selected = list.querySelectorAll(".tag.condition.selected-tag");
+                        if (selected.length === 0) {
+                            hasUnselectedSection = true;
+                            list.style.outline = "2px solid red";
+                            setTimeout(() => list.style.outline = "none", 2000);
+                        }
+                    }
+                });
+            }
+        });
+
+        if (hasUnselectedSection) {
+            alert("선택하지 않은 항목이 있습니다!");
+            return;
+        }
+
+
         const sectionsData = [];
         document.querySelectorAll(".resume-section").forEach(section => {
             let sectionTitle = "";
