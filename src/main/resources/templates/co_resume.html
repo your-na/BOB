@@ -37,7 +37,10 @@
         <span>2. 학력사항</span>
         <button class="delete-btn">✕</button>
       </div>
+      <p class="section-title">※ 모든 선택항목에 한 개 이상의 값을 선택해주세요.</p>
       <input type="text" id="ohcomment" placeholder="설명 입력">
+
+      <p class="section-title">선택항목1</p>
 
       <!-- 첫 번째 줄: 학교 구분 -->
       <div class="tag-list">
@@ -48,6 +51,8 @@
         <span class="tag condition">대학원</span>
         <span class="tag condition">최종</span>
       </div>
+
+      <p class="section-title">선택항목2</p>
 
       <!-- 두 번째 줄: 학교 관련 정보 -->
       <div class="tag-list">
@@ -64,15 +69,23 @@
         <span>3. 희망직무</span>
         <button class="delete-btn">✕</button>
       </div>
+
+      <!-- 빨간 문구 -->
+      <p class="section-title">※ 직무 입력 후 <strong>Enter</strong> 키를 누르면 항목이 추가됩니다.</p>
+
+      <!-- 설명 입력 -->
       <input type="text" id="ohcomment" placeholder="설명 입력">
+
+      <!-- 입력창 -->
+      <input type="text" id="job-input" placeholder="직무 입력 후 엔터">
+
+      <!-- 복수선택 버튼 -->
       <div class="tag-mode">
         <button id="multi-on" class="mode-btn selected-tag">복수선택 ⭕</button>
         <button id="multi-off" class="mode-btn">복수선택 ❌</button>
       </div>
-      <input type="text" id="job-input" placeholder="직무 입력 후 엔터">
-      <p style="color: red; font-size: 12px; margin: 5px 0 10px 5px;">
-        ※ 직무 입력 후 <strong>Enter</strong> 키를 누르면 항목이 추가됩니다.
-      </p>
+
+      <!-- 직무 태그 -->
       <div class="tag-list job-tags">
       </div>
     </section>
@@ -83,7 +96,10 @@
         <span>4. 경력사항</span>
         <button class="delete-btn">✕</button>
       </div>
+      <p class="section-title">※ 모든 선택항목에 한 개 이상의 값을 선택해주세요.</p>
       <input type="text" id="ohcomment" placeholder="설명 입력">
+
+      <p class="section-title">선택항목1</p>
 
       <!-- 첫 번째 줄: 기간 선택 -->
       <div class="tag-list" data-single="true">
@@ -92,6 +108,8 @@
         <span class="tag condition">6개월 이내</span>
         <span class="tag condition direct-input-tag">직접입력</span>
       </div>
+
+      <p class="section-title">선택항목2</p>
 
       <!-- 두 번째 줄: 회사 관련 정보 -->
       <div class="tag-list">
@@ -108,7 +126,11 @@
         <span>5. 포트폴리오</span>
         <button class="delete-btn">✕</button>
       </div>
+      <p class="section-title">※ 모든 선택항목에 한 개 이상의 값을 선택해주세요.</p>
       <input type="text" id="ohcomment" placeholder="설명 입력">
+
+      <p class="section-title">선택항목1</p>
+
       <div class="tag-list" data-single="true">
         <span class="tag condition">1개 이하</span>
         <span class="tag condition">3개 이상</span>

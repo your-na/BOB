@@ -256,3 +256,10 @@ textarea {
 #ohcomment:focus {
     border: none;
 }
+
+.section-title {
+    color: red;           /* 빨간색 글씨 */
+    margin-bottom: 5px;   /* 아래 여백 */
+    margin-top: 10px;     /* 위 여백 */
+    font-size: 12px;      /* 글자 크기 (원하시면 조절 가능) */
+}
