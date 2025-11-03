@@ -20,6 +20,10 @@ repositories {
 dependencies {
 	// Spring Boot Starter
 	// ✅ 누락된 모듈 추가
+	implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.4'
+	implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.2'
+	implementation 'javax.xml.bind:jaxb-api:2.3.1'
+
 	implementation 'org.hibernate.common:hibernate-commons-annotations:6.0.6.Final'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -56,4 +60,8 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.named('bootJar') {
+	launchScript()
 }
