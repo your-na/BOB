@@ -360,7 +360,10 @@ document.addEventListener("DOMContentLoaded", () => {
             body: JSON.stringify(resumeData)
         })
             .then(res => res.json())
-            .then(() => alert("저장 완료!"))
+            .then(() => {
+                alert("저장 완료!");
+                window.location.href = "/coresumelist"; // ✅ 반드시 중괄호 안에 넣기!
+            })
             .catch(err => {
                 alert("저장 중 오류 발생");
                 console.error(err);
