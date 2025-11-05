@@ -60,7 +60,6 @@ public class ContestAwardHistoryController {
         try {
             List<ContestAwardHistory> saved = service.addAwardHistoryForTeam(dto);
 
-            // ✅ 모든 팀원에게 저장된 기록을 DTO로 변환
             List<ContestAwardHistoryResponseDTO> response = saved.stream()
                     .map(ContestAwardHistoryResponseDTO::fromEntity)
                     .toList();
