@@ -233,6 +233,33 @@
   </div>
 </div>
 
+<!-- AI 플로팅 버튼 -->
+<div class="floating-chat-btn" id="openChat">
+  💬
+</div>
+
+<!-- AI 도우미 채팅창 -->
+<!-- 채팅 전체 박스 -->
+<div class="chat-box" id="chatBox">
+
+  <!-- 🟦 채팅 헤더 -->
+  <div class="chat-header">
+    <span>AI 이력서 도우미</span>
+    <button class="chat-close" id="closeChat">×</button>
+  </div>
+
+  <!-- 🟦 채팅 내용 출력 영역 -->
+  <div class="chat-body" id="chatBody">
+    <p>안녕하세요! 이력서 작성 중 도움이 필요하신가요?</p>
+    <p>예: "자기소개 문장 예시 알려줘", "프론트엔드 경력 작성 예시 보여줘"</p>
+  </div>
+
+  <!-- 🟦 채팅 입력 영역 (별도 분리) -->
+  <div class="chat-input-area">
+    <input type="text" id="chatInput" placeholder="예: 자기소개 예시 알려줘">
+    <button id="sendChat">전송</button>
+  </div>
+</div>
 <script src="/js/user_resume2.js"></script>
 </body>
 </html>

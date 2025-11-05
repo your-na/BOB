@@ -90,7 +90,12 @@ public class SecurityConfig {
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/main")
                         .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID", "XSRF-TOKEN")
+                        .deleteCookies("JSESSIONID")
+                )
+                .rememberMe(rememberMe -> rememberMe
+                        .key("bobRememberMeKey")
+                        .tokenValiditySeconds(60 * 60 * 24 * 7)
+                        .userDetailsService(combinedUserDetailsService)
                 )
                 .sessionManagement(session -> session
                         .maximumSessions(1)
