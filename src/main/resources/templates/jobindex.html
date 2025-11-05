@@ -166,7 +166,7 @@
         }
 
         modalTitle.textContent = title;
-        iframe.src = `/myresume/${resumeId}`; // 👉 나의 이력서 상세페이지 로드
+        iframe.src = `/myresume/${resumeId}?preview=true`; // 👉 미리보기 모드로 로드 (헤더 숨김)
         modal.style.display = "flex";
     }
 

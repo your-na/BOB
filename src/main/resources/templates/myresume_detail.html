@@ -9,12 +9,15 @@
 <body>
 
 <!-- ✅ 헤더 삽입 -->
-<div sec:authorize="hasAuthority('COMPANY')">
-  <div th:insert="~{header2 :: header}"></div>
-</div>
-<div sec:authorize="!hasAuthority('COMPANY')">
-  <div th:insert="~{header :: header}"></div>
-</div>
+<div th:if="${!isPreview}">
+  <div sec:authorize="hasAuthority('COMPANY')">
+    <div th:insert="~{header2 :: header}"></div>
+  </div>
+  <div sec:authorize="!hasAuthority('COMPANY')">
+    <div th:insert="~{header :: header}"></div>
+  </div>
+</div> <!-- ✅ 여기에 닫는 div가 빠져 있었어요! -->
+
 
 <div class="resume-detail-container">
 
