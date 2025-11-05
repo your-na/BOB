@@ -70,6 +70,10 @@ public class MyResume {
     @Transient
     private String nameEng;
 
+    // ✅ 소프트 삭제(리스트 숨김용)
+    @Column(nullable = false)
+    private boolean deleted = false;
+
 
     // 섹션 추가 시 양방향 연관관계 세팅
     public void addSection(MyResumeSection section) {

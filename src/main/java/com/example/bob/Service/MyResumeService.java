@@ -194,11 +194,13 @@ public class MyResumeService {
 
 
     /**
-     * 특정 사용자의 모든 이력서 목록 조회
+     * ✅ 특정 사용자의 모든 이력서 목록 조회 (Soft Delete 적용)
+     * - deleted=false 인 이력서만 반환 (삭제된 건 목록에서 제외)
      */
     public List<MyResume> findAllByMemberId(String memberId) {
-        return myResumeRepository.findAllByMemberId(memberId);
+        return myResumeRepository.findAllByMemberIdAndDeletedFalse(memberId);
     }
+
 
 
     /**
@@ -290,9 +292,8 @@ public class MyResumeService {
                 .build();
     }
 
-
     /**
-     * ✅ 로그인 사용자의 이력서를 삭제 (본인 것만 가능)
+     * ✅ 로그인 사용자의 이력서를 삭제 (soft delete - 목록에서만 숨김)
      */
     public void deleteResume(Long id, String memberId) {
         log.info("🗑️ 이력서 삭제 요청 - resumeId: {}, memberId: {}", id, memberId);
@@ -306,9 +307,13 @@ public class MyResumeService {
             throw new SecurityException("본인의 이력서만 삭제 가능합니다.");
         }
 
-        myResumeRepository.deleteById(id);
-        log.info("✅ 삭제 완료");
+        // ✅ 실제 삭제 대신 soft delete 처리
+        resume.setDeleted(true);
+        myResumeRepository.save(resume);
+
+        log.info("✅ Soft delete 완료 (DB에는 남고 목록에서만 숨김)");
     }
+
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadResumeFile(@RequestParam("file") MultipartFile file) {

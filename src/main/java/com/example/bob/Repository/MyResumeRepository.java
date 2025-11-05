@@ -20,12 +20,12 @@ public interface MyResumeRepository extends JpaRepository<MyResume, Long> {
 
     // ✅ 이력서 ID로 조회하면서 섹션도 함께 fetch (상세보기용)
     @Query("""
-    SELECT DISTINCT r
-    FROM MyResume r
-    LEFT JOIN FETCH r.sections s
-    LEFT JOIN FETCH s.dragItems
-    WHERE r.id = :resumeId
-    """)
+            SELECT DISTINCT r
+            FROM MyResume r
+            LEFT JOIN FETCH r.sections s
+            LEFT JOIN FETCH s.dragItems
+            WHERE r.id = :resumeId
+            """)
     Optional<MyResume> findByIdWithSections(@Param("resumeId") Long resumeId);
 
     // ✅ 이력서 삭제 시 본인 것만 삭제되도록
@@ -34,6 +34,11 @@ public interface MyResumeRepository extends JpaRepository<MyResume, Long> {
     // 유저아이디로 조회
     Optional<MyResume> findByUserIdAndTitle(Long userId, String title);
 
+    // ✅ memberId 기준으로 '삭제되지 않은' 이력서만 가져오기 (Soft Delete 대응)
+    List<MyResume> findAllByMemberIdAndDeletedFalse(String memberId);
+
+    // ✅ 전체 중 '삭제되지 않은' 이력서만 조회할 때 사용 (관리자용 등)
+    List<MyResume> findByDeletedFalse();
 
 
 
