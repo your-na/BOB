@@ -1,3 +1,34 @@
+// ✅ 페이지 로드 시 기본 입력값 미리 채워두기
+document.querySelector(".title-input").value = "[신입] 프론트엔드 개발자 채용";
+document.querySelector("textarea[name='companyIntro']").value =
+    "(주)넥스트코드는 혁신적인 웹 서비스와 모바일 솔루션을 개발하는 IT 스타트업입니다.\n" +
+    "사용자 중심의 인터페이스와 안정적인 백엔드 시스템을 통해 더 나은 디지털 경험을 만들어가고 있습니다.";
+
+document.querySelector("input[name='email']").value = "recruit@nextcode.co.kr";
+document.querySelector("input[name='phone']").value = "02-3456-7890";
+document.querySelector("input[name='companyLink']").value = "https://www.nextcode.co.kr";
+document.querySelector("input[name='career']").value = "신입 또는 1년 이하 경력";
+document.querySelector("input[name='education']").value = "학사 이상 (전공 무관, 컴퓨터공학 우대)";
+document.querySelector("input[name='preference']").value =
+    "React 또는 Vue 사용 경험, REST API 연동 프로젝트 경험, Git 협업 경험";
+
+// ✅ 고용형태(정규직) 체크박스 자동 선택
+document.querySelectorAll("input[name='employmentType']").forEach(cb => {
+    if (cb.value === "정규직") cb.checked = true;
+});
+
+document.querySelector("input[name='salary']").value = "연봉 3,200만 원 이상 (경력에 따라 협의)";
+document.querySelector("input[name='time']").value = "09:00 ~ 18:00 (주5일제)";
+document.querySelector("input[name='surew']").value = "이력서, 포트폴리오, 자기소개서";
+
+// ✅ 모집기간 자동 설정 (오늘 ~ 일주일 후)
+const today = new Date();
+const weekLater = new Date();
+weekLater.setDate(today.getDate() + 7);
+document.querySelector("#startDate").value = today.toISOString().slice(0, 10);
+document.querySelector("#endDate").value = weekLater.toISOString().slice(0, 10);
+
+
 document.addEventListener("DOMContentLoaded", function () {
     const resumeButtons = document.querySelectorAll(".resume-tab");
     const modal = document.getElementById("resume-modal");

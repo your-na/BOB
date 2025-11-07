@@ -74,13 +74,15 @@ public class MyResumeApiController {
 
         // 📦 최소 정보만 담은 DTO로 변환
         List<MyResumeDto> dtos = resumes.stream()
+                .filter(r -> !r.isDeleted()) // ✅ 삭제되지 않은 이력서만 목록에 표시
                 .map(r -> MyResumeDto.builder()
                         .id(r.getId())
-                        .title(r.getTitle())       // 이력서 제목
-                        .memberId(r.getMemberId()) // 사용자 ID
+                        .title(r.getTitle())
+                        .memberId(r.getMemberId())
                         .build()
                 )
                 .toList();
+
 
         // 📤 JSON으로 응답
         return ResponseEntity.ok(dtos);
