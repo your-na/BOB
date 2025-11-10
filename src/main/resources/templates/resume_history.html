@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>참여 내역 통합</title>
+  <title>나의 경력 및 포트폴리오</title>
   <link rel="stylesheet" href="/css/history.css">
   <link rel="stylesheet" th:href="@{/css/header.css}">
 
@@ -19,23 +19,24 @@
 <!-- ✅ 탭 메뉴 -->
 <nav class="tab-menu">
   <ul>
-<!--    <li class="tab-item active" data-target="simple-history">기본 사항</li>-->
     <li class="tab-item active" data-target="school-history">학력 내역</li>
     <li class="tab-item" data-target="job-history">경력 내역</li>
     <li class="tab-item" data-target="project-history">프로젝트 참여 내역</li>
     <li class="tab-item" data-target="contest-history">공모전 참여 내역</li>
     <li class="tab-item" data-target="career-history">자격증</li>
   </ul>
-</nav>
 
-<!-- ✅ 공통 검색창 -->
-<div class="searchcontainer">
-  <form id="searchform">
-    <input type="text" name="sw" id="search_sw" class="searchbar" placeholder="검색어 입력" th:value="${sw}">
-    <span class="searchicon"><img src="/images/search.png" alt=""></span>
-  </form>
-  <button class="external-btn">외부문서 불러오기</button>
-</div>
+  <!-- ✅ 검색창 + 버튼을 오른쪽 정렬 -->
+  <div class="searchcontainer">
+    <form id="searchform">
+      <input type="text" name="sw" id="search_sw" class="searchbar" placeholder="검색어 입력">
+      <span class="searchicon">
+        <img src="/images/search.png" alt="">
+      </span>
+    </form>
+    <button class="external-btn">외부문서 불러오기</button>
+  </div>
+</nav>
 
 <!-- ✅ 기본 사항 -->
 <!--<div class="history-section" id="simple-history" style="display: block;">-->
