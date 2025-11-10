@@ -63,6 +63,7 @@
         fetch('/api/cojobs')
             .then(res => res.json())
             .then(data => {
+                console.log("서버에서 받은 공고 데이터:", data); // ✅ testing...
                 const jobListContainer = document.querySelector(".job-list");
                 const jobCount = document.querySelector(".job-count");
                 jobListContainer.innerHTML = '';
@@ -73,24 +74,35 @@
                     const jobCard = document.createElement("div");
                     jobCard.className = "job-card";
 
-                    // 클릭 시 상세보기 페이지로 이동
+                    // ✅ 변수 선언
+                    let submitMark = '';
+
+                    // ✅ 제출 방식 마크 설정
+                    if (job.applyType === 'company') {
+                        submitMark = `<span class="job-mark company">기업 양식 제출</span>`;
+                    } else if (job.applyType === 'member') {
+                        submitMark = `<span class="job-mark resume">회원 이력서 제출</span>`;
+                    }
+
+                    // 클릭 시 상세보기 이동
                     jobCard.addEventListener("click", function () {
                         window.location.href = `/jobindex?id=${job.id}`;
                     });
 
                     jobCard.innerHTML = `
-                    <span class="urgent">채용 마감 임박</span>
-                    <h3>[${job.title}]</h3>
-                    <p><span class="job-phone"><img src="/images/job_phone.png"></span> ${job.phone} | 경력 ${job.career} 이상</p>
-                 <p><span class="job-place"><img src="/images/job_place.png"></span> ${job.companyNick}</p>
+                ${submitMark}
+                <h3>[${job.title}]</h3>
+                <p><span class="job-phone"><img src="/images/job_phone.png"></span> ${job.phone} | 경력 ${job.career} 이상</p>
+                <p><span class="job-place"><img src="/images/job_place.png"></span> ${job.companyNick}</p>
+            `;
 
-                `;
                     jobListContainer.appendChild(jobCard);
                 });
             })
             .catch(error => {
                 console.error("공고 불러오기 실패:", error);
             });
+
 
         // 닫기 버튼 클릭 시 검색창 숨기기
         searchClose.addEventListener("click", function () {

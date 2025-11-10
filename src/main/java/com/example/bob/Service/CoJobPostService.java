@@ -134,7 +134,7 @@ public class CoJobPostService {
                     // ✅ 지원자 수 가져오기
                     int applicantCount = jobApplicationRepository.countByJobPost_Id(post.getId());
 
-                    return new CoJobPostResponseDTO(
+                    CoJobPostResponseDTO dto = new CoJobPostResponseDTO(
                             post.getId(),
                             post.getTitle(),
                             post.getPhone(),
@@ -143,8 +143,10 @@ public class CoJobPostService {
                             post.getStartDate(),
                             post.getEndDate(),
                             post.getStatus(),
-                            applicantCount // ✅ 전달
+                            applicantCount, // ✅ 전달
+                            post.getApplyType() // ✅ 여기 추가!
                     );
+                    return dto;
                 })
                 .collect(Collectors.toList());
     }
@@ -230,7 +232,8 @@ public class CoJobPostService {
                             post.getStartDate(),
                             post.getEndDate(),
                             post.getStatus(),
-                            applicantCount // ✅ 추가
+                            applicantCount, // ✅ 추가
+                            post.getApplyType() // ✅ 여기 추가!
                     );
                 })
                 .collect(Collectors.toList());

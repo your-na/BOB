@@ -17,4 +17,6 @@
         private String endDate;
         private JobStatus status;
         private int applicantCount;
+
+        private String applyType;
     }

@@ -208,3 +208,22 @@ body {
     margin-left: 5px;
     color: #888;
 }
+
+/*제출방식쪽*/
+.job-mark {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.job-mark.company {
+    background-color: #2ecc71; /* 초록색 */
+}
+
+.job-mark.resume {
+    background-color: #3498db; /* 파란색 */
+}
