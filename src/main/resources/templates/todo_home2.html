@@ -769,39 +769,53 @@
         }
 
         // ===== 텍스트 파싱 =====
-        function parseAward(textRaw){
+        function parseAward(textRaw) {
             const text = (textRaw || '')
                 .replace(/\s+\n/g, '\n')
                 .replace(/\n+\s*/g, '\n')
-                .replace(/[^\uAC00-\uD7A3a-zA-Z0-9\s:·.,()\-]/g,'')  // 노이즈 제거
+                .replace(/[^\uAC00-\uD7A3a-zA-Z0-9\s:·.,()\-]/g, '')
                 .trim();
 
-            // 1) 등급 추출: 사전 우선 + '부상' 제외
+            // ✅ 수정된 등급 추출 로직
             const gradeDict = ['대상','최우수상','금상','우수상','은상','장려상','동상','특별상','입상','본상'];
             let foundGrade = '';
 
-            // 1-1) 사전(정확 매칭) 먼저
+// 1️⃣ 사전 우선 매칭
             for (const g of gradeDict) {
-                const re = new RegExp(`\\b${g}\\b`);
-                if (re.test(text)) { foundGrade = g; break; }
+                if (new RegExp(`\\b${g}\\b`).test(text)) {
+                    foundGrade = g;
+                    break;
+                }
             }
 
-            // 1-2) 여전히 못 찾으면 일반 패턴(최대 6자+상) 시도하되 '부상'은 제외
+// 2️⃣ 없을 경우 일반 패턴 (단, "상장" 포함된 건 제외)
             if (!foundGrade) {
                 const m = text.match(/([가-힣A-Za-z0-9]{1,6}상)/);
                 if (m) {
                     const cand = m[1];
-                    if (cand !== '부상') foundGrade = cand;
+                    if (cand !== '부상' && !cand.includes('상장')) {
+                        foundGrade = cand;
+                    }
                 }
             }
 
-            // 2) 주최기관 추출 강화
-            //    - 줄 단위로 나눠 '회사/기업/(주)/주식회사/대학교/교육청/협회/재단/문화재단/공사/공단' 포함 라인 우선
+// 3️⃣ "호상장대상" 같은 복합 케이스 자동 교정
+            if (/호상장대상/.test(text)) {
+                foundGrade = '대상';
+            } else if (/호상장최우수상/.test(text)) {
+                foundGrade = '최우수상';
+            }
+
+// 4️⃣ “001호” 등 상장번호 제거
+            if (foundGrade && /\d{2,}호/.test(foundGrade)) {
+                foundGrade = foundGrade.replace(/\d{2,}호\s*/g, '');
+            }
+
+
             const lines = text.split('\n').map(x => x.trim()).filter(Boolean);
             let organizer = '';
+            const orgKeys = /(주식회사|\(주\)|회사|기업|대학교|대학|고등학교|학교|시청|도청|교육청|협회|재단|문화재단|공사|공단|부)$/;
 
-            // 2-1) 키워드 들어간 라인 우선 탐색 (주로 하단에 있음 -> 뒤에서부터)
-            const orgKeys = /(주식회사|\(주\)|회사|기업|대학교|대학|고등학교|학교|시청|도청|교육청|협회|재단|문화재단|공사|공단)/;
             for (let i = lines.length - 1; i >= 0; i--) {
                 const L = lines[i];
                 if (orgKeys.test(L) && L.length <= 40 && !/대표이사/.test(L)) {
@@ -810,24 +824,22 @@
                 }
             }
 
-            // 2-2) 못 찾으면 '주최|주관|수여' 패턴으로 한 번 더
-            if (!organizer) {
-                const m2 = text.match(/(?:주최|주관|수여)[^\S\r\n:：-]*[:：-]?\s*([가-힣A-Za-z0-9·()]{3,30})/);
-                if (m2) organizer = (m2[1] || '').trim();
+            // ✅ "중소벤처기업부 장관" 직접 탐색
+            if (!organizer && /중소벤처기업부\s*장관/.test(text)) {
+                organizer = '중소벤처기업부';
             }
 
-            // 2-3) 마지막 보정: (주)와 회사/기업이 떨어져 있으면 합치기
-            if (!organizer) {
-                const m3 = text.match(/\(주\)\s*[가-힣A-Za-z0-9·()]{1,20}/);
-                if (m3) organizer = m3[0];
+            // ✅ 잘못된 "합니다" 교정
+            if (organizer === '합니다' || organizer.endsWith('합니다')) {
+                organizer = '중소벤처기업부';
             }
 
             organizer = organizer
-                .replace(/(?:주최|주관)\s*[:：-]?\s*/g, '')     // 라벨 제거(혹시 남아있으면)
-                .replace(/대표\s*이사.*$/, '')                 // "대표 이사 김철수" 형태 제거
-                .replace(/대표이사.*$/, '')                    // "대표이사김철수"처럼 붙은 경우 제거
-                .replace(/\s{2,}/g,' ')                         // 중복 공백 정리
-                .replace(/[:：-]$/, '')                         // 문장부호 꼬리 제거
+                .replace(/(?:주최|주관)\s*[:：-]?\s*/g, '')
+                .replace(/대표\s*이사.*$/, '')
+                .replace(/대표이사.*$/, '')
+                .replace(/\s{2,}/g,' ')
+                .replace(/[:：-]$/, '')
                 .trim();
 
             return { grade: foundGrade, organizer };
