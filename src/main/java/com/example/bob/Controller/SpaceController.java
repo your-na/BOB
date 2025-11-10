@@ -141,6 +141,8 @@ public class SpaceController {
         return "todo_plan"; // "todo_plan.html" 템플릿 반환
     }
 
+
+
     @GetMapping("/todo_plan2/{teamId}")
     public String showContestPlan(@PathVariable Long teamId, Model model) {
         ContestTeamEntity team = contestTeamRepository.findById(teamId)
