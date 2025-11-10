@@ -32,7 +32,9 @@
         <h3>주최한 프로젝트</h3>
         <li th:each="project : ${createdProjects}"
             th:if="${project.status != '완료' and project.status != '신청중' and project.status != '거절됨'}">
-            <a th:href="@{/todohome/{id}(id=${project.id})}"
+            <a href="javascript:void(0);"
+               th:attr="data-id=${project.id}"
+               data-type="project"
                th:text="${project.title}"
                class="protitle">프로젝트 제목</a>
         </li>
@@ -40,7 +42,9 @@
         <h3>참여한 프로젝트</h3>
         <li th:each="project : ${joinedProjects}"
             th:if="${project.status != '완료' and project.status != '신청중' and project.status != '거절됨'}">
-            <a th:href="@{/todohome/{id}(id=${project.id})}"
+            <a href="javascript:void(0);"
+               th:attr="data-id=${project.id}"
+               data-type="project"
                th:text="${project.title}"
                class="protitle">프로젝트 제목</a>
         </li>
@@ -51,7 +55,9 @@
         <h3>팀장 공모전</h3>
         <li th:each="team : ${leaderContests}"
             th:if="${team != null and team.status != '완료' and team.status != '신청중' and team.status != '거절됨'}">
-            <a th:href="@{/contesthome/{id}(id=${team.id})}"
+            <a href="javascript:void(0);"
+               th:attr="data-id=${team.id}"
+               data-type="contest"
                th:text="${team.contest.title}"
                class="protitle">공모전 제목</a>
         </li>
@@ -59,7 +65,9 @@
         <h3>참여 공모전</h3>
         <li th:each="team : ${joinedContests}"
             th:if="${team != null and team.status != '완료' and team.status != '신청중' and team.status != '거절됨'}">
-            <a th:href="@{/contesthome/{id}(id=${team.id})}"
+            <a href="javascript:void(0);"
+               th:attr="data-id=${team.id}"
+               data-type="contest"
                th:text="${team.contest.title}"
                class="protitle">공모전 제목</a>
         </li>
@@ -81,6 +89,42 @@
                         value === "all" ? "block" :
                             section.classList.contains(value) ? "block" : "none";
                 });
+            });
+        });
+    });
+    document.addEventListener("DOMContentLoaded", () => {
+        const filters = document.querySelectorAll('input[name="filter"]');
+        const sections = document.querySelectorAll(".plan-section");
+
+        filters.forEach(filter => {
+            filter.addEventListener("change", () => {
+                const value = filter.value;
+
+                sections.forEach(section => {
+                    section.style.display =
+                        value === "all" ? "block" :
+                            section.classList.contains(value) ? "block" : "none";
+                });
+            });
+        });
+
+        // ✅ 여기 추가된 부분
+        const links = document.querySelectorAll(".protitle");
+
+        links.forEach(link => {
+            link.addEventListener("click", () => {
+                const id = link.getAttribute("data-id");
+                const type = link.getAttribute("data-type");
+
+                let url = "";
+                if (type === "project") {
+                    url = `/todohome/${id}`;
+                } else if (type === "contest") {
+                    url = `/contesthome/${id}`;
+                }
+
+                // ✅ 큰 팝업으로 열기
+                window.open(url, "_blank", "width=1200,height=900,top=50,left=100");
             });
         });
     });
