@@ -130,6 +130,17 @@ document.addEventListener("DOMContentLoaded", function () {
         calendarBody.appendChild(row);
         currentMonth.textContent = `${year}년 ${month + 1}월`;
 
+        // ✅ 오늘 날짜 자동 선택
+        if (year === today.getFullYear() && month === today.getMonth()) {
+            const cells = document.querySelectorAll(".calendar-cell");
+            cells.forEach(cell => {
+                if (parseInt(cell.textContent) === today.getDate()) {
+                    cell.click(); // 오늘 날짜 클릭
+                }
+            });
+        }
+
+
         // ✅ 여기 추가: 할 일 있는 날짜 점 표시
         markTodoDays(year, month);
     }
