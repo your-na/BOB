@@ -142,11 +142,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         }
-
-        // ✅ 여기 추가: 할 일 있는 날짜 점 표시
         markTodoDays(year, month);
+
     }
 
+    // ✅ D-day 계산 함수
     function getDday(dateStr) {
         const today = new Date();
         const target = new Date(dateStr);
@@ -154,6 +154,36 @@ document.addEventListener("DOMContentLoaded", function () {
         const diffDay = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         return diffDay >= 0 ? diffDay : 0;
     }
+
+// ✅ 날짜 셀에 할 일 있으면 점 표시
+    function markTodoDays(year, month) {
+        const cells = document.querySelectorAll(".calendar-cell");
+
+        // 기존 점 제거
+        cells.forEach(cell => cell.classList.remove("has-todo"));
+
+        // 날짜별 할 일 존재 여부 확인
+        cells.forEach(cell => {
+            const day = cell.textContent.trim();
+            if (!day) return;
+
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+            fetch(`http://localhost:8888/api/todos?date=${dateStr}`, {
+                credentials: "include"
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        cell.classList.add("has-todo");
+                    }
+                })
+                .catch(err => {
+                    console.error(`🔴 할 일 표시 실패 (${dateStr})`, err);
+                });
+        });
+    }
+
 
     prevMonthBtn.addEventListener("click", function () {
         month--;
