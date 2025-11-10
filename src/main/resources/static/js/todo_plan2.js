@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const taskTitle = document.querySelector(".task-date-title");
     const teamId = window.teamId;
 
-    // ✅ 사이드바 버튼 동작 추가
+    // ✅ 사이드바 버튼 동작 추가 (원본 그대로)
     const sidebarButtons = document.querySelectorAll('.sidebar-btn');
     sidebarButtons.forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -23,7 +23,6 @@ document.addEventListener("DOMContentLoaded", function () {
             if (text === "홈") {
                 window.location.href = `/contesthome/${teamId}`;
             } else if (text === "WBS") {
-
                 window.location.href = `/todocrud/contest/${teamId}`;
             }
         });
@@ -130,8 +129,28 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         calendarBody.appendChild(row);
         currentMonth.textContent = `${year}년 ${month + 1}월`;
+
+        // ✅ 여기 추가: 할 일 있는 날짜 점 표시
+        markTodoDays(year, month);
     }
 
+    // ✅ 추가된 함수: 달력의 각 날짜에 점 표시
+    function markTodoDays(year, month) {
+        const cells = document.querySelectorAll(".calendar-cell");
+        cells.forEach(c => c.classList.remove("has-todo"));
+
+        cells.forEach(cell => {
+            const day = cell.textContent.trim();
+            if (!day) return;
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            fetch(`/api/todos/contest?date=${dateStr}&teamId=${teamId}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.length > 0) cell.classList.add("has-todo");
+                })
+                .catch(() => { /* 무시 */ });
+        });
+    }
 
     function getDday(dateStr) {
         const today = new Date();
@@ -148,7 +167,8 @@ document.addEventListener("DOMContentLoaded", function () {
     loadTeamSpaces();
 });
 
-// ✅ 할 일 등록 처리
+
+// ✅ 할 일 등록 처리 (원본 그대로)
 document.addEventListener("DOMContentLoaded", () => {
     const addTaskBtn = document.querySelector(".add-task-btn");
     const taskModal = document.querySelector(".task-modal");
@@ -214,17 +234,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// ✅ 공모전 팀원 목록 불러오기
+// ✅ 공모전 팀원 목록 불러오기 (원본 그대로)
 function loadTeamSpaces() {
     const spaceSelect = document.querySelector(".space-select");
     const memberSelect = document.querySelector(".member-select");
 
     spaceSelect.innerHTML = "";
-
-    // 공모전은 스페이스 고정
     spaceSelect.innerHTML += `<optgroup label="개인"><option value="개인">개인</option></optgroup>`;
 
-    // ✅ 공모전 팀
     fetch("/api/todos/my-contest-teams", { credentials: "include" })
         .then(res => res.json())
         .then(contestTeams => {
@@ -242,7 +259,6 @@ function loadTeamSpaces() {
             }
         });
 
-    // ✅ 프로젝트 팀
     fetch("/api/todos/my-projects", { credentials: "include" })
         .then(res => res.json())
         .then(projects => {
@@ -262,13 +278,11 @@ function loadTeamSpaces() {
     spaceSelect.addEventListener("change", () => {
         const selected = spaceSelect.value;
 
-        // 개인
         if (selected === "개인") {
             memberSelect.innerHTML = `<option value="나">나</option>`;
             return;
         }
 
-        // 공모전 or 프로젝트 → 담당자 조회
         fetch(`/api/todos/members?workspace=${encodeURIComponent(selected)}`, {
             credentials: "include"
         })
