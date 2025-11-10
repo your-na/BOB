@@ -656,3 +656,13 @@ body {
     color: black;
     margin-top: 10px;
 }
+
+.nav-menu,
+.user-nick,
+.all-dropdown-menu ul li a,
+.notification-item,
+.modal-content,
+.logout,
+#plz {
+    font-size: 18px;
+}
