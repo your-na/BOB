@@ -19,11 +19,11 @@ h2 {
 
 .main-container {
     display: flex;
-    gap: 30px;
+    gap: 20px;
 }
 
 .form-container {
-    width: 60%;
+    width: 55%;
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 10px;
@@ -31,7 +31,12 @@ h2 {
 
 .form-container label {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
+}
+
+.form-container input,
+.form-container textarea {
+    margin-bottom: 10px;  /* 없으면 추가 (요소 간 거리 일정하게) */
 }
 
 .form-container input[type="text"],
@@ -39,7 +44,7 @@ h2 {
 .form-container input[type="url"],
 .form-container textarea {
     width: 100%;
-    padding: 6px;
+    padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
@@ -291,3 +296,102 @@ h2 {
 .hidden { display: none !important; }
 .apply-type { margin: 12px 0; display: flex; gap: 16px; align-items: center; }
 
+/* 제목 */
+h2 {
+    margin-top: 8%;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+/* 모집 기간 입력 */
+.date-range {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+/* 제목 입력창 */
+.title-input {
+    width: 60%;
+    padding: 12px;
+    font-size: 18px;
+    margin-bottom: 20px;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* 폼 컨테이너 */
+.form-container {
+    width: 60%;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.form-container label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* 입력 필드 */
+.form-container input[type="text"],
+.form-container input[type="email"],
+.form-container input[type="url"],
+.form-container textarea {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* 버튼 */
+.submit-btn,
+.cancel-btn {
+    padding: 10px 22px;
+    border: none;
+    border-radius: 5px;
+    margin: 0 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* 우측 이력서 패널 */
+.resume-container,
+.resume-panel {
+    font-size: 15px;
+}
+
+/* 이력서 이름 */
+.resume-tab {
+    font-size: 15px;
+}
+
+/* 힌트 문구 */
+.resume-hint {
+    color: red;
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+/* 미리보기 */
+.resume-preview-wrapper {
+    font-size: 14px;
+}
+
+/* 프리뷰 섹션 내부 */
+.resume-section.preview-mode .section-header {
+    font-size: 15px;
+}
+
+.resume-section.preview-mode .section-note {
+    font-size: 13px;
+}
+
+.resume-panel {
+    width: 220px;   /* 기존 250px → 220px */
+}
