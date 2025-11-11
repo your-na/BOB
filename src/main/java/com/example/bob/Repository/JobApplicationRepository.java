@@ -92,7 +92,13 @@
         );
 
 
+        // ✅ 최근 1년간 전체 지원 건수
+        @Query("SELECT COUNT(ja) FROM JobApplicationEntity ja WHERE ja.appliedAt >= :startDate")
+        long countTotalApplicationsSince(@Param("startDate") Date startDate);
 
+        // ✅ 최근 1년간 합격한 지원 건수
+        @Query("SELECT COUNT(ja) FROM JobApplicationEntity ja WHERE ja.status = 'ACCEPTED' AND ja.appliedAt >= :startDate")
+        long countAcceptedApplicationsSince(@Param("startDate") Date startDate);
 
 
 
