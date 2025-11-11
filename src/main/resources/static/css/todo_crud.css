@@ -71,3 +71,9 @@ td.active-cell {
     z-index: 9999;
     cursor: pointer;
 }
+
+/* 클릭 반응 즉시 표현 */
+.clickable-cell {
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+}

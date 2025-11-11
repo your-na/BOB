@@ -38,7 +38,7 @@ public class WbsController {
             Long targetId = wbsList.get(0).getTargetId();
 
             // 기존 데이터 제거 후 새로 저장 (덮어쓰기)
-            wbsService.deleteWbsList(type, targetId);
+//            wbsService.deleteWbsList(type, targetId);
             wbsService.saveWbsList(wbsList);
         }
     }

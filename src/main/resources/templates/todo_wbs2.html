@@ -53,6 +53,10 @@
 
 
 <script th:inline="javascript">
+    const now = new Date();
+    let startMonth = now.getMonth() + 1; // 현재 월 (1~12)
+    let renderedMonths = []; // 화면에 표시 중인 월 목록
+
     const type = 'contest'; // 공모전용 고정
     const targetId = /*[[${teamId}]]*/ 0;
     const title = /*[['${projectTitle}']]*/ '';
@@ -63,6 +67,20 @@
 
     const csrfToken = /*[[${_csrf.token}]]*/ "";
     const csrfHeader = /*[[${_csrf.headerName}]]*/ "";
+
+    let currentUserNick = ""; // ✅ 로그인한 사용자 닉네임 저장용
+
+    // ✅ 로그인한 사용자 닉네임 불러오기
+    fetch("http://localhost:8888/api/user/me", {
+        credentials: "include"
+    })
+        .then(res => res.json())
+        .then(data => {
+            currentUserNick = data.userNick;
+            console.log("✅ 로그인된 사용자:", currentUserNick);
+        })
+        .catch(err => console.error("❌ 사용자 정보 불러오기 실패:", err));
+
 
 
     const crudBody = document.getElementById("crud-body");
@@ -91,14 +109,34 @@
 
     function renderWeeks() {
         weekRow.innerHTML = '';
+        monthRow.innerHTML = `<th rowspan="2" colspan="2" class="project-title"></th>`;
+        renderedMonths = [];
+
         for (let i = 0; i < monthCount; i++) {
+            const month = ((startMonth + i - 1) % 12) + 1; // ✅ 12월 지나면 1월로 순환
+            renderedMonths.push(month);
+
+            // 월 헤더
+            const th = document.createElement("th");
+            th.colSpan = weeksPerMonth;
+            th.textContent = `${month}월`;
+            monthRow.appendChild(th);
+
+            // 주차 행
             for (let w = 1; w <= weeksPerMonth; w++) {
                 const td = document.createElement("td");
                 td.textContent = w;
                 weekRow.appendChild(td);
             }
         }
+
+        // 마지막에 "월 추가" 버튼 다시 추가
+        const addMonthTh = document.createElement("th");
+        addMonthTh.classList.add("add-month");
+        addMonthTh.textContent = "월 추가";
+        monthRow.appendChild(addMonthTh);
     }
+
 
     function makeEditable(td) {
         td.addEventListener("dblclick", () => {
@@ -214,8 +252,27 @@
         if (e.target.classList.contains("clickable-cell")) {
             e.target.classList.toggle("active-cell");
             autoSave();
+
+            if (e.target.classList.contains("active-cell")) {
+                // ✅ 선택된 셀의 카테고리/작업/월/주차 추출
+                const row = e.target.parentElement;
+                const categoryCell = row.querySelector(".category-cell") || findCategoryTdAbove(row);
+                const taskCell = row.querySelector(".task-cell");
+
+                const category = categoryCell ? categoryCell.textContent.trim() : "";
+                const task = taskCell ? taskCell.textContent.trim() : "";
+
+                const cellIndex = [...row.querySelectorAll(".clickable-cell")].indexOf(e.target);
+                const monthIndex = Math.floor(cellIndex / weeksPerMonth);
+                const month = renderedMonths[monthIndex];
+                const week = (cellIndex % weeksPerMonth) + 1;
+
+                // ✅ 할 일 자동 등록
+                registerTodoFromWbs({ category, task, month, week });
+            }
         }
     });
+
 
     crudBody.addEventListener("mouseover", (e) => {
         if (isMouseDown && e.target.classList.contains("clickable-cell")) {
@@ -287,7 +344,9 @@
 
                 const clickableTds = [...row.querySelectorAll("td")].filter(td => td.classList.contains("clickable-cell"));
                 clickableTds.forEach((cell, i) => {
-                    const month = Math.floor(i / weeksPerMonth) + 1;
+                    const monthIndex = Math.floor(i / weeksPerMonth);
+                    const month = renderedMonths[monthIndex]; // ✅ 실제 표시 중인 월
+
                     const week = (i % weeksPerMonth) + 1;
 
                     if (cell.classList.contains("active-cell")) {
@@ -332,44 +391,42 @@
 
     function loadWbsFromServer() {
         fetch(`/api/wbs?type=contest&id=${targetId}`)
-                .then(res => res.json())
+            .then(res => res.json())
             .then(data => {
-                // ✅ max month 계산
-                const maxMonth = Math.max(...data.map(item => item.month));
-                if (maxMonth > monthCount) {
-                    monthCount = maxMonth;
+                if (!data || data.length === 0) return;
 
-                    // 1. month-row 업데이트
-                    const addMonthTh = document.querySelector(".add-month");
-                    for (let m = 4; m <= monthCount; m++) {
-                        const th = document.createElement("th");
-                        th.colSpan = weeksPerMonth;
-                        th.textContent = `${m}월`;
-                        monthRow.insertBefore(th, addMonthTh);
+                // ✅ DB에서 등장한 월 목록 추출
+                const monthsInData = [...new Set(data.map(item => item.month))].sort((a,b)=>a-b);
+
+                // ✅ 화면에 아직 없는 월만 추가
+                monthsInData.forEach(m => {
+                    if (!renderedMonths.includes(m)) {
+                        renderedMonths.push(m);
                     }
+                });
 
-                    // 2. 주차 재렌더링
-                    renderWeeks();
+                // ✅ 렌더링 개수를 맞추기
+                monthCount = renderedMonths.length;
 
-                    // 3. 기존 행들에 td 추가
-                    crudBody.querySelectorAll("tr").forEach(tr => {
-                        if (!tr.querySelector(".new-entry")) {
-                            const existingCells = tr.querySelectorAll("td.clickable-cell").length;
-                            const requiredCells = monthCount * weeksPerMonth;
+                // ✅ 실제 표시될 월 순서대로 다시 렌더링
+                renderWeeks();
 
-                            for (let i = existingCells; i < requiredCells; i++) {
-                                const td = document.createElement("td");
-                                td.classList.add("clickable-cell");
-                                tr.appendChild(td);
-                            }
-                        } else {
-                            // new-entry row colspan 갱신
-                            tr.firstChild.colSpan = monthCount * weeksPerMonth + 1;
+                // ✅ 기존 행들에 셀 추가
+                crudBody.querySelectorAll("tr").forEach(tr => {
+                    if (!tr.querySelector(".new-entry")) {
+                        const existingCells = tr.querySelectorAll("td.clickable-cell").length;
+                        const requiredCells = monthCount * weeksPerMonth;
+                        for (let i = existingCells; i < requiredCells; i++) {
+                            const td = document.createElement("td");
+                            td.classList.add("clickable-cell");
+                            tr.appendChild(td);
                         }
-                    });
-                }
+                    } else {
+                        tr.firstChild.colSpan = monthCount * weeksPerMonth + 1;
+                    }
+                });
 
-                // 기존 로직 (카테고리/작업 렌더링)
+                // ✅ 카테고리 및 작업 렌더링
                 const grouped = {};
                 data.forEach(item => {
                     const { category, task } = item;
@@ -381,6 +438,7 @@
                     renderCategory(category, taskList);
                 }
 
+                // ✅ 색칠 복원
                 data.forEach(item => {
                     const { category, task, month, week } = item;
 
@@ -393,15 +451,71 @@
                         );
                     });
 
-                    if (row) {
-                        const cells = row.querySelectorAll(".clickable-cell");
-                        const index = (month - 1) * weeksPerMonth + (week - 1);
-                        if (cells[index]) cells[index].classList.add("active-cell");
-                    }
+                    if (!row) return;
+                    const cells = row.querySelectorAll(".clickable-cell");
+
+                    const monthIndex = renderedMonths.indexOf(month);
+                    if (monthIndex === -1) return;
+
+                    const index = monthIndex * weeksPerMonth + (week - 1);
+                    if (cells[index]) cells[index].classList.add("active-cell");
                 });
             })
             .catch(err => console.error("❌ WBS 불러오기 실패:", err));
     }
+
+    function registerTodoFromWbs(item) {
+        if (!window.registeredTodos) window.registeredTodos = new Set();
+        const todoKey = `${item.category}-${item.task}-${item.month}-${item.week}`;
+        if (window.registeredTodos.has(todoKey)) return;
+        window.registeredTodos.add(todoKey);
+
+        // ✅ 이번 년도 기준으로 주차별 날짜 계산
+        const year = now.getFullYear();
+        const month = item.month; // 1~12
+        const week = item.week;   // 1~5
+        const startDay = (week - 1) * 7 + 1;
+        let endDay = startDay + 6;
+
+        // ✅ 이번 달 말일 넘지 않게 제한
+        const lastDayOfMonth = new Date(year, month, 0).getDate();
+        if (endDay > lastDayOfMonth) endDay = lastDayOfMonth;
+
+        const startDate = `${year}-${String(month).padStart(2, '0')}-${String(startDay).padStart(2, '0')}`;
+        const endDate = `${year}-${String(month).padStart(2, '0')}-${String(endDay).padStart(2, '0')}`;
+
+        const todoData = {
+            title: `${item.category} > ${item.task}`,
+            content: `${item.category} - ${item.task} (${month}월 ${week}주차)`,
+            workspace: "공모전",
+            type: "공모전",
+            targetId: targetId,
+            startDate: startDate,
+            endDate: endDate,
+            assignee: currentUserNick   // ✅ 이 한 줄 추가!
+        };
+
+        console.log("📤 전송 데이터:", todoData);
+
+        fetch("/api/todos", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify(todoData)
+        })
+            .then(res => {
+                console.log("📡 응답 상태:", res.status);
+                return res.text();
+            })
+            .then(text => {
+                console.log(`✅ '${item.task}' 자동 등록 완료 (${month}월 ${week}주차, ${startDate}~${endDate})`);
+            })
+            .catch(err => console.error("❌ 할 일 등록 에러:", err));
+    }
+
+
 
     // ✅ 우클릭 삭제 기능 (카테고리 / 작업 / new-entry 동시 관리)
     crudBody.addEventListener("contextmenu", (e) => {
@@ -435,6 +549,7 @@
                 autoSave();
             }
         }
+
 
         // ✅ 2. 작업(Task) 우클릭 → 해당 작업 행만 삭제
         if (target.classList.contains("task-cell")) {
