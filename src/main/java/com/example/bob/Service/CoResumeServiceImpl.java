@@ -22,6 +22,10 @@
     import java.util.Optional;
     import java.util.stream.Collectors;
     import java.util.Date;
+    import jakarta.persistence.EntityManager;
+    import jakarta.persistence.PersistenceContext;
+    import jakarta.transaction.Transactional;
+
 
 
     @Service
@@ -33,7 +37,8 @@
         private final CompanyRepository companyRepository;
 
 
-
+        @PersistenceContext
+        private EntityManager entityManager;
 
         @Autowired
         public CoResumeServiceImpl(CoResumeRepository coResumeRepository,
@@ -266,7 +271,140 @@
 
         // ✅ 이력서 삭제
         @Override
+        @Transactional
         public void deleteResume(Long id) {
+            logger.info("🗑️ 기업 이력서 삭제 시작 - ID: {}", id);
+
+            // 0️⃣ job_application_entity 삭제
+            int deletedApplications = entityManager.createNativeQuery("""
+        DELETE ja FROM job_application_entity ja
+        WHERE ja.resume_id IN (
+            SELECT r.id FROM resume_entity r WHERE r.co_resume_id = ?
+        )
+    """).setParameter(1, id).executeUpdate();
+            logger.info("🔸 job_application_entity 삭제 완료 ({}건)", deletedApplications);
+
+            // 1️⃣ job_resume 삭제
+            int deletedJobResume = entityManager.createNativeQuery("""
+        DELETE FROM job_resume WHERE resume_id = ?
+    """).setParameter(1, id).executeUpdate();
+            logger.info("🔸 job_resume 삭제 완료 ({}건)", deletedJobResume);
+
+            // 2️⃣ resume_section_entity_selected_tags 삭제
+            int deletedTags = entityManager.createNativeQuery("""
+        DELETE t FROM resume_section_entity_selected_tags t
+        WHERE t.resume_section_entity_id IN (
+            SELECT s.id FROM resume_section_entity s
+            WHERE s.co_section_id IN (
+                SELECT c.id FROM co_resume_section_entity c WHERE c.resume_id = ?
+            )
+        )
+    """).setParameter(1, id).executeUpdate();
+            logger.info("🔸 resume_section_entity_selected_tags 삭제 완료 ({}건)", deletedTags);
+
+            // 3️⃣ resume_drag_item_entity 삭제
+            int deletedDragItems = entityManager.createNativeQuery("""
+        DELETE d FROM resume_drag_item_entity d
+        WHERE d.section_id IN (
+            SELECT s.id FROM resume_section_entity s
+            WHERE s.co_section_id IN (
+                SELECT c.id FROM co_resume_section_entity c WHERE c.resume_id = ?
+            )
+        )
+    """).setParameter(1, id).executeUpdate();
+            logger.info("🔸 resume_drag_item_entity 삭제 완료 ({}건)", deletedDragItems);
+
+            // 4️⃣ resume_education_entity 삭제
+            int deletedEdu = entityManager.createNativeQuery("""
+        DELETE e FROM resume_education_entity e
+        WHERE e.resume_section_id IN (
+            SELECT s.id FROM resume_section_entity s
+            WHERE s.co_section_id IN (
+                SELECT c.id FROM co_resume_section_entity c WHERE c.resume_id = ?
+            )
+        )
+    """).setParameter(1, id).executeUpdate();
+            logger.info("🔸 resume_education_entity 삭제 완료 ({}건)", deletedEdu);
+
+            // 5️⃣ resume_file_entity 삭제
+            int deletedFiles = entityManager.createNativeQuery("""
+        DELETE f FROM resume_file_entity f
+        WHERE f.resume_section_id IN (
+            SELECT s.id FROM resume_section_entity s
+            WHERE s.co_section_id IN (
+                SELECT c.id FROM co_resume_section_entity c WHERE c.resume_id = ?
+            )
+        )
+    """).setParameter(1, id).executeUpdate();
+            logger.info("🔸 resume_file_entity 삭제 완료 ({}건)", deletedFiles);
+
+            // ⚡ 5.5️⃣ resume_career_entity 삭제
+            int deletedCareer = entityManager.createNativeQuery("""
+        DELETE c FROM resume_career_entity c
+        WHERE c.resume_section_id IN (
+            SELECT s.id FROM resume_section_entity s
+            WHERE s.co_section_id IN (
+                SELECT c2.id FROM co_resume_section_entity c2 WHERE c2.resume_id = ?
+            )
+        )
+    """).setParameter(1, id).executeUpdate();
+            logger.info("🔸 resume_career_entity 삭제 완료 ({}건)", deletedCareer);
+
+            // ⚡ 5.6️⃣ resume_portfolio_entity 삭제 (새 추가)
+            int deletedPortfolio = entityManager.createNativeQuery("""
+        DELETE p FROM resume_portfolio_entity p
+        WHERE p.resume_section_id IN (
+            SELECT s.id FROM resume_section_entity s
+            WHERE s.co_section_id IN (
+                SELECT c2.id FROM co_resume_section_entity c2 WHERE c2.resume_id = ?
+            )
+        )
+    """).setParameter(1, id).executeUpdate();
+            logger.info("🔸 resume_portfolio_entity 삭제 완료 ({}건)", deletedPortfolio);
+
+            // 6️⃣ resume_section_entity 삭제
+            int deletedUserSections = entityManager.createNativeQuery("""
+        DELETE rse FROM resume_section_entity rse
+        WHERE rse.co_section_id IN (
+            SELECT s.id FROM co_resume_section_entity s WHERE s.resume_id = ?
+        )
+    """).setParameter(1, id).executeUpdate();
+            logger.info("🔸 resume_section_entity 삭제 완료 ({}건)", deletedUserSections);
+
+            // 7️⃣ resume_entity 삭제
+            int deletedUserResumes = entityManager.createNativeQuery("""
+        DELETE FROM resume_entity WHERE co_resume_id = ?
+    """).setParameter(1, id).executeUpdate();
+            logger.info("🔸 resume_entity 삭제 완료 ({}건)", deletedUserResumes);
+
+            // 8️⃣ co_resume_section_entity_conditions 삭제
+            int deletedConditions = entityManager.createNativeQuery("""
+        DELETE c FROM co_resume_section_entity_conditions c
+        WHERE c.co_resume_section_entity_id IN (
+            SELECT s.id FROM co_resume_section_entity s WHERE s.resume_id = ?
+        )
+    """).setParameter(1, id).executeUpdate();
+            logger.info("🔸 co_resume_section_entity_conditions 삭제 완료 ({}건)", deletedConditions);
+
+            // 9️⃣ co_resume_tag_entity 삭제
+            int deletedTagsEntity = entityManager.createNativeQuery("""
+        DELETE t FROM co_resume_tag_entity t
+        WHERE t.section_id IN (
+            SELECT s.id FROM co_resume_section_entity s WHERE s.resume_id = ?
+        )
+    """).setParameter(1, id).executeUpdate();
+            logger.info("🔸 co_resume_tag_entity 삭제 완료 ({}건)", deletedTagsEntity);
+
+            // 🔟 co_resume_section_entity 삭제
+            int deletedCoSections = entityManager.createNativeQuery("""
+        DELETE FROM co_resume_section_entity WHERE resume_id = ?
+    """).setParameter(1, id).executeUpdate();
+            logger.info("🔸 co_resume_section_entity 삭제 완료 ({}건)", deletedCoSections);
+
+            // 11️⃣ co_resume_entity 삭제
             coResumeRepository.deleteById(id);
+            logger.info("✅ co_resume_entity 삭제 완료 - ID: {}", id);
         }
+
+
     }
