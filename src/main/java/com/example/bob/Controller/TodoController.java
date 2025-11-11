@@ -21,6 +21,7 @@ import com.example.bob.security.UserDetailsImpl;
 import com.example.bob.Entity.UserEntity;
 import com.example.bob.Service.ProjectService;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -182,4 +183,35 @@ public class TodoController {
 
         return ResponseEntity.ok(filtered);
     }
+
+    @GetMapping("/contest/month")
+    public List<TodoEntity> getMonthlyTodos(
+            @RequestParam int year,
+            @RequestParam int month,
+            @RequestParam Long teamId
+    ) {
+        LocalDate start = LocalDate.of(year, month, 1);
+        LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
+        return todoService.findByTeamAndRange(teamId, start, end);
+    }
+
+    // ✅ 수정
+    @PutMapping("/{id}")
+    public ResponseEntity<TodoEntity> updateTodo(
+            @PathVariable Long id,
+            @RequestBody TodoRequestDto dto
+    ) {
+        TodoEntity updated = todoService.updateTodo(id, dto);
+        return ResponseEntity.ok(updated);
+    }
+
+    // ✅ 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTodo(
+            @PathVariable Long id
+    ) {
+        todoService.deleteTodo(id);
+        return ResponseEntity.ok().build();
+    }
+
 }

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface TodoRepository extends JpaRepository<TodoEntity, Long> {
@@ -33,4 +34,13 @@ public interface TodoRepository extends JpaRepository<TodoEntity, Long> {
                                                  @Param("teamId") Long teamId,
                                                  @Param("userNick") String userNick);
 
+
+    @Query("SELECT t FROM TodoEntity t WHERE t.targetId = :teamId " +
+            "AND (DATE(t.startDate) <= :end AND DATE(t.endDate) >= :start)")
+
+    List<TodoEntity> findByTeamAndRange(
+            @Param("teamId") Long teamId,
+            @Param("start") LocalDate start,
+            @Param("end") LocalDate end
+    );
 }

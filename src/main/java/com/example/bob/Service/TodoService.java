@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.example.bob.Entity.UserEntity;
 import com.example.bob.Service.ProjectService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -169,6 +170,24 @@ public class    TodoService {
 
     public List<TodoEntity> findByDateAndTeam(String date, Long teamId, UserEntity user) {
         return todoRepository.findTodosByDateRangeForTeam(date, teamId, user.getUserNick());
+    }
+
+    // ✅ 기존 메서드들과 함께 추가
+    public List<TodoEntity> findByTeamAndRange(Long teamId, LocalDate start, LocalDate end) {
+        return todoRepository.findByTeamAndRange(teamId, start, end);
+    }
+
+    public TodoEntity updateTodo(Long id, TodoRequestDto dto) {
+        TodoEntity todo = todoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("할 일을 찾을 수 없습니다."));
+        todo.setTitle(dto.getTitle());
+        todo.setStartDate(dto.getStartDate());
+        todo.setEndDate(dto.getEndDate());
+        return todoRepository.save(todo);
+    }
+
+    public void deleteTodo(Long id) {
+        todoRepository.deleteById(id);
     }
 
 }

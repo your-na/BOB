@@ -145,23 +145,134 @@ document.addEventListener("DOMContentLoaded", function () {
         markTodoDays(year, month);
     }
 
-    // ✅ 추가된 함수: 달력의 각 날짜에 점 표시
+    // ✅ 날짜 범위 기반 막대 표시
     function markTodoDays(year, month) {
         const cells = document.querySelectorAll(".calendar-cell");
-        cells.forEach(c => c.classList.remove("has-todo"));
 
+        // 각 셀 내부 초기화
         cells.forEach(cell => {
             const day = cell.textContent.trim();
             if (!day) return;
-            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            fetch(`/api/todos/contest?date=${dateStr}&teamId=${teamId}`)
-                .then(r => r.json())
-                .then(data => {
-                    if (data.length > 0) cell.classList.add("has-todo");
-                })
-                .catch(() => { /* 무시 */ });
+            cell.innerHTML = `
+      <div class="day-number">${day}</div>
+      <div class="bar-container"></div>
+    `;
         });
+
+        fetch(`/api/todos/contest/month?year=${year}&month=${month + 1}&teamId=${teamId}`)
+            .then(r => r.json())
+            .then(data => {
+                data.forEach(todo => {
+                    const start = new Date(todo.startDate + "T00:00:00");
+                    const end = new Date(todo.endDate + "T23:59:59");
+                    const color = getRandomColor();
+
+                    for (let day = 1; day <= 31; day++) {
+                        const date = new Date(year, month, day);
+                        if (date >= start && date <= end && date.getMonth() === month) {
+                            const cell = Array.from(cells).find(c => parseInt(c.textContent) === day);
+                            if (cell) {
+                                const barContainer = cell.querySelector(".bar-container");
+                                const bar = document.createElement("div");
+                                bar.classList.add("todo-bar");
+                                bar.style.backgroundColor = color;
+                                bar.textContent = todo.title;
+                                bar.title = `${todo.title} (${todo.startDate} ~ ${todo.endDate})`;
+
+                                bar.addEventListener("click", () => openEditModal(todo));
+
+                                // 클릭 시 상세정보 팝업(원하면 아래 부분 수정 가능)
+                                bar.addEventListener("dblclick", () => {
+                                    alert(`📝 ${todo.title}\n기간: ${todo.startDate} ~ ${todo.endDate}`);
+                                });
+
+                                barContainer.appendChild(bar);
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(err => console.error("할 일 막대 표시 실패:", err));
     }
+
+// ✅ 랜덤 색상 생성 함수
+    function getRandomColor() {
+        const colors = [
+            "#FF6B6B", "#FFD93D", "#6BCB77", "#4D96FF",
+            "#FF8FAB", "#FFAF6D", "#A66DD4", "#4DD6C8"
+        ];
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    // ✅ 수정/삭제 모달 핸들러
+    const editModal = document.querySelector(".edit-task-modal");
+    const editTitle = document.querySelector(".edit-task-title");
+    const editStart = document.querySelector(".edit-start-date");
+    const editEnd = document.querySelector(".edit-end-date");
+    const updateBtn = document.querySelector(".update-task-btn");
+    const deleteBtn = document.querySelector(".delete-task-btn");
+    const cancelEdit = document.querySelector(".cancel-edit-btn");
+
+    let currentTodo = null; // 수정 중인 할 일 저장
+
+// 더블클릭 시 모달 열기
+    function openEditModal(todo) {
+        currentTodo = todo;
+        editTitle.value = todo.title;
+        editStart.value = todo.startDate;
+        editEnd.value = todo.endDate;
+        editModal.classList.remove("active");
+    }
+
+// 닫기
+    cancelEdit.addEventListener("click", () => {
+        editModal.classList.add("active");
+    });
+
+// 수정
+    updateBtn.addEventListener("click", () => {
+        const updated = {
+            title: editTitle.value,
+            startDate: editStart.value,
+            endDate: editEnd.value
+        };
+
+        fetch(`/api/todos/${currentTodo.id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
+            },
+            credentials: "include",
+            body: JSON.stringify(updated)
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("수정 실패");
+                editModal.classList.add("hidden");
+                renderCalendar(); // 캘린더 갱신
+            })
+            .catch(err => alert("수정 중 오류: " + err));
+    });
+
+// 삭제
+    deleteBtn.addEventListener("click", () => {
+        if (!confirm("정말 삭제하시겠습니까?")) return;
+
+        fetch(`/api/todos/${currentTodo.id}`, {
+            method: "DELETE",
+            headers: {
+                "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
+            },
+            credentials: "include"
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("삭제 실패");
+                editModal.classList.add("hidden");
+                renderCalendar();
+            })
+            .catch(err => alert("삭제 중 오류: " + err));
+    });
+
 
     function getDday(dateStr) {
         const today = new Date();

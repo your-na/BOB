@@ -86,6 +86,27 @@
   </div>
 </div>
 
+<!-- ✅ 할 일 수정 모달 -->
+<div class="edit-task-modal hidden">
+  <div class="edit-task-modal-content">
+    <h3>할 일 수정</h3>
+
+    <input type="text" class="edit-task-title" placeholder="할 일 제목" />
+    <div class="date-picker">
+      📅 기간
+      <input type="date" class="edit-start-date" /> ~
+      <input type="date" class="edit-end-date" />
+    </div>
+
+    <div class="task-btns">
+      <button class="update-task-btn">수정</button>
+      <button class="delete-task-btn">삭제</button>
+      <button class="cancel-edit-btn">닫기</button>
+    </div>
+  </div>
+</div>
+
+
 <script src="/js/todo_plan2.js"></script>
 </body>
 <script th:inline="javascript">
