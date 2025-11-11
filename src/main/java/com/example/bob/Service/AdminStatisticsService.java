@@ -38,7 +38,7 @@ public class AdminStatisticsService {
                 .build();
 
     }
-    
+
     // 최근 1년 구직 성공률 계산 (합격자 수 / 지원자 수 * 100)
     public double getJobSuccessRateLastYear() {
         // 현재 날짜 기준 1년 전 날짜 계산

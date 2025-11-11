@@ -14,7 +14,6 @@
     max-width: 600px;
     margin: 0 auto;
     padding: 30px 20px;
-    font-family: 'Noto Sans KR', sans-serif;
     text-align: left;
 }
 
@@ -150,7 +149,6 @@
     box-sizing: border-box;
     resize: none; /* 수동 리사이즈 막기 */
     overflow-y: hidden; /* 스크롤 안 보이게 */
-    font-family: 'Noto Sans KR', sans-serif;
 }
 
 .submit-btn {

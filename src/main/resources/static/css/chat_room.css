@@ -2,7 +2,6 @@ body, html {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: 'Arial', sans-serif;
     background-color: #f4f4f4;
 }
 
@@ -36,10 +35,10 @@ body, html {
 
 /* 메시지 */
 .message {
-    max-width: 80%;
+    max-width: 120%;
     padding: 8px 12px;
     border-radius: 15px;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.4;
 }
 
