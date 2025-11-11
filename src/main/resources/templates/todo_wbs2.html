@@ -20,7 +20,7 @@
             <div class="header">
                 <button class="back-btn">&lt;</button>
                 <!-- 프로젝트 제목을 동적으로 불러오기 -->
-                <h2 id="project-name" th:text="${contestTitle}">공모전 제목</h2>
+                <h2 id="project-name" th:text="${projectTitle}">공모전 제목</h2>
                 <button class="close-btn">&times;</button>
             </div>
 
@@ -53,16 +53,17 @@
 
 
 <script th:inline="javascript">
-    const teamId = /*[[${team.id}]]*/ 0;
+    const type = 'contest'; // 공모전용 고정
+    const targetId = /*[[${teamId}]]*/ 0;
+    const title = /*[['${projectTitle}']]*/ '';
+
     const weeksPerMonth = 5;
     let monthCount = 3;
     let isMouseDown = false;
 
-    window.teamId = /*[[${teamId}]]*/ 0;
-    window.contestTitle = /*[['${contestTitle}']]*/ '';
-
     const csrfToken = /*[[${_csrf.token}]]*/ "";
     const csrfHeader = /*[[${_csrf.headerName}]]*/ "";
+
 
     const crudBody = document.getElementById("crud-body");
     const weekRow = document.getElementById("week-row");
@@ -292,7 +293,7 @@
                     if (cell.classList.contains("active-cell")) {
                         wbsList.push({
                             type: "contest",
-                            targetId: teamId,
+                            targetId: targetId,
                             category: currentCategory,
                             task: currentTask,
                             month: month,
@@ -330,7 +331,7 @@
     }
 
     function loadWbsFromServer() {
-        fetch(`/api/wbs?type=contest&id=${teamId}`)
+        fetch(`/api/wbs?type=contest&id=${targetId}`)
                 .then(res => res.json())
             .then(data => {
                 // ✅ max month 계산
