@@ -68,11 +68,13 @@
     text-align: left;
     padding: 8px;
     border-bottom: 1px solid #ddd;
+    font-size: 18px;
 }
 
 .contest-table th {
     background-color: #f9f9f9;
     font-weight: bold;
+    font-size: 18px;
 }
 
 /* 상세 내용 */
@@ -80,6 +82,7 @@
     margin-top: 20px;
     padding: 10px;
     border-top: 2px solid #ddd;
+    font-size: 18px;
 }
 
 .contest-details h3 {

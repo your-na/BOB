@@ -148,9 +148,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // 이력서 추가 텍스트 클릭 이벤트
-    addResumeText.addEventListener("click", () => {
-        alert("이력서 추가 기능은 추후 구현 예정입니다.");
-    });
+    // addResumeText.addEventListener("click", () => {
+    //     alert("이력서 추가 기능은 추후 구현 예정입니다.");
+    // });
 
     // 드롭 처리 (회사 양식일 때만 의미 있음)
     addButton.addEventListener("dragover", (e) => {
