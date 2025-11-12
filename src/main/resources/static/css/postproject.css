@@ -1,8 +1,16 @@
 .title-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between; /* 제목 쪽과 모집현황 쪽을 양쪽 정렬 */
     margin-top: 170px;
+    position: relative;
+}
+
+/* 제목 + 디데이 묶음 */
+.title-box {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 제목과 D-Day 간격 */
 }
 
 .title {
@@ -11,18 +19,21 @@
 }
 
 .deadline {
+    margin-left: 10px; /* 제목과의 간격 */
     color: red;
     font-weight: bold;
-    margin-left: -20px;
     font-size: 20px;
 }
 
+/* 모집현황을 오른쪽 끝으로 완전히 붙이기 */
 .status {
     display: flex;
+    align-items: center;
     font-size: 17px;
-    margin-right: 20px;
     font-weight: bold;
-    color : grey;
+    color: grey;
+    position: absolute;
+    right: 0; /* 🔥 화면 오른쪽 끝으로 붙임 */
 }
 
 .team {
@@ -82,14 +93,16 @@
 
 .apply-btn {
     display: block;
-    margin: 15px auto;
-    padding: 10px;
-    background: #5aec5e;
+    margin: 20px auto;
+    padding: 12px 40px; /* ⬇ 버튼 크기 살짝 축소 */
+    font-size: 17px;   /* ⬇ 글씨도 살짝 작게 */
+    background: #00b800;
     color: white;
     font-weight: bold;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .apply-btn:hover {
@@ -123,14 +136,19 @@
 .comment-box:focus {
     border-color: #00c800;
 }
+
 .postbutton {
     margin-left: 30px;
-    width: 60px;
-    height: 30px;
+    width: 70px;       /* ⬆ 약간 넓힘 */
+    height: 36px;      /* ⬆ 높이도 살짝 키움 */
     border: none;
     background: #2fd12f;
     color: white;
+    font-weight: bold; /* 글씨 조금 더 또렷하게 */
     border-radius: 10px;
+    font-size: 15px;   /* 글씨도 살짝 키움 */
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .postdetail {
@@ -268,4 +286,29 @@
     font-weight: 600;
     padding: 2px 4px;
     border-radius: 4px;
+}
+
+/* ===== 가독성 향상 ===== */
+
+/* 항목 제목 (진행 일정, 모집 일정, 프로젝트 목표, 프로젝트 내용) */
+.form-group label,
+.good > p {
+    font-size: 18px;
+    font-weight: 600;
+    color: #222;
+}
+
+/* 항목 내용 (날짜, 목표, 설명 등) */
+.date-inputs span,
+.goal span,
+.content {
+    font-size: 16px;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* 목표, 내용 박스 내부 여백 */
+.goal,
+.content {
+    padding: 15px;
 }

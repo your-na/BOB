@@ -15,19 +15,23 @@
 
 <!-- 제목과 모집현황 -->
 <div class="title-row">
-    <div class="title" th:text="${project.title}">프로젝트 제목</div>
-    <span class="deadline" th:text="'D-' + ${project.dDay}">D-14</span>
+    <!-- 제목 + D-Day 묶음 -->
+    <div class="title-box">
+        <div class="title" th:text="${project.title}">프로젝트 제목</div>
+        <span class="deadline" th:text="'D-' + ${project.dDay}">D-14</span>
+    </div>
+
+    <!-- 모집현황 -->
     <div class="status">
         모집현황
-<!--        <span th:text="${project.currentParticipants} + '/' + ${project.recruitmentCount}"></span>-->
         <div class="team">
-            <!-- 총 정원(recruitmentCount) 만큼 반복 -->
             <span th:each="i : ${#numbers.sequence(1, project.recruitmentCount)}">
-            <img th:src="${i <= project.currentParticipants} ? '/images/team.png' : '/images/user.png'">
-        </span>
+                <img th:src="${i <= project.currentParticipants} ? '/images/team.png' : '/images/user.png'">
+            </span>
         </div>
     </div>
 
+    <!-- 점 세 개 메뉴 -->
     <div class="post-detail">
         <img class="postdetail" src="/images/postdetail.png" alt="점 세 개" onclick="toggleDropdown()" th:if="${isOwner}">
         <div class="dropdownmenu" id="dropdownMenu" style="display: none;" th:if="${isOwner}">
@@ -36,6 +40,7 @@
         </div>
     </div>
 </div>
+
 <hr>
 
 <!-- 작성자 및 작성일 -->
