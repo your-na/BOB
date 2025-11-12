@@ -122,8 +122,9 @@
     background-color: #F0FFEF;
     border-top: 2px solid #00b800;
     text-align: center;
-    color: #404040;
+    color: #000000;
     font-weight: bold;
+    font-size: 18px;
 }
 
 .contest-table tr:nth-child(even) {
@@ -135,8 +136,9 @@
 }
 
 .contest-table td {
-    color: #555;
+    color: #2b2b2b;
     background-color: #fff;
+    font-size: 18px;
 }
 
 .contest-table td:last-child {
