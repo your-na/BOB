@@ -1,20 +1,27 @@
+html { font-size: 20px; }  /* 전체 기본 폰트 크기 조정 */
+
 h2 {
-    margin-top: 8%;
+    margin-top: 6%;
+    font-size: 30px;           /* 22px → 24px */
+    font-weight: 700;          /* bold → 더 두껍게 */
+    color: #333;               /* 글자색 명확히 */
 }
 
 .date-range {
-    margin-bottom: 10px;
-    font-size: 14px;
+    margin-bottom: 15px;       /* 10px → 15px */
+    font-size: 16px;           /* 14~16px로 통일 */
+    line-height: 1.6;          /* 행간 추가 */
 }
 
 .title-input {
-    width: 60%;
-    padding: 10px;
-    font-size: 16px;
-    margin-bottom: 20px;
-    background-color: #f5f5f5;
+    width: 60%;       /* 기존 65% → 폼과 동일하게 */
+    padding: 14px;
+    font-size: 18px;
+    background-color: #fafafa;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 6px;
+    line-height: 1.5;
+    margin-bottom: 20px;
 }
 
 .main-container {
@@ -23,15 +30,21 @@ h2 {
 }
 
 .form-container {
-    width: 55%;
-    padding: 20px;
+    width: 60%;
+    padding: 24px;             /* 여백 확대 */
     border: 1px solid #ddd;
     border-radius: 10px;
+    font-size: 17px;           /* 기존보다 +1 */
+    line-height: 1.6;
+    background-color: #fff;
 }
 
 .form-container label {
     display: block;
-    margin-bottom: 6px;
+    margin-bottom: 12px;       /* 라벨 간격 늘림 */
+    font-size: 17px;
+    font-weight: 600;
+    color: #333;
 }
 
 .form-container input,
@@ -44,9 +57,12 @@ h2 {
 .form-container input[type="url"],
 .form-container textarea {
     width: 100%;
-    padding: 8px;
+    padding: 10px 12px;        /* 입력창 여백 확대 */
+    font-size: 16px;
+    line-height: 1.5;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 6px;
+    background-color: #fafafa;
 }
 
 .extra-employment {
@@ -59,14 +75,47 @@ h2 {
     margin-top: 20px;
 }
 
+/* 버튼 */
 .submit-btn,
 .cancel-btn {
-    padding: 8px 20px;
-    border: none;
-    border-radius: 5px;
-    margin: 0 10px;
+    padding: 12px 24px;        /* 버튼 크기 확대 */
+    font-size: 16px;
     font-weight: bold;
+    border-radius: 6px;
     cursor: pointer;
+}
+
+/* 우측 고정 이력서 패널 폰트 크기 확대 */
+.resume-panel {
+    font-size: 18px;
+    line-height: 1.6;
+    width: 320px;
+    position: fixed;
+    top: 100px;
+    right: 30px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    padding: 15px;
+    z-index: 100;
+}
+
+.resume-tab {
+    font-size: 18px;
+    padding: 12px 14px;
+}
+
+.resume-hint {
+    color: red;
+    font-size: 16px;
+    margin-top: 12px;
+    line-height: 1.6;
+}
+
+.modal-content {
+    font-size: 15px;
+    line-height: 1.6;
 }
 
 .submit-btn {
@@ -100,12 +149,6 @@ h2 {
     background-color: white;
     border-radius: 5px;
     cursor: pointer;
-}
-
-.resume-hint {
-    color: red;
-    font-size: 12px;
-    margin-top: 15px;
 }
 
 /* 모달 스타일 */
@@ -170,19 +213,6 @@ h2 {
     border: 1px solid #ddd;
 }
 
-/* 우측 고정 이력서 패널 */
-.resume-panel {
-    position: fixed;
-    top: 100px;
-    right: 30px;
-    width: 250px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.05);
-    padding: 15px;
-    z-index: 100;
-}
 
 .resume-header {
     display: flex;
@@ -295,103 +325,3 @@ h2 {
 
 .hidden { display: none !important; }
 .apply-type { margin: 12px 0; display: flex; gap: 16px; align-items: center; }
-
-/* 제목 */
-h2 {
-    margin-top: 8%;
-    font-size: 22px;
-    font-weight: bold;
-}
-
-/* 모집 기간 입력 */
-.date-range {
-    margin-bottom: 10px;
-    font-size: 16px;
-}
-
-/* 제목 입력창 */
-.title-input {
-    width: 60%;
-    padding: 12px;
-    font-size: 18px;
-    margin-bottom: 20px;
-    background-color: #f5f5f5;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-/* 폼 컨테이너 */
-.form-container {
-    width: 60%;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    font-size: 16px;
-}
-
-.form-container label {
-    display: block;
-    margin-bottom: 10px;
-    font-size: 16px;
-    font-weight: 600;
-}
-
-/* 입력 필드 */
-.form-container input[type="text"],
-.form-container input[type="email"],
-.form-container input[type="url"],
-.form-container textarea {
-    width: 100%;
-    padding: 8px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-/* 버튼 */
-.submit-btn,
-.cancel-btn {
-    padding: 10px 22px;
-    border: none;
-    border-radius: 5px;
-    margin: 0 10px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-/* 우측 이력서 패널 */
-.resume-container,
-.resume-panel {
-    font-size: 15px;
-}
-
-/* 이력서 이름 */
-.resume-tab {
-    font-size: 15px;
-}
-
-/* 힌트 문구 */
-.resume-hint {
-    color: red;
-    font-size: 14px;
-    margin-top: 15px;
-}
-
-/* 미리보기 */
-.resume-preview-wrapper {
-    font-size: 14px;
-}
-
-/* 프리뷰 섹션 내부 */
-.resume-section.preview-mode .section-header {
-    font-size: 15px;
-}
-
-.resume-section.preview-mode .section-note {
-    font-size: 13px;
-}
-
-.resume-panel {
-    width: 220px;   /* 기존 250px → 220px */
-}
