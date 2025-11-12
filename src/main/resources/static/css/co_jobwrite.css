@@ -56,11 +56,11 @@ h2 {
 .form-container input[type="email"],
 .form-container input[type="url"],
 .form-container textarea {
-    width: 100%;
+    width: 95%;
     padding: 10px 12px;        /* 입력창 여백 확대 */
     font-size: 16px;
     line-height: 1.5;
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
     border-radius: 6px;
     background-color: #fafafa;
 }
@@ -83,6 +83,14 @@ h2 {
     font-weight: bold;
     border-radius: 6px;
     cursor: pointer;
+}
+
+.submit-btn {
+    margin-right: 10px;
+}
+
+.cancel-btn {
+    margin-left: 10px;
 }
 
 /* 우측 고정 이력서 패널 폰트 크기 확대 */
