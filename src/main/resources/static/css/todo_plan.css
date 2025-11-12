@@ -464,3 +464,7 @@ body {
 .cancel-edit-btn:hover {
     background-color: #bbb;
 }
+
+.hidden {
+    display: none;
+}

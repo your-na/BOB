@@ -353,3 +353,30 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     });
 });
+
+// ✅ 할 일 수정 모달 제어
+document.addEventListener("DOMContentLoaded", () => {
+    const editModal = document.querySelector(".edit-task-modal");
+    const cancelEditBtn = document.querySelector(".cancel-edit-btn");
+    const saveEditBtn = document.querySelector(".save-edit-btn");
+
+    // 수정 모달 열기 함수 (필요 시 외부에서 호출 가능)
+    window.openEditModal = function(todo) {
+        editModal.classList.remove("hidden");
+        document.querySelector(".edit-task-input").value = todo.title;
+        document.querySelector(".edit-start-date").value = todo.startDate;
+        document.querySelector(".edit-end-date").value = todo.endDate;
+    };
+
+    // 닫기 버튼
+    cancelEditBtn.addEventListener("click", () => {
+        editModal.classList.add("hidden");
+    });
+
+    // 저장 버튼
+    saveEditBtn.addEventListener("click", () => {
+        editModal.classList.add("hidden");
+        // TODO: 여기서 fetch로 수정 요청 보내면 됨
+    });
+});
+
