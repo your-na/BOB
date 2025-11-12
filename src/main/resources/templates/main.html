@@ -86,12 +86,18 @@
     </section>
 
     <!-- 플로팅 캘린더 버튼 -->
-    <button class="floating-calendar" onclick="toggleTaskPlanButtons()"><img src="/images/schedule.png" alt=""></button>
+    <button class="floating-calendar" onclick="toggleTaskPlanButtons()">
+        <img src="/images/schedule.png" alt="캘린더 아이콘" id="calendar-icon">
+    </button>
 
     <!-- 새롭게 나타날 버튼들 (초기에는 숨김 상태) -->
     <div id="task-plan-buttons" class="hidden">
-        <button class="task-button" onclick="openTaskPopup()">✔<br>TODO</button>
-        <button class="plan-button" onclick="openPlanPopup()">✏<br>PLAN</button>
+        <button class="task-button" onclick="openTaskPopup()">
+            <img src="/images/todo.png" alt="TODO 아이콘"><br>TODO
+        </button>
+        <button class="space-button" onclick="openSpacePopup()">
+            <img src="/images/space.png" alt="SPACE 아이콘"><br>SPACE
+        </button>
     </div>
 
     <!-- 푸터 -->
@@ -101,11 +107,24 @@
 
     <script>
         function toggleTaskPlanButtons() {
-            var buttons = document.getElementById("task-plan-buttons");
-            if (buttons.style.display === "none" || buttons.style.display === "") {
-                buttons.style.display = "flex"; // 버튼 보이기
+            const buttons = document.getElementById("task-plan-buttons");
+            const icon = document.getElementById("calendar-icon");
+
+            // 애니메이션 토글
+            buttons.classList.toggle("show");
+
+            // 회전 효과 토글 (💫 추가)
+            icon.classList.toggle("rotated");
+
+            // 아이콘 토글 (캘린더 ↔ X)
+            if (buttons.classList.contains("show")) {
+                icon.src = "/images/close.png";
+                icon.alt = "닫기 아이콘";
+                icon.classList.add("close-icon");   // ✅ 추가
             } else {
-                buttons.style.display = "none"; // 버튼 숨기기
+                icon.src = "/images/schedule.png";
+                icon.alt = "캘린더 아이콘";
+                icon.classList.remove("close-icon"); // ✅ 복구
             }
         }
 
@@ -118,8 +137,8 @@
             };
         }
 
-        function openPlanPopup() {
-            window.open('/plan', 'planPopup', 'width=400,height=500,resizable=no,scrollbars=no');
+        function openSpacePopup() {
+            window.open('/plan', 'spacePopup', 'width=400,height=500,resizable=no,scrollbars=no');
         }
 
         // 배너 수정할거양 흥.
@@ -316,6 +335,8 @@
                 })
                 .catch(err => console.error("❌ 공모전 불러오기 실패", err));
         });
+
+
 
 
     </script>

@@ -352,19 +352,28 @@
     color: white;
     border: none;
     border-radius: 50%;
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
     font-size: 24px;
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
 }
 
 .floating-calendar img{
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     object-fit: cover;
     align-items: center;
+    transition: transform 0.3s ease;
 }
+
+/* 닫기 아이콘만 작게 */
+.floating-calendar img.close-icon {
+    width: 30px;
+    height: 30px;
+}
+
 /* 푸터 */
 .footer {
     text-align: center;
@@ -372,6 +381,10 @@
     margin: 0 -12.5%;
     background-color: #f9f9f9;
     border-top: 1px solid #ddd;
+}
+
+.floating-calendar img.rotated {
+    transform: rotate(180deg);
 }
 
 .filter-container {
@@ -402,35 +415,95 @@
 }
 
 #task-plan-buttons {
-    display: none; /* 처음에는 숨김 상태 */
     position: fixed;
-    bottom: 100px; /* 달력 버튼 위에 배치 */
-    left: 95%;
-    transform: translateX(-50%);
+    bottom: 120px;
+    right: 60px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 20px;
+    align-items: center;
+
+    /* 처음엔 숨김 상태 */
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
-.task-button, .plan-button {
+.task-button, .space-button {
     padding: 10px 20px;
-    font-size: 12px;
+    font-size: 14px;
     text-align: center;
     border: none;
     cursor: pointer;
     border-radius: 50%;
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
+    background-color: #5CF05C;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, background-color 0.3s ease;
+    font-weight: bold; /* 👈 글씨 굵게 */
+    letter-spacing: 0.5px; /* 약간 더 깔끔하게 간격 정돈 */
+    display: flex;                 /* 중앙정렬 핵심 */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;                      /* 아이콘-텍스트 간격 */
 }
 
+.task-button br, .space-button br { display: none; } /* <br> 숨김 */
+
+.task-button img,
+.space-button img {
+    width: 38px;
+    height: 38px;
+    margin-bottom: 2px; /* 👈 아이콘과 텍스트 사이 간격 좁힘 (기존 5px → 2px) */
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    transition: transform 0.2s ease;
+    display: block;
+}
+
+.task-button:hover img,
+.space-button:hover img {
+    transform: scale(1.1);
+}
+
+/* TODO 버튼 색상 */
 .task-button {
-    background-color: rgba(102, 255, 0, 0.66);
-    color: white;
+    background-color: #1FE91A;
 }
 
-.plan-button {
-    background-color: rgba(102, 255, 0, 0.66);
-    color: white;
+.task-button:hover {
+    background-color: #38d138;
+}
+
+/* SPACE 버튼 색상 */
+.space-button {
+    background-color: #1FE91A;
+}
+
+.space-button:hover {
+    background-color: #38d138;
+}
+
+#task-plan-buttons.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* 선택적으로 hover 효과 추가 */
+.task-button:hover, .space-button:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+.task-button::first-line,
+.space-button::first-line {
+    font-size: 26px; /* ✔ ✏ 아이콘만 크게 */
+    line-height: 1.2;
 }
 
 .more {
