@@ -34,18 +34,19 @@
 }
 
 .photo-wrapper {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
+    width: 150px;     /* 가로 크기 */
+    height: 200px;    /* 세로 크기 → 더 길게 */
+    border-radius: 6px;  /* 살짝만 둥글게 */
     border: 3px solid #eee;
     overflow: hidden;
     flex-shrink: 0;
+    margin-right: 30px;  /* 오른쪽 여백으로 글자 밀기 */
 }
 
 .photo-wrapper img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: cover;  /* 사진이 꽉 차도록 */
 }
 
 .profile-info {
@@ -53,20 +54,24 @@
 }
 
 .name-skill {
-    font-size: 18px;
+    font-size: 22px;
     margin-bottom: 10px;
+}
+
+.name-skill strong {
+    font-size: 22px;
 }
 
 .name-skill .skill {
     color: #19CB13;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 18px;
     margin-left: 10px;
 }
 
 .info-table div {
-    font-size: 14px;
-    margin: 3px 0;
+    font-size: 18px;
+    margin: 10px 0;
 }
 
 .info-table strong {
@@ -82,7 +87,7 @@
 }
 
 .info-section h3 {
-    font-size: 17px;
+    font-size: 20px;
     font-weight: bold;
     margin-bottom: 10px;
     color: #333;
@@ -107,17 +112,19 @@
     border: 1px solid #999;
     border-radius: 6px;
     padding: 10px;
-    font-size: 14px;
+    font-size: 18px;
     background-color: #fafafa;
 }
 
 /* ✅ 태그 스타일 */
 .tag {
     display: inline-block;
-    padding: 4px 10px;
-    background-color: #f0f0f0;
+    padding: 6px 12px;
+    background-color: #19CB13;
+    color: white;
+    font-weight: bold;
     border-radius: 999px;
-    font-size: 13px;
+    font-size: 18px;
     margin: 3px 5px 3px 0;
     white-space: nowrap;
 }
@@ -167,7 +174,7 @@
     width: 100%;
     border-collapse: collapse;
     margin: 15px 0;
-    font-size: 14px;
+    font-size: 18px;
     background-color: #fff;
 }
 
@@ -186,7 +193,7 @@
     border: 1px solid #ddd;
     padding: 8px;
     text-align: center;
-    color: #444;
+    color: black;
     vertical-align: middle;
 }
 
