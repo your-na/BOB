@@ -72,44 +72,22 @@
       </div>
     </div>
 
-    <!-- 본문 영역 -->
-    <div th:each="section : ${resume.sections}" class="info-section">
-      <strong th:text="${section.title}">섹션 제목</strong>
-
-      <!-- ✅ 드래그 항목 -->
-      <div th:if="${not #lists.isEmpty(section.dragItems)}">
-        <ul>
-          <li th:each="item : ${section.dragItems}" style="margin-bottom: 1em;">
-            <div style="margin-left: 15px;">
-              <div><strong th:text="${item.displayText}">항목</strong></div>
-              <div th:if="${item.startDate != null and item.endDate != null}" style="color: #444;">
-                <span th:text="|(${item.startDate} ~ ${item.endDate})|"></span>
-              </div>
-              <div th:if="${item.filePath != null}">
-                <a th:href="@{'/uploads/projectFiles/' + ${item.filePath}}" target="_blank">📁 파일 보기</a>
-              </div>
-            </div>
-          </li>
-        </ul>
-      </div>
-
-      <!-- ✅ content -->
-      <div th:if="${#lists.isEmpty(section.dragItems) and section.content != null and section.content != ''}">
-        <textarea th:if="${section.title == '자기소개'}" readonly th:text="${section.content}">자기소개</textarea>
-        <p th:if="${section.title != '자기소개'}" th:text="${section.content}"></p>
-      </div>
-
-      <!-- ✅ 태그 -->
-      <div th:if="${section.selectedTags != null
-            and #lists.size(section.selectedTags) > 0
-            and section.title != '경력사항'
-            and section.title != '포트폴리오'}">
+    <!-- ✅ 희망직무 (학력사항 위로 고정) -->
+    <div th:each="section : ${resume.sections}" th:if="${section.title == '희망직무'}" class="info-section">
+      <h3 th:text="${section.title}">희망직무</h3>
+      <div th:if="${section.selectedTags != null}">
         <span th:each="tag : ${section.selectedTags}" class="tag" th:text="${tag}">태그</span>
       </div>
+    </div>
 
-      <!-- ✅ 학력사항 -->
+    <!-- ✅ 나머지 섹션 (희망직무 제외) -->
+    <div th:each="section : ${resume.sections}" th:if="${section.title != '희망직무'}" class="info-section">
+
+      <!-- 섹션 제목 -->
+      <h3 th:text="${section.title}">섹션 제목</h3>
+
+      <!-- 학력사항 -->
       <div th:if="${section.title == '학력사항'}">
-        <h3>학력사항</h3>
         <table class="detail-table">
           <thead>
           <tr>
@@ -130,9 +108,8 @@
         </table>
       </div>
 
-      <!-- ✅ 경력사항 -->
+      <!-- 경력사항 -->
       <div th:if="${section.title == '경력사항'}">
-        <h3>경력사항</h3>
         <table class="detail-table">
           <thead>
           <tr>
@@ -153,9 +130,8 @@
         </table>
       </div>
 
-      <!-- ✅ 포트폴리오 -->
+      <!-- 포트폴리오 -->
       <div th:if="${section.title == '포트폴리오'}">
-        <h3>포트폴리오</h3>
         <table class="detail-table">
           <thead>
           <tr>
@@ -181,14 +157,19 @@
         </table>
       </div>
 
-      <!-- ✅ 사진 첨부 -->
+      <!-- 자기소개 -->
+      <div th:if="${section.title == '자기소개'}">
+        <textarea readonly class="readonly-textarea" th:text="${section.content}"></textarea>
+      </div>
+
+      <!-- 사진 첨부 -->
       <div th:if="${not #lists.isEmpty(section.fileNames) and section.type?.trim() == '사진 첨부'}">
         <div class="image-preview" th:each="imgName : ${section.fileNames}">
           <img th:src="@{'/uploads/resumeFiles/' + ${imgName}}" alt="첨부 이미지">
         </div>
       </div>
 
-      <!-- ✅ 파일 첨부 -->
+      <!-- 파일 첨부 -->
       <div th:if="${not #lists.isEmpty(section.fileNames) and section.type?.trim() == '파일 첨부'}" class="attachments">
         <div class="file-download" th:each="fileName : ${section.fileNames}">
           <a th:href="@{'/uploads/resumeFiles/' + ${fileName}}" download>
@@ -197,6 +178,7 @@
         </div>
       </div>
     </div>
+
 
   </div>
 </form>
