@@ -470,3 +470,105 @@
     font-weight: 600;
     font-size: 15px;
 }
+
+/* 공고 제목 옆 라벨 스타일 */
+.apply-type-label {
+    font-size: 18px;
+    color: #20c35a;
+    font-weight: 600;
+    margin-left: 10px;
+}
+
+/* =================================== */
+/* 공고 제목 옆 배지형 라벨 스타일 */
+/* =================================== */
+.apply-type-badge {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+/* 제목 + 배지 전체 정렬 */
+.job-header .header-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* 🔹 제목 왼쪽, 배지 오른쪽 */
+    width: 100%;
+}
+
+/* 제목 기본 스타일 */
+.job-header .job-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* 제출유형 배지 */
+.apply-type-badge {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 15px;
+}
+
+/* 회원 이력서 제출 */
+.apply-type-badge.member {
+    background-color: #4da3ff;
+}
+
+/* 기업 양식 제출 */
+.apply-type-badge.company {
+    background-color: #20c35a;
+}
+
+/* D-Day 스타일 (기존 유지 가능) */
+.d-day-badge {
+    background-color: #00b800;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-weight: 600;
+}
+
+/* ===== 공통 배지 스타일 (크게 조정됨) ===== */
+.apply-type-badge,
+.d-day-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;         /* 🔹 글자 크기 약간 키움 */
+    font-weight: 700;        /* 🔹 더 두껍게 */
+    color: #fff;
+    padding: 8px 16px;       /* 🔹 좌우 여백 확대 */
+    border-radius: 22px;     /* 🔹 더 둥글게 */
+    line-height: 1;
+    height: 34px;            /* 🔹 높이 조정 */
+}
+
+/* 제출유형별 색상 */
+.apply-type-badge.member {
+    background-color: #4da3ff; /* 회원 이력서 제출 */
+}
+
+.apply-type-badge.company {
+    background-color: #20c35a; /* 기업 양식 제출 */
+}
+
+/* D-Day — 동일한 스타일 */
+.d-day-badge {
+    background-color: #00b800;
+}
+
+/* 오른쪽 배지 묶음 */
+.badge-group {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 배지 사이 간격 */
+}

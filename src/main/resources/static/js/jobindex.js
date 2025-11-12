@@ -26,9 +26,30 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (resumePanel) resumePanel.classList.remove("hidden");
             }
 
-            // 공고 제목 업데이트
+            // ✅ 제목 + 제출유형 + D-Day 한 줄 표시
+            const jobHeader = document.querySelector('.job-header');
             const jobTitleElement = document.querySelector('.job-header h2');
-            if (jobTitleElement && data.title) jobTitleElement.textContent = data.title;
+            const ddayBadge = document.querySelector('.d-day-badge');
+
+            if (jobHeader && jobTitleElement && data.title) {
+                let badgeHTML = '';
+                if (data.applyType === 'member') {
+                    badgeHTML = `<span class="apply-type-badge member">회원 이력서 제출</span>`;
+                } else if (data.applyType === 'company') {
+                    badgeHTML = `<span class="apply-type-badge company">기업 양식 제출</span>`;
+                }
+
+                jobHeader.innerHTML = `
+    <div class="header-line">
+        <h2 class="job-title">${data.title}</h2>
+        <div class="badge-group">
+            ${badgeHTML}
+            <span class="d-day-badge">${ddayBadge?.textContent || ''}</span>
+        </div>
+    </div>
+`;
+
+            }
 
             // 회사 소개글 업데이트
             const jobDescriptionElement = document.querySelector('.job-desc');
