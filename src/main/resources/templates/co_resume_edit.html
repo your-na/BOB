@@ -285,7 +285,7 @@
         // 전체 조건 항목을 미리 정의하거나 서버에서 받아오는 로직을 추가
         const allConditions = {
             "경력사항": ["1년 이내", "3개월 이내", "6개월 이내", "직접입력"],
-            "포트폴리오": ["1개 이하", "3개 이상", "5개 이상", "직접입력"],
+            "포트폴리오": ["1개 이상", "3개 이상", "5개 이상", "직접입력"],
             "자기소개": ["50자 이상", "200자 이상", "500자 이상", "직접입력"],
             "학력사항": ["초등학교", "중학교", "고등학교", "대학교", "대학원", "최종"]
         };
@@ -414,7 +414,7 @@
         </div>
         <input type="text" id="ohcomment" value="${section.comment || ''}" placeholder="설명 입력">
         <div class="tag-list conditions-list">
-            ${["1개 이하", "3개 이상", "5개 이상", "직접입력"].map(condition => {
+            ${["1개 이상", "3개 이상", "5개 이상", "직접입력"].map(condition => {
                                 const isSelected = section.conditions?.includes(condition) ? "selected-tag active" : "";
                                 return `<span class="tag condition ${isSelected}" data-condition="${condition}">${condition}</span>`;
                             }).join('')}
