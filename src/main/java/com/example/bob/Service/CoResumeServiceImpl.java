@@ -275,14 +275,15 @@
         public void deleteResume(Long id) {
             logger.info("🗑️ 기업 이력서 삭제 시작 - ID: {}", id);
 
-            // 0️⃣ job_application_entity 삭제
-            int deletedApplications = entityManager.createNativeQuery("""
-        DELETE ja FROM job_application_entity ja
-        WHERE ja.resume_id IN (
-            SELECT r.id FROM resume_entity r WHERE r.co_resume_id = ?
-        )
-    """).setParameter(1, id).executeUpdate();
-            logger.info("🔸 job_application_entity 삭제 완료 ({}건)", deletedApplications);
+            // 0-1️⃣ my_resume_id 기준 job_application_entity 삭제도 추가
+            int deletedMyResumeApplications = entityManager.createNativeQuery("""
+    DELETE FROM job_application_entity
+    WHERE my_resume_id IN (
+        SELECT mr.id FROM my_resume mr WHERE mr.co_resume_id = ?
+    )
+""").setParameter(1, id).executeUpdate();
+            logger.info("🔸 my_resume 기반 지원 내역 삭제 완료 ({}건)", deletedMyResumeApplications);
+
 
             // 1️⃣ job_resume 삭제
             int deletedJobResume = entityManager.createNativeQuery("""
