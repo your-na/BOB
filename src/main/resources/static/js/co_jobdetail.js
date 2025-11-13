@@ -135,6 +135,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector(".delete").addEventListener("click", () => {
         const jobId = new URLSearchParams(window.location.search).get("id");
 
+        console.log("🟡 삭제하려는 공고 ID:", jobId);  // ✅ 로그 확인!
+
         if (!confirm("정말로 이 공고를 삭제하시겠습니까?")) {
             return;
         }
@@ -142,22 +144,26 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch(`/api/cojobs/${jobId}`, {
             method: "DELETE",
             headers: {
-                "X-XSRF-TOKEN": getCsrfToken()  // ✅ CSRF 토큰 헤더 추가!
+                "X-XSRF-TOKEN": getCsrfToken()
             }
         })
             .then(res => {
+                console.log("🟢 서버 응답 상태:", res.status); // ✅ 상태코드 로그
                 if (res.ok) {
                     alert("공고가 성공적으로 삭제되었습니다.");
                     window.location.href = "/job2";
                 } else {
                     return res.text().then(msg => {
+                        console.error("❌ 삭제 실패 메시지:", msg);
                         alert("삭제 실패: " + msg);
                     });
                 }
             })
             .catch(error => {
+                console.error("🔥 삭제 중 오류 발생:", error);
                 alert("오류 발생: " + error.message);
             });
     });
+
 
 });

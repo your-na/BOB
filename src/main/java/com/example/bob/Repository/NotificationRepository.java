@@ -1,27 +1,27 @@
-package com.example.bob.Repository;
+    package com.example.bob.Repository;
 
-import com.example.bob.Entity.*;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+    import com.example.bob.Entity.*;
+    import org.springframework.data.jpa.repository.JpaRepository;
+    import org.springframework.data.domain.Page;
+    import org.springframework.data.domain.Pageable;
+    import org.springframework.data.jpa.repository.Modifying;
+    import org.springframework.data.jpa.repository.Query;
+    import org.springframework.data.repository.query.Param;
 
-import java.util.List;
+    import java.util.List;
 
-public interface NotificationRepository extends JpaRepository<NotificationEntity, Long> {
+    public interface NotificationRepository extends JpaRepository<NotificationEntity, Long> {
 
-    // 일반 사용자
-    int countByUserAndIsRead(UserEntity userEntity, boolean isRead);
+        // 일반 사용자
+        int countByUserAndIsRead(UserEntity userEntity, boolean isRead);
 
-    List<NotificationEntity> findByUser(UserEntity userEntity);
+        List<NotificationEntity> findByUser(UserEntity userEntity);
 
-    List<NotificationEntity> findByUserAndIsRead(UserEntity userEntity, boolean isRead);
+        List<NotificationEntity> findByUserAndIsRead(UserEntity userEntity, boolean isRead);
 
-    Page<NotificationEntity> findByUser(UserEntity userEntity, Pageable pageable);
+        Page<NotificationEntity> findByUser(UserEntity userEntity, Pageable pageable);
 
-    // 기업 사용자
+        // 기업 사용자
     int countByCompanyAndIsRead(CompanyEntity companyEntity, boolean isRead);
 
     List<NotificationEntity> findByCompany(CompanyEntity companyEntity);
@@ -40,6 +40,8 @@ public interface NotificationRepository extends JpaRepository<NotificationEntity
 
     List<NotificationEntity> findByContestTeamIdAndUserAndIsHiddenFalse(Long teamId, UserEntity user);
 
+        // ✅ 기업 공고 관련 알림 삭제
+        void deleteAllByJobPost_Id(Long jobPostId);  // ✅ 이렇게!
 
     // 프로젝트 관련된 알림 삭제
     @Modifying

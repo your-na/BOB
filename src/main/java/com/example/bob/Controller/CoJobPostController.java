@@ -85,18 +85,20 @@ public class CoJobPostController {
     // ✅ 공고 삭제 요청을 처리하는 API
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteJobPost(@PathVariable Long id) {
-        try {
-            // 🔍 서비스에서 공고 ID로 삭제 수행
-            coJobPostService.deleteJobPost(id);
+        System.out.println("🟡 삭제 요청 받음 - ID: " + id);  // ✅ 로그 추가
 
-            // ✅ 성공 응답 반환
+        try {
+            coJobPostService.deleteJobPost(id);
+            System.out.println("🟢 공고 삭제 성공");
+
             return ResponseEntity.ok("공고가 성공적으로 삭제되었습니다.");
         } catch (Exception e) {
-            // ❌ 실패 시 에러 메시지 반환
+            System.err.println("❌ 공고 삭제 실패: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("공고 삭제 실패: " + e.getMessage());
         }
     }
+
 
 
 
