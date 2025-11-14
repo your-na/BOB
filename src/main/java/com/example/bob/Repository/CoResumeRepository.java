@@ -17,5 +17,4 @@ public interface CoResumeRepository extends JpaRepository<CoResumeEntity, Long> 
 
     List<CoResumeEntity> findByCompany_CompanyId(Long companyId);
 
-
 }

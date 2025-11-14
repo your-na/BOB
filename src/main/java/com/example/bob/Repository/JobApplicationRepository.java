@@ -42,6 +42,10 @@
         // ✅ 공고 ID 기준으로 지원자 수 세기
         int countByJobPost_Id(Long jobPostId);
 
+        // 🔥 공고 ID로 모든 지원 내역 삭제 (공고 삭제 문제 해결 핵심!)
+        void deleteAllByJobPost_Id(Long jobPostId);
+
+
         // ✅ 공고별로 유저 기준 중복 없이 지원자 수 세기
         @Query("SELECT COUNT(DISTINCT a.user.userId) FROM JobApplicationEntity a WHERE a.jobPost.id = :jobPostId")
         int countDistinctApplicantsByJobPostId(@Param("jobPostId") Long jobPostId);

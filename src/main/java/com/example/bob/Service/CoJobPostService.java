@@ -10,6 +10,11 @@ import com.example.bob.Repository.CoJobPostRepository;
 import com.example.bob.Repository.CoResumeRepository;
 import com.example.bob.Repository.CompanyRepository;
 import com.example.bob.Repository.JobApplicationRepository;
+import com.example.bob.Repository.ResumeRepository;
+import com.example.bob.Repository.JobResumeQueryRepository;
+import com.example.bob.Repository.NotificationRepository;
+
+
 
 
 import com.example.bob.security.CustomUserDetails;
@@ -33,6 +38,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.time.LocalDate;
 import java.util.Comparator;
+import org.springframework.transaction.annotation.Transactional;
 
 
 
@@ -51,6 +57,16 @@ public class CoJobPostService {
 
     @Autowired
     private JobApplicationRepository jobApplicationRepository;
+
+    @Autowired
+    private ResumeRepository resumeRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
+
+    @Autowired
+    private JobResumeQueryRepository jobResumeQueryRepository;
+
 
     // 구인글 등록
     public Long saveJobPost(CoJobPostRequestDTO dto) {
@@ -322,20 +338,31 @@ public class CoJobPostService {
     }
 
     // ✅ 공고 삭제 메서드
+    @Transactional
     public void deleteJobPost(Long id) {
-        // 1. 삭제할 공고를 ID로 조회
+        System.out.println("🔧 deleteJobPost 실행 - 공고 ID: " + id);
+
         CoJobPostEntity post = coJobPostRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("삭제할 공고를 찾을 수 없습니다."));
+        System.out.println("📌 삭제할 공고 찾음: " + post.getTitle());
 
-        // 2. 삭제 실행
+        // 1. 중간 테이블 삭제 (ManyToMany)
+        jobResumeQueryRepository.deleteByJobPostId(id);
+        System.out.println("🧹 job_resume 삭제 완료");
+
+        // 2. 연관 테이블 삭제
+        jobApplicationRepository.deleteAllByJobPost_Id(id);   // O
+        resumeRepository.deleteAllByJobPost_Id(id);           // O
+        notificationRepository.deleteAllByJobPost_Id(id);     // ✅ 여기도 _ 포함!
+
+        // ❌ CoResumeEntity 삭제하면 안됨! (양식은 살아있어야 함)
+
+        // 3. 공고 삭제
         coJobPostRepository.delete(post);
+        System.out.println("✅ 공고 삭제 완료");
     }
 
-
-
-
-
-
-
 }
+
+
 

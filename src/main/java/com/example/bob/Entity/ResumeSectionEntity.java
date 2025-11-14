@@ -3,6 +3,8 @@ package com.example.bob.Entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import java.util.ArrayList;
+
 
 import java.util.List;
 
@@ -24,6 +26,17 @@ public class ResumeSectionEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resume_id")
     private ResumeEntity resume;
+
+    @OneToMany(mappedBy = "resumeSection", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ResumeEducationEntity> educationEntities = new ArrayList<>();
+
+    // 🔥 Career 삭제 문제 해결 추가 코드
+    @OneToMany(mappedBy = "resumeSection", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<ResumeCareerEntity> careerEntities = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "resumeSection", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<ResumePortfolioEntity> portfolioEntities = new ArrayList<>();
+
 
     // 실제 사용자가 입력한 텍스트
     @Lob
