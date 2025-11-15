@@ -81,18 +81,22 @@ public class BoardCommentService {
         return commentRepository.findByBoardPostOrderByCreatedAtAsc(post).stream()
                 .map(c -> {
 
-                    // 🔥 좋아요 여부 확인
+                    // 🔥 좋아요 여부
                     boolean liked = false;
                     if (currentUser != null) {
                         liked = likeRepository.findByUserAndComment(currentUser, c).isPresent();
                     }
+
+                    // 🔥 좋아요 수 (로그인 여부와 무관)
+                    int likeCount = likeRepository.countByComment(c);
 
                     return new BoardCommentResponseDto(
                             c.getId(),
                             c.getWriter(),
                             c.getContent(),
                             c.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")),
-                            liked
+                            liked,
+                            likeCount
                     );
                 })
                 .collect(Collectors.toList());

@@ -182,3 +182,26 @@
 .menu-popup:hover {
     background: #f5f5f5;
 }
+
+/* 좋아요 하트 + 숫자 수직 정렬 */
+.comment-like-box {
+    display: flex;
+    flex-direction: column;   /* 수직 정렬 */
+    align-items: center;      /* 가운데 정렬 */
+    position: absolute;
+    right: 0;
+    top: 10px;
+}
+
+/* 하트 이미지 */
+.comment-like {
+    width: 20px;
+    cursor: pointer;
+}
+
+/* 숫자 */
+.comment-like-count {
+    font-size: 13px;
+    color: #666;
+    margin-top: 4px; /* 하트 아래 간격 */
+}

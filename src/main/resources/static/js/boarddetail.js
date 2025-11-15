@@ -96,11 +96,17 @@ function loadComments() {
                     : "/images/heart2.png";
 
                 div.innerHTML = `
-        <div class="comment-writer" style="${writerStyle}">${writerLabel}</div>
-        <div class="comment-content">${comment.content}</div>
-        <div class="comment-date">${comment.createdAt}</div>
-        <img src="${heartSrc}" class="comment-like">
-    `;
+  <div class="comment-writer" style="${writerStyle}">${writerLabel}</div>
+  <div class="comment-content">${comment.content}</div>
+  <div class="comment-date">${comment.createdAt}</div>
+  <div class="comment-like-box">
+    <img src="${heartSrc}" class="comment-like">
+    <span class="comment-like-count">${comment.likeCount}</span>
+  </div>
+`;
+
+
+
 
                 const heart = div.querySelector(".comment-like");
 
@@ -114,11 +120,15 @@ function loadComments() {
                             if (!res.ok) throw new Error("좋아요 실패");
                             return res.text();
                         })
-                        .then(() => {
+                        .then(likeCount => {
                             heart.src = heart.src.includes("heart2.png")
                                 ? "/images/pinkheart.png"
                                 : "/images/heart2.png";
+
+                            // ✅ 숫자 갱신
+                            div.querySelector(".comment-like-count").textContent = likeCount;
                         })
+
                         .catch(err => alert(err.message));
                 });
 
