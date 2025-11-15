@@ -53,8 +53,8 @@ public class SecurityConfig {
                                 "/api/user/resumes/submit", "/contest/team/invite/respond", "/contesthistory", "/api/contest-history/**", "/api/team-contest-history","/api/applications/job/pass", "/api/notifications/delete/**", "/profile/company/update",
                                 "/api/user/resumes/submit", "/contest/team/invite/respond","/api/applications/job/pass", "/api/notifications/delete/**", "/contest/team/application/**",
                                 "/api/cojobs/**", "/vendor/**","/api/applications/job/pass-myresume",
-                                "/api/applications/job/reject-myresume","/api/posts"
-                        )
+                                "/api/applications/job/reject-myresume","/api/posts",
+                                "/api/comments", "/api/comments/**")
                 )
                 .headers(headers -> headers
                         .frameOptions(frameOptions -> frameOptions.sameOrigin()) // ✅ iframe 허용 설정
@@ -69,7 +69,7 @@ public class SecurityConfig {
                         .requestMatchers("/error", "/favicon.ico").permitAll()
                         .requestMatchers("/login", "/sign").anonymous()
                         .requestMatchers("/profile/**", "/bw", "/postproject/**", "/myproject", "/api/todos", "/api/resumes", "/api/chat/**", "chat/group-chatroom", "/chatting", "/chat/**", "/api/users/search", "/contest/team/**","/contesthome/**", "/todocrud/**", "/api/contest/team/**", "/contest/recruit","/todo_plan/{teamId}", "/ws-chat/**"
-                        ,"/api/user/resumes/submit", "/api/user/resumes/upload", "/api/user/resumes/detail/**",  "/api/group-chat", "/group/**", "/recruit/{id}").authenticated()
+                        ,"/api/user/resumes/submit", "/api/user/resumes/upload", "/api/user/resumes/detail/**",  "/api/group-chat", "/group/**", "/recruit/{id}","/api/posts/*/comments").authenticated()
                         .requestMatchers("/signup", "/co_signup", "/check-nickname", "/check-username", "/api/my-projects","/api/cojobs").permitAll()
                         .requestMatchers("/comhome", "/comhome/**", "/comcontest").hasAuthority("COMPANY")
                         .requestMatchers("/admin/**", "/sidebar", "/ad_contest", "/adcomcont", "/adcomcont").hasAuthority("ADMIN")
