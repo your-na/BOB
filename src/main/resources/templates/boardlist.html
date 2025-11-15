@@ -29,7 +29,7 @@
 
             <div class="right-controls">
                 <div class="search-box">
-                    <input type="text" placeholder="검색어를 입력해주세요">
+                    <input type="text" id="searchInput" placeholder="검색어를 입력해주세요">
                     <button class="search-btn">
                         <img src="/images/search.png" alt="검색" />
                     </button>
@@ -48,72 +48,85 @@
                 <th>작성일</th>
             </tr>
             </thead>
-
             <tbody id="postList"></tbody>
         </table>
     </div>
 </div>
 
 <script>
-    // 더미 데이터 (예시용)
-    const posts = [
-        { board: "자유/수다", title: "슈붕 vs 팥붕", writer: "사용자1", date: "25/11/15 17:18" },
-        { board: "공모전", title: "공모전 수상 받으면 관련 취업할 때 좋은가요?", writer: "사용자2", date: "25/11/16 09:10" },
-        { board: "프로젝트", title: "프로젝트 주제 추천 받습니다", writer: "사용자3", date: "25/11/17 12:00" },
-        { board: "취업꿀팁", title: "면접 팁 공유한다ㅋㅋ", writer: "사용자4", date: "25/11/18 14:20" },
-        { board: "자유/수다", title: "날씨 갑자기 왤케 추워짐?", writer: "사용자5", date: "25/11/19 11:11" },
-        { board: "취업꿀팁", title: "1분 자기소개서 다들 어떤 식으로 쓰셨나요?", writer: "사용자6", date: "25/11/18 14:20" },
-        { board: "자유/수다", title: "브롤스타즈 할 사람 구함", writer: "사용자9", date: "25/11/15 00:20" },
-    ];
-
     const tbody = document.getElementById("postList");
 
+    // 게시글 렌더링 함수
     function renderPosts(list) {
-        tbody.innerHTML = ""; // 테이블 초기화
+        tbody.innerHTML = "";
 
         list.forEach(post => {
             const tr = document.createElement("tr");
-
             tr.innerHTML = `
-            <td>${post.board}</td>
-            <td>${post.title}</td>
-            <td>${post.writer}</td>
-            <td>${post.date}</td>
-        `;
-
-            // 🔥 게시글 클릭 시 상세보기 페이지로 이동
-            tr.style.cursor = "pointer";  // 마우스 커서 변경
+                <td>${post.category.replace("_", "/")}</td>
+                <td>${post.title}</td>
+                <td>${post.writer}</td>
+                <td>${post.createdAt}</td>
+            `;
+            tr.style.cursor = "pointer";
             tr.addEventListener("click", () => {
-                location.href = "/boarddetail";
+                location.href = "/boarddetail?id=" + post.id;
             });
-
             tbody.appendChild(tr);
         });
     }
 
-    // 페이지 들어오면 전체 게시글 출력
-    renderPosts(posts);
+    let postsData = [];
 
-    // 카테고리 버튼 클릭 시 active 변경 + 필터 실행
+    // 초기 게시글 불러오기
+    fetch("/api/posts")
+        .then(res => {
+            if (!res.ok) throw new Error("게시글 불러오기 실패");
+            return res.json();
+        })
+        .then(data => {
+            postsData = data;
+            renderPosts(postsData);
+        })
+        .catch(err => {
+            alert("에러 발생: " + err.message);
+        });
+
+    // 카테고리 필터
     const categoryButtons = document.querySelectorAll(".category-filter button");
-
     categoryButtons.forEach(button => {
         button.addEventListener("click", () => {
-
-            // 1) active 클래스 변경
             categoryButtons.forEach(btn => btn.classList.remove("active"));
             button.classList.add("active");
 
-            const category = button.textContent.trim(); // 전체 / 공모전 / 자유/수다 등
-
-            // 2) 필터링 로직
+            const category = button.textContent.trim();
             if (category === "전체") {
-                renderPosts(posts);
+                renderPosts(postsData);
             } else {
-                const filtered = posts.filter(post => post.board === category);
+                const filtered = postsData.filter(post => post.category.replace("_", "/") === category);
                 renderPosts(filtered);
             }
         });
     });
+
+    // 검색 필터
+    const searchInput = document.getElementById("searchInput");
+    const searchBtn = document.querySelector(".search-btn");
+
+    searchBtn.addEventListener("click", () => {
+        const keyword = searchInput.value.trim();
+        if (keyword === "") {
+            renderPosts(postsData);
+            return;
+        }
+
+        const filtered = postsData.filter(post =>
+            post.title.includes(keyword) ||
+            post.writer.includes(keyword) ||
+            post.category.includes(keyword)
+        );
+        renderPosts(filtered);
+    });
 </script>
 </body>
+</html>

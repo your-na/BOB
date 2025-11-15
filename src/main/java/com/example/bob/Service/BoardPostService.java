@@ -4,9 +4,16 @@ import com.example.bob.DTO.BoardPostRequestDto;
 import com.example.bob.Entity.BoardCategory;
 import com.example.bob.Entity.BoardPost;
 import com.example.bob.Repository.BoardPostRepository;
+import org.springframework.web.multipart.MultipartFile;
+import com.example.bob.DTO.BoardPostListDto;
+
+
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -57,5 +64,20 @@ public class BoardPostService {
 
         boardPostRepository.save(post);
     }
+
+    //게시글 목록
+    public List<BoardPostListDto> getAllPosts() {
+        return boardPostRepository.findAllByOrderByCreatedAtDesc()
+                .stream()
+                .map(post -> new BoardPostListDto(
+                        post.getId(),
+                        post.getCategory().name(),   // 혹은 post.getCategory().getDisplayName()
+                        post.getTitle(),
+                        post.getWriter(),
+                        post.getCreatedAt().format(DateTimeFormatter.ofPattern("yy/MM/dd HH:mm"))
+                ))
+                .collect(Collectors.toList());
+    }
+
 
 }

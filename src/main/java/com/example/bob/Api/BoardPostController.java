@@ -29,4 +29,17 @@ public class BoardPostController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류 발생");
         }
     }
+
+    // 게시글 목록 조회 API
+    @GetMapping
+    public ResponseEntity<?> getAllPosts() {
+        try {
+            return ResponseEntity.ok(boardPostService.getAllPosts());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("게시글 목록 조회 중 오류 발생");
+        }
+    }
+
 }
