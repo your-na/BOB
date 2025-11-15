@@ -53,7 +53,7 @@ public class SecurityConfig {
                                 "/api/user/resumes/submit", "/contest/team/invite/respond", "/contesthistory", "/api/contest-history/**", "/api/team-contest-history","/api/applications/job/pass", "/api/notifications/delete/**", "/profile/company/update",
                                 "/api/user/resumes/submit", "/contest/team/invite/respond","/api/applications/job/pass", "/api/notifications/delete/**", "/contest/team/application/**",
                                 "/api/cojobs/**", "/vendor/**","/api/applications/job/pass-myresume",
-                                "/api/applications/job/reject-myresume","/api/posts","/api/posts/**",
+                                "/api/applications/job/reject-myresume",
                                 "/api/comments", "/api/comments/**")
                 )
                 .headers(headers -> headers
@@ -62,6 +62,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         // ✅ 로그아웃 상태에서도 공모전/프로젝트/채용공고 목록을 볼 수 있도록 허용
                         .requestMatchers("/api/contest/latest", "/api/cojobs", "/project/api").permitAll()
+                        // 게시판: 목록은 허용, 상세/작성/좋아요는 로그인 필요
+                        .requestMatchers(HttpMethod.GET, "/boardlist").permitAll()   // ← 목록만 허용
+                        .requestMatchers(HttpMethod.GET, "/api/posts").permitAll()   // ← API 목록도 허용
+
+                        .requestMatchers(HttpMethod.GET, "/boarddetail").authenticated() // ← 상세는 로그인
+                        .requestMatchers(HttpMethod.GET, "/api/posts/*").authenticated() // ← 상세 API 로그인
+
+                        .requestMatchers(HttpMethod.POST, "/api/posts").authenticated()     // 작성
+                        .requestMatchers("/api/posts/*/like", "/api/posts/my").authenticated() // 좋아요, 내 글
 
                         .requestMatchers("/", "/main", "/css/**", "/js/**", "/images/**", "/static/**", "/project", "/project/api","/contest", "/app/**", "/topic/**", "/user/me","/api/user/resumes/cancel","/api/user/**","/resume/**","/resume/detail","/api/user/resumes/detail").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
