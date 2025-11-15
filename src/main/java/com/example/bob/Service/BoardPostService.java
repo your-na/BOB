@@ -16,15 +16,14 @@ import com.example.bob.Repository.BoardPostLikeRepository;
 
 
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+
+import org.springframework.transaction.annotation.Transactional;
 
 
 
@@ -152,6 +151,7 @@ public class BoardPostService {
 
 
     // ===== 좋아요 토글 메서드 =====
+    @Transactional  // <- 이거 꼭 추가하세요!
     public int toggleLike(Long postId, String username) {
 
         // 게시글 조회
