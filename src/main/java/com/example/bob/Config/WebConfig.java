@@ -23,6 +23,9 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/uploads/chat/**")
                 .addResourceLocations("file:uploads/chat/");
 
+        registry.addResourceHandler("/uploads/boardFiles/**")
+                .addResourceLocations("file:uploads/boardFiles/");
+
     }
 
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {

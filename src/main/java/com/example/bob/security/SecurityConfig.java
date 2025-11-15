@@ -53,7 +53,7 @@ public class SecurityConfig {
                                 "/api/user/resumes/submit", "/contest/team/invite/respond", "/contesthistory", "/api/contest-history/**", "/api/team-contest-history","/api/applications/job/pass", "/api/notifications/delete/**", "/profile/company/update",
                                 "/api/user/resumes/submit", "/contest/team/invite/respond","/api/applications/job/pass", "/api/notifications/delete/**", "/contest/team/application/**",
                                 "/api/cojobs/**", "/vendor/**","/api/applications/job/pass-myresume",
-                                "/api/applications/job/reject-myresume"
+                                "/api/applications/job/reject-myresume","/api/posts"
                         )
                 )
                 .headers(headers -> headers

@@ -7,54 +7,46 @@
     <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 <body>
+
 <!-- header -->
 <div th:insert="~{header :: header}"></div>
 
 <div class="page-wrapper">
     <div class="container">
-
         <h2 class="page-title">게시글 작성</h2>
         <hr class="title-line">
 
         <!-- 게시글 작성 폼 -->
-        <form class="write-form" enctype="multipart/form-data">
+        <form id="postForm" class="write-form" enctype="multipart/form-data" method="post">
 
-            <select class="board-select" required>
+            <select name="category" id="category" class="board-select" required>
                 <option value="" disabled selected>게시판을 선택해 주세요.</option>
                 <option value="공모전">공모전</option>
                 <option value="프로젝트">프로젝트</option>
-                <option value="자유/수다">자유/수다</option>
+                <option value="자유_수다">자유/수다</option>
                 <option value="취업꿀팁">취업꿀팁</option>
             </select>
 
-            <input type="text" class="title-input" placeholder="제목을 입력해주세요." required>
+            <input type="text" name="title" id="title" class="title-input" placeholder="제목을 입력해주세요." required>
 
-            <textarea class="content-input" placeholder="내용을 입력해주세요." required></textarea>
+            <textarea name="content" id="content" class="content-input" placeholder="내용을 입력해주세요." required></textarea>
 
             <div class="bottom-area">
-
                 <div class="file-area">
                     <label>첨부 파일</label>
-                    <input type="file" id="fileInput">
+                    <input type="file" id="fileInput" name="file">
                     <span id="fileName">선택된 파일 없음</span>
                 </div>
 
                 <button type="submit" class="submit-btn">등록</button>
-
             </div>
 
         </form>
-
     </div>
 </div>
 
-<script>
-    // 파일명 표시
-    document.getElementById("fileInput").addEventListener("change", function () {
-        const fileName = this.files.length > 0 ? this.files[0].name : "선택된 파일 없음";
-        document.getElementById("fileName").textContent = fileName;
-    });
-</script>
+<!-- JS 분리 -->
+<script src="/js/boardwrite.js"></script>
 
 </body>
 </html>
