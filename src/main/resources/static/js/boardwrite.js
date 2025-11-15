@@ -22,7 +22,6 @@ postForm.addEventListener("submit", function (e) {
     e.preventDefault();
 
     const formData = new FormData(postForm);
-    formData.append("writer", "임시작성자"); // 실제 로그인 연동 시 제거
 
     fetch("/api/posts", {
         method: "POST",
