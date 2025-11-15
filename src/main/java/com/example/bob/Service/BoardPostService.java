@@ -186,6 +186,13 @@ public class BoardPostService {
         return count;
     }
 
+    // 📌 내가 쓴 게시글 목록 조회 서비스
+    public List<BoardPost> getMyPosts(String userNick) {
+        return boardPostRepository.findByWriterOrderByCreatedAtDesc(userNick);
+    }
+
+
+
 
 
 }

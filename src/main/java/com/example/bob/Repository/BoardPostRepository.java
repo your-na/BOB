@@ -9,5 +9,10 @@ import java.util.List;
 
 @Repository
 public interface BoardPostRepository extends JpaRepository<BoardPost, Long> {
+
     List<BoardPost> findAllByOrderByCreatedAtDesc(); //게시판 목록용
+
+    List<BoardPost> findByWriterOrderByCreatedAtDesc(String writer);  // ✅ 내가 쓴 게시글 목록 조회
+
+
 }

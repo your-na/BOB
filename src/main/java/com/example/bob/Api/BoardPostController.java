@@ -2,12 +2,18 @@ package com.example.bob.Api;
 
 import com.example.bob.DTO.BoardPostRequestDto;
 import com.example.bob.Service.BoardPostService;
+import com.example.bob.Repository.UserRepository;
+import com.example.bob.Entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
+
 
 
 
@@ -18,6 +24,7 @@ import java.security.Principal;
 public class BoardPostController {
 
     private final BoardPostService boardPostService;
+    private final UserRepository userRepository;
 
     // 게시글 작성 API
     @PostMapping
@@ -87,6 +94,23 @@ public class BoardPostController {
 
         return ResponseEntity.ok(String.valueOf(likeCount));
     }
+
+    // ✨ 내가 쓴 게시글 조회 API
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyPosts(Principal principal) {
+
+        String loginId = principal.getName();
+
+        // loginId → userNick 변환
+        UserEntity user = userRepository.findByUserIdLogin(loginId)
+                .orElseThrow(() -> new RuntimeException("사용자 없음"));
+
+        String userNick = user.getUserNick();
+
+        return ResponseEntity.ok(boardPostService.getMyPosts(userNick));
+    }
+
+
 
 
 

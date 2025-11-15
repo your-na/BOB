@@ -53,17 +53,27 @@
 </div>
 
 <script>
-    // 예시 데이터
-    const myPosts = [
-        { board: "자유/수다", title: "게시글 제목", writer: "사용자1", date: "25/11/15 17:18" },
-        { board: "자유/수다", title: "게시글 제목", writer: "사용자1", date: "25/11/15 17:18" },
-        { board: "자유/수다", title: "게시글 제목", writer: "사용자1", date: "25/11/15 17:18" },
-        { board: "자유/수다", title: "게시글 제목", writer: "사용자1", date: "25/11/15 17:18" },
-        { board: "자유/수다", title: "게시글 제목", writer: "사용자1", date: "25/11/15 17:18" },
-    ];
-
     const tbody = document.getElementById("myPostList");
 
+    // 📌 내가 쓴 게시글 불러오기
+    async function loadMyPosts() {
+        try {
+            const response = await fetch("/api/posts/my");
+
+            if (!response.ok) {
+                alert("로그인이 필요합니다!");
+                return;
+            }
+
+            const posts = await response.json();
+            renderMyPosts(posts);
+
+        } catch (error) {
+            console.error("내 게시글 불러오기 실패:", error);
+        }
+    }
+
+    // 📌 HTML 렌더링
     function renderMyPosts(posts) {
         tbody.innerHTML = "";
 
@@ -71,26 +81,30 @@
             const tr = document.createElement("tr");
 
             tr.innerHTML = `
-            <td>${post.board}</td>
-            <td>${post.title}</td>
-            <td>${post.writer}</td>
-            <td>${post.date}</td>
-            <td><input type="checkbox" class="row-check"></td>
-        `;
+                <td>${post.category}</td>
+                <td>${post.title}</td>
+                <td>${post.writer}</td>
+                <td>${post.createdAt}</td>
+                <td><input type="checkbox" class="row-check"></td>
+            `;
 
-            // 🔥 행 클릭 시 상세보기 이동 (단, 체크박스 클릭은 제외)
+            // ✔ 상세보기 이동
             tr.addEventListener("click", (e) => {
-                if (e.target.type === "checkbox") return;  // 체크박스 클릭이면 무시
-                location.href = "/boarddetail";
+                if (e.target.type === "checkbox") return;
+                location.href = "/boarddetail?id=" + post.id;
             });
 
             tbody.appendChild(tr);
         });
     }
 
-    renderMyPosts(myPosts);
+    // 📌 페이지 로드시 실행
+    loadMyPosts();
 
-    // ✔ 전체 선택 (위/아래 둘 다 동기화)
+
+    // ===========================
+    // ✔ 체크박스 전체 선택
+    // ===========================
     const checkAll = document.getElementById("checkAll");
     const checkAllBottom = document.getElementById("checkAllBottom");
 
@@ -103,12 +117,12 @@
     checkAll.addEventListener("change", e => syncCheckAll(e.target.checked));
     checkAllBottom.addEventListener("change", e => syncCheckAll(e.target.checked));
 
-    // ✔ 삭제 버튼 (예시)
+    // ▶ 삭제는 나중에 구현
     document.querySelector(".delete-btn").addEventListener("click", () => {
         alert("삭제 기능은 백엔드 연동 후 구현됩니다!");
     });
-
 </script>
+
 
 </body>
 </html>
