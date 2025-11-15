@@ -54,7 +54,7 @@ public class SecurityConfig {
                                 "/api/user/resumes/submit", "/contest/team/invite/respond","/api/applications/job/pass", "/api/notifications/delete/**", "/contest/team/application/**",
                                 "/api/cojobs/**", "/vendor/**","/api/applications/job/pass-myresume",
                                 "/api/applications/job/reject-myresume",
-                                "/api/comments", "/api/comments/**")
+                                "/api/comments", "/api/comments/**","/api/posts/**")
                 )
                 .headers(headers -> headers
                         .frameOptions(frameOptions -> frameOptions.sameOrigin()) // ✅ iframe 허용 설정
