@@ -76,6 +76,12 @@ function loadComments() {
             const box = document.querySelector(".comment-box");
             box.innerHTML = ""; // 초기화
 
+            // ✅ 댓글 개수 반영
+            document.querySelector(".post-status .comment").innerHTML = `
+        <img src="/images/comment.png">
+        ${comments.length}
+    `;
+
             comments.forEach(comment => {
                 const div = document.createElement("div");
                 div.className = "comment-item";
