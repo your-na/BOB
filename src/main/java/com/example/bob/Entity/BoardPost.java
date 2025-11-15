@@ -35,6 +35,9 @@ public class BoardPost {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime createdAt; // 작성일시
 
+    private int likeCount = 0;  // ❤️ 좋아요 개수 저장
+
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now(); // 저장 전 자동 설정

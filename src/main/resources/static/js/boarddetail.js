@@ -16,9 +16,33 @@ function getCsrfTokenFromCookie() {
 const postId = new URLSearchParams(window.location.search).get("id");
 
 // 좋아요 하트 토글
-document.querySelector('.post-status .like img').addEventListener('click', function () {
-    this.src = this.src.includes('heart2.png') ? '/images/pinkheart.png' : '/images/heart2.png';
+document.querySelector(".like-icon").addEventListener("click", function () {
+
+    fetch(`/api/posts/${postId}/like`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "X-XSRF-TOKEN": getCsrfTokenFromCookie()
+        }
+    })
+        .then(res => {
+            if (!res.ok) throw new Error("좋아요 처리 실패");
+            return res.text();
+        })
+        .then(likeCount => {
+
+            // ❤️ 하트 토글
+            const icon = document.querySelector(".like-icon");
+            icon.src = icon.src.includes("heart2.png")
+                ? "/images/pinkheart.png"
+                : "/images/heart2.png";
+
+            // ❤️ 좋아요 수 갱신
+            document.querySelector(".like-count").textContent = likeCount;
+        })
+        .catch(err => alert(err.message));
 });
+
 
 // 메뉴 토글
 const menuIcon = document.querySelector(".menu-icon");
@@ -41,6 +65,14 @@ fetch(`/api/posts/${postId}`)
         window.postWriter = post.writer; // ✅ 전역으로 저장해서 댓글 비교에 사용
         document.querySelector(".post-date").textContent = post.createdAt;
         document.querySelector(".post-content").textContent = post.content;
+
+        // ❤️ 좋아요 초기 세팅
+        document.querySelector(".like-count").textContent = post.likeCount;
+
+        const likeIcon = document.querySelector(".like-icon");
+        likeIcon.src = post.likedByMe
+            ? "/images/pinkheart.png"
+            : "/images/heart2.png";
 
         // 첨부파일 처리
         if (post.filePath) {

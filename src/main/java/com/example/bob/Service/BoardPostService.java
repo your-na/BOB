@@ -10,6 +10,9 @@ import com.example.bob.Entity.UserEntity;
 import com.example.bob.Repository.UserRepository;
 import com.example.bob.DTO.BoardPostDetailDto;
 import java.time.format.DateTimeFormatter;
+import com.example.bob.Entity.BoardPostLike;
+import com.example.bob.Repository.BoardPostLikeRepository;
+
 
 
 
@@ -37,6 +40,7 @@ public class BoardPostService {
 
     private final BoardPostRepository boardPostRepository;
     private final UserRepository userRepository;
+    private final BoardPostLikeRepository boardPostLikeRepository;
 
 
     // 게시글 저장 메서드
@@ -124,9 +128,14 @@ public class BoardPostService {
     }
 
     // 게시글 상세보기 조회
-    public BoardPostDetailDto getPostById(Long id) {
+    public BoardPostDetailDto getPostById(Long id, String username) {
+
         BoardPost post = boardPostRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
+        // ❤️ 내가 좋아요 눌렀는지
+        boolean likedByMe = boardPostLikeRepository
+                .existsByBoardPostIdAndUsername(id, username);
 
         return new BoardPostDetailDto(
                 post.getId(),
@@ -135,8 +144,46 @@ public class BoardPostService {
                 post.getContent(),
                 post.getWriter(),
                 post.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
-                post.getFilePath()
+                post.getFilePath(),
+                post.getLikeCount(),
+                likedByMe
         );
+    }
+
+
+    // ===== 좋아요 토글 메서드 =====
+    public int toggleLike(Long postId, String username) {
+
+        // 게시글 조회
+        BoardPost post = boardPostRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
+        // 이미 좋아요 눌렀는지 여부 확인
+        boolean alreadyLiked = boardPostLikeRepository
+                .existsByBoardPostIdAndUsername(postId, username);
+
+        if (alreadyLiked) {
+            // ❤️ 좋아요 취소
+            boardPostLikeRepository.deleteByBoardPostIdAndUsername(postId, username);
+        } else {
+            // ❤️ 좋아요 추가
+            BoardPostLike like = BoardPostLike.builder()
+                    .boardPost(post)
+                    .username(username)
+                    .build();
+
+            boardPostLikeRepository.save(like);
+        }
+
+        // 최신 좋아요 개수 다시 계산
+        int count = (int) boardPostLikeRepository.countByBoardPostId(postId);
+
+        // 게시글 엔티티에 좋아요 개수 반영
+        post.setLikeCount(count);
+        boardPostRepository.save(post);
+
+        // 프론트에 리턴될 최종 좋아요 수
+        return count;
     }
 
 
