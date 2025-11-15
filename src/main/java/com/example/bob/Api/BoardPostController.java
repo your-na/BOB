@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartException;
 
+
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/posts")
@@ -41,5 +43,18 @@ public class BoardPostController {
                     .body("게시글 목록 조회 중 오류 발생");
         }
     }
+
+    // 게시글 상세보기  API
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPostById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(boardPostService.getPostById(id));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("해당 게시글을 찾을 수 없습니다.");
+        }
+    }
+
 
 }

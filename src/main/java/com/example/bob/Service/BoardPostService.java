@@ -8,6 +8,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.bob.DTO.BoardPostListDto;
 import com.example.bob.Entity.UserEntity;
 import com.example.bob.Repository.UserRepository;
+import com.example.bob.DTO.BoardPostDetailDto;
+import java.time.format.DateTimeFormatter;
+
 
 
 import java.time.format.DateTimeFormatter;
@@ -115,6 +118,23 @@ public class BoardPostService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    // 게시글 상세보기 조회
+    public BoardPostDetailDto getPostById(Long id) {
+        BoardPost post = boardPostRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
+        return new BoardPostDetailDto(
+                post.getId(),
+                post.getCategory().name(),
+                post.getTitle(),
+                post.getContent(),
+                post.getWriter(),
+                post.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                post.getFilePath()
+        );
+    }
+
 
 
 }

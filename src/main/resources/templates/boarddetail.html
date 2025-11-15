@@ -14,111 +14,96 @@
   <div class="container">
 
     <div class="title-row">
-      <h2 class="post-title">[게시판 이름]게시글 제목</h2>
+      <h2 class="post-title"></h2>
 
       <div class="icon-box">
-
         <div class="menu-wrapper">
           <img src="/images/notice.png" class="report-icon">
           <img src="/images/menu.png" class="menu-icon">
-
-          <!-- 🔽 메뉴 박스 -->
-          <div class="menu-popup">
-            삭제하기
-          </div>
+          <div class="menu-popup">삭제하기</div>
         </div>
-
       </div>
     </div>
 
     <hr class="title-line">
 
-    <!-- 작성자 + 날짜 -->
     <div class="info-row">
-      <span class="writer">사용자1</span>
-      <span class="post-date">2025.01.03 오후 11:05</span>
+      <span class="writer"></span>
+      <span class="post-date"></span>
     </div>
 
-    <!-- 게시글 본문 -->
-    <div class="post-content">
-      게시글 내용
-    </div>
+    <div class="post-content"></div>
 
-    <!-- 좋아요/댓글 카운트 -->
+    <!-- 첨부파일 -->
+    <div class="file-preview" style="margin-top: 20px;"></div>
+
     <div class="post-status">
-            <span class="like">
-                <img src="/images/heart2.png">
-                10
-            </span>
-
+      <span class="like">
+        <img src="/images/heart2.png">
+        10
+      </span>
       <span class="comment">
-                <img src="/images/comment.png">
-                1
-            </span>
+        <img src="/images/comment.png">
+        1
+      </span>
     </div>
 
-    <!-- 댓글 영역 -->
     <div class="comment-box">
-
-      <!-- 댓글 1개 예시 -->
-      <div class="comment-item">
-        <div class="comment-writer">사용자2</div>
-        <div class="comment-content">댓글 내용~~~~~~~~</div>
-        <div class="comment-date">2025.11.15 10:53</div>
-
-        <img src="/images/heart2.png" class="comment-like">
-      </div>
-
+      <!-- 댓글 예시는 생략 -->
     </div>
 
-    <!-- 댓글 입력 -->
     <div class="comment-write-box">
       <input type="text" class="comment-input" placeholder="댓글을 남겨보세요.">
       <button class="comment-submit">등록</button>
     </div>
-
   </div>
 </div>
 
 <script>
-  // 게시글 좋아요 하트 클릭 시 빨간 하트로 변경 (토글)
-  const postLikeHeart = document.querySelector('.post-status .like img');
-
-  postLikeHeart.addEventListener('click', () => {
-    if (postLikeHeart.src.includes('heart2.png')) {
-      postLikeHeart.src = '/images/pinkheart.png';   // 핑크 하트
-    } else {
-      postLikeHeart.src = '/images/heart2.png';      // 빈 하트
-    }
+  // 좋아요 하트 토글
+  document.querySelector('.post-status .like img').addEventListener('click', function () {
+    this.src = this.src.includes('heart2.png') ? '/images/pinkheart.png' : '/images/heart2.png';
   });
 
-  // 댓글 좋아요 하트 클릭 시 토글
-  const commentHearts = document.querySelectorAll('.comment-like');
-
-  commentHearts.forEach(heart => {
-    heart.addEventListener('click', () => {
-      if (heart.src.includes('heart2.png')) {
-        heart.src = '/images/pinkheart.png';
-      } else {
-        heart.src = '/images/heart2.png';
-      }
-    });
-  });
-
+  // 메뉴 토글
   const menuIcon = document.querySelector(".menu-icon");
   const menuPopup = document.querySelector(".menu-popup");
-
-  menuIcon.addEventListener("click", (e) => {
-    e.stopPropagation();  // 다른 곳 클릭과 구분
-    menuPopup.style.display =
-            menuPopup.style.display === "block" ? "none" : "block";
+  menuIcon.addEventListener("click", e => {
+    e.stopPropagation();
+    menuPopup.style.display = (menuPopup.style.display === "block") ? "none" : "block";
   });
+  document.addEventListener("click", () => menuPopup.style.display = "none");
 
-  // 다른 곳 클릭 시 메뉴 닫기
-  document.addEventListener("click", () => {
-    menuPopup.style.display = "none";
-  });
+  // ✅ 게시글 데이터 불러오기
+  const postId = new URLSearchParams(window.location.search).get("id");
+
+  fetch(`/api/posts/${postId}`)
+          .then(res => {
+            if (!res.ok) throw new Error("게시글을 불러오지 못했습니다");
+            return res.json();
+          })
+          .then(post => {
+            document.querySelector(".post-title").textContent = `[${post.category}] ${post.title}`;
+            document.querySelector(".writer").textContent = post.writer;
+            document.querySelector(".post-date").textContent = post.createdAt;
+            document.querySelector(".post-content").textContent = post.content;
+
+            // ✅ 첨부파일 표시
+            if (post.filePath) {
+              const fileDiv = document.querySelector(".file-preview");
+              const fileName = post.filePath.split("/").pop();
+
+              if (post.filePath.match(/\.(jpg|jpeg|png|gif)$/i)) {
+                fileDiv.innerHTML = `<img src="${post.filePath}" alt="첨부 이미지" style="max-width:100%; margin-top:10px;">`;
+              } else {
+                fileDiv.innerHTML = `<a href="${post.filePath}" download style="margin-top:10px; display:inline-block;">📎 ${fileName}</a>`;
+              }
+            }
+          })
+          .catch(err => {
+            alert(err.message);
+            location.href = "/boardlist";
+          });
 </script>
-
 </body>
 </html>
