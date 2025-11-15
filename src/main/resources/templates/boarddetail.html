@@ -94,7 +94,14 @@
               const fileName = post.filePath.split("/").pop();
 
               if (post.filePath.match(/\.(jpg|jpeg|png|gif)$/i)) {
-                fileDiv.innerHTML = `<img src="${post.filePath}" alt="첨부 이미지" style="max-width:100%; margin-top:10px;">`;
+                fileDiv.innerHTML = `
+  <img
+    src="${post.filePath}"
+    alt="첨부 이미지"
+    style="max-width: 600px; max-height: 400px; width: 100%; height: auto; margin-top: 10px; border-radius: 8px;"
+  >
+`;
+
               } else {
                 fileDiv.innerHTML = `<a href="${post.filePath}" download style="margin-top:10px; display:inline-block;">📎 ${fileName}</a>`;
               }

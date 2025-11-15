@@ -45,7 +45,7 @@ public class BoardPostService {
         // ===============================
         // 1) 첨부파일 저장
         // ===============================
-        String filePath = null;
+        String fileWebPath = null; // ★ 웹에서 접근할 경로만 저장!
 
         MultipartFile file = dto.getFile();
         if (file != null && !file.isEmpty()) {
@@ -53,21 +53,24 @@ public class BoardPostService {
             String originalFileName = file.getOriginalFilename();
             String savedFileName = UUID.randomUUID() + "_" + originalFileName;
 
-            // 절대 경로
+            // 실제 저장 경로 (절대 경로)
             String uploadDir = System.getProperty("user.dir") + "/uploads/boardFiles/";
             File dir = new File(uploadDir);
             if (!dir.exists() && !dir.mkdirs()) {
                 throw new IOException("업로드 폴더 생성 실패: " + dir.getAbsolutePath());
             }
 
-            filePath = uploadDir + savedFileName;
-
+            // OS 절대 경로로 파일 저장
+            String fullPath = uploadDir + savedFileName;
             try {
-                file.transferTo(new File(filePath));
+                file.transferTo(new File(fullPath));
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new IOException("파일 저장 실패", e);
             }
+
+            // ★ 웹에서 접근 가능한 경로만 저장!
+            fileWebPath = "/uploads/boardFiles/" + savedFileName;
         }
 
 
@@ -98,11 +101,12 @@ public class BoardPostService {
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .writer(userNick)  // ★ 로그인한 사용자의 닉네임 저장
-                .filePath(filePath)
+                .filePath(fileWebPath) // ★ 웹 경로 저장!
                 .build();
 
         boardPostRepository.save(post);
     }
+
 
 
     //게시글 목록
