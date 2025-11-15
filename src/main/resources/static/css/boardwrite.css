@@ -1,0 +1,124 @@
+.page-wrapper {
+    margin: 0;
+    padding-top: 120px;
+    background: white;
+    min-height: 100vh;
+}
+
+/* 컨테이너 */
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* 페이지 제목 */
+.page-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.title-line {
+    border: 0;
+    border-top: 2px solid #e5e5e5;
+    margin-bottom: 20px;
+}
+
+/* 입력 폼 전체 */
+.write-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* 게시판 선택 */
+.board-select {
+    width: 100%;
+    padding: 14px;
+    font-size: 17px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    outline-color: #45aaff;
+}
+
+/* 제목 입력 */
+.title-input {
+    width: 100%;
+    padding: 14px;
+    font-size: 17px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    outline-color: #45aaff;
+}
+
+/* 내용 입력 */
+.content-input {
+    width: 100%;
+    height: 350px;
+    padding: 14px;
+    font-size: 17px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    outline-color: #45aaff;
+    resize: none;
+}
+
+/* 파일 첨부 영역 */
+.file-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.file-area label {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+
+/* 등록 버튼 */
+.submit-btn {
+    align-self: flex-end;
+    padding: 10px 30px;
+    background: #19CB13;
+    border: none;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+}
+
+.submit-btn:hover {
+    background: #7ae695;
+}
+
+input[type="file"] {
+    color: transparent;
+    width: 130px;
+}
+
+input[type="file"]::file-selector-button {
+    color: black;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background: white;
+    cursor: pointer;
+}
+
+/* 파일명 텍스트 */
+#fileName {
+    font-size: 15px;
+    color: #555;
+    white-space: nowrap;
+}
+
+/* 첨부파일 + 등록 버튼 같은 라인 */
+.bottom-area {
+    display: flex;
+    justify-content: space-between;   /* 양쪽 정렬 */
+    align-items: center;              /* 수평 정렬 */
+    margin-top: 10px;
+}

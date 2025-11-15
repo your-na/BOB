@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>내가 쓴 게시글</title>
+    <link rel="stylesheet" href="/css/boardmy.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+
+<!-- header -->
+<div th:insert="~{header :: header}"></div>
+
+<div class="page-wrapper">
+    <div class="container">
+
+        <div class="header-line">
+            <h2 class="page-title">내가 쓴 게시글</h2>
+
+            <div class="search-box">
+                <input type="text" placeholder="검색어를 입력해주세요">
+                <button class="search-btn">
+                    <img src="/images/search.png" alt="검색">
+                </button>
+            </div>
+        </div>
+
+        <!-- 게시글 목록 -->
+        <table class="board-table">
+            <thead>
+            <tr>
+                <th>게시판</th>
+                <th>제목</th>
+                <th>작성자</th>
+                <th>작성일</th>
+                <th><input type="checkbox" id="checkAll"></th>
+            </tr>
+            </thead>
+            <tbody id="myPostList"></tbody>
+        </table>
+
+        <!-- 아래 선택 옵션 -->
+        <div class="bottom-area">
+            <label>
+                <input type="checkbox" id="checkAllBottom">
+                전체선택
+            </label>
+
+            <button class="delete-btn">삭제</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // 예시 데이터
+    const myPosts = [
+        { board: "자유/수다", title: "게시글 제목", writer: "사용자1", date: "25/11/15 17:18" },
+        { board: "자유/수다", title: "게시글 제목", writer: "사용자1", date: "25/11/15 17:18" },
+        { board: "자유/수다", title: "게시글 제목", writer: "사용자1", date: "25/11/15 17:18" },
+        { board: "자유/수다", title: "게시글 제목", writer: "사용자1", date: "25/11/15 17:18" },
+        { board: "자유/수다", title: "게시글 제목", writer: "사용자1", date: "25/11/15 17:18" },
+    ];
+
+    const tbody = document.getElementById("myPostList");
+
+    function renderMyPosts(posts) {
+        tbody.innerHTML = "";
+
+        posts.forEach(post => {
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+            <td>${post.board}</td>
+            <td>${post.title}</td>
+            <td>${post.writer}</td>
+            <td>${post.date}</td>
+            <td><input type="checkbox" class="row-check"></td>
+        `;
+
+            // 🔥 행 클릭 시 상세보기 이동 (단, 체크박스 클릭은 제외)
+            tr.addEventListener("click", (e) => {
+                if (e.target.type === "checkbox") return;  // 체크박스 클릭이면 무시
+                location.href = "/boarddetail";
+            });
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    renderMyPosts(myPosts);
+
+    // ✔ 전체 선택 (위/아래 둘 다 동기화)
+    const checkAll = document.getElementById("checkAll");
+    const checkAllBottom = document.getElementById("checkAllBottom");
+
+    function syncCheckAll(checked) {
+        document.querySelectorAll(".row-check").forEach(ch => ch.checked = checked);
+        checkAll.checked = checked;
+        checkAllBottom.checked = checked;
+    }
+
+    checkAll.addEventListener("change", e => syncCheckAll(e.target.checked));
+    checkAllBottom.addEventListener("change", e => syncCheckAll(e.target.checked));
+
+    // ✔ 삭제 버튼 (예시)
+    document.querySelector(".delete-btn").addEventListener("click", () => {
+        alert("삭제 기능은 백엔드 연동 후 구현됩니다!");
+    });
+
+</script>
+
+</body>
+</html>

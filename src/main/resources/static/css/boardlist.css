@@ -1,0 +1,141 @@
+.page-wrapper {
+    margin: 0;
+    padding-top: 120px;   /* 헤더 높이에 맞춰 여백 */
+    background: white;
+    min-height: 100vh;
+}
+
+/* 컨테이너 */
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* 페이지 제목 */
+.page-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+/* h2 라인 */
+.header-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+/* 카테고리 + 검색/작성 버튼 한 줄 */
+.category-and-search {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px; /* 테이블과 간격 */
+}
+
+/* 카테고리 버튼 */
+.category-filter {
+    display: flex;
+    gap: 15px;
+}
+
+/* 카테고리 버튼 */
+.category-filter button {
+    padding: 9px 22px;
+    border-radius: 22px;
+    border: none;
+    background: #f1f1f1;
+    cursor: pointer;
+    font-size: 17px;     /* ✔ 사이즈 업 */
+    font-weight: 500;    /* ✔ Bold 적용 */
+}
+
+.category-filter button.active,
+.category-filter button:hover {
+    background: #00c73c;
+    color: white;
+}
+
+/* 오른쪽 컨트롤 (검색창 + 작성하기) */
+.right-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* 검색창 */
+.search-box {
+    display: flex;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.search-box input {
+    padding: 8px 12px;
+    border: none;
+    outline: none;
+    width: 220px;
+}
+
+.search-box button {
+    border: none;
+    background: white;
+    cursor: pointer;
+    padding: 8px 12px;
+}
+
+/* 작성하기 버튼 */
+.write-btn {
+    background: #00c73c;
+    color: white;
+    padding: 9px 22px;      /* ✔ 카테고리와 동일 */
+    border: none;
+    border-radius: 22px;    /* ✔ 동일 */
+    cursor: pointer;
+    font-size: 17px;        /* ✔ 동일 */
+    font-weight: 500;       /* ✔ 동일 */
+}
+
+/* 게시글 테이블 */
+.board-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 17px;
+    margin-top: 40px;
+}
+
+.board-table th {
+    background: #f6f6f6;
+    font-weight: 600;
+    padding: 12px;
+}
+
+.board-table td {
+    text-align: center;
+    padding: 14px 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.board-table tr:hover {
+    background: #f9f9f9;
+    cursor: pointer;
+}
+
+.search-btn img {
+    width: 18px;   /* 원하는 크기로 조절 */
+    height: 18px;
+}
+
+.search-btn {
+    border: none;
+    background: white;
+    cursor: pointer;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

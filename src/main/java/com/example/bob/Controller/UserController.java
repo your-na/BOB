@@ -262,4 +262,17 @@ public class UserController {
     @GetMapping("/jjimnotice")
     public String jjimnoticeform() {return "jjimnotice";}
 
+    @GetMapping("/boardlist")
+    public String boardlistform() {return "boardlist";}
+
+    @GetMapping("/boardwrite")
+    public String boardwriteform() {return "boardwrite";}
+
+    @GetMapping("/boarddetail")
+    public String boarddetailform() {return "boarddetail";}
+
+    @GetMapping("/boardmy")
+    public String boardmyform() {return "boardmy";}
+
+
 }

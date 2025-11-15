@@ -1,0 +1,184 @@
+.page-wrapper {
+    padding-top: 120px;
+    background: white;
+    min-height: 100vh;
+}
+
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* 제목 */
+.title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.post-title {
+    font-size: 28px;   /* << 변경 */
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.report-icon {
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    margin-top: 13px;
+}
+
+.title-line {
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 10px 0 20px 0;
+}
+
+/* 작성자 + 날짜 */
+.info-row {
+    display: flex;
+    gap: 20px;
+    font-size: 16px;   /* << 변경 */
+    color: #777;
+    margin-bottom: 20px;
+}
+
+/* 게시글 내용 */
+.post-content {
+    width: 100%;
+    min-height: 280px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    font-size: 17px;   /* << 변경 */
+    margin-bottom: 15px;
+    box-sizing: border-box;   /* ← 추가 (패딩 포함 계산) */
+    margin-left: 0;           /* ← 혹시 모를 들여쓰기 제거 */
+    margin-right: 0;          /* ← 오른쪽 정렬 고정 */
+}
+
+/* 좋아요 & 댓글 */
+.post-status {
+    display: flex;
+    gap: 25px;
+    margin: 10px 0 30px 0;
+    color: #444;
+    font-size: 17px;     /* << 변경 */
+}
+
+.post-status img {
+    width: 18px;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+/* 댓글 전체 */
+.comment-box {
+    margin-bottom: 40px;
+}
+
+/* 댓글 한 개 */
+.comment-item {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.comment-writer {
+    font-size: 17px;   /* << 변경 */
+    font-weight: 600;
+    margin-bottom: 3px;
+}
+
+.comment-content {
+    font-size: 17px;   /* << 변경 */
+    margin-bottom: 5px;
+}
+
+.comment-date {
+    font-size: 16px;   /* << 변경 */
+    color: #888;
+}
+
+.comment-like {
+    width: 20px;
+    position: absolute;
+    right: 0;
+    top: 10px;
+    cursor: pointer;
+}
+
+/* 댓글 입력 */
+.comment-write-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.comment-input {
+    flex: 1;
+    padding: 12px;
+    font-size: 17px;   /* << 변경 */
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    outline: none;
+}
+
+.comment-submit {
+    background: #19CB13;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 17px;   /* << 변경 */
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.comment-submit:hover {
+    background: #7ae695;
+}
+
+.post-status img,
+.comment-like {
+    cursor: pointer;
+}
+
+.report-icon {
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    margin-top: 25px;
+}
+
+.menu-icon {
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    margin-left: 10px;  /* 신고 아이콘과 간격 */
+    margin-top: 25px;
+}
+
+.menu-wrapper {
+    position: relative;
+}
+
+.menu-popup {
+    position: absolute;
+    top: 50px;     /* 메뉴 아이콘 바로 아래에 뜨도록 */
+    right: -80px;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    display: none;     /* 처음에는 숨김 */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    white-space: nowrap;
+}
+
+.menu-popup:hover {
+    background: #f5f5f5;
+}
