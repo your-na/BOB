@@ -38,4 +38,16 @@ public class BoardCommentController {
             return ResponseEntity.badRequest().body("댓글 조회 실패: " + e.getMessage());
         }
     }
+
+    // 댓글 좋아요 토글
+    @PostMapping("/{commentId}/like")
+    public ResponseEntity<?> toggleCommentLike(@PathVariable Long commentId) {
+        try {
+            int likeCount = boardCommentService.toggleLike(commentId); // 서비스 호출
+            return ResponseEntity.ok(likeCount);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("좋아요 실패: " + e.getMessage());
+        }
+    }
+
 }

@@ -85,26 +85,46 @@ function loadComments() {
             comments.forEach(comment => {
                 const div = document.createElement("div");
                 div.className = "comment-item";
+
                 const isPostWriter = comment.writer === postWriter;
                 const writerLabel = isPostWriter ? "작성자" : comment.writer;
                 const writerStyle = isPostWriter ? 'color: green; font-weight: bold;' : '';
 
+                // ✅ 좋아요 상태(likedByCurrentUser)에 따라 하트 초기 이미지 설정
+                const heartSrc = comment.likedByCurrentUser
+                    ? "/images/pinkheart.png"
+                    : "/images/heart2.png";
+
                 div.innerHTML = `
-  <div class="comment-writer" style="${writerStyle}">${writerLabel}</div>
-  <div class="comment-content">${comment.content}</div>
-  <div class="comment-date">${comment.createdAt}</div>
-  <img src="/images/heart2.png" class="comment-like">
-`;
+        <div class="comment-writer" style="${writerStyle}">${writerLabel}</div>
+        <div class="comment-content">${comment.content}</div>
+        <div class="comment-date">${comment.createdAt}</div>
+        <img src="${heartSrc}" class="comment-like">
+    `;
 
-
-                // 하트 토글 (각 댓글에 대해)
                 const heart = div.querySelector(".comment-like");
+
+                // ✅ 좋아요 클릭 시 서버 요청 + UI 토글
                 heart.addEventListener("click", () => {
-                    heart.src = heart.src.includes("heart2.png") ? "/images/pinkheart.png" : "/images/heart2.png";
+                    fetch(`/api/comments/${comment.id}/like`, {
+                        method: "POST",
+                        credentials: "include"
+                    })
+                        .then(res => {
+                            if (!res.ok) throw new Error("좋아요 실패");
+                            return res.text();
+                        })
+                        .then(() => {
+                            heart.src = heart.src.includes("heart2.png")
+                                ? "/images/pinkheart.png"
+                                : "/images/heart2.png";
+                        })
+                        .catch(err => alert(err.message));
                 });
 
                 box.appendChild(div);
             });
+
         })
         .catch(err => alert(err.message));
 }
