@@ -38,6 +38,7 @@ fetch(`/api/posts/${postId}`)
     .then(post => {
         document.querySelector(".post-title").textContent = `[${post.category}] ${post.title}`;
         document.querySelector(".writer").textContent = post.writer;
+        window.postWriter = post.writer; // ✅ 전역으로 저장해서 댓글 비교에 사용
         document.querySelector(".post-date").textContent = post.createdAt;
         document.querySelector(".post-content").textContent = post.content;
 
@@ -78,12 +79,17 @@ function loadComments() {
             comments.forEach(comment => {
                 const div = document.createElement("div");
                 div.className = "comment-item";
+                const isPostWriter = comment.writer === postWriter;
+                const writerLabel = isPostWriter ? "작성자" : comment.writer;
+                const writerStyle = isPostWriter ? 'color: green; font-weight: bold;' : '';
+
                 div.innerHTML = `
-                    <div class="comment-writer">${comment.writer || "익명"}</div>
-                    <div class="comment-content">${comment.content}</div>
-                    <div class="comment-date">${comment.createdAt}</div>
-                    <img src="/images/heart2.png" class="comment-like">
-                `;
+  <div class="comment-writer" style="${writerStyle}">${writerLabel}</div>
+  <div class="comment-content">${comment.content}</div>
+  <div class="comment-date">${comment.createdAt}</div>
+  <img src="/images/heart2.png" class="comment-like">
+`;
+
 
                 // 하트 토글 (각 댓글에 대해)
                 const heart = div.querySelector(".comment-like");
