@@ -80,6 +80,9 @@
         posts.forEach(post => {
             const tr = document.createElement("tr");
 
+            // 🔥 게시글 ID를 data-id로 담기 (삭제용)
+            tr.setAttribute("data-id", post.id);
+
             tr.innerHTML = `
                 <td>${post.category}</td>
                 <td>${post.title}</td>
@@ -117,10 +120,47 @@
     checkAll.addEventListener("change", e => syncCheckAll(e.target.checked));
     checkAllBottom.addEventListener("change", e => syncCheckAll(e.target.checked));
 
-    // ▶ 삭제는 나중에 구현
-    document.querySelector(".delete-btn").addEventListener("click", () => {
-        alert("삭제 기능은 백엔드 연동 후 구현됩니다!");
+    // ▶ 삭제는
+    document.querySelector(".delete-btn").addEventListener("click", async () => {
+        const selected = document.querySelectorAll(".row-check:checked");
+        if (selected.length === 0) {
+            alert("삭제할 게시글을 선택해주세요!");
+            return;
+        }
+
+        if (!confirm("정말 삭제하시겠습니까?")) return;
+
+        const selectedIds = Array.from(selected).map(chk =>
+            chk.closest("tr").getAttribute("data-id")
+        );
+
+        try {
+            const response = await fetch("/api/posts/delete", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(selectedIds)
+            });
+
+            if (!response.ok) {
+                const errorMsg = await response.text();
+                alert("삭제 실패: " + errorMsg);
+                return;
+            }
+
+            alert("삭제 성공!");
+            loadMyPosts(); // 목록 갱신
+
+        } catch (err) {
+            console.error("삭제 요청 중 오류:", err);
+            alert("삭제 중 오류가 발생했습니다.");
+        }
     });
+
+
+
+
 </script>
 
 

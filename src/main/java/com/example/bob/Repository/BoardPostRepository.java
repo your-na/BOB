@@ -14,5 +14,8 @@ public interface BoardPostRepository extends JpaRepository<BoardPost, Long> {
 
     List<BoardPost> findByWriterOrderByCreatedAtDesc(String writer);  // ✅ 내가 쓴 게시글 목록 조회
 
+    List<BoardPost> findAllByIdInAndWriter(List<Long> ids, String writer);   // 게시글 삭제
+
+
 
 }

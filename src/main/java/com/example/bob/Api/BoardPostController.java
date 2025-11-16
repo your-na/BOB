@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
+import java.util.List;
+
 
 
 
@@ -109,6 +111,27 @@ public class BoardPostController {
 
         return ResponseEntity.ok(boardPostService.getMyPosts(userNick));
     }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deletePosts(
+            @RequestBody List<Long> ids,
+            Principal principal
+    ) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        try {
+            String loginId = principal.getName();
+            boardPostService.deleteMyPosts(ids, loginId);
+            return ResponseEntity.ok("삭제 성공!");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류 발생");
+        }
+    }
+
 
 
 

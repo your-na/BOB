@@ -12,4 +12,13 @@ public interface BoardCommentRepository extends JpaRepository<BoardComment, Long
 
     // 특정 게시글의 댓글 목록 조회 (최신순)
     List<BoardComment> findByBoardPostOrderByCreatedAtAsc(BoardPost post);
+
+    // ✅ 댓글 목록 조회 (삭제용)
+    List<BoardComment> findByBoardPostIdIn(List<Long> postIds);
+
+    // ✅ 댓글 삭제
+    void deleteByBoardPostIdIn(List<Long> postIds);
+
+
+
 }

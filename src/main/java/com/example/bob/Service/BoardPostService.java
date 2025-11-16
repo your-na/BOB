@@ -12,7 +12,9 @@ import com.example.bob.DTO.BoardPostDetailDto;
 import java.time.format.DateTimeFormatter;
 import com.example.bob.Entity.BoardPostLike;
 import com.example.bob.Repository.BoardPostLikeRepository;
-
+import com.example.bob.Entity.BoardComment;
+import com.example.bob.Repository.BoardCommentRepository;
+import com.example.bob.Repository.BoardCommentLikeRepository;
 
 
 
@@ -40,6 +42,9 @@ public class BoardPostService {
     private final BoardPostRepository boardPostRepository;
     private final UserRepository userRepository;
     private final BoardPostLikeRepository boardPostLikeRepository;
+    private final BoardCommentRepository boardCommentRepository;
+    private final BoardCommentLikeRepository boardCommentLikeRepository;
+
 
 
     // 게시글 저장 메서드
@@ -190,6 +195,36 @@ public class BoardPostService {
     public List<BoardPost> getMyPosts(String userNick) {
         return boardPostRepository.findByWriterOrderByCreatedAtDesc(userNick);
     }
+
+
+    // 삭제
+    @Transactional
+    public void deleteMyPosts(List<Long> ids, String loginId) {
+        // 1. 사용자 정보 조회
+        UserEntity user = userRepository.findByUserIdLogin(loginId)
+                .orElseThrow(() -> new RuntimeException("사용자 정보가 없습니다."));
+        String userNick = user.getUserNick();
+
+        // 2. 본인 게시글만 필터링
+        List<BoardPost> postsToDelete = boardPostRepository.findAllByIdInAndWriter(ids, userNick);
+        if (postsToDelete.size() != ids.size()) {
+            throw new RuntimeException("본인이 작성하지 않은 게시글이 포함되어 있습니다.");
+        }
+
+        // 3. 댓글 ID 수집
+        List<BoardComment> comments = boardCommentRepository.findByBoardPostIdIn(ids);
+        List<Long> commentIds = comments.stream()
+                .map(BoardComment::getId)
+                .toList();
+
+        // 4. 삭제 순서대로 진행 (댓글하트 → 댓글 → 게시글하트 → 게시글)
+        boardCommentLikeRepository.deleteByCommentIdIn(commentIds);    // 댓글 좋아요 삭제
+        boardCommentRepository.deleteByBoardPostIdIn(ids);             // 댓글 삭제
+        boardPostLikeRepository.deleteByBoardPostIdIn(ids);            // 게시글 좋아요 삭제
+        boardPostRepository.deleteAll(postsToDelete);                  // 게시글 삭제
+    }
+
+
 
 
 

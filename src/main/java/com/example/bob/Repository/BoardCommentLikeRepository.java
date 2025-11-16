@@ -6,6 +6,8 @@ import com.example.bob.Entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
+import java.util.List;
+
 
 public interface BoardCommentLikeRepository extends JpaRepository<BoardCommentLike, Long> {
 
@@ -14,4 +16,6 @@ public interface BoardCommentLikeRepository extends JpaRepository<BoardCommentLi
     Optional<BoardCommentLike> findByUserAndComment(UserEntity user, BoardComment comment);
 
     int countByComment(BoardComment comment);
+
+    void deleteByCommentIdIn(List<Long> commentIds);
 }

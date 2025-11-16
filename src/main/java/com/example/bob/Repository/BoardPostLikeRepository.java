@@ -3,6 +3,8 @@ package com.example.bob.Repository;
 import com.example.bob.Entity.BoardPostLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface BoardPostLikeRepository extends JpaRepository<BoardPostLike, Long> {
 
     // 특정 게시글에 특정 유저가 좋아요 눌렀는지 확인
@@ -13,4 +15,8 @@ public interface BoardPostLikeRepository extends JpaRepository<BoardPostLike, Lo
 
     // 특정 게시글 좋아요 개수
     long countByBoardPostId(Long postId);
+
+    // 게시글 삭제시 댓글 삭제
+    void deleteByBoardPostIdIn(List<Long> postIds);
+
 }
