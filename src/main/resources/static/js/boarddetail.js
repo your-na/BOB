@@ -204,6 +204,39 @@ document.querySelector(".comment-submit").addEventListener("click", () => {
 // 페이지 로드시 댓글 불러오기
 loadComments();
 
+// ✅ 게시글 삭제 기능
+document.querySelector(".menu-popup").addEventListener("click", async () => {
+    const postId = new URLSearchParams(window.location.search).get("id");
+
+    if (!confirm("정말 이 게시글을 삭제하시겠습니까?")) return;
+
+    try {
+        const response = await fetch("/api/posts/delete", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "X-XSRF-TOKEN": getCsrfTokenFromCookie()
+            },
+            credentials: "include",
+            body: JSON.stringify([postId])  // 리스트로 보냄!
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            alert("삭제 실패: " + errorText);
+            return;
+        }
+
+        alert("삭제가 완료되었습니다.");
+        location.href = "/boardmy";  // ← 원하는 페이지로 이동
+
+    } catch (err) {
+        console.error("삭제 중 오류:", err);
+        alert("오류가 발생했습니다.");
+    }
+});
+
+
 
 
 
